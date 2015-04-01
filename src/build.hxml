@@ -1,0 +1,30 @@
+
+-main App
+#-js ./app.js
+-python ../dist/python/app.py
+-debug
+
+--next
+
+-main App
+-js ../dist/node/app.js
+-D node
+-debug
+
+--next
+
+-main App
+-cpp ../dist/cpp/
+-debug
+
+--next
+
+-main App
+-neko ../dist/neko/App.n
+-debug
+
+--next
+
+-main App
+-java ../dist/java/
+-debug
