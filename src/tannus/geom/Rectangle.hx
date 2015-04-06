@@ -40,13 +40,20 @@ class Rectangle {
 	}
 
 	/**
-	  * Whether [point] is 'inside' [this] Rectangle
+	  * Whether [ox] and [oy] describe a point which is 'inside' [this] Rectangle
 	  */
 	public inline function contains(ox:Float, oy:Float):Bool {
 		return (
 			(ox > x && (ox < (x + w))) &&
 			(oy > y && (oy < (y + h)))
 		);
+	}
+
+	/**
+	  * Whether [point] is 'inside' [this] Rectangle
+	  */
+	public inline function containsPoint(point : Point):Bool {
+		return contains(point.x, point.y);
 	}
 
 
