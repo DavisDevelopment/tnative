@@ -55,6 +55,20 @@ class Rectangle {
 	public inline function containsPoint(point : Point):Bool {
 		return contains(point.x, point.y);
 	}
+	
+	/**
+	  * Whether [rect] is 'inside' [this] Rectangle
+	  */
+	public function containsRect(o : Rectangle):Bool {
+		//- For every corner of [o]
+		for (p in o.corners) {
+			//- Check whether [this] contains that corner
+			if (containsPoint(p)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 
 /* === Computed Instance Fields === */
