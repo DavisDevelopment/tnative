@@ -1,4 +1,4 @@
-package tnative.io;
+package tannus.io;
 
 import haxe.macro.Expr;
 
@@ -56,7 +56,7 @@ abstract Setter<T> (T -> T) from T -> T {
 	  * Create a Setter instance conveniently
 	  */
 	public static macro function create<T>(ref : ExprOf<T>):ExprOf<Setter<T>> {
-		return macro (new tnative.io.Setter(function(v) {
+		return macro (new tannus.io.Setter(function(v) {
 			$ref = v;
 
 			return $ref;

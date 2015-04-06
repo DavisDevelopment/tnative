@@ -1,10 +1,10 @@
-package tnative.io;
+package tannus.io;
 
 import haxe.macro.Expr;
-import tnative.io.Getter;
-import tnative.io.Setter;
+import tannus.io.Getter;
+import tannus.io.Setter;
 
-import tnative.ds.TwoTuple;
+import tannus.ds.TwoTuple;
 
 @:generic
 abstract Pointer<T> (TwoTuple<Getter<T>, Setter<T>>) {
@@ -93,6 +93,6 @@ abstract Pointer<T> (TwoTuple<Getter<T>, Setter<T>>) {
 	  * Create a Pointer conveniently
 	  */
 	public static macro function create<T>(ref : ExprOf<T>):ExprOf<Pointer<T>> {
-		return macro (new tnative.io.Pointer(tnative.io.Getter.create($ref), tnative.io.Setter.create($ref)));
+		return macro (new tannus.io.Pointer(tannus.io.Getter.create($ref), tannus.io.Setter.create($ref)));
 	}
 }

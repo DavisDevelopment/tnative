@@ -1,13 +1,13 @@
-package tnative.io;
+package tannus.io;
 
 /* "haxe" imports */
 import haxe.io.Bytes;
 import haxe.io.BytesData;
 
 /* "gen" imports */
-import tnative.io.Byte;
+import tannus.io.Byte;
 
-import tnative.math.Nums;
+import tannus.math.Nums;
 
 /* == Platform-Specific Imports == */
 
@@ -105,6 +105,31 @@ abstract ByteArray (Array<Byte>) {
 	}
 
 	/**
+	  * Check to see if the numerical sequence described by [sub]
+	  * is present anywhere in [this] ByteArray, and return the
+	  * index at which said sequence starts
+	  */
+	public function indexOf(sub : ByteArray):Int {
+		for (i in 0...(self.length - sub.length)) {
+			var hunk:ByteArray = self.slice(i, (i + sub.length));
+			trace( hunk );
+
+			if (hunk == sub) {
+				return i;
+			}
+		}
+
+		return -1;
+	}
+
+	/**
+	  * Check whether [this] contains [sub]
+	  */
+	public function contains(sub : ByteArray):Bool {
+		return (indexOf(sub) != -1);
+	}
+
+	/**
 	  * Write a hunk of data to [this] ByteArray in the form of a String
 	  */
 	public function writeString(s : String):Void {
@@ -114,6 +139,25 @@ abstract ByteArray (Array<Byte>) {
 	}
 
 /* == Operators == */
+
+	/* Equality Testing */
+	@:op(A == B)
+	public function equals_byteArray(other : ByteArray):Bool {
+		if (self.length != other.length) {
+			return false;
+		} 
+		else {
+			var i:Int = 0;
+			while (i < self.length) {
+				if (self[i] != other[i]) {
+					return false;
+				}
+
+				i++;
+			}
+			return true;
+		}
+	}
 
 /* == Type Casting == */
 
@@ -160,6 +204,17 @@ abstract ByteArray (Array<Byte>) {
 		throw 'Cannot create NODE Buffer outside of Node!';
 		#end
 	}
+
+	#if python
+	/* To Python bytearray */
+	@:to
+	public inline function toPythonByteArray():python.lib.ByteArray {
+		var ia:Array<Int> = toIntArray();
+		var ba:Dynamic = python.Syntax.pythonCode('bytearray(ia)');
+
+		return cast ba;
+	}
+	#end
 
 	/* From Array<Int> */
 	@:from

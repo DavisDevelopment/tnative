@@ -1,4 +1,4 @@
-package tnative.sys;
+package tannus.sys;
 
 typedef FileStat = {
 	/**

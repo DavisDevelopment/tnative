@@ -1,4 +1,4 @@
-package tnative.io;
+package tannus.io;
 
 import haxe.macro.Expr;
 
@@ -54,6 +54,6 @@ abstract Getter<T> (Void -> T) from Void->T {
 	  * Macro to allow creation of Getters in a convenient fashion
 	  */
 	public static macro function create<T>(ref : ExprOf<T>):ExprOf<Getter<T>> {
-		return macro (new tnative.io.Getter(function() return $ref));
+		return macro (new tannus.io.Getter(function() return $ref));
 	}
 }

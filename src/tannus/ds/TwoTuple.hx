@@ -1,4 +1,4 @@
-package tnative.ds;
+package tannus.ds;
 
 @:generic
 abstract TwoTuple<A, B> (T2<A, B>) {

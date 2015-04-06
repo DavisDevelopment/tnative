@@ -1,4 +1,4 @@
-package tnative.sys.node;
+package tannus.sys.node;
 
 @:jsRequire('fs', 'Stats')
 extern class NodeFStat {

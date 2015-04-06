@@ -1,4 +1,4 @@
-package tnative.math;
+package tannus.math;
 
 import Math;
 

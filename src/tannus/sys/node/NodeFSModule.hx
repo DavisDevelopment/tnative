@@ -1,6 +1,6 @@
-package tnative.sys.node;
+package tannus.sys.node;
 
-import tnative.sys.node.NodeFStat;
+import tannus.sys.node.NodeFStat;
 
 @:jsRequire('fs')
 extern class NodeFSModule {

@@ -1,7 +1,7 @@
-package tnative.sys;
+package tannus.sys;
 
-import tnative.io.ByteArray;
-import tnative.sys.FileStat;
+import tannus.io.ByteArray;
+import tannus.sys.FileStat;
 
 #if !js
 
@@ -133,5 +133,5 @@ class FileSystem {
 	#end
 #else
 	
-		typedef FileSystem = tnative.sys.node.NodeFileSystem;
+		typedef FileSystem = tannus.sys.node.NodeFileSystem;
 #end

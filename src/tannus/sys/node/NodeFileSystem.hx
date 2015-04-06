@@ -1,7 +1,7 @@
-package tnative.sys.node;
+package tannus.sys.node;
 
-import tnative.io.ByteArray;
-import tnative.sys.FileStat;
+import tannus.io.ByteArray;
+import tannus.sys.FileStat;
 
 class NodeFileSystem {
 	public static inline function exists(path : String):Bool {
@@ -91,4 +91,4 @@ class NodeFileSystem {
 	}
 }
 
-private typedef NFS = tnative.sys.node.NodeFSModule;
+private typedef NFS = tannus.sys.node.NodeFSModule;

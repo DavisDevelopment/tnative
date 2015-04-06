@@ -1,10 +1,10 @@
-package tnative;
+package tannus;
 
-import tnative.sys.Path;
-import tnative.io.Ptr;
-import tnative.io.ByteArray;
+import tannus.sys.Path;
+import tannus.io.Ptr;
+import tannus.io.ByteArray;
 
-import tnative.internal.NSys;
+import tannus.internal.NSys;
 
 /**
   * Wrapper around Haxe's Sys class, and implementations of those methods which are possible in Node
@@ -50,9 +50,9 @@ class TSys {
 	public static inline function setCwd(ncwd : String):Void {
 		var _n:String = ncwd;
 		#if node
-			untyped __js__('process.chdir(
+			untyped __js__('process.chdir(_n)');
 		#else
-
+			NSys.setCwd(_n);
 		#end
 	}
 
