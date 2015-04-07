@@ -1,4 +1,4 @@
-
 *.swp
+src/*.swp
 dist/*
 
