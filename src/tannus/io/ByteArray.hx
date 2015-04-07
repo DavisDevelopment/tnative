@@ -138,6 +138,14 @@ abstract ByteArray (Array<Byte>) {
 		}
 	}
 
+	/**
+	  * Write a hunk of data to [this] ByteArray in the form of a ByteArray
+	  */
+	@:op(A += B)
+	public inline function write(ba : ByteArray):Void {
+		this = (this.concat(ba));
+	}
+
 /* == Operators == */
 
 	/* Equality Testing */
@@ -157,6 +165,14 @@ abstract ByteArray (Array<Byte>) {
 			}
 			return true;
 		}
+	}
+
+	/**
+	  * The result of [this] ByteArray added to another
+	  */
+	@:op(A + B)
+	public inline function plus(other : ByteArray):ByteArray {
+		return (this.concat(other));
 	}
 
 /* == Type Casting == */
