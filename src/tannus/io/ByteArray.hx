@@ -239,6 +239,34 @@ abstract ByteArray (Array<Byte>) {
 	}
 	#end
 
+	#if flash
+	/* To Flash ByteArray */
+	@:to
+	public inline function toFlashByteArray():flash.utils.ByteArray {
+		var b = new flash.utils.ByteArray();
+
+		for (n in this) {
+			b.writeByte(n.asint);
+		}
+
+		return b;
+	}
+
+	/* From Flash ByteArray */
+	@:from
+	public static inline function fromFlashByteArray(b : flash.utils.ByteArray):ByteArray {
+		var ba:ByteArray = new ByteArray();
+
+		b.position = 0;
+		for (i in 0...b.length) {
+			b.position = i;
+			ba.push(b.readByte());
+		}
+
+		return ba;
+	}
+	#end
+
 	/* From Array<Int> */
 	@:from
 	public static inline function fromIntArray(ia : Array<Int>):ByteArray {
