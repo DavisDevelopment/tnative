@@ -4,6 +4,7 @@ package tannus.sys;
 import tannus.sys.FileSystem;
 import tannus.sys.FileStat;
 import tannus.sys.Path;
+import tannus.sys.internal.FileContent;
 
 /* == Tannus IO Imports == */
 import tannus.io.Byte;
@@ -99,6 +100,27 @@ class CFile {
 	private function get_size():Int {
 		var stats = FileSystem.stat(path);
 		return stats.size;
+	}
+
+	/**
+	  * The 'data' of [this] File
+	  */
+	public var data(get, set):ByteArray;
+	private function get_data():ByteArray {
+		return read();
+	}
+	private function set_data(nd : ByteArray):ByteArray {
+		write( nd );
+		return read();
+	}
+
+	/**
+	  * The 'content' of [this] File
+	  */
+	public var content(get, never):FileContent;
+	private function get_content():FileContent {
+		var f:File = (cast this);
+		return new FileContent(Ptr.create(f));
 	}
 
 /* === Instance Fields === */
