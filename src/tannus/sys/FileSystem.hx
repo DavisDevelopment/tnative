@@ -3,7 +3,19 @@ package tannus.sys;
 import tannus.io.ByteArray;
 import tannus.sys.FileStat;
 
-#if !js
+#if flash
+
+typedef FileSystem = tannus.sys.FlashFileSystem;
+
+#elseif node
+
+typedef FileSystem = tannus.sys.node.NodeFileSystem;
+
+#elseif js
+
+typedef FileSystem = tannus.sys.JavaScriptFileSystem;
+
+#else
 
 private typedef FS = sys.FileSystem;
 
@@ -150,7 +162,4 @@ class FileSystem {
 	#if !python
 		private typedef F = sys.io.File;
 	#end
-#else
-	
-		typedef FileSystem = tannus.sys.node.NodeFileSystem;
 #end
