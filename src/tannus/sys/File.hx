@@ -67,6 +67,15 @@ class CFile {
 		return FileSystem.exists(path);
 	}
 
+	/**
+	  * The 'size' of [this] File
+	  */
+	public var size(get, never):Int;
+	private function get_size():Int {
+		var stats = FileSystem.stat(path);
+		return stats.size;
+	}
+
 /* === Instance Fields === */
 
 	//- The path to [this] File
