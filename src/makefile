@@ -22,3 +22,6 @@ test: build
 	#
 	# == Testing Java == #
 	cd ../dist/java && java -jar ./App-Debug.jar cheeks
+	#
+	# == Testing PHP == #
+	cd ../dist/php && php -f ./index.php

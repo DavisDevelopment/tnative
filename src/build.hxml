@@ -3,6 +3,7 @@
 #-js ./app.js
 -python ../dist/python/app.py
 -debug
+-lib hscript
 
 --next
 
@@ -10,21 +11,32 @@
 -js ../dist/node/app.js
 -D node
 -debug
+-lib hscript
 
 --next
 
 -main App
 -cpp ../dist/cpp/
 -debug
+-lib hscript
 
 --next
 
 -main App
 -neko ../dist/neko/App.n
 -debug
+-lib hscript
 
 --next
 
 -main App
 -java ../dist/java/
 -debug
+-lib hscript
+
+--next
+
+-main App
+-php ../dist/php/
+-debug
+-lib hscript
