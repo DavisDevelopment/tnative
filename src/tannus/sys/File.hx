@@ -21,6 +21,31 @@ abstract File (CFile) {
 
 /* === Instance Methods === */
 
+/* === Class Methods === */
+
+	/**
+	  * Create a File object from a String
+	  */
+	@:from
+	public static inline function fromString(p : String):File {
+		return new File(p);
+	}
+
+	/**
+	  * Create a File object from a Path
+	  */
+	@:from
+	public static inline function fromPath(p : Path):File {
+		return new File(p);
+	}
+
+	/**
+	  * Create a File object from a ByteArray
+	  */
+	@:from
+	public static inline function fromByteArray(p : ByteArray):File {
+		return fromString( p );
+	}
 }
 
 class CFile {
