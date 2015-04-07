@@ -101,6 +101,25 @@ class FileSystem {
 	}
 
 	/**
+	  * Appends [data] to a file
+	  */
+	public static function append(path:String, data:ByteArray):Void {
+		#if python
+			var p:String = path;
+			var f:Dynamic = python.Syntax.pythonCode('open(p, "ab")');
+			var _data:Dynamic = python.Syntax.pythonCode('bytearray()');
+			for (i in data.toArray()) {
+				_data.append(i.asint);
+			}
+			f.write( _data );
+		#else
+			var out = F.append(path, true);
+			out.write( data );
+			out.close();
+		#end
+	}
+
+	/**
 	  * Moves the given path to a new one
 	  */
 	public static function rename(oldpath:String, newpath:String):Void {
