@@ -42,6 +42,13 @@ abstract ByteArray (Array<Byte>) {
 		return this[i];
 	}
 
+	/**
+	  * Forward the 'iterator' method
+	  */
+	public inline function iterator():Iterator<Byte> {
+		return (this.iterator());
+	}
+
 /* == Instance Fields == */
 
 	/**
