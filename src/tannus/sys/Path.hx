@@ -9,6 +9,15 @@ abstract Path (String) from String to String {
 		this = s;
 	}
 
+/* === Instance Methods === */
+
+	/**
+	  * "normalized" version of [this] Path
+	  */
+	public inline function normalize():Path {
+		return (P.normalize(this));
+	}
+
 /* === Instance Fields === */
 
 	/**
@@ -17,6 +26,14 @@ abstract Path (String) from String to String {
 	public var directory(get, never):Path;
 	private inline function get_directory():Path {
 		return P.directory(this);
+	}
+
+	/**
+	  * Whether [this] Path is the "root" directory
+	  */
+	public var root(get, never):Bool;
+	private inline function get_root():Bool {
+		return (directory == '');
 	}
 
 	/**
