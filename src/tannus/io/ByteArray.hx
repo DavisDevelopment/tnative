@@ -22,7 +22,7 @@ using Lambda;
 /**
   * Abstract Class representing an Array of Bytes as an Entity unto itself, such as the contents of a File
   */
-@:forward(length, push, pop, shift, unshift, filter)
+@:forward(length, push, pop, shift, unshift, filter, concat)
 abstract ByteArray (Array<Byte>) {
 	/* Constructor */
 	public function new(?a : Array<Byte>):Void {
