@@ -34,6 +34,12 @@ class NodeFileSystem {
 		return ByteArray.fromNodeBuffer(buf);
 	}
 
+	public static function append(path:String, data:ByteArray):Void {
+		var c:ByteArray = read(path);
+		c = c.concat( data );
+		write(path, c);
+	}
+
 	public static function deleteFile(path : String):Void {
 		NFS.unlinkSync(path);
 	}
