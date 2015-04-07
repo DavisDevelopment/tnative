@@ -114,6 +114,28 @@ class VVEntry {
 		}
 	}
 
+	/**
+	  * Returns a serializable representation of [this] Entry
+	  */
+	public function serialize():Dynamic {
+		return {
+			'name'    : name,
+			'type'    : type,
+			'meta'    : meta,
+			'content' : content
+		};
+	}
+
+	/**
+	  * Create and return a VVEntry from an Object like that returned by VVEntry's 'serialize' method
+	  */
+	public static function deserialize(o:Dynamic, vol:VirtualVolume):VVEntry {
+		var e:VVEntry = new VVEntry(vol, o.name, (cast o.type));
+		e.meta = (cast o.meta);
+		e.content = (cast o.content);
+		return e;
+	}
+
 /* === Computed Instance Fields === */
 
 	/**

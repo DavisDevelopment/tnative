@@ -8,6 +8,9 @@ import tannus.sys.VVEntry;
 import tannus.sys.VVType;
 import tannus.sys.FileStat;
 
+import haxe.Serializer;
+import haxe.Unserializer;
+
 /**
   * Class which acts as a virtual filesystem
   */
@@ -228,6 +231,25 @@ class VirtualVolume {
 		}
 	}
 
+	/**
+	  * Serializes [this] VirtualVolume
+	  */
+	public function serialize():ByteArray {
+		var bits:Array<Dynamic> = new Array();
+
+		for (e in entries) {
+			bits.push(e.serialize());
+		}
+
+		var data:ByteArray = new ByteArray();
+
+		Serializer.USE_CACHE = true;
+		Serializer.USE_ENUM_INDEX = true;
+		data.write(Serializer.run( bits ));
+		
+		return data;
+	}
+
 
 /* === Instance Fields === */
 
@@ -235,6 +257,21 @@ class VirtualVolume {
 	private var entries:Array<VVEntry>;
 
 /* === Class Methods === */
+
+	/**
+	  * Deserializes a VirtualVolume, and returns it
+	  */
+	public static function deserialize(data : ByteArray):VirtualVolume {
+		var bits:Array<Dynamic> = Unserializer.run( data );
+		var vv:VirtualVolume = new VirtualVolume('wut');
+
+		for (bit in bits) {
+			var e = VVEntry.deserialize(bit, vv);
+			vv.entries.push( e );
+		}
+
+		return vv;
+	}
 
 	/**
 	  * Throws an error with the given message
