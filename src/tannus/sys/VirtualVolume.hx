@@ -87,10 +87,15 @@ class VirtualVolume {
 	  */
 	public function isDirectory(name : String):Bool {
 		name = normal(name);
+		var p:Path = name;
 		var e = getEntry(name);
 		if (e == null) {
 			return false;
-		} else {
+		} 
+		else if (name == '' || name == '/') {
+			return true;
+		}
+		else {
 			switch (e.type) {
 				case VVFolder:
 					return true;
@@ -131,7 +136,15 @@ class VirtualVolume {
 	  */
 	public function readDirectory(name : String):Array<String> {
 		name = normal(name);
-		if (isDirectory(name)) {
+		var p:Path = name;
+		if (name == '' || name == '/') {
+			return entries.filter(function(e) {
+				return (e.path.root);
+			}).map(function(e) {
+				return (e.path.normalize() + '');
+			});
+		}
+		else if (isDirectory(name)) {
 			var e = getEntry(name);
 			return e.list().map(function(e) return e.name);
 		} else {
