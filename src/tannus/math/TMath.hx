@@ -56,8 +56,16 @@ class TMath {
         return (a < b) ? a : b;
     }
 
+    /** Perform a linear interpolation between two numbers */
     public static inline function lerp<T:Float> (a:T, b:T, x:Float):Float {
 	return a + x * (b - a);
+    }
+
+    /** Round a float to the nearest [digit] decimal place */
+    public static function roundFloat(f:Float, digit:Int):Float {
+	var n:Float = Math.pow(10, digit);
+	var r:Float = (Math.round(f * n) / n);
+	return r;
     }
 
     #if !js @:generic #end
