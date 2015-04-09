@@ -58,12 +58,43 @@ abstract Point (TPoint) {
 		return Angle.fromDegrees( angl );
 	}
 
+/* === Type Casting === */
+
 	/**
 	  * Casts [this] Point to a human-readable String
 	  */
+	@:to
 	public inline function toString():String {
 		return 'Point($x, $y, $z)';
 	}
+
+	/* To Array<Float> */
+	@:to
+	public inline function toArray():Array<Float> {
+		return [x, y, z];
+	}
+
+	/* From Array<Float> */
+	@:from
+	public static inline function fromArray(a : Array<Float>):Point {
+		return new Point(a[0], a[1], a[2]);
+	}
+
+	#if flash
+	
+	/* To flash.geom.Point */
+	@:to
+	public inline function toFlashPoint():flash.geom.Point {
+		return new flash.geom.Point(x, y);
+	}
+
+	/* From flash.geom.Point */
+	@:from
+	public static inline function fromFlashPoint(fp : flash.geom.Point):Point {
+		return new Point(fp.x, fp.y);
+	}
+
+	#end
 }
 
 private typedef TPoint = {x:Float, y:Float, z:Float};
