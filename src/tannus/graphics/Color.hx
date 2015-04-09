@@ -13,7 +13,7 @@ using StringTools;
   */
 abstract Color (Array<Int>) {
 	/* Constructor Function */
-	public inline function new(?r:Int=0, ?g:Int=0, ?b:Int=0, ?a:Int):Void {
+	public inline function new(?r:Int=0, ?g:Int=0, ?b:Int=0, ?a:Int=0):Void {
 		this = [r, g, b, a];
 	}
 
@@ -57,7 +57,7 @@ abstract Color (Array<Int>) {
 	  */
 	public var channels(get, never):Int;
 	private inline function get_channels():Int {
-		return (this.length);
+		return (alpha == 0 ? 3 : 4);
 	}
 
 /* === Instance Methods === */
@@ -86,8 +86,9 @@ abstract Color (Array<Int>) {
 	public function toString():String {
 		if (channels == 3) {
 			var out:String = '#';
-			
-			for (c in this) {
+			var bits:Array<Int> = this.slice(0, this.length-1);
+
+			for (c in bits) {
 				var piece:String = hex(c, 2);
 
 				out += piece;
@@ -96,26 +97,7 @@ abstract Color (Array<Int>) {
 			return out;
 		}
 		else if (channels == 4) {
-			var out:String = 'rgba(';
-
-			var i:Int = 0;
-			for (c in this) {
-				if (i == 3) {
-					var n:Percent = Percent.percent(alpha, 255);
-					var i:Float = n.of( 1 );
-					trace( i );
-					var piece:String = (i+'');
-					out += piece;
-
-				} else {
-					var piece:String = hex(c, 2);
-					
-					out += ('$piece, ');
-				}
-				i++;
-			}
-			
-			out += ')';
+			var out:String = 'rgba($red, $green, $blue, ${Percent.percent(alpha, 255).of(1)})';
 			return out;
 		}
 		else {
@@ -131,6 +113,24 @@ abstract Color (Array<Int>) {
 		return toString();
 	}
 
+	/* To Int */
+	@:to
+	public function toInt():Int {
+		if (channels == 3) {
+			return (Math.round(red) << 16) | (Math.round(green) << 8) | Math.round(blue);
+		} else if (channels == 4) {
+			return ((Math.round(red) << 16) | (Math.round(green) << 8) | Math.round(blue) | Math.round(alpha) << 24);
+		} else {
+			throw '$this is not a Color!';
+		}
+	}
+
+	/* From Int */
+	/* BUG -- Unfortunately, this method cannot handle alpha, and I don't know of an elegant workaround to this as of now */
+	@:from
+	public static inline function fromInt(color : Int):Color {
+		return new Color((color >> 16 & 0xFF), (color >> 8 & 0xFF), (color & 0xFF));
+	}
 
 	/**
 	  * Casting from a String
@@ -195,6 +195,22 @@ abstract Color (Array<Int>) {
 			throw 'ColorError: Cannot create Color from "$_s"!';
 		}
 	}
+
+	#if java
+
+	/* To java.awt.Color */
+	@:to
+	public function toJavaColor():java.awt.Color {
+		return (channels < 4 ? new java.awt.Color(red, green, blue) : new java.awt.Color(red, green, blue, alpha));
+	}
+
+	/* From java.awt.Color */
+	@:from
+	public static inline function fromJavaColor(col : java.awt.Color):Color {
+		return new Color(col.getRed(), col.getGreen(), col.getBlue(), col.getAlpha());
+	}
+
+	#end
 
 
 	/**
