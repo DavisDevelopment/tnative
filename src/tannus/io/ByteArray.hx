@@ -153,6 +153,14 @@ abstract ByteArray (Array<Byte>) {
 		this = (this.concat(ba));
 	}
 
+	/**
+	  * Convert [this] ByteArray to a DataURI
+	  */
+	public inline function toDataURI(?mime:String='text/plain'):String {
+		var encoded:String = haxe.crypto.Base64.encode( self);
+		return 'data:$mime;base64,$encoded';
+	}
+
 /* == Operators == */
 
 	/* Equality Testing */
@@ -239,7 +247,7 @@ abstract ByteArray (Array<Byte>) {
 	}
 	#end
 
-	#if flash
+	#if (flash || as3)
 	/* To Flash ByteArray */
 	@:to
 	public inline function toFlashByteArray():flash.utils.ByteArray {
