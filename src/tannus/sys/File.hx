@@ -52,7 +52,7 @@ abstract File (CFile) {
 class CFile {
 	/* Constructor Function */
 	public function new(p : Path):Void {
-		path = p;
+		_path = p;
 		
 		//- validate that [path] is a File
 		if (FileSystem.exists(path) && FileSystem.isDirectory(path)) {
@@ -81,6 +81,20 @@ class CFile {
 	  */
 	public inline function append(data : ByteArray):Void {
 		FileSystem.append(path, data);
+	}
+
+	/**
+	  * Renames [this] File
+	  */
+	public inline function rename(newpath : Path):Void {
+		path = newpath;
+	}
+
+	/**
+	  * Deletes [this] File
+	  */
+	public inline function delete():Void {
+		FileSystem.deleteFile(path);
 	}
 
 /* === Computed Instance Fields === */
@@ -123,10 +137,22 @@ class CFile {
 		return new FileContent(Ptr.create(f));
 	}
 
+	/**
+	  * The path to [this] File
+	  */
+	public var path(get, set):Path;
+	private inline function get_path():Path {
+		return _path;
+	}
+	private function set_path(np : Path):Path {
+		FileSystem.rename(_path, np);
+		return (_path = np);
+	}
+
 /* === Instance Fields === */
 
 	//- The path to [this] File
-	public var path : Path;
+	private var _path : Path;
 
 /* === Class Methods === */
 
