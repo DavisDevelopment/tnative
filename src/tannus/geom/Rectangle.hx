@@ -3,7 +3,41 @@ package tannus.geom;
 import tannus.geom.Point;
 import tannus.geom.Area;
 
-class Rectangle {
+@:forward
+abstract Rectangle (CRectangle) from CRectangle to CRectangle {
+	/* Constructor Function */
+	public inline function new(_x:Float=0, _y:Float=0, _width:Float=0, _height:Float=0):Void {
+		this = new CRectangle(_x, _y, _width, _height);
+	}
+
+/* === Operators === */
+
+	/* Equality Testing */
+	@:op(A == B)
+	public inline function eq(o : Rectangle):Bool {
+		return this.equals( o );
+	}
+
+/* === Type Casting === */
+
+	#if flash
+	
+	/* To flash.geom.Rectangle */
+	@:to
+	public inline function toFlashRect():flash.geom.Rectangle {
+		return new flash.geom.Rectangle(this.x, this.y, this.width, this.height);
+	}
+
+	/* From flash.geom.Rectangle */
+	@:from
+	public static inline function fromFlashRect(fr : flash.geom.Rectangle):Rectangle {
+		return new Rectangle(fr.x, fr.y, fr.width, fr.height);
+	}
+
+	#end
+}
+
+class CRectangle {
 	public function new(_x:Float=0, _y:Float=0, _width:Float=0, _height:Float=0):Void {
 		x = _x;
 		y = _y;
