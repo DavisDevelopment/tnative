@@ -95,4 +95,11 @@ abstract Pointer<T> (TwoTuple<Getter<T>, Setter<T>>) {
 	public static macro function create<T>(ref : ExprOf<T>):ExprOf<Pointer<T>> {
 		return macro (new tannus.io.Pointer(tannus.io.Getter.create($ref), tannus.io.Setter.create($ref)));
 	}
+
+	/**
+	  * Slightly more robust Pointer creation
+	  */
+	public static macro function dual<T>(gref:ExprOf<T>, sref:ExprOf<T>):ExprOf<Pointer<T>> {
+		return macro (new tannus.io.Pointer(tannus.io.Getter.create($gref), tannus.io.Setter.create($sref)));
+	}
 }
