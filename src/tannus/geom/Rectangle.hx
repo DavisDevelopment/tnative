@@ -35,6 +35,14 @@ abstract Rectangle (CRectangle) from CRectangle to CRectangle {
 	}
 
 	#end
+
+	/**
+	  * Create a Rectangle from an Array of Numbers
+	  */
+	@:from
+	public static inline function fromArray<T : Float> (a : Array<T>):Rectangle {
+		return new Rectangle(a[0], a[1], a[2], a[3]);
+	}
 }
 
 class CRectangle {
@@ -137,8 +145,7 @@ class CRectangle {
 	public var topRight(get, never):Point;
 	private inline function get_topRight():Point {
 		return new Point((x + width), y);
-	}
-
+	} 
 	/**
 	  * The top-left corner
 	  */
