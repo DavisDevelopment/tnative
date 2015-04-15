@@ -8,6 +8,11 @@ import tannus.graphics.GraphicsPath;
   */
 interface TGraphics {
 	/**
+	  * The dimensions of [this] Graphics
+	  */
+	var width(get, never) : Float;
+	var height(get, never) : Float;
+	/**
 	  * Background Color
 	  */
 	var backgroundColor(get, set): Color;
