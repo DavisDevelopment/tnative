@@ -1,6 +1,7 @@
 package tannus.display.backend.flash;
 
 import tannus.display.backend.flash.*;
+import tannus.display.backend.flash.PathRenderer;
 import tannus.display.TGraphics;
 import tannus.geom.Point;
 import tannus.geom.Rectangle;
@@ -12,6 +13,7 @@ import tannus.graphics.GraphicsPath;
 /**
   * Flash implementation of the TGraphics interface
   */
+@:allow(tannus.display.backend.flash.PathRenderer)
 class TannusGraphics implements TGraphics {
 	/* Constructor Function */
 	public function new(owner : Window):Void {
@@ -36,7 +38,8 @@ class TannusGraphics implements TGraphics {
 	  * Renders a GraphicsPath onto [this] Graphics
 	  */
 	public function drawPath(path : GraphicsPath):Void {
-		null;
+		var pr = new PathRenderer( this );
+		pr.draw( path );
 	}
 
 
