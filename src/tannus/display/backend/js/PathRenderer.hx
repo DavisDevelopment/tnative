@@ -19,7 +19,14 @@ class PathRenderer {
 	/**
 	  * Render the given path
 	  */
-	public function draw(path : GraphicsPath):Void {
+	public function draw(_path : GraphicsPath):Void {
+		path = _path;
+		
+		if (path.vectorized) {
+			path = _path.clone();
+			path.devectorize();
+		}
+
 		var ctx:CanvasRenderingContext2D = g.win.ctx;
 		var opfunc = performOperation.bind(_, ctx);
 
@@ -40,6 +47,21 @@ class PathRenderer {
 			//- draw a line from the 'cursor' to the given position
 			case Pc.LineTo( pos ):
 				c.lineTo(pos.x, pos.y);
+
+			//- draw a rectangle
+			case Pc.Rectangle( r ):
+				c.rect(r.x, r.y, r.w, r.h);
+
+			//- draw an ellipse
+			case Pc.Ellipse( r ):
+				trace('Ellipse not yet implemented');
+
+			case Pc.SubPath( sub ):
+				save();
+
+				sub.draw();
+				
+				restore();
 
 			//- stroke the current Path
 			case Pc.StrokePath:
@@ -72,10 +94,27 @@ class PathRenderer {
 		}
 	}
 
+	/**
+	  * 'save' the current state of [this] PathRenderer
+	  */
+	public function save():Void {
+		g.win.ctx.save();
+	}
+
+	/**
+	  * 'restore' [this] PathRenderer to a previous state
+	  */
+	public function restore():Void {
+		g.win.ctx.restore();
+	}
+
 /* === Instance Fields === */
 
 	//- reference to the Graphics instance that created [this]
 	private var g : TannusGraphics;
+
+	//- reference to the GraphicsPath currently being drawn
+	private var path : GraphicsPath;
 }
 
 private typedef Pc = PathComponent;
