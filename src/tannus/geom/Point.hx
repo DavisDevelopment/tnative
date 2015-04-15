@@ -73,6 +73,14 @@ abstract Point (TPoint) {
 		return new Point(perc(x, r.w), perc(y, r.h));
 	}
 
+	/**
+	  * Devectorize [this] Point, based on a given Rectangle
+	  */
+	public inline function devectorize(r : Rectangle):Point {
+		var px:Percent = new Percent(x), py:Percent = new Percent(y);
+		return new Point(px.of(r.w), py.of(r.h));
+	}
+
 /* === Type Casting === */
 
 	/**
