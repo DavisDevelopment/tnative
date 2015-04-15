@@ -23,7 +23,9 @@ class TannusGraphics implements TGraphics {
 	  * Creates and returns a new GraphicsPath
 	  */
 	public inline function createPath():GraphicsPath {
-		return new GraphicsPath();
+		var gp = new GraphicsPath();
+		gp.graphics = this;
+		return gp;
 	}
 
 	/**
@@ -52,5 +54,21 @@ class TannusGraphics implements TGraphics {
 	private inline function set_backgroundColor(nc : Color):Color {
 		win.setBackground( nc );
 		return (_bg = nc);
+	}
+
+	/**
+	  * The 'width' of [this] Graphics
+	  */
+	public var width(get, never):Float;
+	private inline function get_width():Float {
+		return (win.nc_size.width);
+	}
+
+	/**
+	  * The 'height' of [this] Graphics
+	  */
+	public var height(get, never):Float;
+	private inline function get_height():Float {
+		return (win.nc_size.height);
 	}
 }
