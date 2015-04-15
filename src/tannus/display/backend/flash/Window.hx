@@ -19,6 +19,7 @@ class Window extends Sprite implements TWindow {
 
 		frameEvent = new Signal();
 		resizeEvent = new Signal();
+		nc_graphics = new TannusGraphics(this);
 
 		var cur = flash.Lib.current;
 		cur.addChild( this );
@@ -39,10 +40,28 @@ class Window extends Sprite implements TWindow {
 		ebinder.bind();
 		
 		stage.addEventListener(flash.events.Event.EXIT_FRAME, function(event):Void {
+			__perFrameInternal();
+
 			frameEvent.broadcast( null );
 		});
 	}
 
+	/**
+	  * Nitty Gritty internals that need to be run per-frame
+	  */
+	private inline function __perFrameInternal():Void {
+		var g = graphics;
+		var a = nc_size;
+
+		/* === Draw Background === */
+		g.beginFill(nc_graphics.backgroundColor);
+		g.drawRect(0, 0, stage.stageWidth, stage.stageHeight);
+		g.endFill();
+	}
+
+	/**
+	  * Execute a snippet of JavaScript code
+	  */
 	private inline function js(code : String):Dynamic {
 		return ExternalInterface.call('eval', code);
 	}
@@ -53,6 +72,8 @@ class Window extends Sprite implements TWindow {
 
 	public var resizeEvent : Signal<{then:Area, now:Area}>;
 	public var frameEvent : Signal<Dynamic>;
+
+	public var nc_graphics : TGraphics;
 	
 /* === Computed Instance Fields === */
 
