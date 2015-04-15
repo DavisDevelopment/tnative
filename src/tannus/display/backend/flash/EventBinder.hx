@@ -41,7 +41,8 @@ class EventBinder {
 				'then' : la,
 				'now'  : win.nc_size
 			});
-
+			
+			win.__prepareCanvas();
 			la = win.nc_size;
 		});
 	}
