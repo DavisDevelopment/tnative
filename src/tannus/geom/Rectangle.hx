@@ -124,6 +124,14 @@ class CRectangle {
 	}
 
 	/**
+	  * Point representing the 'center' of [this] Rectangle
+	  */
+	public var center(get, never):Point;
+	private inline function get_center():Point {
+		return new Point((x + (width / 2)), (y + (height / 2)));
+	}
+
+	/**
 	  * The top-right corner
 	  */
 	public var topRight(get, never):Point;
