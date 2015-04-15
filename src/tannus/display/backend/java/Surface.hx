@@ -8,6 +8,9 @@ import java.awt.RenderingHints;
 
 import tannus.io.Ptr;
 import tannus.display.backend.java.Window;
+import tannus.geom.Rectangle;
+import tannus.geom.Area;
+private typedef TColor = tannus.graphics.Color;
 
 class Surface extends JPanel {
 	/* Constructor Function */
@@ -28,8 +31,14 @@ class Surface extends JPanel {
 		
 		context = rg;
 
+		//- Draw the Background
 		var g:Graphics2D = cast rg;
+		var bg:TColor = win.nc_graphics.backgroundColor;
+		g.setColor( bg );
 
+		var s:Area = win.nc_size;
+		var i = Math.round.bind(_);
+		g.fillRect(0, 0, i(s.width), i(s.height));
 	}
 
 /* === Instance Fields === */
