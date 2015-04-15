@@ -34,6 +34,8 @@ class Window extends JFrame implements TWindow {
 	  * Initialize [this] Window
 	  */
 	private inline function __init():Void {
+		gref = Ptr.create( surface.context );
+
 		//- enable hardware rendering
 		System.setProperty("sun.java2d.opengl", "True");
 
@@ -71,10 +73,23 @@ class Window extends JFrame implements TWindow {
 	  * Frame Loop
 	  */
 	private inline function __frameLoop():Void {
+		
 		function frame():Void {
-			frameEvent.broadcast(null);
+			//- Draw Background
+			var g:Graphics = getGraphics();
+			var c:Color = nc_graphics.backgroundColor;
+			var s = nc_size;
 
-			var delay:Int = cast System.currentTimeMillis()+30;
+			g.setColor( c );
+			g.fillRect(0, 0, Std.int(s.width), Std.int(s.height));
+			g.dispose();
+
+			//- Emit 'frame' Event
+			g = surface.getGraphics();
+			frameEvent.broadcast( g );
+			g.dispose();
+
+			var delay:Int = cast System.currentTimeMillis()+40;
 			mse.schedule(new RunnableFunction(frame), cast delay, java.util.concurrent.TimeUnit.MILLISECONDS);
 		}
 
@@ -94,6 +109,12 @@ class Window extends JFrame implements TWindow {
 			};
 			resizeEvent.broadcast(cast d);
 			larea = nc_size;
+
+			//- Draw Background
+			var g:Graphics = getGraphics();
+			g.setColor(nc_graphics.backgroundColor);
+			var s = nc_size;
+			g.fillRect(0, 0, Std.int(s.width), Std.int(s.height));
 		}
 
 		return f;
@@ -130,10 +151,10 @@ class Window extends JFrame implements TWindow {
 /* === Instance Fields === */
 
 	//- [this] Window's Panel
-	private var surface:Surface;
+	public var surface:Surface;
 
 	//- Pointer to the 'context' field of [surface]
-	private var gref:Ptr<Graphics>;
+	public var gref:Ptr<Graphics>;
 
 	//- The timer-thing I use to schedule frame-events
 	private var mse:java.util.concurrent.ScheduledThreadPoolExecutor;

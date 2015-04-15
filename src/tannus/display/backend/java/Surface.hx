@@ -7,6 +7,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 
 import tannus.io.Ptr;
+import tannus.io.Signal;
 import tannus.display.backend.java.Window;
 import tannus.geom.Rectangle;
 import tannus.geom.Area;
@@ -18,6 +19,7 @@ class Surface extends JPanel {
 		super( true );
 
 		win = ref;
+		onPaint = new Signal();
 	}
 
 /* === Instance Methods === */
@@ -31,14 +33,7 @@ class Surface extends JPanel {
 		
 		context = rg;
 
-		//- Draw the Background
-		var g:Graphics2D = cast rg;
-		var bg:TColor = win.nc_graphics.backgroundColor;
-		g.setColor( bg );
-
-		var s:Area = win.nc_size;
-		var i = Math.round.bind(_);
-		g.fillRect(0, 0, i(s.width), i(s.height));
+		rg.dispose();
 	}
 
 /* === Instance Fields === */
@@ -48,4 +43,7 @@ class Surface extends JPanel {
 
 	//- reference to [this] Surface's Graphics object
 	public var context:Graphics;
+
+	//- Signal to fire each frame
+	public var onPaint:Signal<Graphics2D>;
 }
