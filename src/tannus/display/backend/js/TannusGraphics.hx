@@ -18,7 +18,6 @@ class TannusGraphics implements TGraphics {
 		win = owner;
 
 		_bg = 0;
-		pr = new PathRenderer( this );
 	}
 
 /* === Instance Methods === */
@@ -36,6 +35,7 @@ class TannusGraphics implements TGraphics {
 	  * Render a GraphicsPath onto [this] Graphics
 	  */
 	public function drawPath(path : GraphicsPath):Void {
+		var pr = new PathRenderer(this);
 		pr.draw( path );
 	}
 
@@ -44,9 +44,6 @@ class TannusGraphics implements TGraphics {
 
 	public var win : Window;
 	private var _bg : Color;
-
-	//- The PathRenderer for [this] Graphics
-	private var pr : PathRenderer;
 
 	/**
 	  * Background Color of [this] Graphics
