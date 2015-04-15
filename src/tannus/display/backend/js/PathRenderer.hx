@@ -3,7 +3,7 @@ package tannus.display.backend.js;
 import tannus.display.backend.js.*;
 
 import tannus.graphics.*;
-import tannus.geom.Point;
+import tannus.geom.*;
 
 import js.html.CanvasElement;
 import js.html.CanvasRenderingContext2D;
@@ -54,7 +54,21 @@ class PathRenderer {
 
 			//- draw an ellipse
 			case Pc.Ellipse( r ):
-				trace('Ellipse not yet implemented');
+				var ell = new Ellipse(r.x, r.y, r.w, r.h);
+				var curves = ell.calculateCurves();
+				
+				for (curv in curves) {
+					var s:Point = curv.start;
+					c.moveTo(s.x, s.y);
+					c.bezierCurveTo( 
+						curv.ctrl1.x,
+						curv.ctrl1.y,
+						curv.ctrl2.x,
+						curv.ctrl2.y,
+						curv.end.x,
+						curv.end.y
+					);
+				}
 
 			case Pc.SubPath( sub ):
 				save();
