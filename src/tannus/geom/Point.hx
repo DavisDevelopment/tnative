@@ -1,6 +1,7 @@
 package tannus.geom;
 
 import tannus.math.TMath;
+import tannus.math.Percent;
 import tannus.geom.Angle;
 
 abstract Point (TPoint) {
@@ -58,6 +59,13 @@ abstract Point (TPoint) {
 		return Angle.fromDegrees( angl );
 	}
 
+	/**
+	  * Vectorize [this] Point, based on a given Rectangle
+	  */
+	public inline function vectorize(r : Rectangle):Point {
+		return new Point(perc(x, r.w), perc(y, r.h));
+	}
+
 /* === Type Casting === */
 
 	/**
@@ -95,6 +103,13 @@ abstract Point (TPoint) {
 	}
 
 	#end
+
+	/**
+	  * Shorthand function for creating a Percent
+	  */
+	private static inline function perc(what:Float, of:Float):Percent {
+		return Percent.percent(what, of);
+	}
 }
 
 private typedef TPoint = {x:Float, y:Float, z:Float};
