@@ -39,4 +39,10 @@ abstract Window (TWindow) {
 	public var size(get, set):Area;
 	private inline function get_size() return (this.nc_size);
 	private inline function set_size(ns:Area) return (this.nc_size = ns);
+
+	/**
+	  * Window Graphics
+	  */
+	public var graphics(get, never):TGraphics;
+	private inline function get_graphics() return (this.nc_graphics);
 }
