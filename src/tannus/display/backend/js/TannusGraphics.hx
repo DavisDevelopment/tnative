@@ -18,6 +18,7 @@ class TannusGraphics implements TGraphics {
 		win = owner;
 
 		_bg = 0;
+		pr = new PathRenderer( this );
 	}
 
 /* === Instance Methods === */
@@ -26,21 +27,26 @@ class TannusGraphics implements TGraphics {
 	  * Create and return a new GraphicsPath
 	  */
 	public inline function createPath():GraphicsPath {
-		return new GraphicsPath();
+		var gp = new GraphicsPath();
+		gp.graphics = this;
+		return gp;
 	}
 
 	/**
 	  * Render a GraphicsPath onto [this] Graphics
 	  */
 	public function drawPath(path : GraphicsPath):Void {
-		null;
+		pr.draw( path );
 	}
 
 
 /* === Instance Fields === */
 
-	private var win : Window;
+	public var win : Window;
 	private var _bg : Color;
+
+	//- The PathRenderer for [this] Graphics
+	private var pr : PathRenderer;
 
 	/**
 	  * Background Color of [this] Graphics
@@ -59,5 +65,21 @@ class TannusGraphics implements TGraphics {
 	private var ctx(get, never) : CanvasRenderingContext2D;
 	private inline function get_ctx():CanvasRenderingContext2D {
 		return win.ctx;
+	}
+
+	/**
+	  * The 'width' of [this] Graphics
+	  */
+	public var width(get, never) : Float;
+	private inline function get_width():Float {
+		return (ctx.canvas.width);
+	}
+
+	/**
+	  * The 'height' of [this] Graphics
+	  */
+	public var height(get, never) : Float;
+	private inline function get_height():Float {
+		return (ctx.canvas.height);
 	}
 }
