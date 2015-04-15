@@ -3,6 +3,7 @@ package tannus.io;
 /* "haxe" imports */
 import haxe.io.Bytes;
 import haxe.io.BytesData;
+import haxe.crypto.Base64;
 
 /* "gen" imports */
 import tannus.io.Byte;
@@ -210,6 +211,12 @@ abstract ByteArray (Array<Byte>) {
 		return (this.map(function(b) return b.aschar).join(''));
 	}
 
+	/* To Base64 String */
+	public inline function toBase64():String {
+		var b:Bytes = self;
+		return Base64.encode( b );
+	}
+
 	/* To haxe.io.Bytes */
 	@:to
 	public inline function toBytes():Bytes {
@@ -314,6 +321,12 @@ abstract ByteArray (Array<Byte>) {
 		var ba:ByteArray = new ByteArray();
 		ba.writeString( s );
 		return ba;
+	}
+
+	/* From Base64 String */
+	public static inline function fromBase64(s : String):ByteArray {
+		var b:Bytes = Base64.decode(s);
+		return b;
 	}
 
 /* == Class Methods == */
