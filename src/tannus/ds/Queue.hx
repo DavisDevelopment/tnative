@@ -5,7 +5,7 @@ import tannus.ds.Maybe;
 /**
   * Abstract class which represents a 'Queue' of things, implemented as an Array
   */
-@:forward(unshift, pop)
+@:forward(unshift, pop, length)
 abstract Queue<T> (Array<T>) from Array<T> {
 	/* Constructor Function */
 	public inline function new(?a : Array<T>):Void {
@@ -60,6 +60,12 @@ abstract Queue<T> (Array<T>) from Array<T> {
 			return null;
 		}
 	}
+
+	/**
+	  * Whether [this] Queue is currently 'empty'
+	  */
+	public var empty(get, never):Bool;
+	private inline function get_empty() return (this.length == 0);
 
 	/**
 	  * Get an item out of [this] Queue using ArrayAccess
