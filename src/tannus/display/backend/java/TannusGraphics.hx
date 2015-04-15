@@ -1,6 +1,7 @@
 package tannus.display.backend.java;
 
 import tannus.display.backend.java.*;
+import tannus.display.backend.java.PathRenderer;
 import tannus.display.TGraphics;
 
 import tannus.graphics.Color;
@@ -32,13 +33,14 @@ class TannusGraphics implements TGraphics {
 	  * Renders a GraphicsPath onto [this] Graphics
 	  */
 	public function drawPath(path : GraphicsPath):Void {
-		null;
+		var pr = new PathRenderer( this );
+		pr.draw( path );
 	}
 
 /* === Instance Fields === */
 
 	//- Reference to the Window object [this] Graphics operates on
-	private var win : Window;
+	public var win : Window;
 
 	//- internal variable to store the current background color
 	private var _bg : Color;
