@@ -3,6 +3,8 @@ package tannus.geom;
 import tannus.geom.Point;
 import tannus.geom.Area;
 
+import tannus.math.Percent;
+
 @:forward
 abstract Rectangle (CRectangle) from CRectangle to CRectangle {
 	/* Constructor Function */
@@ -112,6 +114,32 @@ class CRectangle {
 		return false;
 	}
 
+	/**
+	  * Vectorize [this] Rectangle
+	  */
+	public function vectorize(r : Rectangle):Rectangle {
+		var pos:Point = topLeft.vectorize( r );
+		var dim:Area = new Area(perc(w, r.w), perc(h, r.h));
+
+		return new Rectangle(pos.x, pos.y, dim.width, dim.height);
+	}
+
+	/**
+	  * Devectorize [this] Rectangle
+	  */
+	public function devectorize(r : Rectangle):Rectangle {
+		var px:Percent = x, py:Percent = y, pw:Percent = w, ph:Percent = h;
+
+		return new Rectangle(px.of(r.w), py.of(r.h), pw.of(r.w), ph.of(r.h));
+	}
+
+	/**
+	  * Convert into a human-readable String
+	  */
+	public inline function toString():String {
+		return 'Rectangle($x, $y, $w, $h)';
+	}
+
 
 /* === Computed Instance Fields === */
 
@@ -199,4 +227,13 @@ class CRectangle {
 	public var width:Float;
 	public var height:Float;
 	public var depth:Float;
+
+/* === Class Methods === */
+
+	/**
+	  * Shorthand to create a Percent
+	  */
+	private static inline function perc(what:Float, of:Float):Percent {
+		return Percent.percent(what, of);
+	}
 }
