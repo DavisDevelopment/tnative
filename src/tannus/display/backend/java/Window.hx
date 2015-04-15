@@ -76,18 +76,7 @@ class Window extends JFrame implements TWindow {
 		
 		function frame():Void {
 			//- Draw Background
-			var g:Graphics = getGraphics();
-			var c:Color = nc_graphics.backgroundColor;
-			var s = nc_size;
-
-			g.setColor( c );
-			g.fillRect(0, 0, Std.int(s.width), Std.int(s.height));
-			g.dispose();
-
-			//- Emit 'frame' Event
-			g = surface.getGraphics();
-			frameEvent.broadcast( g );
-			g.dispose();
+			surface.repaint();
 
 			var delay:Int = cast System.currentTimeMillis()+40;
 			mse.schedule(new RunnableFunction(frame), cast delay, java.util.concurrent.TimeUnit.MILLISECONDS);

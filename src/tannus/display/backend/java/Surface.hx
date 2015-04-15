@@ -30,9 +30,19 @@ class Surface extends JPanel {
 	@:overload
 	override public function paintComponent(rg : Graphics):Void {
 		super.paintComponent( rg );
-		
-		context = rg;
 
+		var g:Graphics2D = (cast rg);
+
+		/* Draw Background */
+		var c:TColor = win.nc_graphics.backgroundColor;
+		var s = win.nc_size;
+
+		g.setColor( c );
+		g.fillRect(0, 0, Std.int(s.width), Std.int(s.height));
+
+		/* Draw Any Queued Paths */
+		win.frameEvent.broadcast( g );
+		
 		rg.dispose();
 	}
 
