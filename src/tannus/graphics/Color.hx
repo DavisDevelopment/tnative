@@ -77,6 +77,13 @@ abstract Color (Array<Int>) {
 		return this[channel];
 	}
 
+	/**
+	  * Creates and returns a 'clone' of [this] Color
+	  */
+	public inline function clone():Color {
+		return cast this.copy();
+	}
+
 /* === Implicit Type Casting === */
 
 	/**
