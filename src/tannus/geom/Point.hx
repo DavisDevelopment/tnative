@@ -60,6 +60,13 @@ abstract Point (TPoint) {
 	}
 
 	/**
+	  * Create and return a copy of [this] Point
+	  */
+	public inline function clone():Point {
+		return new Point(x, y, z);
+	}
+
+	/**
 	  * Vectorize [this] Point, based on a given Rectangle
 	  */
 	public inline function vectorize(r : Rectangle):Point {
