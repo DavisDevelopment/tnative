@@ -48,17 +48,31 @@ class GraphicsPath {
 	}
 
 	/**
+	  * Move the 'cursor' to the given position (expressed as a Point)
+	  */
+	public function move(pos : Point):Void {
+		add(MoveTo(pos));
+	}
+
+	/**
 	  * Move the 'cursor' to the given position
 	  */
-	public function moveTo(pos : Point):Void {
-		add(MoveTo(pos));
+	public function moveTo(x:Float, y:Float):Void {
+		add(MoveTo([x, y]));
+	}
+
+	/**
+	  * Draw a line from the 'cursor', to some other position (expressed as a Point), moving the cursor as we go
+	  */
+	public function line(pos : Point):Void {
+		add(LineTo(pos));
 	}
 
 	/**
 	  * Draw a line from the 'cursor', to some other position, moving the cursor as we go
 	  */
-	public function lineTo(pos : Point):Void {
-		add(LineTo(pos));
+	public function lineTo(x:Float, y:Float):Void {
+		add(LineTo([x, y]));
 	}
 
 	/**
@@ -93,6 +107,10 @@ class GraphicsPath {
 			throw 'PathError: Cannot draw path; No \'graphics\' field provided!';
 		}
 	}
+
+	/**
+	  * Vectorize [this] Path
+	  */
 
 /* === Computed Instance Fields === */
 
