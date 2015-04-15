@@ -31,6 +31,14 @@ abstract Maybe<T> (Null<T>) from Null<T> {
 	}
 
 	/**
+	  * Whether [this] Maybe instance is [null], accessed as a field
+	  */
+	public var exists(get, never):Bool;
+	private inline function get_exists():Bool {
+		return (this != null);
+	}
+
+	/**
 	  * Under those circumstances where we KNOW that [this]
 	  * is not null, we may just cast implicitly
 	  */
@@ -41,5 +49,14 @@ abstract Maybe<T> (Null<T>) from Null<T> {
 		} else {
 			throw 'TypeError: Cannot declare NULL non-nullable!';
 		}
+	}
+
+	/**
+	  * Allow the use of [this] as a Maybe instance in things like
+	  * 'if' statements
+	  */
+	@:to
+	public inline function toBoolean():Bool {
+		return (this != null);
 	}
 }
