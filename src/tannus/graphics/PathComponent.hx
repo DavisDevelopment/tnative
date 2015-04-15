@@ -2,6 +2,7 @@ package tannus.graphics;
 
 import tannus.geom.*;
 import tannus.graphics.PathStyleAlteration;
+import tannus.graphics.GraphicsPath;
 
 /**
   * A Component of a GraphicsPath
@@ -16,6 +17,16 @@ enum PathComponent {
 	//- Draw a line from the current Point, to some other one
 	LineTo(position : Point);
 
+	//- Draw a Rectangle
+	Rectangle(rect : Rectangle);
+
+	//- Draw an Ellipse
+	Ellipse(rect : Rectangle);
+
+	SubPath(path : GraphicsPath);
+
 	//- Stroke the last Stack of operations
 	StrokePath;
+
+	FillPath;
 }
