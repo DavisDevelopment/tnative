@@ -14,6 +14,9 @@ interface TWindow {
 
 	/* Window Size */
 	var nc_size(get, set):Area;
+	
+	/* TGraphics instance in use by [this] TWindow */
+	var nc_graphics : TGraphics;
 
 	/* Signal Fired When Window is Resized */
 	var resizeEvent : Signal<{then:Area, now:Area}>;
