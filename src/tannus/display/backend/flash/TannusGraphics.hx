@@ -7,6 +7,7 @@ import tannus.geom.Rectangle;
 import tannus.geom.Area;
 
 import tannus.graphics.Color;
+import tannus.graphics.GraphicsPath;
 
 /**
   * Flash implementation of the TGraphics interface
@@ -19,6 +20,23 @@ class TannusGraphics implements TGraphics {
 		//- default background color
 		_bg = 0;
 	}
+
+/* === Instance Methods === */
+
+	/**
+	  * Creates and returns a new GraphicsPath
+	  */
+	public inline function createPath():GraphicsPath {
+		return new GraphicsPath();
+	}
+
+	/**
+	  * Renders a GraphicsPath onto [this] Graphics
+	  */
+	public function drawPath(path : GraphicsPath):Void {
+		null;
+	}
+
 
 /* === Computed Instance Fields === */
 

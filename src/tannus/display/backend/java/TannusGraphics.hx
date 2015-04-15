@@ -2,7 +2,10 @@ package tannus.display.backend.java;
 
 import tannus.display.backend.java.*;
 import tannus.display.TGraphics;
+
 import tannus.graphics.Color;
+import tannus.graphics.GraphicsPath;
+
 import tannus.io.Signal;
 import tannus.io.Ptr;
 
@@ -12,6 +15,22 @@ class TannusGraphics implements TGraphics {
 		win = owner;
 
 		backgroundColor = 0;
+	}
+
+/* === Instance Methods === */
+
+	/**
+	  * Creates and returns a new GraphicsPath
+	  */
+	public inline function createPath():GraphicsPath {
+		return new GraphicsPath();
+	}
+
+	/**
+	  * Renders a GraphicsPath onto [this] Graphics
+	  */
+	public function drawPath(path : GraphicsPath):Void {
+		null;
 	}
 
 /* === Instance Fields === */

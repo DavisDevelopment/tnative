@@ -2,7 +2,10 @@ package tannus.display.backend.js;
 
 import tannus.display.backend.js.*;
 import tannus.display.TGraphics;
+
 import tannus.graphics.Color;
+import tannus.graphics.GraphicsPath;
+
 import tannus.io.Signal;
 import tannus.io.Ptr;
 
@@ -18,6 +21,20 @@ class TannusGraphics implements TGraphics {
 	}
 
 /* === Instance Methods === */
+
+	/**
+	  * Create and return a new GraphicsPath
+	  */
+	public inline function createPath():GraphicsPath {
+		return new GraphicsPath();
+	}
+
+	/**
+	  * Render a GraphicsPath onto [this] Graphics
+	  */
+	public function drawPath(path : GraphicsPath):Void {
+		null;
+	}
 
 
 /* === Instance Fields === */
