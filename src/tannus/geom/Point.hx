@@ -76,7 +76,7 @@ abstract Point (TPoint) {
 
 	/* From Array<Float> */
 	@:from
-	public static inline function fromArray(a : Array<Float>):Point {
+	public static inline function fromArray<T : Float> (a : Array<T>):Point {
 		return new Point(a[0], a[1], a[2]);
 	}
 
