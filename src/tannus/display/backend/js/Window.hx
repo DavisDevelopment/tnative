@@ -2,11 +2,14 @@ package tannus.display.backend.js;
 
 import tannus.display.backend.js.*;
 import tannus.display.TWindow;
+import tannus.display.TGraphics;
+import tannus.graphics.Color;
 import tannus.geom.Area;
 import tannus.io.Signal;
 
 import js.html.Document;
 import js.html.CanvasElement;
+import js.html.CanvasRenderingContext2D;
 
 class Window implements TWindow {
 	/* Constructor Function */
@@ -19,6 +22,8 @@ class Window implements TWindow {
 		
 		//- Create a new Canvas
 		canvas = cast doc.createElement( 'canvas' );
+		ctx = canvas.getContext('2d');
+		nc_graphics = new TannusGraphics( this );
 
 		__init();
 	}
@@ -58,9 +63,21 @@ class Window implements TWindow {
 		  */
 		win.setInterval(function() {
 			
+			__perFrameInternal();
 			frameEvent.broadcast(null);
 		}, 30);
 
+	}
+
+	/**
+	  * Nitty Gritty stuff that should happen every frame
+	  */
+	private inline function __perFrameInternal():Void {
+		var bg:Color = nc_graphics.backgroundColor;
+		ctx.beginPath();
+		ctx.fillStyle = bg;
+		ctx.fillRect(0, 0, canvas.width, canvas.height);
+		ctx.closePath();
 	}
 
 	/**
@@ -105,11 +122,17 @@ class Window implements TWindow {
 	//- The Canvas in use by [this] Window
 	public var canvas : CanvasElement;
 
+	//- The Rendering Context used by [this] Window
+	public var ctx : CanvasRenderingContext2D;
+
 	//- Event fired when the Window is resized
 	public var resizeEvent : Signal<{then:Area, now:Area}>;
 
 	//- Event fired before the rendering of each frame
 	public var frameEvent : Signal<Dynamic>;
+
+	//- Implementation of TGraphics in use by [this] Window
+	public var nc_graphics : TGraphics;
 }
 
 private typedef Win = js.html.Window;
