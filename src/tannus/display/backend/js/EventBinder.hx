@@ -34,6 +34,7 @@ class EventBinder {
 		var la:Area = win.nc_size;
 		w.addEventListener('resize', function(event) {
 			win.makeFullScreen(win.canvas);
+			win.ctx = win.canvas.getContext('2d');
 
 			win.resizeEvent.call({
 				'then' : la,
