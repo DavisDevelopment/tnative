@@ -5,10 +5,12 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.MouseEvent;
+
+import tannus.display.backend.java.*;
 
 import tannus.io.Ptr;
 import tannus.io.Signal;
-import tannus.display.backend.java.Window;
 import tannus.geom.Rectangle;
 import tannus.geom.Area;
 private typedef TColor = tannus.graphics.Color;
@@ -19,6 +21,12 @@ class Surface extends JPanel {
 		super( true );
 
 		win = ref;
+
+		mouseListener = new MouseEventListener( win );
+
+		addMouseListener( mouseListener );
+		addMouseMotionListener( mouseListener );
+
 		onPaint = new Signal();
 	}
 
@@ -46,6 +54,14 @@ class Surface extends JPanel {
 		rg.dispose();
 	}
 
+	/**
+	  * Listener for Mouse Events
+	  */
+	@:overload
+	override public function processMouseEvent(event:MouseEvent):Void {
+		super.processMouseEvent(event);
+	}
+
 /* === Instance Fields === */
 
 	//- reference to the Window [this] is attached to
@@ -56,4 +72,7 @@ class Surface extends JPanel {
 
 	//- Signal to fire each frame
 	public var onPaint:Signal<Graphics2D>;
+
+	//- MouseEventListener instance, attached to [this] Surface
+	public var mouseListener : MouseEventListener;
 }

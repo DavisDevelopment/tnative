@@ -10,6 +10,8 @@ import java.lang.System;
 import java.javax.swing.JFrame;
 import java.awt.Graphics;
 
+import tannus.events.MouseEvent;
+
 import tannus.display.backend.java.*;
 
 class Window extends JFrame implements TWindow {
@@ -23,6 +25,7 @@ class Window extends JFrame implements TWindow {
 		mse = new java.util.concurrent.ScheduledThreadPoolExecutor(2);
 		resizeEvent = new Signal();
 		frameEvent = new Signal();
+		mouseEvent = new Signal();
 		nc_graphics = new TannusGraphics(this);
 
 		__init();
@@ -153,6 +156,9 @@ class Window extends JFrame implements TWindow {
 
 	//- The event which fires when a frame is about to be rendered
 	public var frameEvent:Signal<Dynamic>;
+
+	//- The Signal which fires when [this] Window receives a MouseEvent
+	public var mouseEvent:Signal<MouseEvent>;
 
 	//- The Graphics object for [this] Window
 	public var nc_graphics : TGraphics;
