@@ -33,7 +33,10 @@ class MouseEventListener implements MouseListener implements MouseMotionListener
 		if (e.isControlDown()) mods.push( Control );
 		if (e.isMetaDown()) mods.push( Meta );
 
-		var mevent:MouseEvent = new MouseEvent(type, ([e.getXOnScreen(), e.getYOnScreen()]), e.getButton(), mods);
+		var p = e.getPoint();
+		var pos:Point = ([p.x, p.y]);
+		
+		var mevent:MouseEvent = new MouseEvent(type, pos, e.getButton(), mods);
 		return mevent;
 	}
 
