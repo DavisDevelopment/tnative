@@ -4,13 +4,17 @@ import tannus.display.backend.js.*;
 import tannus.geom.Area;
 import tannus.geom.Point;
 
+import tannus.events.MouseEvent;
+import tannus.events.EventCreator;
+import tannus.events.EventMod;
+
 import tannus.io.Signal;
 import tannus.io.Ptr;
 
 /**
   * Class to bind all relevant event-listeners to the Window
   */
-class EventBinder {
+class EventBinder implements EventCreator {
 	/* Constructor Function */
 	public function new(owner : Window):Void {
 		win = owner;
@@ -24,6 +28,7 @@ class EventBinder {
 	public function bind():Void {
 
 		bindWindowEvents();
+		bindMouseEvents();
 	}
 
 	/**
@@ -43,6 +48,42 @@ class EventBinder {
 
 			la = win.nc_size;
 		});
+	}
+
+	/**
+	  * Attach listeners for all mouse-events
+	  */
+	private function bindMouseEvents():Void {
+		var listenFor:Array<String> = ['mousedown', 'mouseup', 'mousemove', 'click'];
+		
+		for (t in listenFor) {
+			w.addEventListener(t, function(event : js.html.MouseEvent):Void {
+				var me:MouseEvent = createTannusEvent(event);
+
+				win.mouseEvent.broadcast( me );
+			});
+		}
+	}
+
+	/**
+	  * Create a Tannus Event from an HTML5 Event
+	  */
+	private function createTannusEvent(e : js.html.MouseEvent):MouseEvent {
+		var mods:Array<EventMod> = new Array();
+		
+		if (e.altKey) mods.push( Alt );
+		if (e.shiftKey) mods.push( Shift );
+		if (e.ctrlKey) mods.push( Control );
+		if (e.metaKey) mods.push( Meta );
+
+		var button:Int = e.button;
+		var pos:Point = new Point(e.clientX, e.clientY);
+
+		var mev:MouseEvent = new MouseEvent(e.type, pos, button, mods);
+		mev.onDefaultPrevented.once(function(v) e.preventDefault());
+		mev.onPropogationStopped.once(function(v) e.stopPropagation());
+
+		return mev;
 	}
 
 /* === Computed Instance Fields === */

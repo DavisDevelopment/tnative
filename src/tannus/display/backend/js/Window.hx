@@ -7,6 +7,8 @@ import tannus.graphics.Color;
 import tannus.geom.Area;
 import tannus.io.Signal;
 
+import tannus.events.MouseEvent;
+
 import js.html.Document;
 import js.html.CanvasElement;
 import js.html.CanvasRenderingContext2D;
@@ -19,6 +21,7 @@ class Window implements TWindow {
 		//- Create Event Signals
 		resizeEvent = new Signal();
 		frameEvent = new Signal();
+		mouseEvent = new Signal();
 		
 		//- Create a new Canvas
 		canvas = cast doc.createElement( 'canvas' );
@@ -130,6 +133,9 @@ class Window implements TWindow {
 
 	//- Event fired before the rendering of each frame
 	public var frameEvent : Signal<Dynamic>;
+
+	//- Event fired for mouse-events
+	public var mouseEvent : Signal<MouseEvent>;
 
 	//- Implementation of TGraphics in use by [this] Window
 	public var nc_graphics : TGraphics;
