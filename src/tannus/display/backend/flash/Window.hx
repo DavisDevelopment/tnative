@@ -4,6 +4,7 @@ import tannus.display.backend.flash.*;
 import tannus.display.TWindow;
 import tannus.geom.Area;
 import tannus.io.Signal;
+import tannus.events.MouseEvent;
 
 import flash.Lib;
 import flash.display.Sprite;
@@ -22,6 +23,8 @@ class Window extends Sprite implements TWindow {
 
 		frameEvent = new Signal();
 		resizeEvent = new Signal();
+		mouseEvent = new Signal();
+
 		nc_graphics = new TannusGraphics(this);
 
 		var cur = flash.Lib.current;
@@ -100,6 +103,7 @@ class Window extends Sprite implements TWindow {
 
 	public var resizeEvent : Signal<{then:Area, now:Area}>;
 	public var frameEvent : Signal<Dynamic>;
+	public var mouseEvent : Signal<MouseEvent>;
 
 	public var nc_graphics : TGraphics;
 
