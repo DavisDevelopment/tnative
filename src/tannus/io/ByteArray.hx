@@ -282,6 +282,18 @@ abstract ByteArray (Array<Byte>) {
 	}
 	#end
 
+	#if java
+	
+	/* To java.lang.byte[] */
+	@:to
+	public inline function toJavaByteArray():java.NativeArray<java.lang.Byte> {
+		var _ba:Array<java.lang.Byte> = this.map(function(b : Byte) return b.toJavaByte());
+
+		return untyped java.Lib.nativeArray(_ba, false);
+	}
+
+	#end
+
 	/* From Array<Int> */
 	@:from
 	public static inline function fromIntArray(ia : Array<Int>):ByteArray {
