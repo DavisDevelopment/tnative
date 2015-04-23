@@ -4,6 +4,8 @@ import tannus.geom.Area;
 import tannus.geom.Rectangle;
 import tannus.io.Signal;
 
+import tannus.events.*;
+
 /**
   * Generic Window interface to allow autocompletion
   */
@@ -23,4 +25,7 @@ interface TWindow {
 
 	/* Signal Fired Every Frame */
 	var frameEvent : Signal<Dynamic>;
+
+	/* Signal Fired Upon Receipt of a Mouse Event */
+	var mouseEvent : Signal<MouseEvent>;
 }
