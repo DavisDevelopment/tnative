@@ -76,8 +76,16 @@ class Window implements TWindow {
 	  * Nitty Gritty stuff that should happen every frame
 	  */
 	private inline function __perFrameInternal():Void {
+		//- Get the 'background color' of [this] Window
 		var bg:Color = nc_graphics.backgroundColor;
+
+		//- Clear the Canvas
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+		//- Begin a new Path
 		ctx.beginPath();
+
+		//- Fill the entire canvas with the 'background color'
 		ctx.fillStyle = bg;
 		ctx.fillRect(0, 0, canvas.width, canvas.height);
 		ctx.closePath();
