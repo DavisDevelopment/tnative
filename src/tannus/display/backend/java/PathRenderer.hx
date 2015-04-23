@@ -158,8 +158,8 @@ class PathRenderer {
 			case LineWidth( nwidth ):
 				lineStyle.width = nwidth;
 
-			case LineColor( color ):
-				lineStyle.color = color;
+			case LineBrush( brush ):
+				lineStyle.brush = brush;
 
 			default:
 				throw 'PathError: Cannot perform Style Alteration $change!';
@@ -174,7 +174,26 @@ class PathRenderer {
 	private inline function syncStyles():Void {
 		var stroke = new java.awt.BasicStroke(i(lineStyle.width));
 		g.setStroke( stroke );
-		g.setColor( lineStyle.color );
+
+		var brush:Brush = lineStyle.brush;
+		
+		/* === Determine what to do with the current Brush === */
+		switch (brush.type) {
+			/* Solid Color Brush */
+			case BColor( col ):
+				g.setColor( col );
+
+			/* Linear Gradient Brush */
+			case BLinearGradient( grad ):
+				var fractions = java.Lib.nativeArray(cast grad.stops.map(function(stop) return (stop.offset.of(1))), true);
+				var colors = java.Lib.nativeArray(grad.stops.map(function(stop) return (stop.color.toJavaColor())), true);
+
+				var lg = new java.awt.LinearGradientPaint(grad.start, grad.end, fractions, colors);
+				g.setPaint( lg );
+
+			default:
+				throw 'Unknown Brush type ${brush.type}!';
+		}
 	}
 
 	/**
@@ -253,3 +272,5 @@ class PathRenderer {
 	//- the current styling for drawn paths
 	private var styles : PathStyle;
 }
+
+private typedef Brush = tannus.graphics.GraphicsBrush;
