@@ -97,6 +97,19 @@ abstract Color (Array<Int>) {
 		);
 	}
 
+	/**
+	  * Mix [this] Color with another one
+	  */
+	public inline function mix(t:Color, weight:Percent):Color {
+		var ratio:Float = weight.of( 1 );
+		return new Color(
+			i(red + (t.red - red) * ratio),
+			i(green + (t.green - green) * ratio),
+			i(blue + (t.blue - blue) * ratio),
+			i(alpha + (t.alpha - alpha) * ratio)
+		);
+	}
+
 /* === Implicit Type Casting === */
 
 	/**
@@ -246,5 +259,12 @@ abstract Color (Array<Int>) {
 		#else
 			return StringTools.hex(val, digits);
 		#end
+	}
+
+	/**
+	  * Utility Method for converting Float to Int
+	  */
+	private static inline function i(f : Float):Int {
+		return Std.int( f );
 	}
 }
