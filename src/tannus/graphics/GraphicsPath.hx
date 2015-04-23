@@ -172,26 +172,26 @@ class GraphicsPath {
 	}
 
 	/**
-	  * Line Color
+	  * Line Brush
 	  */
-	public var lineBrush(get, set):Color;
-	private function get_lineBrush():Color {
-		var lb:Maybe<Color> = null;
+	public var lineBrush(get, set):Brush;
+	private function get_lineBrush():Brush {
+		var lb:Maybe<Brush> = null;
 
 		for (op in stack) {
 			switch (op) {
-				case StyleAlteration(LineColor( ncol )):
-					lb = ncol;
+				case StyleAlteration(LineBrush( nbrush )):
+					lb = nbrush;
 
 				default:
 					continue;
 			}
 		}
 
-		return lb.or(LineStyle.DEFAULT_COLOR);
+		return lb.or(Brush.fromColor(LineStyle.DEFAULT_COLOR));
 	}
-	private function set_lineBrush(nb : Color):Color {
-		setLineColor( nb );
+	private function set_lineBrush(nb : Brush):Brush {
+		setLineBrush( nb );
 		return nb;
 	}
 
@@ -205,8 +205,8 @@ class GraphicsPath {
 	/**
 	  * Set the current line-color
 	  */
-	private inline function setLineColor(color : Color):Void {
-		sc(LineColor( color ));
+	private inline function setLineBrush(brush : Brush):Void {
+		sc(LineBrush( brush ));
 	}
 
 
@@ -252,8 +252,8 @@ class GraphicsPath {
 				/* == StyleAleration Operation == */
 				case StyleAlteration(change):
 					switch (change) {
-						case LineColor( color ):
-							cstack.push(StyleAlteration(LineColor(color.clone())));
+						case LineBrush( brush ):
+							cstack.push(StyleAlteration(LineBrush(brush.clone())));
 
 						case LineWidth( nwidth ):
 							cstack.push(StyleAlteration(LineWidth(nwidth)));
@@ -463,3 +463,6 @@ class GraphicsPath {
 	//- Parent Path (if any)
 	private var parent : Null<GraphicsPath>;
 }
+
+/* Alias for GraphicsBrush */
+private typedef Brush = tannus.graphics.GraphicsBrush;
