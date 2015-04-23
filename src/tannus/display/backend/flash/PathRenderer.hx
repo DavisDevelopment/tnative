@@ -5,6 +5,7 @@ import tannus.display.TGraphics;
 
 import tannus.geom.*;
 import tannus.graphics.Color;
+import tannus.graphics.GraphicsBrush;
 import tannus.graphics.GraphicsPath;
 import tannus.graphics.PathComponent;
 import tannus.graphics.PathStyleAlteration;
@@ -113,8 +114,8 @@ class PathRenderer {
 				lineStyle.width = nwidth;
 
 			/* == Change Line Color == */
-			case LineColor( color ):
-				lineStyle.color = color;
+			case LineBrush( brush ):
+				lineStyle.brush = brush;
 
 			/* == Anything Else == */
 			default:
@@ -130,9 +131,9 @@ class PathRenderer {
 	private function syncStyles():Void {
 		/* == Line Styles == */
 
-		var lcolor:Color = lineStyle.color.clone();
-		var a:Float = (255 / lcolor.alpha);
-		lcolor.alpha = 0;
+		var lcolor:Color = new Color();
+		var a:Float = 0;
+		lcolor.alpha = 255;
 
 		//- determine cap-style
 		var cap:flash.display.CapsStyle = (switch (lineStyle.cap) {
@@ -148,7 +149,35 @@ class PathRenderer {
 		});
 
 		// g.lineStyle(thickness, color, alpha, null, null, capStyle, jointStyle);
-		g.lineStyle(lineStyle.width, lcolor, a, false, null, cap, joint);
+
+		/* === Determine what to do with the current Brush === */
+		var brush:GraphicsBrush = lineStyle.brush;
+		switch (brush.type) {
+			/* Solid Color Brush */
+			case BColor( color ):
+				a = (255 / color.alpha);
+				color.alpha = 0;
+				lcolor = color;
+
+				g.lineStyle(lineStyle.width, lcolor, a, false, null, cap, joint);
+
+			/* Linear Gradient Brush */
+			case BLinearGradient( grad ):
+				var ocolors:Array<Color> = grad.stops.map(function(stop) return (stop.color));
+				var ratios:Array<Float> = grad.stops.map(function(stop) return (stop.offset.of(1)));
+				var alphas:Array<Float> = ocolors.map(function(color) {
+					var a:Float = (255 / color.alpha);
+					color.alpha = 0;
+					return a;
+				});
+				var colors:Array<UInt> = ocolors.map(function(c) return cast c.toInt());
+
+				g.lineGradientStyle(LINEAR, colors, alphas, ratios);
+
+			default:
+				throw 'Unknown Brush type ${brush.type}!';
+		}
+
 	}
 
 	/**
