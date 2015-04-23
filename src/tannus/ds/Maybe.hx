@@ -39,6 +39,17 @@ abstract Maybe<T> (Null<T>) from Null<T> {
 	}
 
 	/**
+	  * If [this] isn't [null], returns [this], otherwise, throws [error]
+	  */
+	public inline function orDie(error : Dynamic):T {
+		if (!exists) {
+			throw error;
+		}
+
+		return toNonNullable();
+	}
+
+	/**
 	  * Under those circumstances where we KNOW that [this]
 	  * is not null, we may just cast implicitly
 	  */
