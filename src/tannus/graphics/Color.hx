@@ -84,6 +84,19 @@ abstract Color (Array<Int>) {
 		return cast this.copy();
 	}
 
+	/**
+	  * Compare two Color objects
+	  */
+	@:op(A == B)
+	public inline function equals(other : Color):Bool {
+		return (
+			(red == other.red) &&
+			(green == other.green) &&
+			(blue == other.blue) &&
+			(alpha == other.alpha)
+		);
+	}
+
 /* === Implicit Type Casting === */
 
 	/**
