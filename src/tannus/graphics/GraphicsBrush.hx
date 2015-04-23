@@ -30,6 +30,10 @@ abstract GraphicsBrush (Gbt) {
 			case BColor( color ):
 				return color.clone();
 
+			/* Linear Gradient Brush */
+			case BLinearGradient(grad):
+				return grad.clone();
+
 			default:
 				error('Cannot clone Brush of type $this!');
 		}
