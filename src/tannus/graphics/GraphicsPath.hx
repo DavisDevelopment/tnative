@@ -326,26 +326,53 @@ class GraphicsPath {
 
 		//- vectorize [op]
 		switch (op) {
-			//- MoveTo
+			/* MoveTo Component */
 			case MoveTo( pos ):
 				pos = pos.vectorize([0, 0, g.width, g.height]);
 				return MoveTo(pos);
 
-			//- LineTo
+			/* LineTo Component */
 			case LineTo( pos ):
 				pos = pos.vectorize([0, 0, g.width, g.height]);
 				return LineTo(pos);
 
+			/* Rectangle Component */
 			case Rectangle(r):
 				return Rectangle(r.vectorize([0, 0, g.width, g.height]));
 
+			/* Ellipse Component */
 			case Ellipse(r):
 				return Ellipse(r.vectorize([0, 0, g.width, g.height]));
 
+			/* SubPath Component */
 			case SubPath( sub ):
 				var vsub = sub.clone();
 				vsub.vectorize();
 				return SubPath( vsub );
+
+			/* StyleAlteration Component */
+			case StyleAlteration( change ):
+				//- Determine what to do with [change]
+				switch (change) {
+					/* LineBrush Alteration */
+					case LineBrush( brush ):
+						//- Determine what to do with the given brush type
+						switch (brush.type) {
+							/* Linear Gradient Brush */
+							case BLinearGradient(grad):
+								var c = grad.clone();
+								c.start = (c.start.vectorize([0, 0, g.width, g.height]));
+								return StyleAlteration(LineBrush( c ));
+
+							/* Anything Else */
+							default:
+								return op;
+						}
+
+					/* Anything Else */
+					default:
+						return op;
+				}
 
 			//- Anything Else
 			default:
@@ -410,6 +437,25 @@ class GraphicsPath {
 				var vsub = sub.clone();
 				vsub.devectorize();
 				return SubPath( vsub );
+
+			case StyleAlteration( change ):
+				switch (change) {
+					/* LineBrush Alteration */
+					case LineBrush( brush ):
+						switch (brush.type) {
+							case BLinearGradient(grad):
+								var dv = grad.clone();
+								dv.start = (dv.start.devectorize([0, 0, g.width, g.height]));
+								dv.end = (dv.end.devectorize([0, 0, g.width, g.height]));
+								return StyleAlteration(LineBrush( dv ));
+
+							default:
+								return op;
+						}
+
+					default:
+						return op;
+				}
 
 			default:
 				 return op;
