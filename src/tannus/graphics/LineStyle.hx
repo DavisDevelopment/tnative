@@ -1,6 +1,7 @@
 package tannus.graphics;
 
 import tannus.graphics.Color;
+import tannus.graphics.GraphicsBrush;
 import tannus.graphics.LineCap;
 import tannus.graphics.LineJoin;
 
@@ -11,7 +12,7 @@ class LineStyle {
 	/* Constructor Function */
 	public function new():Void {
 		width = DEFAULT_WIDTH;
-		color = DEFAULT_COLOR;
+		brush = DEFAULT_COLOR;
 		cap = DEFAULT_CAP;
 		join = DEFAULT_JOIN;
 	}
@@ -23,7 +24,7 @@ class LineStyle {
 	  */
 	public inline function reset():Void {
 		width = DEFAULT_WIDTH;
-		color = DEFAULT_COLOR;
+		brush = DEFAULT_COLOR;
 		cap = DEFAULT_CAP;
 		join = DEFAULT_JOIN;
 	}
@@ -34,7 +35,7 @@ class LineStyle {
 	public inline function clone():LineStyle {
 		var c = new LineStyle();
 		c.width = width;
-		c.color = color.clone();
+		c.brush = brush.clone();
 		c.cap = cap;
 		c.join = join;
 
@@ -47,7 +48,7 @@ class LineStyle {
 	public var width : Float;
 
 	//- The color of drawn lines
-	public var color : Color;
+	public var brush : GraphicsBrush;
 
 	//- The joint type of drawn lines
 	public var join : LineJoin;
