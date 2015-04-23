@@ -130,6 +130,15 @@ abstract Byte (Int) from Int to Int {
 		return asint;
 	}
 
+	#if java
+	/* To java.lang.Byte */
+	@:to
+	public inline function toJavaByte():java.lang.Byte {
+		var _i:Int = asint;
+		return cast (untyped __java__('(byte) _i'));
+	}
+	#end
+
 	@:from(String)
 	public static inline function fromString(s : String):Byte {
 		var b:Byte = 0;
