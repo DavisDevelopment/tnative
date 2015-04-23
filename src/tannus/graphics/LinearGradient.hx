@@ -24,6 +24,19 @@ class LinearGradient {
 /* === Instance Methods === */
 
 	/**
+	  * Creates and returns a clone of [this] Gradient
+	  */
+	public function clone():LinearGradient {
+		var c:LinearGradient = new LinearGradient(start, end);
+
+		for (stop in stops) {
+			c.addColorStop(stop.offset, stop.color);
+		}
+
+		return c;
+	}
+
+	/**
 	  * Adds a Color Stop to [this] Gradient
 	  */
 	public function addColorStop(offset:Percent, color:Color):Void {
