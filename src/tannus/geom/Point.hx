@@ -119,6 +119,17 @@ abstract Point (TPoint) {
 
 	#end
 
+	#if java
+	
+	/* To java.awt.geom.Point2D */
+	@:to
+	public inline function toJavaPoint2D():java.awt.geom.Point2D {
+		var jp = (new java.awt.geom.Point2D.Point2D_Double(x, y));
+		return jp;
+	}
+
+	#end
+
 	/**
 	  * Shorthand function for creating a Percent
 	  */
