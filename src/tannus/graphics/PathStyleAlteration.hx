@@ -1,6 +1,7 @@
 package tannus.graphics;
 
 import tannus.graphics.Color;
+import tannus.graphics.GraphicsBrush;
 
 /**
   * Enum of possible alterations to the current Path Styling
@@ -10,5 +11,5 @@ enum PathStyleAlteration {
 	LineWidth(width : Float);
 
 	//- Set the line-color to [col]
-	LineColor(col : Color);
+	LineBrush(brush : GraphicsBrush);
 }
