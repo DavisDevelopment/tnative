@@ -12,6 +12,7 @@ class PathRenderer {
 	/* Constructor Function */
 	public function new(graphics : TannusGraphics):Void {
 		g = graphics;
+		style = new PathStyle();
 	}
 
 /* === Instance Methods === */
@@ -100,8 +101,28 @@ class PathRenderer {
 				c.lineWidth = w;
 
 			//- Change the color of drawn lines
-			case Psa.LineColor( color ):
-				c.strokeStyle = (color + '');
+			case Psa.LineBrush( brush ):
+				switch (brush.type) {
+					/* Solid Color Brush */
+					case BColor( color ):
+						c.strokeStyle = (color + '');
+
+					/* Linear Gradient */
+					case BLinearGradient( grad ):
+						var s:Point = grad.start;
+						var e:Point = grad.end;
+
+						var lg = c.createLinearGradient(s.x, s.y, e.x, e.y);
+						for (stop in grad.stops) {
+							lg.addColorStop((stop.offset.of(1)), (stop.color.toString()));
+						}
+
+						c.strokeStyle = lg;
+
+					default:
+						var typ:String = Type.getEnumConstructs(tannus.graphics.GraphicsBrushType)[Type.enumIndex(brush.type)];
+						throw 'Unknown Brush Type $typ!';
+				}
 
 			default:
 				throw 'PathError: Unknown Style Aleration $change!';
@@ -129,7 +150,11 @@ class PathRenderer {
 
 	//- reference to the GraphicsPath currently being drawn
 	private var path : GraphicsPath;
+
+	//- The current Styling of [this] Path
+	private var style : PathStyle;
 }
 
 private typedef Pc = PathComponent;
 private typedef Psa = PathStyleAlteration;
+private typedef Brush = GraphicsBrush;
