@@ -15,6 +15,15 @@ class Triangle {
 		three = z;
 	}
 
+/* === Instance Methods === */
+
+	/**
+	  * Create and return a clone of [this] Triangle
+	  */
+	public inline function clone():Triangle {
+		return new Triangle(one.clone(), two.clone(), three.clone());
+	}
+
 /* === Instance Fields === */
 
 	public var one:Point;
