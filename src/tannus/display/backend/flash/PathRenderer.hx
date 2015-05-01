@@ -117,6 +117,14 @@ class PathRenderer {
 			case LineBrush( brush ):
 				lineStyle.brush = brush;
 
+			/* === Change Line Cap === */
+			case LineCap( cap ):
+				lineStyle.cap = cap;
+
+			/* === Change Line Join === */
+			case LineJoin( jon ):
+				lineStyle.join = jon;
+
 			/* == Anything Else == */
 			default:
 				throw 'PathError: Cannot perform style alteration $change!';
