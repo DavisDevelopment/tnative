@@ -30,6 +30,13 @@ class Line {
 	private inline function get_start() return one;
 	private inline function set_start(ns) return (one = ns);
 
+	/**
+	  * 'end', an alias for [two]
+	  */
+	public var end(get, set):Point;
+	private inline function get_end() return two;
+	private inline function set_end(ne) return (two = ne);
+
 /* === Instance Fields === */
 
 	public var one:Point;
