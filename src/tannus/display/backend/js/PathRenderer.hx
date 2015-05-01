@@ -124,6 +124,28 @@ class PathRenderer {
 						throw 'Unknown Brush Type $typ!';
 				}
 
+			case Psa.LineCap( cap ):
+				switch (cap) {
+					case Round:
+						c.lineCap = 'round';
+					case Square:
+						c.lineCap = 'square';
+					case Butt:
+						c.lineCap = 'butt';
+				}
+
+			case Psa.LineJoin( jon ):
+				switch (jon) {
+					case Bevel:
+						c.lineJoin = 'bevel';
+
+					case Miter:
+						c.lineJoin = 'miter';
+
+					case Round:
+						c.lineJoin = 'round';
+				}
+
 			default:
 				throw 'PathError: Unknown Style Aleration $change!';
 		}
