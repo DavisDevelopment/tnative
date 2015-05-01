@@ -24,6 +24,15 @@ class Triangle {
 		return new Triangle(one.clone(), two.clone(), three.clone());
 	}
 
+	/**
+	  * Vectorize [this] Triangle
+	  */
+	public inline function vectorize(r : Rectangle):Void {
+		one = one.vectorize(r);
+		two = two.vectorize(r);
+		three = three.vectorize(r);
+	}
+
 /* === Instance Fields === */
 
 	public var one:Point;
