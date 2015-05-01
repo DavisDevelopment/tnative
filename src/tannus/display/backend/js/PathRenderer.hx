@@ -49,6 +49,10 @@ class PathRenderer {
 			case Pc.LineTo( pos ):
 				c.lineTo(pos.x, pos.y);
 
+			//- draw an Arc
+			case Pc.Arc( curve ):
+				drawArc(curve, c);
+
 			//- draw a rectangle
 			case Pc.Rectangle( r ):
 				c.rect(r.x, r.y, r.w, r.h);
@@ -84,6 +88,8 @@ class PathRenderer {
 					//- Draw a new line to the end of [line]
 					c.lineTo(line.end.x, line.end.y);
 				}
+
+				c.lineTo(tri.one.x, tri.one.y);
 
 			//- Draw a sub-path
 			case Pc.SubPath( sub ):
@@ -163,6 +169,23 @@ class PathRenderer {
 
 			default:
 				throw 'PathError: Unknown Style Aleration $change!';
+		}
+	}
+
+	/**
+	  * Draw an Arc onto the Canvas
+	  */
+	public function drawArc(arc:Arc, c:CanvasRenderingContext2D):Void {
+		var lines:Array<Line> = arc.getLines();
+		var first:Line = lines.shift();
+
+		c.moveTo(first.start.x, first.start.y);
+		c.lineTo(first.end.x, first.end.y);
+
+		for (line in lines) {
+			var p:Point = line.end;
+
+			c.lineTo(p.x, p.y);
 		}
 	}
 
