@@ -328,6 +328,10 @@ class GraphicsPath {
 				case LineTo(pos):
 					cstack.push(LineTo(pos.clone()));
 
+				//- Arc Operation
+				case Arc( arc ):
+					cstack.push(Arc(arc.clone()));
+
 				//- Rectangle Operation
 				case Rectangle(r):
 					cstack.push(Rectangle(r.clone()));
@@ -436,6 +440,10 @@ class GraphicsPath {
 			case LineTo( pos ):
 				pos = pos.vectorize([0, 0, g.width, g.height]);
 				return LineTo(pos);
+
+			/* Arc Component */
+			case Arc( arc ):
+				return Arc(arc.vectorize([0, 0, g.width, g.height]);
 
 			/* Rectangle Component */
 			case Rectangle(r):
