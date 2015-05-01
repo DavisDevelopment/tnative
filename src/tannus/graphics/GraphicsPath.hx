@@ -13,6 +13,8 @@ import tannus.graphics.Color;
 import tannus.graphics.LineStyle;
 import tannus.graphics.PathComponent;
 import tannus.graphics.PathStyleAlteration;
+import tannus.graphics.LineCap;
+import tannus.graphics.LineJoin;
 
 /**
   * Class to allow the creation and execution of a series a drawing operations, called a "path"
@@ -99,6 +101,13 @@ class GraphicsPath {
 	  */
 	public function ellipse(rect : Rectangle):Void {
 		add(Ellipse( rect ));
+	}
+
+	/**
+	  * Draw an Ellipse
+	  */
+	public function drawEllipse(x:Float, y:Float, w:Float, h:Float):Void {
+		add(Ellipse([x, y, w, h]));
 	}
 
 	/**
@@ -214,6 +223,13 @@ class GraphicsPath {
 	  */
 	private inline function setLineBrush(brush : Brush):Void {
 		sc(LineBrush( brush ));
+	}
+
+	/**
+	  * Set the current line-cap
+	  */
+	private inline function setLineCap(cap : LineCap):Void {
+		sc(LineCap( cap ));
 	}
 
 
