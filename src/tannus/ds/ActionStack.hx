@@ -31,7 +31,11 @@ abstract ActionStack (Array<Void -> Void>) {
 	  */
 	public inline function call():Void {
 		for (action in this) {
-			action();
+			if (Reflect.isFunction(action)) {
+				action();
+			} else {
+				trace('Non-Function action found!');
+			}
 		}
 	}
 
