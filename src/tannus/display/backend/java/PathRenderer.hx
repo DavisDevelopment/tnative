@@ -161,6 +161,12 @@ class PathRenderer {
 			case LineBrush( brush ):
 				lineStyle.brush = brush;
 
+			case LineCap( cap ):
+				lineStyle.cap = cap;
+
+			case LineJoin( jon ):
+				lineStyle.join = jon;
+
 			default:
 				throw 'PathError: Cannot perform Style Alteration $change!';
 		}
@@ -172,10 +178,10 @@ class PathRenderer {
 	  * Style our Graphics2D object to match the styles of the current state
 	  */
 	private inline function syncStyles():Void {
-		var stroke = new java.awt.BasicStroke(i(lineStyle.width));
-		g.setStroke( stroke );
 
 		var brush:Brush = lineStyle.brush;
+		var cap:Int = 0;
+		var join:Int = 0;
 		
 		/* === Determine what to do with the current Brush === */
 		switch (brush.type) {
@@ -194,6 +200,26 @@ class PathRenderer {
 			default:
 				throw 'Unknown Brush type ${brush.type}!';
 		}
+
+		switch (lineStyle.cap) {
+			case Butt:
+				cap = java.awt.BasicStroke.CAP_BUTT;
+
+			case Round:
+				cap = java.awt.BasicStroke.CAP_ROUND;
+
+			case Square:
+				cap = java.awt.BasicStroke.CAP_SQUARE;
+		}
+
+		switch (lineStyle.join) {
+			case Bevel: join = java.awt.BasicStroke.JOIN_BEVEL;
+			case Round: join = java.awt.BasicStroke.JOIN_ROUND;
+			case Miter: join = java.awt.BasicStroke.JOIN_MITER;
+		}
+
+		var stroke = new java.awt.BasicStroke(i(lineStyle.width), cap, join);
+		g.setStroke( stroke );
 	}
 
 	/**
