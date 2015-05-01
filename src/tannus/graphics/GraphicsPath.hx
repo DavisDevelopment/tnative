@@ -235,6 +235,30 @@ class GraphicsPath {
 	}
 
 	/**
+	  * Line Join
+	  */
+	public var lineJoin(get, set):LineJoin;
+	private function get_lineJoin():LineJoin {
+		var lj:Maybe<LineJoin> = null;
+
+		for (op in stack) {
+			switch (op) {
+				case StyleAlteration(LineJoin( njoin )):
+					lj = njoin;
+
+				default:
+					continue;
+			}
+		}
+
+		return (lj || Miter);
+	}
+	private function set_lineJoin(njoin : LineJoin):LineJoin {
+		setLineJoin( njoin );
+		return njoin;
+	}
+
+	/**
 	  * Set the current line-thickness
 	  */
 	private inline function setLineWidth(width : Float):Void {
