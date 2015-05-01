@@ -445,6 +445,10 @@ class GraphicsPath {
 			case Ellipse(r):
 				return Ellipse(r.vectorize([0, 0, g.width, g.height]));
 
+			/* Triangle Component */
+			case Triangle( tri ):
+				return Triangle(tri.vectorize([0, 0, g.width, g.height]));
+
 			/* SubPath Component */
 			case SubPath( sub ):
 				var vsub = sub.clone();
