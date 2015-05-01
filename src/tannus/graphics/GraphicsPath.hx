@@ -533,6 +533,10 @@ class GraphicsPath {
 			case LineTo( pos ):
 				 return LineTo(pos.devectorize([0, 0, g.width, g.height]));
 
+			/* == Arc Operation == */
+			case Arc( arc ):
+				 return Arc(arc.devectorize([0, 0, g.width, g.height]));
+
 			/* == Rectangle Operation == */
 			case Rectangle(r):
 				return Rectangle(r.devectorize([0, 0, g.width, g.height]));
