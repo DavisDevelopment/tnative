@@ -42,6 +42,13 @@ class Signal<T> {
 	}
 
 	/**
+	  * Alias to [listen]
+	  */
+	public inline function on(f:T->Void, ?once:Bool=false):Void {
+		listen(f, once);
+	}
+
+	/**
 	  * Attach a listener function which will only be invoked the very next broadcast
 	  */
 	public function once(f : T->Void):Void {
