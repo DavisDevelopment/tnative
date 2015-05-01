@@ -538,6 +538,9 @@ class GraphicsPath {
 			case Ellipse(r):
 				return Ellipse(r.devectorize([0, 0, g.width, g.height]));
 
+			case Triangle( tri ):
+				return Triangle(tri.devectorize([0, 0, g.width, g.height]));
+
 			case SubPath( sub ):
 				var vsub = sub.clone();
 				vsub.devectorize();
