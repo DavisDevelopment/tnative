@@ -33,6 +33,15 @@ class Triangle {
 		three = three.vectorize(r);
 	}
 
+	/**
+	  * Devectorize [this] Triangle
+	  */
+	public inline function devectorize(r : Rectangle):Void {
+		one = one.devectorize(r);
+		two = two.devectorize(r);
+		three = three.devectorize(r);
+	}
+
 /* === Instance Fields === */
 
 	public var one:Point;
