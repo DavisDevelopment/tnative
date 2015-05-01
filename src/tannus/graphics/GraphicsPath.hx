@@ -529,23 +529,29 @@ class GraphicsPath {
 			case MoveTo( pos ):
 				 return MoveTo(pos.devectorize([0, 0, g.width, g.height]));
 
+			/* == LineTo Operation == */
 			case LineTo( pos ):
 				 return LineTo(pos.devectorize([0, 0, g.width, g.height]));
 
+			/* == Rectangle Operation == */
 			case Rectangle(r):
 				return Rectangle(r.devectorize([0, 0, g.width, g.height]));
 
+			/* == Ellipse Operation == */
 			case Ellipse(r):
 				return Ellipse(r.devectorize([0, 0, g.width, g.height]));
 
+			/* == Triangle Operation == */
 			case Triangle( tri ):
 				return Triangle(tri.devectorize([0, 0, g.width, g.height]));
 
+			/* == SubPath Operation == */
 			case SubPath( sub ):
 				var vsub = sub.clone();
 				vsub.devectorize();
 				return SubPath( vsub );
 
+			/* == StyleAlteration Operation == */
 			case StyleAlteration( change ):
 				switch (change) {
 					/* LineBrush Alteration */
