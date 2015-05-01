@@ -304,6 +304,12 @@ class GraphicsPath {
 						case LineWidth( nwidth ):
 							cstack.push(StyleAlteration(LineWidth(nwidth)));
 
+						case LineCap( cap ):
+							cstack.push(StyleAlteration(LineCap(cap)));
+
+						case LineJoin( join ):
+							cstack.push(StyleAlteration(LineJoin(join)));
+
 						default:
 							throw 'PathError: Cannot clone Style Alteration $change!';
 					}
