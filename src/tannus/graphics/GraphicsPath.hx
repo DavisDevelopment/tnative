@@ -83,6 +83,17 @@ class GraphicsPath {
 	}
 
 	/**
+	  * Draw an Arc
+	  */
+	public function arc(curve : Arc):Void {
+		add(Arc( curve ));
+	}
+
+	/**
+	  * Draw an Arc
+	  */
+
+	/**
 	  * Draw a Rectangle
 	  */
 	public function rectangle(rect : Rectangle):Void {
