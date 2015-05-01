@@ -92,6 +92,9 @@ class GraphicsPath {
 	/**
 	  * Draw an Arc
 	  */
+	public inline function drawArc(x:Float, y:Float, radius:Float, start:Angle, end:Angle, ?cc:Bool=false):Void {
+		arc(new Arc(x, y, radius, start, end, cc));
+	}
 
 	/**
 	  * Draw a Rectangle
