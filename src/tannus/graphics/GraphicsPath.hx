@@ -212,6 +212,29 @@ class GraphicsPath {
 	}
 
 	/**
+	  * Line Cap
+	  */
+	public var lineCap(get, set):LineCap;
+	private function get_lineCap():LineCap {
+		var lc:Maybe<LineCap> = null;
+		for (op in stack) {
+			switch (op) {
+				case StyleAlteration(LineCap( ncap )):
+					lc = ncap;
+
+				default:
+					continue;
+			}
+		}
+
+		return lc.or( Butt );
+	}
+	private function set_lineCap(ncap : LineCap):LineCap {
+		setLineCap( ncap );
+		return ncap;
+	}
+
+	/**
 	  * Set the current line-thickness
 	  */
 	private inline function setLineWidth(width : Float):Void {
