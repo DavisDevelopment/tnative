@@ -23,6 +23,9 @@ enum PathComponent {
 	//- Draw an Ellipse
 	Ellipse(rect : Rectangle);
 
+	//- Draw a Triangle
+	Triangle(tri : Triangle);
+
 	SubPath(path : GraphicsPath);
 
 	//- Stroke the last Stack of operations
