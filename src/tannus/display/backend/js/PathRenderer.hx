@@ -71,6 +71,21 @@ class PathRenderer {
 					);
 				}
 
+			//- Draw a Triangle
+			case Pc.Triangle( tri ):
+				//- Get the Array of Line instances
+				var lines = tri.lines;
+
+				//- Move to the first point of [tri]
+				c.moveTo(tri.one.x, tri.one.y);
+
+				//- Iterate over all lines of the Triangle
+				for (line in lines) {
+					//- Draw a new line to the end of [line]
+					c.lineTo(line.end.x, line.end.y);
+				}
+
+			//- Draw a sub-path
 			case Pc.SubPath( sub ):
 				save();
 
