@@ -134,7 +134,7 @@ abstract ByteArray (Array<Byte>) {
 	  * Check whether [this] contains [sub]
 	  */
 	public function contains(sub : ByteArray):Bool {
-		return (indexOf(sub) != -1);
+		return (self.indexOf(sub) != -1);
 	}
 
 	/**
@@ -230,7 +230,6 @@ abstract ByteArray (Array<Byte>) {
 	}
 
 	/* To NodeJS Buffer */
-	@:to
 	public inline function toNodeBuffer():Dynamic {
 		#if js
 		var len:Int = this.length;
