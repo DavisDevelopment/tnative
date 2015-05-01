@@ -17,6 +17,9 @@ enum PathComponent {
 	//- Draw a line from the current Point, to some other one
 	LineTo(position : Point);
 
+	//- Draw an arc
+	Arc(arc : Arc);
+
 	//- Draw a Rectangle
 	Rectangle(rect : Rectangle);
 
