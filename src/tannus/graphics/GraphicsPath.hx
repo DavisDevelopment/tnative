@@ -88,6 +88,13 @@ class GraphicsPath {
 	}
 
 	/**
+	  * Draw a Rectangle
+	  */
+	public function drawRectangle(x:Float, y:Float, w:Float, h:Float):Void {
+		add(Rectangle([x, y, w, h]));
+	}
+
+	/**
 	  * Draw an Ellipse
 	  */
 	public function ellipse(rect : Rectangle):Void {
