@@ -111,6 +111,20 @@ class GraphicsPath {
 	}
 
 	/**
+	  * Draw a Triangle
+	  */
+	public function triangle(shape : Triangle):Void {
+		add(Triangle( shape ));
+	}
+
+	/**
+	  * Draw a Triangle
+	  */
+	public function drawTriangle(x:Point, y:Point, z:Point):Void {
+		add(Triangle(new Triangle(x, y, z)));
+	}
+
+	/**
 	  * Open and return a sub-path
 	  */
 	public function open():GraphicsPath {
