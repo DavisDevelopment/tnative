@@ -58,7 +58,8 @@ abstract Maybe<T> (Null<T>) from Null<T> {
 		if (this != null) {
 			return this;
 		} else {
-			throw 'TypeError: Cannot declare NULL non-nullable!';
+			//throw 'TypeError: Cannot declare NULL non-nullable!';
+			return this;
 		}
 	}
 

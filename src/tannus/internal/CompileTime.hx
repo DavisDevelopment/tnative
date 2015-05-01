@@ -6,6 +6,7 @@ import tannus.io.Ptr;
 import tannus.sys.File;
 
 import haxe.macro.Context;
+import haxe.macro.Compiler;
 import haxe.macro.Expr;
 import haxe.macro.Type;
 import haxe.macro.Format;
@@ -43,7 +44,6 @@ class CompileTime {
 
 		return macro tannus.io.ByteArray.fromBase64($enc);
 	}
-
 
 #if macro
 	
