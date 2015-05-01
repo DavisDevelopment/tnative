@@ -255,6 +255,13 @@ class GraphicsPath {
 		sc(LineCap( cap ));
 	}
 
+	/**
+	  * Set the current line-join
+	  */
+	private inline function setLineJoin(jon : LineJoin):Void {
+		sc(LineJoin( jon ));
+	}
+
 
 
 /* === Utility Methods === */
