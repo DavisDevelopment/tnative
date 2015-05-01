@@ -27,7 +27,7 @@ class Triangle {
 	/**
 	  * Create and return a vectorized 'clone' of [this]
 	  */
-	public inline function vectorize(r : Rectangle):Void {
+	public inline function vectorize(r : Rectangle):Triangle {
 		var c:Triangle = clone();
 		c.one = one.vectorize(r);
 		c.two = two.vectorize(r);
