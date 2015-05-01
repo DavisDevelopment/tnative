@@ -457,7 +457,7 @@ class GraphicsPath {
 
 			/* Arc Component */
 			case Arc( arc ):
-				return Arc(arc.vectorize([0, 0, g.width, g.height]);
+				return Arc(arc.vectorize([0, 0, g.width, g.height]));
 
 			/* Rectangle Component */
 			case Rectangle(r):

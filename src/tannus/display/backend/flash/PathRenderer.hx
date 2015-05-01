@@ -65,6 +65,12 @@ class PathRenderer {
 					g.lineTo(pos.x, pos.y);
 				});
 
+			/* == Arc Operation == */
+			case Arc( curve ):
+				buffer.append({
+					drawArc( curve );
+				});
+
 			/* == Rectangle Operation == */
 			case Rectangle( r ):
 				buffer.append({
@@ -106,10 +112,10 @@ class PathRenderer {
 
 			/* == Stroke Operation == */
 			case StrokePath:
-				g.beginFill(0x000000, 0);
+				//g.beginFill(0x000000, 0);
 				syncStyles();
 				buffer.call();
-				g.endFill();
+				//g.endFill();
 
 			/* == Everything Else == */
 			default:
@@ -208,6 +214,24 @@ class PathRenderer {
 		buffer = new ActionStack();
 		path = null;
 		lineStyle = new LineStyle();
+	}
+
+	/**
+	  * Draw an Arc
+	  */
+	private function drawArc(arc:Arc, ?precision:Int = 1):Void {
+		var lines:Array<Line> = arc.getLines(precision);
+
+		var first:Line = lines.shift();
+
+		g.moveTo(first.start.x, first.start.y);
+		g.lineTo(first.end.x, first.end.y);
+
+		for (line in lines) {
+			var p:Point = line.end;
+
+			g.lineTo(p.x, p.y);
+		}
 	}
 
 /* === Computed Instance Fields === */
