@@ -61,6 +61,13 @@ class Arc {
 	private inline function get_x() return pos.x;
 	private inline function set_x(nx) return (pos.x = nx);
 
+	/**
+	  * 'y' position of [this] Arc
+	  */
+	public var y(get, set):Float;
+	private inline function get_y() return pos.y;
+	private inline function set_y(ny) return (pos.y = ny);
+
 /* === Instance Fields === */
 
 	/* The Starting Position of [this] Arc */
