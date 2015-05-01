@@ -39,10 +39,14 @@ class Triangle {
 	/**
 	  * Devectorize [this] Triangle
 	  */
-	public inline function devectorize(r : Rectangle):Void {
-		one = one.devectorize(r);
-		two = two.devectorize(r);
-		three = three.devectorize(r);
+	public function devectorize(r : Rectangle):Triangle {
+		var c:Triangle = clone();
+
+		c.one = one.devectorize(r);
+		c.two = two.devectorize(r);
+		c.three = three.devectorize(r);
+
+		return c;
 	}
 
 /* === Instance Fields === */
