@@ -129,6 +129,19 @@ class PathRenderer {
 				buffer.append({
 					g.drawOval(i(r.x), i(r.y), i(r.w), i(r.h));
 				});
+
+			/* == Triangle Operation == */
+			case Triangle( tri ):
+				buffer.append({
+					var lines = tri.lines;
+
+					for (line in lines) {
+						var s = line.start;
+						var e = line.end;
+
+						g.drawLine(i(s.x), i(s.y), i(e.x), i(e.y));
+					}
+				});
 			
 			case StyleAlteration( change ):
 				buffer.append({
