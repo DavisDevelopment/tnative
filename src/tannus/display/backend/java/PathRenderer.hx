@@ -120,6 +120,12 @@ class PathRenderer {
 					cursor = pos.clone();
 				});
 
+			/* == Arc Component == */
+			case Arc( curve ):
+				buffer.append({
+					drawArc( curve );
+				});
+
 			case Rectangle( r ):
 				buffer.append({
 					g.drawRect(i(r.x), i(r.y), i(r.w), i(r.h));
@@ -233,6 +239,27 @@ class PathRenderer {
 
 		var stroke = new java.awt.BasicStroke(i(lineStyle.width), cap, join);
 		g.setStroke( stroke );
+	}
+
+	/**
+	  * Draw an Arc
+	  */
+	private function drawArc(arc : Arc):Void {
+		var lines:Array<Line> = arc.getLines();
+
+		var s:Point, e:Point;
+
+		for (l in lines) {
+			s = l.start;
+			e = l.end;
+
+			g.drawLine(
+				i(s.x),
+				i(s.y),
+				i(e.x),
+				i(e.y)
+			);
+		}
 	}
 
 	/**
