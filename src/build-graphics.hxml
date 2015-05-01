@@ -1,0 +1,16 @@
+
+-main App
+-js ../dist/html/scripts/app.js
+
+--next
+
+-main App
+-java ../dist/java/
+-debug
+
+--next
+
+-main App
+-swf ../dist/flash/app.swf
+-swf-version 10
+
