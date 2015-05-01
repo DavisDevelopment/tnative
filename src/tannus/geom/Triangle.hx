@@ -25,12 +25,15 @@ class Triangle {
 	}
 
 	/**
-	  * Vectorize [this] Triangle
+	  * Create and return a vectorized 'clone' of [this]
 	  */
 	public inline function vectorize(r : Rectangle):Void {
-		one = one.vectorize(r);
-		two = two.vectorize(r);
-		three = three.vectorize(r);
+		var c:Triangle = clone();
+		c.one = one.vectorize(r);
+		c.two = two.vectorize(r);
+		c.three = three.vectorize(r);
+
+		return c;
 	}
 
 	/**
