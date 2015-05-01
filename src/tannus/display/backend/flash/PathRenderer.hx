@@ -79,6 +79,19 @@ class PathRenderer {
 					g.drawEllipse(r.x, r.y, r.w, r.h);
 				});
 
+			/* == Triangle Operation == */
+			case Triangle( tri ):
+				buffer.append({
+					var lines = tri.lines;
+
+					g.moveTo(tri.one.x, tri.one.y);
+
+					for (line in lines) {
+						var e = line.end;
+						g.lineTo(e.x, e.y);
+					}
+				});
+
 			/* == StyleAlteration Operation == */
 			case StyleAlteration( change ):
 				buffer.append({
