@@ -336,6 +336,10 @@ class GraphicsPath {
 				case Ellipse(r):
 					cstack.push(Ellipse(r.clone()));
 
+				//- Triangle Operation
+				case Triangle( tri ):
+					cstack.push(Triangle(tri.clone()));
+
 				//- Sub Path
 				case SubPath(sub):
 					cstack.push(SubPath(sub.clone()));
