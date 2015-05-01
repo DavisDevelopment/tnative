@@ -52,6 +52,15 @@ class Arc {
 		return c;
 	}
 
+/* === Computed Instance Fields === */
+
+	/**
+	  * 'x' position of [this] Arc
+	  */
+	public var x(get, set):Float;
+	private inline function get_x() return pos.x;
+	private inline function set_x(nx) return (pos.x = nx);
+
 /* === Instance Fields === */
 
 	/* The Starting Position of [this] Arc */
