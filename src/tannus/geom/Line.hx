@@ -23,6 +23,13 @@ class Line {
 		return (one.distanceFrom(two));
 	}
 
+	/**
+	  * 'start', an alias for [one]
+	  */
+	public var start(get, set):Point;
+	private inline function get_start() return one;
+	private inline function set_start(ns) return (one = ns);
+
 /* === Instance Fields === */
 
 	public var one:Point;
