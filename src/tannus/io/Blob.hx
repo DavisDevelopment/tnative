@@ -17,9 +17,10 @@ class Blob {
 	/**
 	  * Save [this] Blob as a File, at the given directory
 	  */
-	public function save(dirname : String):Void {
+	public function save(dirname : String):File {
 		var f = new File('$dirname/$name');
 		f.write( data );
+		return f;
 	}
 
 	/**
