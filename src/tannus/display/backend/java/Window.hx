@@ -120,6 +120,13 @@ class Window extends JFrame implements TWindow {
 		JOptionPane.showMessageDialog(this, message);
 	}
 
+	/**
+	  * Prompt User for Input
+	  */
+	public function prompt(q : String):String {
+		return JOptionPane.showInputDialog(this, q);
+	}
+
 /* === Computed Instance Fields === */
 
 	/**
