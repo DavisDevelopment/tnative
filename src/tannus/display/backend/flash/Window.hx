@@ -98,6 +98,13 @@ class Window extends Sprite implements TWindow {
 	}
 
 	/**
+	  * Prompt User for Input
+	  */
+	public function prompt(q : String):String {
+		return (js('prompt("$q")') + '');
+	}
+
+	/**
 	  * Execute a snippet of JavaScript code
 	  */
 	private inline function js(code : String):Dynamic {
