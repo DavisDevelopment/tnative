@@ -186,7 +186,6 @@ abstract Color (Array<Int>) {
 					parts.push(chars.shift()+chars.shift());
 					parts.push(chars.shift()+chars.shift());
 					parts.push(chars.shift()+chars.shift());
-					trace(parts);
 
 					var channels:Array<Int> = new Array();
 					for (part in parts) {
@@ -206,7 +205,6 @@ abstract Color (Array<Int>) {
 					parts.push(chars.shift());
 					parts.push(chars.shift());
 					parts = parts.map(function(c) return (c + c));
-					trace(parts);
 
 					var channels:Array<Int> = new Array();
 					for (part in parts) {
