@@ -18,6 +18,12 @@ class Writer {
 		buffer.write( data );
 	}
 
+	/* Write some data, followed by a line-break */
+	private inline function line(data : ByteArray):Void {
+		w( data );
+		newline();
+	}
+
 	/* Add a line-break to the buffer */
 	private inline function newline() w('\n');
 
