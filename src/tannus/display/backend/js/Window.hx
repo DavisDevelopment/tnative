@@ -100,6 +100,13 @@ class Window implements TWindow {
 		can.height = win.innerHeight;
 	}
 
+	/**
+	  * Display Alert Box
+	  */
+	public function alert(message : String):Void {
+		win.alert( message );
+	}
+
 
 /* === Computed Instance Fields === */
 
