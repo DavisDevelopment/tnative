@@ -58,7 +58,7 @@ class Playlist {
 				return trackByIndex(i);
 
 			case QLocation( loc ):
-				return trackByLocation( loc );
+				return (trackByLocation(loc) || trackByName(loc));
 		}
 	}
 
@@ -77,6 +77,15 @@ class Playlist {
 	private function trackByLocation(loc : String):Maybe<Track> {
 		for (t in tracks)
 			if (t.location == loc) return t;
+		return null;
+	}
+
+	/**
+	  * Get Track by Name
+	  */
+	private function trackByName(name : String):Maybe<Track> {
+		for (t in tracks)
+			if (t.name == name) return t;
 		return null;
 	}
 
