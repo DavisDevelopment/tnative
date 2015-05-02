@@ -8,6 +8,7 @@ import tannus.io.Signal;
 
 import java.lang.System;
 import java.javax.swing.JFrame;
+import java.javax.swing.JOptionPane;
 import java.awt.Graphics;
 
 import tannus.events.MouseEvent;
@@ -110,6 +111,13 @@ class Window extends JFrame implements TWindow {
 		}
 
 		return f;
+	}
+
+	/**
+	  * Display an Alert Box
+	  */
+	public function alert(message : String):Void {
+		JOptionPane.showMessageDialog(this, message);
 	}
 
 /* === Computed Instance Fields === */
