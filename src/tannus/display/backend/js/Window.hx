@@ -107,6 +107,13 @@ class Window implements TWindow {
 		win.alert( message );
 	}
 
+	/**
+	  * Prompt User for Text Input
+	  */
+	public function prompt(q : String):String {
+		return win.prompt( q );
+	}
+
 
 /* === Computed Instance Fields === */
 
