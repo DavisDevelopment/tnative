@@ -26,6 +26,14 @@ class Playlist {
 	}
 
 	/**
+	  * Encode [this] Playlist to M3U Format
+	  */
+	public function encodeAsM3U():ByteArray {
+		var w = new tannus.format.m3u.Writer(this);
+		return w.generate();
+	}
+
+	/**
 	  * Add a new Track to [this] Playlist
 	  */
 	public function addTrack(name:String, location:String, ?trackn:Maybe<Int>):Track {
