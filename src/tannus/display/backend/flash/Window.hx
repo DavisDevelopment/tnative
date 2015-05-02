@@ -91,6 +91,13 @@ class Window extends Sprite implements TWindow {
 	}
 
 	/**
+	  * Show Alert Box
+	  */
+	public function alert(message : String):Void {
+		js('alert("$message")');
+	}
+
+	/**
 	  * Execute a snippet of JavaScript code
 	  */
 	private inline function js(code : String):Dynamic {
