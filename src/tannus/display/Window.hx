@@ -24,6 +24,23 @@ abstract Window (TWindow) {
 		#end
 	}
 
+/* === Instance Methods === */
+
+	/**
+	  * Wrapper around the "prompt" method, which ensures that a response is given
+	  */
+	public function prompt(q:String, ?required:Bool=false):String {
+		var res:String = (this.prompt( q ));
+
+		if (required) {
+			while (res == '') {
+				res = (this.prompt(q));
+			}
+		}
+
+		return res;
+	}
+
 /* === Alias 'nc_' (Non-Conflicting) Fields to Their Intended Names === */
 
 	/**
