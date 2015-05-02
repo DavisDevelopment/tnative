@@ -111,7 +111,7 @@ class Window implements TWindow {
 	  * Prompt User for Text Input
 	  */
 	public function prompt(q : String):String {
-		return win.prompt( q );
+		return (win.prompt(q) + '');
 	}
 
 
