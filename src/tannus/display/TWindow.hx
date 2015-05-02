@@ -31,4 +31,7 @@ interface TWindow {
 
 	/* Show Alert Box */
 	function alert(message : String):Void;
+
+	/* Prompt User for Text Input */
+	function prompt(question : String):String;
 }
