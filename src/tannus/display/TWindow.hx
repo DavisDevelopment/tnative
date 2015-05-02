@@ -28,4 +28,7 @@ interface TWindow {
 
 	/* Signal Fired Upon Receipt of a Mouse Event */
 	var mouseEvent : Signal<MouseEvent>;
+
+	/* Show Alert Box */
+	function alert(message : String):Void;
 }
