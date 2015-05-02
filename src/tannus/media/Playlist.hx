@@ -1,6 +1,8 @@
 package tannus.media;
 
 import tannus.io.Ptr;
+import tannus.io.ByteArray;
+
 import tannus.ds.Maybe;
 import tannus.ds.Object;
 
@@ -16,6 +18,14 @@ class Playlist {
 /* === Instance Methods === */
 
 	/**
+	  * Encode [this] Playlist to PLS Format
+	  */
+	public function encodeAsPLS():ByteArray {
+		var w = new tannus.format.pls.Writer( this );
+		return w.generate();
+	}
+
+	/**
 	  * Add a new Track to [this] Playlist
 	  */
 	public function addTrack(name:String, location:String, ?trackn:Maybe<Int>):Track {
@@ -26,8 +36,40 @@ class Playlist {
 		} else {
 			tracks.push( t );
 		}
+		t.index = tracks.indexOf(t);
 
 		return t;
+	}
+
+	/**
+	  * Get Track by either index or location
+	  */
+	public function getTrack(q : TrackQ):Maybe<Track> {
+		switch (q) {
+			case QIndex( i ):
+				return trackByIndex(i);
+
+			case QLocation( loc ):
+				return trackByLocation( loc );
+		}
+	}
+
+	/**
+	  * Get Track by Index
+	  */
+	private function trackByIndex(i : Int):Maybe<Track> {
+		for (t in tracks) 
+			if (t.index == i) return t;
+		return null;
+	}
+
+	/**
+	  * Get Track by Location
+	  */
+	private function trackByLocation(loc : String):Maybe<Track> {
+		for (t in tracks)
+			if (t.location == loc) return t;
+		return null;
 	}
 
 /* === Instance Fields === */
@@ -37,4 +79,29 @@ class Playlist {
 
 	/* List of Tracks in [this] Playlist */
 	public var tracks : Array<Track>;
+}
+
+/**
+  * Type-Safe Wrapper thing
+  */
+private abstract TrackQ (ETrackQ) from ETrackQ to ETrackQ {
+	public inline function new(q : ETrackQ) this = q;
+
+	@:from
+	public static inline function fromString(s : String):TrackQ {
+		return QLocation(s);
+	}
+
+	@:from
+	public static inline function fromInt(i : Int):TrackQ {
+		return QIndex(i);
+	}
+}
+
+/**
+  * Enum of different ways Tracks can be queried
+  */
+private enum ETrackQ {
+	QIndex(i : Int);
+	QLocation(loc : String);
 }
