@@ -7,7 +7,7 @@ import haxe.crypto.Base64;
 
 /* "gen" imports */
 import tannus.io.Byte;
-
+import tannus.ds.Maybe;
 import tannus.math.Nums;
 
 /* == Platform-Specific Imports == */
@@ -162,6 +162,27 @@ abstract ByteArray (Array<Byte>) {
 		return 'data:$mime;base64,$encoded';
 	}
 
+	/**
+	  * Rip a Chunk of [this] ByteArray from either the beginning or the end
+	  */
+	public function chunk(len:Int, ?end:Bool=false):Array<Byte> {
+		var chnk:Array<Byte> = new Array();
+		var rip:Getter<Null<Byte>> = new Getter((end?this.pop:this.shift).bind());
+
+		for (i in 0...len) {
+			var b:Null<Byte> = rip.get();
+
+			if (b != null) {
+				chnk.push( b );
+			}
+			else {
+				throw 'IncompleteChunkError: Byte-Retrieval failed on byte $i/$len!';
+			}
+		}
+
+		return chnk;
+	}
+
 /* == Operators == */
 
 	/* Equality Testing */
@@ -298,6 +319,13 @@ abstract ByteArray (Array<Byte>) {
 	public static inline function fromIntArray(ia : Array<Int>):ByteArray {
 		return new ByteArray(ia.map(function(n:Int) return new Byte(n)));
 	}
+
+	/* From Array<Float> */
+	@:from
+	public static inline function fromFloatArray(ia : Array<Float>):ByteArray {
+		return new ByteArray(ia.map(function(n:Float) return new Byte(Math.round(n))));
+	}
+
 
 	/* From Bytes */
 	@:from
