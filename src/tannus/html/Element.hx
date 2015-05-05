@@ -18,6 +18,14 @@ abstract Element (JQuery) from JQuery {
 /* === Instance Fields === */
 
 	/**
+	  * Determine whether any actual Elements are currently being referenced
+	  */
+	public var exists(get, never):Bool;
+	private inline function get_exists() {
+		return (this.length > 0);
+	}
+
+	/**
 	  * textual value of [this] Element, as a field
 	  */
 	public var text(get, set):String;
