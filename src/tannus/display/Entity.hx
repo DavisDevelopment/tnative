@@ -74,6 +74,20 @@ class Entity extends EventDispatcher {
 		null;
 	}
 
+	/**
+	  * Cache [this] Entity
+	  */
+	public function cache():Void {
+		__cached = true;
+	}
+
+	/**
+	  * Uncache [this] Entity
+	  */
+	public function uncache():Void {
+		__cached = false;
+	}
+
 /* === Computed Instance Fields === */
 
 	/* The 'x' Coordinate of [this] Entity */
