@@ -19,12 +19,22 @@ abstract Velocity (TwoTuple<Float, Angle>) {
 
 /* === Instance Methods === */
 
-	public function setVector(vx:Float, vy:Float):Void {
+	/**
+	  * Reassign [speed, angle] as [x-velocity, y-velocity]
+	  */
+	private function setVector(vx:Float, vy:Float):Void {
 		var e:Point = new Point(vx, vy);
 		var l:Line = new Line([0, 0], e);
 
 		speed = l.length;
 		angle = TMath.angleBetween(0.0, 0.0, e.x, e.y);
+	}
+
+	/**
+	  * Create and return a copy of [this] Velocity
+	  */
+	public inline function clone():Velocity {
+		return new Velocity(speed, angle);
 	}
 
 /* === Instance Fields === */
