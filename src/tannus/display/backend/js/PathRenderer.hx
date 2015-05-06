@@ -62,9 +62,12 @@ class PathRenderer {
 				var ell = new Ellipse(r.x, r.y, r.w, r.h);
 				var curves = ell.calculateCurves();
 				
+				c.beginPath();
+				var s:Point = curves[0].start;
+				c.moveTo(s.x, s.y);
 				for (curv in curves) {
-					var s:Point = curv.start;
-					c.moveTo(s.x, s.y);
+					s = curv.start;
+
 					c.bezierCurveTo( 
 						curv.ctrl1.x,
 						curv.ctrl1.y,
@@ -74,6 +77,7 @@ class PathRenderer {
 						curv.end.y
 					);
 				}
+				c.closePath();
 
 			//- Draw a Triangle
 			case Pc.Triangle( tri ):
@@ -102,6 +106,9 @@ class PathRenderer {
 			//- stroke the current Path
 			case Pc.StrokePath:
 				c.stroke();
+
+			case Pc.FillPath:
+				c.fill();
 
 			//- perform a style alteration
 			case Pc.StyleAlteration( change ):
@@ -139,6 +146,27 @@ class PathRenderer {
 						}
 
 						c.strokeStyle = lg;
+
+					default:
+						var typ:String = Type.getEnumConstructs(tannus.graphics.GraphicsBrushType)[Type.enumIndex(brush.type)];
+						throw 'Unknown Brush Type $typ!';
+				}
+
+			case Psa.FillBrush( brush ):
+				switch (brush.type) {
+					case BColor( color ):
+						c.fillStyle = (color + '');
+
+					case BLinearGradient( grad ):
+						var s:Point = grad.start;
+						var e:Point = grad.end;
+
+						var lg = c.createLinearGradient(s.x, s.y, e.x, e.y);
+						for (stop in grad.stops) {
+							lg.addColorStop((stop.offset.of(1)), (stop.color + ''));
+						}
+
+						c.fillStyle = lg;
 
 					default:
 						var typ:String = Type.getEnumConstructs(tannus.graphics.GraphicsBrushType)[Type.enumIndex(brush.type)];
