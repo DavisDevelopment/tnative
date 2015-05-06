@@ -23,6 +23,7 @@ class Entity extends EventDispatcher {
 		area = new Area();
 		root = null;
 		__remove = false;
+		__cached = false;
 	}
 
 /* === Instance Methods === */
@@ -100,6 +101,18 @@ class Entity extends EventDispatcher {
 	private inline function get_height() return area.height;
 	private inline function set_height(nh : Float) return (area.height = nh);
 
+	/* A Rectangle for [this] Entity */
+	public var rectangle(get, set):Rectangle;
+	private inline function get_rectangle() return new Rectangle(x, y, width, height);
+	private function set_rectangle(nr : Rectangle) {
+		x = nr.x;
+		y = nr.y;
+		z = nr.z;
+		width = nr.w;
+		height = nr.h;
+		return nr;
+	}
+
 /* === Instance Fields === */
 
 	/* The Coordinates of [this] Entity */
@@ -113,4 +126,7 @@ class Entity extends EventDispatcher {
 
 	/* Whether [this] Entity is flagged for deletion */
 	private var __remove : Bool;
+
+	/* Whether [this] Entity is flagged as cached */
+	private var __cached : Bool;
 }
