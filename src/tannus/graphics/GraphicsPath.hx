@@ -178,6 +178,13 @@ class GraphicsPath {
 	}
 
 	/**
+	  * Clears [this] Path
+	  */
+	public function clear():Void {
+		add( FillPath );
+	}
+
+	/**
 	  * Draw [this] Path
 	  */
 	public function draw():Void {
@@ -284,6 +291,24 @@ class GraphicsPath {
 	private function set_lineJoin(njoin : LineJoin):LineJoin {
 		setLineJoin( njoin );
 		return njoin;
+	}
+
+	/**
+	  * Set the Brush used to perform Fill Operations
+	  */
+	public var fillBrush(get, set):Brush;
+	private function get_fillBrush():Brush {
+		for (op in stack) switch (op) {
+			case StyleAlteration(FillBrush( fb )):
+				return fb;
+			default:
+				continue;
+		}
+		return '#000';
+	}
+	private function set_fillBrush(fb : Brush):Brush {
+		sc(FillBrush(fb));
+		return fb;
 	}
 
 	/**
