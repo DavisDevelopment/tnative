@@ -7,6 +7,8 @@ class PathStyle {
 	public function new():Void {
 		lineStyle = new LineStyle();
 
+		fillBrush = '#000';
+
 		reset();
 	}
 
@@ -33,4 +35,6 @@ class PathStyle {
 
 	//- line-related styles
 	public var lineStyle:LineStyle;
+
+	public var fillBrush : GraphicsBrush;
 }
