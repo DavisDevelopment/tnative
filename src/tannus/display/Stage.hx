@@ -62,19 +62,31 @@ class Stage {
 	  * 'update' [this] Stage
 	  */
 	public function update():Void {
+		/* Delete All Entity's Flagged for Removal */
 		for (ent in childNodes) {
 			if (ent.__remove) {
 				ent.__delete();
 			}
 		}
 
+		/* Sort Them by Z-Index */
 		haxe.ds.ArraySort.sort(childNodes, function(a, b) {
 			return Std.int(a.z - b.z);
 		});
 
+		/* Update Them All */
 		for (ent in childNodes) {
-			ent.update();
+			if (!ent.__cached) {
+				ent.update();
+			}
 		}
+	}
+
+	/**
+	  * Obtain a StageSelection
+	  */
+	public function get(des : String):StageSelection {
+		return new StageSelection(des, this);
 	}
 
 	/**
