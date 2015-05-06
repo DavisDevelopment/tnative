@@ -37,6 +37,14 @@ abstract Velocity (TwoTuple<Float, Angle>) {
 		return new Velocity(speed, angle);
 	}
 
+	/**
+	  * Create and return an inverted copy of [this] Velocity
+	  */
+	@:op( !A )
+	public inline function inverted():Velocity {
+		return Velocity.fromVector(x * -1, y * -1);
+	}
+
 /* === Instance Fields === */
 
 	/* Speed of Movement */
@@ -75,5 +83,16 @@ abstract Velocity (TwoTuple<Float, Angle>) {
 	private function set_vector(nv : Point):Point {
 		setVector(nv.x, nv.y);
 		return new Point(x, y);
+	}
+
+/* === Class Methods === */
+
+	/**
+	  * Create a new Velocity instance from x,y vector
+	  */
+	public static function fromVector(x:Float, y:Float):Velocity {
+		var v = new Velocity(0, 0);
+		v.vector = new Point(x, y);
+		return v;
 	}
 }
