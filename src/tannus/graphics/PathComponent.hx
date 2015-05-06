@@ -35,4 +35,6 @@ enum PathComponent {
 	StrokePath;
 
 	FillPath;
+
+	ClearPath;
 }
