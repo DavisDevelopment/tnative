@@ -96,6 +96,7 @@ class Stage {
 	  */
 	public function addChild(child : Entity):Void {
 		childNodes.push( child );
+		child.attachTo( this );
 	}
 
 	/**
