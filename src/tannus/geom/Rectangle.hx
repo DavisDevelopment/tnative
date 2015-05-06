@@ -162,9 +162,14 @@ class CRectangle {
 	/**
 	  * Point representing the 'center' of [this] Rectangle
 	  */
-	public var center(get, never):Point;
+	public var center(get, set):Point;
 	private inline function get_center():Point {
 		return new Point((x + (width / 2)), (y + (height / 2)));
+	}
+	private function set_center(nc : Point):Point {
+		x = (nc.x - (w / 2));
+		y = (nc.y - (h / 2));
+		return nc;
 	}
 
 	/**
