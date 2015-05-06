@@ -106,6 +106,28 @@ class Stage {
 		childNodes.remove( child );
 	}
 
+/* === Computed Instance Fields === */
+
+	/**
+	  * 'width' of [this] Stage
+	  */
+	public var width(get, set):Int;
+	private inline function get_width() return Math.round(window.size.width);
+	private inline function set_width(nw : Int) {
+		window.size = new Area(nw, window.size.height);
+		return nw;
+	}
+
+	/**
+	  * 'height' of [this] Stage
+	  */
+	public var height(get, set):Int;
+	private inline function get_height() return Math.round(window.size.height);
+	private inline function set_height(nh : Int) {
+		window.size = new Area(window.size.width, nh);
+		return nh;
+	}
+
 /* === Instance Fields === */
 
 	/* The Window [this] Stage is attached to */
