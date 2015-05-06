@@ -18,6 +18,15 @@ abstract Area (TwoTuple<Float, Float>) {
 	private inline function get_height() return (this.two);
 	private inline function set_height(nh:Float) return (this.two = nh);
 
+/* === Instance Methods === */
+
+	/**
+	  * Create and Return a copy of [this]
+	  */
+	public inline function clone():Area {
+		return new Area(width, height);
+	}
+
 /* === Type Casting === */
 
 	/* To Rectangle */
