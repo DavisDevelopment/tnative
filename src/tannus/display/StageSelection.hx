@@ -16,6 +16,12 @@ abstract StageSelection (TwoTuple<Selector<Entity>, Stage>) {
 
 /* === Instance Methods === */
 
+	/* DO Stuff */
+	@:arrayAccess
+	public inline function getEnt<T : Entity>(i : Int):Null<T> {
+		return (cast matches[i]);
+	}
+
 	/**
 	  * Iterate over all matches
 	  */
