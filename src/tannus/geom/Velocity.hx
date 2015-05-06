@@ -1,6 +1,9 @@
 package tannus.geom;
 
 import tannus.geom.Angle;
+import tannus.geom.Point;
+import tannus.geom.Line;
+
 import tannus.math.TMath;
 
 import tannus.ds.TwoTuple;
@@ -12,6 +15,16 @@ abstract Velocity (TwoTuple<Float, Angle>) {
 	/* Constructor Function */
 	public inline function new(speed:Float, angle:Angle):Void {
 		this = new TwoTuple(speed, angle);
+	}
+
+/* === Instance Methods === */
+
+	public function setVector(vx:Float, vy:Float):Void {
+		var e:Point = new Point(vx, vy);
+		var l:Line = new Line([0, 0], e);
+
+		speed = l.length;
+		angle = TMath.angleBetween(0.0, 0.0, e.x, e.y);
 	}
 
 /* === Instance Fields === */
@@ -27,14 +40,22 @@ abstract Velocity (TwoTuple<Float, Angle>) {
 	private inline function set_angle(ns) return (this.two = ns);
 
 	/* Movement along the 'x' axis */
-	public var x(get, never):Float;
+	public var x(get, set):Float;
 	private inline function get_x():Float {
-		return (Math.sin(angle.degrees) * speed);
+		return (Math.cos(angle.radians) * speed);
+	}
+	private function set_x(nx : Float):Float {
+		setVector(nx, y);
+		return nx;
 	}
 
 	/* Movement along the 'y' axis */
-	public var y(get, never):Float;
+	public var y(get, set):Float;
 	private inline function get_y():Float {
-		return (Math.cos(angle.degrees) * speed);
+		return (Math.sin(angle.radians) * speed);
+	}
+	private function set_y(ny : Float):Float {
+		setVector(x, ny);
+		return ny;
 	}
 }
