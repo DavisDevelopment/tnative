@@ -209,7 +209,6 @@ abstract Color (Array<Int>) {
 					var channels:Array<Int> = new Array();
 					for (part in parts) {
 						var channel:Int = Std.parseInt('0x'+part);
-						trace( channel );
 						channels.push( channel );
 					}
 
@@ -250,7 +249,6 @@ abstract Color (Array<Int>) {
 	private static function hex(val:Int, digits:Int):String {
 		#if python
 			var _v:Int = val;
-			trace( _v );
 			var _d:Int = digits;
 			var h:String = python.Syntax.pythonCode('hex(_v).replace("0x", "").upper()');
 			return h;
