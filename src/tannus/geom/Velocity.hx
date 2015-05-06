@@ -58,4 +58,12 @@ abstract Velocity (TwoTuple<Float, Angle>) {
 		setVector(x, ny);
 		return ny;
 	}
+
+	/* Movement represented as a Point */
+	public var vector(get, set):Point;
+	private inline function get_vector() return new Point(x, y);
+	private inline function set_vector(nv : Point):Point {
+		setVector(nv.x, nv.y);
+		return new Point(x, y);
+	}
 }
