@@ -15,6 +15,9 @@ enum PathStyleAlteration {
 	//- Set the line-color to [col]
 	LineBrush(brush : GraphicsBrush);
 
+	//- Set the fill-color to [brush]
+	FillBrush(brush : GraphicsBrush);
+
 	//- Set the line-cap to [cap]
 	LineCap(cap : LineCap);
 
