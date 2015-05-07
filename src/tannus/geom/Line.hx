@@ -37,6 +37,17 @@ class Line {
 	private inline function get_end() return two;
 	private inline function set_end(ne) return (two = ne);
 
+	/**
+	  * The smallest Rectangle which would hold [this] Line
+	  */
+	public var rectangle(get, never):Rectangle;
+	private inline function get_rectangle():Rectangle {
+		var min:Point = (one > two ? two : one);
+		var max:Point = (one > two ? one : two);
+
+		return new Rectangle(min.x, min.y, (max.x - min.x), (max.y - min.y));
+	}
+
 /* === Instance Fields === */
 
 	public var one:Point;
