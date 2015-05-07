@@ -31,6 +31,9 @@ abstract Point (TPoint) {
 	public var z(get, set):Float;
 	private inline function get_z():Float return this.z;
 	private inline function set_z(nz:Float):Float return (this.z = nz);
+
+	public var d(get, never):Float;
+	private inline function get_d():Float return (distanceFrom(new Point()));
 	
 /* === Instance Methods === */
 
@@ -48,6 +51,19 @@ abstract Point (TPoint) {
 	@:op(A + B)
 	public function plus(other : Point):Point {
 		return new Point((x + other.x), (y + other.y), (z + other.z));
+	}
+
+	/**
+	  * Compare two Points, based on their distance from (0, 0)
+	  */
+	@:op(A > B)
+	public inline function greaterThan(other : Point):Bool {
+		return (d > other.d);
+	}
+
+	@:op(A < B)
+	public inline function lessThan(other : Point):Bool {
+		return (!greaterThan(other));
 	}
 
 	/**
