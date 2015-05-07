@@ -55,9 +55,17 @@ abstract Path (String) from String to String {
 	/**
 	  * The extension-name (if any) of [this] Path
 	  */
-	public var extension(get, never):String;
-	private inline function get_extension():String {
+	public var extension(get, set):Null<String>;
+	private inline function get_extension():Null<String> {
 		return P.extension(this);
+	}
+	private inline function set_extension(ns : Null<String>):Null<String> {
+		if (ns != null) {
+			this = (this.substr(0, this.lastIndexOf('.')) + '.$ns');
+		} else {
+			this = (this.substr(this.lastIndexOf('.') + 1));
+		}
+		return extension;
 	}
 
 	/**
