@@ -1,7 +1,0 @@
-
--main tannus.concurrent.JSWorkerProgram
--cp ../../
---macro tannus.concurrent.WorkerBuildTools.classReference('{{path-to-class}}')
--js {{temp-path}}
--debug
--D thread

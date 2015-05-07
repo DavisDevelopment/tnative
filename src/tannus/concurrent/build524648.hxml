@@ -1,6 +1,0 @@
-
--main tannus.concurrent.JSWorkerProgram
--cp ../../
---macro tannus.concurrent.WorkerBuildTools.classReference('TestWorker')
--js ../../dist/threading/worker_temp.js
--debug
