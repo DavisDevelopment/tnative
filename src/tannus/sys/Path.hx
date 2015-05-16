@@ -3,6 +3,7 @@ package tannus.sys;
 using StringTools;
 using Lambda;
 
+@:access(haxe.io.Path)
 abstract Path (String) from String to String {
 	/* Constructor */
 	public inline function new(s : String):Void {
@@ -23,9 +24,13 @@ abstract Path (String) from String to String {
 	/**
 	  * The directory name of [this] Path
 	  */
-	public var directory(get, never):Path;
+	public var directory(get, set):Path;
 	private inline function get_directory():Path {
 		return P.directory(this);
+	}
+	private inline function set_directory(nd : Path):Path {
+		this = (nd + name);
+		return directory;
 	}
 
 	/**
@@ -75,6 +80,18 @@ abstract Path (String) from String to String {
 	private inline function get_absolute():Bool {
 		return P.isAbsolute(this);
 	}
+	
+	/**
+	  * An Array of all segments of [this] Path
+	  */
+	public var pieces(get, set):Array<String>;
+	private inline function get_pieces():Array<String> {
+		return (this.replace('\\', '/').split('/'));
+	}
+	private inline function set_pieces(a : Array<String>):Array<String> {
+		this = P.join(a);
+		return pieces;
+	}
 
 /* === Instance Methods === */
 
@@ -84,6 +101,36 @@ abstract Path (String) from String to String {
 	@:op(A + B)
 	public inline function join(other : Path):Path {
 		return P.join([this, other]);
+	}
+
+	/**
+	  * Obtain a Path which is [other] relative to [this]
+	  */
+	public function resolve(other : Path):Path {
+		if (!absolute) {
+			throw 'PathError: Cannot resolve a relative Path by another relative Path; One of them must be absolute!';
+		} else {
+			var mine = pieces;
+			var yours = other.pieces;
+
+			for (s in yours) {
+				if (s == '.' || s == '') 
+					continue;
+
+				else if (s == '..') 
+					mine.pop();
+
+				else 
+					mine.push(s);
+			}
+			var res:Path = (P.join( mine ));
+			/* Now, ensure that [res] is still an absolute Path */
+			if (!res.absolute)
+				res = ('/' + res);
+
+			res = res.normalize();
+			return res;
+		}
 	}
 }
 
