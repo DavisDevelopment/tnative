@@ -61,6 +61,11 @@ class TMath {
 	return a + x * (b - a);
     }
 
+    /** Cast from Float to Int */
+    public static inline function i(f : Float):Int {
+	return Math.round(f);
+    }
+
     /** Round a float to the nearest [digit] decimal place */
     public static function roundFloat(f:Float, digit:Int):Float {
 	var n:Float = Math.pow(10, digit);
