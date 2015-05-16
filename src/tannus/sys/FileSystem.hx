@@ -94,6 +94,17 @@ class FileSystem {
 	}
 
 	/**
+	  * Opens and Returns an Output instance, bound to the given File
+	  */
+	public static function fileOutput(path : String):sys.io.FileOutput {
+		#if python
+			return untyped (new tannus.sys.PyFileOutput( path ));
+		#else
+			return sys.io.File.write(path, true);
+		#end
+	}
+
+	/**
 	  * Reads data from a file, and returns it
 	  */
 	public static inline function read(path:String, ?length:Int):ByteArray {
