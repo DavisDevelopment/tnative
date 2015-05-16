@@ -4,6 +4,7 @@ package tannus.sys;
 import tannus.sys.FileSystem;
 import tannus.sys.FileStat;
 import tannus.sys.Path;
+import tannus.sys.Directory;
 import tannus.sys.internal.FileContent;
 
 /* == Tannus IO Imports == */
@@ -147,6 +148,27 @@ class CFile {
 	private function set_path(np : Path):Path {
 		FileSystem.rename(_path, np);
 		return (_path = np);
+	}
+
+	/**
+	  * The Directory [this] File is in
+	  */
+	public var directory(get, never):Directory;
+	private inline function get_directory():Directory {
+		return (path.directory);
+	}
+
+	/**
+	  * An Input, Bound to [this] File, for Buffered Reading
+	  */
+	public var input(get, never):haxe.io.Input;
+	private inline function get_input():haxe.io.Input {
+		#if (js || flash || python)
+			var inp = new haxe.io.BytesInput(data);
+			return inp;
+		#else
+			return sys.io.File.read(_path, true);
+		#end
 	}
 
 /* === Instance Fields === */
