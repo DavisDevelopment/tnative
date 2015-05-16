@@ -266,11 +266,8 @@ abstract ByteArray (Array<Byte>) {
 	#if python
 	/* To Python bytearray */
 	@:to
-	public inline function toPythonByteArray():python.lib.ByteArray {
-		var ia:Array<Int> = toIntArray();
-		var ba:Dynamic = python.Syntax.pythonCode('bytearray(ia)');
-
-		return cast ba;
+	public inline function toPythonByteArray():python.Bytearray {
+		return new python.Bytearray(python.Lib.toPythonIterable(toIntArray()));
 	}
 	#end
 
