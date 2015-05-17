@@ -8,6 +8,7 @@ import tannus.geom.Rectangle;
 	import python.Tuple.Tuple2;
 #end
 
+using StringTools;
 abstract Area (TwoTuple<Float, Float>) {
 	public inline function new(w:Float=0, h:Float=0):Void {
 		this = new TwoTuple(w, h);
@@ -67,7 +68,7 @@ abstract Area (TwoTuple<Float, Float>) {
 	/* To String */
 	@:to
 	public function toString():String {
-		return 'Area(width=$width, height=$height)';
+		return 'Area<${width}x$height>';
 	}
 
 	#if java
