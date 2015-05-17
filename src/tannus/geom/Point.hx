@@ -38,6 +38,30 @@ abstract Point (TPoint) {
 	private inline function get_z():Float return this.z;
 	private inline function set_z(nz:Float):Float return (this.z = nz);
 
+	/**
+	  * [x] as an Int
+	  */
+	public var ix(get, set):Int;
+	private inline function get_ix() return i(x);
+	private inline function set_ix(nix : Int) return i(x = nix);
+
+	/**
+	  * [y] as an Int
+	  */
+	public var iy(get, set):Int;
+	private inline function get_iy() return i(y);
+	private inline function set_iy(niy : Int) return i(y = niy);
+
+	/**
+	  * [z] as an Int
+	  */
+	public var iz(get, set):Int;
+	private inline function get_iz() return i(z);
+	private inline function set_iz(niz : Int) return i(z = niz);
+
+	/**
+	  * [this] Point's distance from (0, 0)
+	  */
 	public var d(get, never):Float;
 	private inline function get_d():Float return (distanceFrom(new Point()));
 	
@@ -162,7 +186,7 @@ abstract Point (TPoint) {
 		/* To Python Tuple<Int> */
 		@:to
 		public inline function toGenericIntTuple():Tuple<Int> {
-			return new Tuple([i(x), i(y)]);
+			return new Tuple([ix, iy]);
 		}
 	#end
 
