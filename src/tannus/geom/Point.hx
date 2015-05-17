@@ -213,10 +213,22 @@ abstract Point (TPoint) {
 			return Tuple2.make(x, y);
 		}
 
+		/* From Tuple2<Float> */
+		@:from
+		public static inline function fromPythonTwoTupleFloat(t : Tuple2<Float, Float>):Point {
+			return fromGenericFloatTuple(cast t);
+		}
+
 		/* To Tuple2<Int> */
 		@:to
 		public inline function toPythonTwoTupleInt():Tuple2<Int, Int> {
 			return Tuple2.make(ix, iy);
+		}
+
+		/* From Tuple2<Int> */
+		@:from
+		public static inline function fromPythonTwoTupleInt(t : Tuple2<Int, Int>):Point {
+			return fromGenericIntTuple(cast t);
 		}
 	#end
 
