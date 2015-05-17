@@ -13,6 +13,15 @@ class Line {
 		two = t;
 	}
 
+/* === Instance Methods === */
+
+	/**
+	  * Convert to human-readable String
+	  */
+	public inline function toString():String {
+		return ('Line<(${start.x}, ${start.y}) => (${end.x}, ${end.y})>');
+	}
+
 /* === Computed Instance Fields === */
 
 	/**
