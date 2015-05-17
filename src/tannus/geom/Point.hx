@@ -188,6 +188,13 @@ abstract Point (TPoint) {
 		public inline function toGenericIntTuple():Tuple<Int> {
 			return new Tuple([ix, iy]);
 		}
+
+		/* From Python Tuple<Float> */
+		@:from
+		public static function fromGenericFloatTuple(t : Tuple<Float>):Point {
+			if (t.
+			return new Point(t[0], t[1]);
+		}
 	#end
 
 	/**
