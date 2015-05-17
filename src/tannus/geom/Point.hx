@@ -1,8 +1,14 @@
 package tannus.geom;
 
 import tannus.math.TMath;
+import tannus.math.TMath.i;
 import tannus.math.Percent;
 import tannus.geom.Angle;
+
+#if python
+	import python.Tuple;
+	import python.Tuple.Tuple2;
+#end
 
 abstract Point (TPoint) {
 	/* Constructor Function */
@@ -144,6 +150,20 @@ abstract Point (TPoint) {
 		return jp;
 	}
 
+	#end
+
+	#if python
+		/* To Python Tuple<Float> */
+		@:to
+		public inline function toGenericFloatTuple():Tuple<Float> {
+			return new Tuple([x, y]);
+		}
+
+		/* To Python Tuple<Int> */
+		@:to
+		public inline function toGenericIntTuple():Tuple<Int> {
+			return new Tuple([i(x), i(y)]);
+		}
 	#end
 
 	/**
