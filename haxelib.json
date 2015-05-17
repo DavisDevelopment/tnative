@@ -1,0 +1,14 @@
+{
+	"name" : "tnative",
+	"description" : "Toolbelt writing Applications (command-line and graphical) in Haxe",
+	"url" : "http://github.com/DavisDevelopment/tnative",
+	"contributors" : ["DavisDevelopment"],
+	"license" : "Apache",
+	"version" : "0.2.0",
+	"tags" : [
+		"tannus",
+		"tnative",
+		"geometry"
+	],
+	"releasenote" : "Initial Release"
+}
