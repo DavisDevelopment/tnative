@@ -192,8 +192,31 @@ abstract Point (TPoint) {
 		/* From Python Tuple<Float> */
 		@:from
 		public static function fromGenericFloatTuple(t : Tuple<Float>):Point {
-			if (t.
-			return new Point(t[0], t[1]);
+			if (t.length == 3)
+				return new Point(t[0], t[1], t[2]);
+			else
+				return new Point(t[0], t[1]);
+		}
+
+		/* From Python Tuple<Int> */
+		@:from
+		public static function fromGenericIntTuple(t : Tuple<Int>):Point {
+			if (t.length == 3)
+				return new Point(t[0], t[1], t[2]);
+			else
+				return new Point(t[0], t[1]);
+		}
+
+		/* To Tuple2<Float> */
+		@:to
+		public inline function toPythonTwoTupleFloat():Tuple2<Float, Float> {
+			return Tuple2.make(x, y);
+		}
+
+		/* To Tuple2<Int> */
+		@:to
+		public inline function toPythonTwoTupleInt():Tuple2<Int, Int> {
+			return Tuple2.make(ix, iy);
 		}
 	#end
 
