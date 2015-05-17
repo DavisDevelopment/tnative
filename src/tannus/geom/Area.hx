@@ -67,8 +67,41 @@ abstract Area (TwoTuple<Float, Float>) {
 
 	/* To String */
 	@:to
-	public function toString():String {
+	public inline function toString():String {
 		return 'Area<${width}x$height>';
+	}
+
+	/* From String */
+	@:from
+	public static inline function fromString(s : String):Area {
+		var w:Float, h:Float;
+		s = s.replace('Area', '').replace('<', '').replace('>', '');
+		
+		return fromFloatArray(s.split('x').map(Std.parseFloat.bind(_)));
+	}
+
+	/* To Array<Float> */
+	@:to
+	public inline function toFloatArray():Array<Float> {
+		return [width, height];
+	}
+
+	/* To Array<Int> */
+	@:to
+	public inline function toIntArray():Array<Int> {
+		return (toFloatArray().map(Math.round));
+	}
+
+	/* From Array<Float> */
+	@:from
+	public static inline function fromFloatArray(a : Array<Float>):Area {
+		return new Area(a[0], a[1]);
+	}
+
+	/* From Array<Int> */
+	@:from
+	public static inline function fromIntArray(a : Array<Int>):Area {
+		return new Area(a[0], a[1]);
 	}
 
 	#if java
