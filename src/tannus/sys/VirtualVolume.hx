@@ -263,6 +263,35 @@ class VirtualVolume {
 		return data;
 	}
 
+	/**
+	  * Encode [this] Volume as a ZIP
+	  */
+	public function zip():tannus.io.Blob {
+		var entry_list:List<haxe.zip.Entry> = new List();
+		for (e in entries) {
+			if (e.isFile) {
+				var zentry:haxe.zip.Entry = {
+					'fileTime' : Date.now(),
+					'fileSize' : e.content.length,
+					'fileName' : e.path,
+					'dataSize' : e.content.length,
+					'data' : e.content.toBytes(),
+					'compressed' : false,
+					'extraFields' : null,
+					'crc32' : null
+				};
+				entry_list.push(zentry);
+			}
+		}
+
+		var out = new haxe.io.BytesOutput();
+		var writer = new haxe.zip.Writer( out );
+		writer.write( entry_list );
+		var zip_data:ByteArray = out.getBytes();
+		
+		return new tannus.io.Blob('zipfile', 'application/zip', zip_data);
+	}
+
 
 /* === Instance Fields === */
 
