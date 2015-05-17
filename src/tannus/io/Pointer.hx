@@ -27,6 +27,20 @@ abstract Pointer<T> (TwoTuple<Getter<T>, Setter<T>>) {
 	}
 
 	/**
+	  * Alias to [value]
+	  */
+	public var _(get, set):T;
+	private inline function get__() return value;
+	private inline function set__(v : T) return (value = v);
+
+	/**
+	  * Alias to [value]
+	  */
+	public var v(get, set):T;
+	private inline function get_v() return value;
+	private inline function set_v(nv : T) return (value = nv);
+
+	/**
 	  * The Getter for [this] Pointer
 	  */
 	public var getter(get, set):Getter<T>;
