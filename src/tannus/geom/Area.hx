@@ -54,11 +54,15 @@ abstract Area (TwoTuple<Float, Float>) {
 
 	/* To Rectangle */
 	@:to
-	public function toRectangle():tannus.geom.Rectangle {
+	public inline function toRectangle():Rectangle {
 		return new Rectangle(0, 0, width, height);
 	}
 
 	/* From Rectangle */
+	@:from
+	public static inline function fromRectangle(r : Rectangle):Area {
+		return new Area(r.w, r.h);
+	}
 
 	/* To String */
 	@:to
