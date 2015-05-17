@@ -144,6 +144,20 @@ class CRectangle {
 /* === Computed Instance Fields === */
 
 	/**
+	  * The position of [this] Rectangle as a Point
+	  */
+	public var position(get, set):Point;
+	private inline function get_position():Point {
+		return new Point(x, y, z);
+	}
+	private inline function set_position(np : Point):Point {
+		x = np.x;
+		y = np.y;
+		z = np.z;
+		return position;
+	}
+
+	/**
 	  * An Array of all corners of [this] Rectangle
 	  */
 	public var corners(get, never):Array<Point>;
