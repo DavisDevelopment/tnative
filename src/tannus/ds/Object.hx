@@ -67,4 +67,38 @@ abstract Object (Dynamic) from Dynamic {
 	public inline function iterator():Iterator<{name:String, value:Dynamic}> {
 		return (pairs().iterator());
 	}
+
+/* === Implicit Casting === */
+
+	/* To Map<String, Dynamic> */
+	@:to
+	public function toMap():Map<String, Dynamic> {
+		var m:Map<String, Dynamic> = new Map();
+		for (p in iterator()) {
+			m.set(p.name, p.value);
+		}
+		return m;
+	}
+
+	#if python
+		/* To Dict<String, Dynamic> */
+		@:to
+		public function toDict():python.Dict<String, Dynamic> {
+			var d:python.Dict<String, Dynamic> = new python.Dict();
+			for (p in iterator()) {
+				d.set(p.name, p.value);
+			}
+			return d;
+		}
+
+		/* From Dict<String, Dynamic> */
+		@:from
+		public static function fromDict(d : python.Dict<String, Dynamic>):Object {
+			var o:Object = {};
+			for (p in d.items()) {
+				o.set(p._1, p._2);
+			}
+			return o;
+		}
+	#end
 }
