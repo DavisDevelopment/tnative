@@ -1,5 +1,0 @@
-<application>
-	<meta name="title" value="Cheeks :3"/>
-
-	<asset name="logo.png" path="../dist/assets/haxe-logo.png" />
-</application>
