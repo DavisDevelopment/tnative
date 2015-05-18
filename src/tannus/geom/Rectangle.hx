@@ -2,6 +2,8 @@ package tannus.geom;
 
 import tannus.geom.Point;
 import tannus.geom.Area;
+import tannus.geom.Shape;
+import tannus.geom.Vertices;
 
 import tannus.math.Percent;
 
@@ -47,7 +49,7 @@ abstract Rectangle (CRectangle) from CRectangle to CRectangle {
 	}
 }
 
-class CRectangle {
+class CRectangle implements Shape {
 	public function new(_x:Float=0, _y:Float=0, _width:Float=0, _height:Float=0):Void {
 		x = _x;
 		y = _y;
@@ -131,6 +133,21 @@ class CRectangle {
 		var px:Percent = x, py:Percent = y, pw:Percent = w, ph:Percent = h;
 
 		return new Rectangle(px.of(r.w), py.of(r.h), pw.of(r.w), ph.of(r.h));
+	}
+
+	/**
+	  * Obtain [this] Rect's vertices
+	  */
+	public function getVertices():Vertices {
+		var self:Rectangle = cast this;
+
+		var verts = new Vertices([
+			self.topLeft, self.topRight,
+			self.bottomRight, 
+			self.bottomLeft
+		]);
+
+		return verts;
 	}
 
 	/**
