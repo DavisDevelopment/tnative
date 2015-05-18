@@ -3,16 +3,18 @@ package tannus.geom;
 import tannus.geom.Point;
 import tannus.geom.Rectangle;
 import tannus.geom.Line;
+import tannus.geom.Shape;
+import tannus.geom.Vertices;
 
 /**
   * Class to represent a Triangle
   */
-class Triangle {
+class Triangle implements Shape {
 	/* Constructor Function */
-	public function new(x:Point, y:Point, z:Point):Void {
-		one = x;
-		two = y;
-		three = z;
+	public function new(?x:Point, ?y:Point, ?z:Point):Void {
+		one = (x!=null?x:new Point());
+		two = (y!=null?y:new Point());
+		three = (z!=null?z:new Point());
 	}
 
 /* === Instance Methods === */
@@ -47,6 +49,10 @@ class Triangle {
 		c.three = three.devectorize(r);
 
 		return c;
+	}
+
+	public function getVertices():Vertices {
+		return lines;
 	}
 
 /* === Instance Fields === */
