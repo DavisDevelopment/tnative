@@ -2,10 +2,11 @@ package tannus.geom;
 
 import tannus.geom.Point;
 import tannus.geom.Line;
+import tannus.geom.Shape;
 import tannus.geom.Vertices;
 
 using Lambda;
-class Polygon {
+class Polygon implements Shape {
 	/* Constructor Function */
 	public function new():Void {
 		vertices = new Vertices();
@@ -41,6 +42,13 @@ class Polygon {
 	  */
 	public function getLines(?close:Bool = false):Array<Line> {
 		return vertices.calculateLines(close);
+	}
+
+	/**
+	  * Obtain [this] Shape's vertices
+	  */
+	public function getVertices():Vertices {
+		return vertices;
 	}
 
 /* === Instance Fields === */
