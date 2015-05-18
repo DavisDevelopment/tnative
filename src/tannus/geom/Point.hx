@@ -4,6 +4,7 @@ import tannus.math.TMath;
 import tannus.math.TMath.i;
 import tannus.math.Percent;
 import tannus.geom.Angle;
+import tannus.ds.Maybe;
 
 #if python
 	import python.Tuple;
@@ -13,7 +14,7 @@ import tannus.geom.Angle;
 abstract Point (TPoint) {
 	/* Constructor Function */
 	public inline function new(?x:Float=0, ?y:Float=0, ?z:Float=0):Void {
-		this = {'x':x, 'y':y, 'z':z};
+		this = new TPoint(x, y, z);
 	}
 
 /* === Instance Fields === */
@@ -96,6 +97,16 @@ abstract Point (TPoint) {
 		return (!greaterThan(other));
 	}
 
+	@:op(A == B)
+	public inline function equals(other : Point):Bool {
+		return (x == other.x && y == other.y && z == other.z);
+	}
+
+	@:op(A != B)
+	public inline function nequals(other : Point):Bool {
+		return !equals(other);
+	}
+
 	/**
 	  * Calculate the Angle that exists between two Points
 	  */
@@ -110,6 +121,15 @@ abstract Point (TPoint) {
 	  */
 	public inline function clone():Point {
 		return new Point(x, y, z);
+	}
+
+	/**
+	  * Round off [this] Point's coordinates to Ints
+	  */
+	public inline function clamp():Void {
+		this.x = ix;
+		this.y = iy;
+		this.z = iz;
 	}
 
 	/**
@@ -145,9 +165,18 @@ abstract Point (TPoint) {
 
 	/* From Array<Float> */
 	@:from
-	public static inline function fromArray<T : Float> (a : Array<T>):Point {
-		return new Point(a[0], a[1], a[2]);
+	public static function fromFloatArray(a : Array<Float>):Point {
+		var ma:Array<Maybe<Float>> = cast a;
+		return new Point(ma[0].or(0), ma[1].or(0), ma[2].or(0));
 	}
+
+	/* From Array<Int> */
+	@:from
+	public static function fromIntArray(a : Array<Int>):Point {
+		var ma:Array<Maybe<Int>> = cast a;
+		return new Point(ma[0].or(0), ma[1].or(0), ma[2].or(0));
+	}
+
 
 	#if flash
 	
@@ -240,4 +269,15 @@ abstract Point (TPoint) {
 	}
 }
 
-private typedef TPoint = {x:Float, y:Float, z:Float};
+/* Base Point Class */
+class TPoint {
+	public function new(_x:Float, _y:Float, _z:Float):Void {
+		x = _x;
+		y = _y;
+		z = _z;
+	}
+
+	public var x:Float;
+	public var y:Float;
+	public var z:Float;
+}
