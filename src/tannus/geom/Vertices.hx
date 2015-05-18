@@ -52,6 +52,13 @@ abstract Vertices (Array<Point>) {
 	}
 
 	/**
+	  * Append another Vertices instance onto [this] one
+	  */
+	public inline function append(other : Vertices):Void {
+		this = (this.concat(other.toPoints()));
+	}
+
+	/**
 	  * Apply function [f] to each Point of [this] Vertices
 	  */
 	public inline function transform(f : Point->Void):Void {
@@ -145,7 +152,7 @@ abstract Vertices (Array<Point>) {
 	/* From Array<Array<Float>> */
 	@:from
 	public static inline function fromFloatVerticeArray(fva : Arr2<Float>):Vertices {
-		return new Vertices(fva.map(function(row) return Point.fromArray(row)));
+		return new Vertices(fva.map(function(row) return Point.fromFloatArray(row)));
 	}
 
 	/* To Array<Array<Int>> */
@@ -157,7 +164,7 @@ abstract Vertices (Array<Point>) {
 	/* From Array<Array<Int>> */
 	@:from
 	public static inline function fromIntVerticeArray(fva : Arr2<Int>):Vertices {
-		return new Vertices(fva.map(function(row) return Point.fromArray(row)));
+		return new Vertices(fva.map(function(row) return Point.fromIntArray(row)));
 	}
 
 	/* To Array<Point> */
