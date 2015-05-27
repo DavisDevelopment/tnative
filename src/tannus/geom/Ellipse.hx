@@ -5,8 +5,10 @@ import tannus.geom.Rectangle;
 import tannus.geom.Line;
 import tannus.geom.Bezier;
 import tannus.math.TMath;
+import tannus.geom.Shape;
+import tannus.geom.Vertices;
 
-class Ellipse {
+class Ellipse implements Shape {
 	/* Constructor Function */
 	public function new(x:Float, y:Float, w:Float, h:Float):Void {
 		pos = new Point(x, y);
@@ -21,8 +23,7 @@ class Ellipse {
 	  */
 	public function calculateCurves():Array<Bezier> {
 		var center:Point = rect.center;
-		var x:Float = pos.x;
-		var y:Float = pos.y;
+		var x:Float = pos.x;		var y:Float = pos.y;
 		var aX:Float = x;
 		var aY:Float = y;
 		var hB:Float = (width / 2) * TMath.KAPPA;
@@ -54,6 +55,10 @@ class Ellipse {
 		}
 		
 		return points;
+	}
+
+	public function getVertices() {
+		return new Vertices(getPoints());
 	}
 
 /* === Instance Fields === */

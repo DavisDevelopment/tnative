@@ -56,6 +56,55 @@ class TMath {
         return (a < b) ? a : b;
     }
 
+    /**
+      * Find and return the highest value in [nums]
+      */
+    #if !js @:generic #end
+    public static inline function maxr<T:Float> (nums : Iterable<T>):T {
+	var m:Null<T> = null;
+	for (n in nums) {
+		if (m == null)
+			m = n;
+		m = max(n, m);
+	}
+	return m;
+    }
+
+    /**
+      * Find and return the lowest value in [nums]
+      */
+    #if !js @:generic #end
+    public static inline function minr<T:Float> (nums : Array<T>):T {
+	var m:Null<T> = null;
+	for (n in nums) {
+		if (m == null)
+			m = n;
+		m = min(n, m);
+	}
+	return m;
+    }
+
+    /**
+      * Find and return both the lowest, and the highest value in [nums]
+      */
+    #if !js @:generic #end
+    public static inline function range<T:Float> (nums : Array<T>):tannus.ds.Range<T> {
+	var mi:Null<T> = null;
+	var ma:Null<T> = null;
+
+	for (n in nums) {
+		if (mi == null) 
+			mi = n;
+		if (ma == null) 
+			ma = n;
+
+		mi = min(n, mi);
+		ma = max(n, ma);
+	}
+
+	return new tannus.ds.Range(mi, ma);
+    }
+
     /** Perform a linear interpolation between two numbers */
     public static inline function lerp<T:Float> (a:T, b:T, x:Float):Float {
 	return a + x * (b - a);
@@ -63,7 +112,7 @@ class TMath {
 
     /** Cast from Float to Int */
     public static inline function i(f : Float):Int {
-	return Math.round(f);
+	return (Std.int(f));
     }
 
     /** Round a float to the nearest [digit] decimal place */

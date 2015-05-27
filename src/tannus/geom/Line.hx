@@ -2,6 +2,11 @@ package tannus.geom;
 
 import tannus.geom.Point;
 import tannus.geom.Rectangle;
+import tannus.geom.Vertices;
+import tannus.geom.Velocity;
+
+import tannus.math.Percent;
+import tannus.math.TMath;
 
 /**
   * Class to represent a Line between two points
@@ -11,6 +16,41 @@ class Line {
 	public function new(o:Point, t:Point):Void {
 		one = o;
 		two = t;
+	}
+
+/* === Instance Methods === */
+
+	/**
+	  * Convert to human-readable String
+	  */
+	public inline function toString():String {
+		return ('Line<(${start.x}, ${start.y}) => (${end.x}, ${end.y})>');
+	}
+
+	/**
+	  * Calculate a Point at a given percentage between [start] and [end]
+	  */
+	public function getPoint(d : Int):Point {
+		var dist:Int = d;//Math.round(t.of(length));
+		var vel = new Velocity(dist, (start.angleTo(end)));
+		var res = vel.vector;
+		res += start;
+		res.clamp();
+		return res;
+	}
+
+	/**
+	  * Obtain an Array of Points between [start] and [end]
+	  */
+	public function getVertices():Vertices {
+		var pts:Array<Point> = new Array();
+		start.clamp();
+		end.clamp();
+
+		for (i in 0...Math.round(length))
+			pts.push(getPoint(i));
+
+		return new Vertices( pts );
 	}
 
 /* === Computed Instance Fields === */

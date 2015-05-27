@@ -6,5 +6,9 @@ import tannus.concurrent.IWorker;
 
 typedef Worker<I, O> = tannus.concurrent.js.JSWorker<I, O>;
 
+#elseif python
+
+typedef Worker<I, O> = tannus.concurrent.python.PyWorker;
+
 #end
 

@@ -4,13 +4,13 @@
         "tnative",
         "geometry"
     ],
-    "name": "tnative",
-    "version": "0.2.1",
-    "releasenote": "Fixed description",
-    "description": "Toolbelt libary for writing Applications (command-line and graphical) in Haxe",
-    "url": "http://github.com/DavisDevelopment/tnative",
-    "license": "Apache",
     "contributors": [
         "DavisDevelopment"
-    ]
+    ],
+    "version": "0.2.2",
+    "url": "http://github.com/DavisDevelopment/tnative",
+    "releasenote": "Added \"_\", and \"v\" fields to tannus.io.Pointer, \"position\" field to tannus.geom.Rectangle, and created new tannus.geom.Square class",
+    "license": "Apache",
+    "name": "tnative",
+    "description": "Toolbelt libary for writing Applications (command-line and graphical) in Haxe"
 }

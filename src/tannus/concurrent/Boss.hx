@@ -16,11 +16,13 @@ abstract Boss<I, O> (IBoss<I, O>) from IBoss<I, O> to IBoss<I, O> {
 	  */
 	public static macro function hire( worker ) {
 		var fl = Context.getDefines();
-		trace(fl.keys());
-
 		/* JavaScript (Not NodeJS) Target */
 		if (fl.exists('js')) {
 			return macro new tannus.concurrent.Boss(tannus.concurrent.js.Workers.create($worker, '../dist/html/scripts/'));
+		}
+
+		else if (fl.exists('python')) {
+			return macro new tannus.concurrent.Boss(new tannus.concurrent.python.PyBoss($worker));
 		}
 
 		/* Current Target Unsupported */

@@ -1,34 +1,38 @@
 package tannus.ds;
 
-import tannus.ds.TwoTuple;
+import tannus.math.TMath in N;
 
-abstract Range (TwoTuple<Int, Int>) {
+class Range<T : Float> {
 	/* Constructor Function */
-	public inline function new(min:Int, max:Int):Void {
-		this = new TwoTuple(min, max);
+	public inline function new(mi:T, ma:T):Void {
+		min = N.min(mi, ma);
+		max = N.max(mi, ma);
 	}
+
+/* === Instance Methods === */
+
+	/**
+	  * Determine whether [v] is between [min] and [max]
+	  */
+	public inline function contains(v : T):Bool {
+		return ((v > min) && (v < max));
+	}
+
+	/**
+	  * Clamp [v] to the bounds of [this] Range
+	  */
+	public inline function clamp(v : T):T {
+		return N.clamp(v, min, max);
+	}
+
+	/**
+	  * Show as String
+	  */
+	public inline function toString():String {
+		return 'Range($min => $max)';
+	}
+
 /* === Instance Fields === */
-
-	/* 'start' of [this] Range */
-	public var min(get, set):Int;
-	private inline function get_min() return this.one;
-	private inline function set_min(m) return (this.one = m);
-
-	/* 'end' of [this] Range */
-	public var max(get, set):Int;
-	private inline function get_max() return this.two;
-	private inline function set_max(m) return (this.two = m);
-
-	/* 'offset' of [this] Range */
-	public var offset(get, set):Int;
-	private inline function get_offset() return this.one;
-	private inline function set_offset(o) return (this.one = o);
-
-	/* 'size' of [this] Range */
-	public var size(get, set):Int;
-	private inline function get_size() return (max - min);
-	private inline function set_size(s : Int) {
-		max = (min + s);
-		return s;
-	}
+	public var min:T;
+	public var max:T;
 }
