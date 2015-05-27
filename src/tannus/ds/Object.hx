@@ -5,7 +5,7 @@ import tannus.ds.Maybe;
 /**
   * Allows for the use of any Dynamic object as if it were a Map
   */
-abstract Object (Dynamic) from Dynamic {
+abstract Object (Dynamic) from Dynamic to Dynamic {
 	/* Constructor Function */
 	public inline function new(o : Dynamic):Void {
 		this = o;
