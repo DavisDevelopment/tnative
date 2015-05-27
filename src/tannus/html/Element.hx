@@ -9,7 +9,7 @@ import tannus.html.ElStyles;
 import js.JQuery;
 
 @:forward
-abstract Element (JQuery) from JQuery {
+abstract Element (JQuery) from JQuery to JQuery {
 	/* Constructor Function */
 	public inline function new(jq : Dynamic):Void {
 		this = new JQuery(jq);
