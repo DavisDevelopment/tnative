@@ -31,12 +31,29 @@ abstract ElStyles (Styler) {
 	}
 
 	/**
+	  * Copy [keys] from [other] onto [this]
+	  */
+	public inline function copy(other:ElStyles, keys:Array<String>):Void {
+		for (k in keys) set(k, other[k]);
+	}
+
+	/**
 	  * Obtain a pointer to the value of a particular css-property
 	  */
 	public inline function reference(key : String):Ptr<String> {
 		var s:ElStyles = new ElStyles(this);
 
 		return Ptr.create(s[key]);
+	}
+
+	/**
+	  * Get an Object of css-properties from an Array of keys
+	  */
+	public function gets(keys : Array<String>):Object {
+		var o:Object = {};
+		for (k in keys)
+			o[k] = get(k);
+		return o;
 	}
 
 	/**
