@@ -2,6 +2,7 @@ package tannus.geom;
 
 import tannus.ds.TwoTuple;
 import tannus.geom.Rectangle;
+import tannus.math.Percent;
 
 #if python
 	import python.Tuple;
@@ -31,6 +32,38 @@ abstract Area (TwoTuple<Float, Float>) {
 	  */
 	public inline function clone():Area {
 		return new Area(width, height);
+	}
+
+	/**
+	  * Resize [this] Area
+	  * @param mr {Boolean} - Whether to maintain the same ration between [width] and [height]
+	  */
+	public function resize(nw:Null<Float>, nh:Null<Float>, ?mr:Bool=false):Area {
+		if (mr) {
+			var w:Float = width;
+			var h:Float = height;
+			
+			if (nw != null) {
+				var rat:Float = (h / w);
+				w = nw;
+				h = (w * rat);
+				return new Area(w, h);
+			}
+			else if (nh != null) {
+				var rat:Float = (w / h);
+				h = nh;
+				w = (h * rat);
+				return new Area(w, h);
+			}
+			else {
+				throw 'GeometryError: Cannot maintain ration if both [width] and [height] are assigned!';
+			}
+		} else {
+			var w:Float = (nw != null ? nw : width);
+			var h:Float = (nh != null ? nh : height);
+
+			return new Area(w, h);
+		}
 	}
 
 /* === Type Casting === */
