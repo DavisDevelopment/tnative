@@ -15,6 +15,28 @@ abstract Duration (Dur) {
 		};
 	}
 
+/* === Instance Methods === */
+
+	public function toString():String {
+		var bits:Array<String> = new Array();
+		if (hours > 0) {
+			bits.push('${hours}hr');
+		}
+		if (minutes > 0)
+			bits.push('${minutes}min');
+		if (seconds > 0)
+			bits.push('${seconds}sec');
+		return bits.join(' ');
+	}
+
+	/**
+	  * Obtain the 'sum' of [this] Duration, and another
+	  */
+	@:op(A + B)
+	public inline function add(other : Duration):Duration {
+		return new Duration((seconds + other.seconds), (minutes + other.minutes), (hours + other.hours));
+	}
+
 /* === Instance Fields === */
 
 	/**
