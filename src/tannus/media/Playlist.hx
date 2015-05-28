@@ -50,6 +50,13 @@ class Playlist {
 	}
 
 	/**
+	  * Remove a Track from [this] Playlist
+	  */
+	public function removeTrack(track : Track):Bool {
+		return tracks.remove( track );
+	}
+
+	/**
 	  * Get Track by either index or location
 	  */
 	public function getTrack(q : TrackQ):Maybe<Track> {
