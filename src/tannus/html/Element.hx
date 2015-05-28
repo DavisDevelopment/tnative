@@ -78,12 +78,25 @@ abstract Element (JQuery) from JQuery to JQuery {
 		return value;
 	}
 
+	/**
+	  * Get the js.html.Element instance at [index]
+	  */
+	public inline function at(index : Int):js.html.Element {
+		return this.get( index );
+	}
+
 /* === Type Casting === */
 
 	/* To Array of ELements */
 	@:to
 	public inline function toArray():Array<Element> {
 		return (this.toArray().map(function(e) return new Element(e)));
+	}
+
+	/* To js.html.Element */
+	@:to
+	public inline function toHTMLElement():js.html.Element {
+		return (at(0));
 	}
 
 	/* From String */
