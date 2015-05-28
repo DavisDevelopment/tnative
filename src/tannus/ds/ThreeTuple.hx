@@ -39,7 +39,7 @@ abstract ThreeTuple<A, B, C> (T3<A, B, C>) {
 	  */
 	@:to
 	public inline function toString():String {
-		return ('(' + Std.string(one) + ', ' + Std.string(two) + ', ' + Std.string(three)')');
+		return ('(' + Std.string(one) + ', ' + Std.string(two) + ', ' + Std.string(three) + ')');
 	}
 }
 
