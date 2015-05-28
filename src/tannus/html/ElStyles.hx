@@ -61,7 +61,7 @@ abstract ElStyles (Styler) {
 	  */
 	@:op(A += B)
 	public function writeObject(o : Object):Void {
-		for (p in o) {
+		for (p in o.pairs()) {
 			set(p.name, Std.string(p.value));
 		}
 	}
