@@ -34,6 +34,36 @@ class Playlist {
 	}
 
 	/**
+	  * Encode [this] Playlist to XSPF
+	  */
+	public function encodeAsXSPF():ByteArray {
+		var w = new tannus.format.xspf.Writer( this );
+		return w.write();
+	}
+
+	/**
+	  * Encode [this] Playlist to WPL
+	  */
+	public function encodeAsWPL():ByteArray {
+		var w = new tannus.format.wpl.Writer( this );
+		return w.generate();
+	}
+
+	/**
+	  * Encode [this] Playlist to JSON
+	  */
+	public function encodeAsJSON():ByteArray {
+		var vids:Array<Dynamic> = new Array();
+		for (t in tracks) 
+			vids.push({
+				'name': t.name,
+				'url' : t.location,
+				'meta': t.meta
+			});
+		return haxe.Json.stringify( vids );
+	}
+
+	/**
 	  * Add a new Track to [this] Playlist
 	  */
 	public function addTrack(name:String, location:String, ?trackn:Maybe<Int>):Track {
