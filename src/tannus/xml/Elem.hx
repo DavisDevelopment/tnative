@@ -83,6 +83,13 @@ class Elem {
 		return xm;
 	}
 
+	/**
+	  * Output [this] DOM as an XML String
+	  */
+	public function print(?pretty:Bool=false):String {
+		return haxe.xml.Printer.print(toXml(), pretty);
+	}
+
 /* === Static Fields === */
 
 	/* Create a new Elem */
