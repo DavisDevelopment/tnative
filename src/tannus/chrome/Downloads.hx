@@ -11,11 +11,12 @@ class Downloads {
 	/**
 	  * Initiate a new download
 	  */
-	public static function download(data:DownloadOptions, callb:DownloadItem->Void):Void {
+	public static function download(data:DownloadOptions, ?callb:DownloadItem->Void):Void {
 		lib.download(data.clone(), function(i : Int) {
-			lib.search({'id' : i}, function(dlitems:Array<DownloadItem>) {
-				callb(dlitems[0]);
-			});
+			if (callb != null)
+				lib.search({'id' : i}, function(dlitems:Array<DownloadItem>) {
+					callb(dlitems[0]);
+				});
 		});
 	}
 
