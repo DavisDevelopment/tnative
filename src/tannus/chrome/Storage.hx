@@ -16,4 +16,13 @@ class Storage {
 
 	public static var sync(get, never):StorageArea;
 	private static inline function get_sync() return cast lib.sync;
+
+	/**
+	  * Observe and handle changes to storage
+	  */
+	public static function onChange(listener:String->Object->Void):Void {
+		lib.onChanged.addListener(function(changes:Object, area:String) {
+			listener(area, changes);
+		});
+	}
 }
