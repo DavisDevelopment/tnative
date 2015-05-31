@@ -2,12 +2,26 @@ package tannus.chrome;
 
 import tannus.ds.Object;
 import tannus.ds.Maybe;
+import tannus.chrome.Storage;
 
 @:forward
 abstract StorageArea (CStorageArea) from CStorageArea {
 	/* Constructor Function */
 	public inline function new(a : CStorageArea):Void {
 		this = a;
+	}
+
+/* === Instance Methods === */
+
+	public inline function onChange(cb : Object->Void):Void {
+		Storage.onChange(function(area, changes) {
+			if (area == 'local' && this == Storage.local) {
+				cb( changes );
+			}
+			else if (area == 'sync' && this == Storage.sync) {
+				cb( changes );
+			}
+		});
 	}
 }
 
