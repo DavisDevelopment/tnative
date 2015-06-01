@@ -104,4 +104,10 @@ abstract Element (JQuery) from JQuery to JQuery {
 	public static inline function fromString(q : String):Element {
 		return new Element(q);
 	}
+
+	/* From js.html.Element */
+	@:from
+	public static inline function fromDOMElement(el : js.html.DOMElement):Element {
+		return new Element( el );
+	}
 }
