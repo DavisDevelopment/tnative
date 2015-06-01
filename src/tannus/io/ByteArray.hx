@@ -340,6 +340,15 @@ abstract ByteArray (Array<Byte>) {
 		return ba;
 	}
 
+	#if (js && !node)
+		/* From ArrayBuffer */
+		@:from
+		public static inline function fromArrayBuffer(abuf : js.html.ArrayBuffer):ByteArray {
+			var ui = new js.html.Uint8Array( abuf );
+			return fromIntArray([for (i in ui) i]);
+		}
+	#end
+
 	/* From NodeJS Buffer */
 	public static inline function fromNodeBuffer(nb : Dynamic):ByteArray {
 		var len:Int = cast nb.length;
