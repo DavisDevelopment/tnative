@@ -33,7 +33,8 @@ class Reader {
 			var title:String = lines.shift().split('=')[1].substr( 1 );
 			var url:String = lines.shift().split('=')[1];
 
-			playlist.addTrack(title, url);
+			var track = playlist.addTrack(title, url);
+			trace(track.meta);
 		}
 
 		return playlist.tracks;

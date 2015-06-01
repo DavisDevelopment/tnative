@@ -23,6 +23,13 @@ class Tabs {
 	}
 
 	/**
+	  * Get Current Tab
+	  */
+	public static inline function getCurrent(cb : Tab->Void):Void {
+		lib.getCurrent( cb );
+	}
+
+	/**
 	  * Create a new Tab
 	  */
 	public static function create(options:Object, ?cb:Tab->Void):Void {
