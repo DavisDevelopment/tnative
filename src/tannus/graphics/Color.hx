@@ -6,6 +6,8 @@ import tannus.math.Percent;
 import tannus.io.Ptr;
 import tannus.io.ByteArray;
 
+import Std.*;
+
 using StringTools;
 
 /**
@@ -108,6 +110,31 @@ abstract Color (Array<Int>) {
 			i(blue + (t.blue - blue) * ratio),
 			i(alpha + (t.alpha - alpha) * ratio)
 		);
+	}
+
+	/**
+	  * Brighten [this] Color
+	  */
+	public function lighten(amount : Float):Color {
+		var col:Color = clone();
+		
+		// amount.value += 100;
+		var red = int(col.red * (100 + amount) / 100);
+		var green = int(col.green * (100 + amount) / 100);
+		var blue = int(col.blue * (100 + amount) / 100);
+
+		col.red = red;
+		col.green = green;
+		col.blue = blue;
+
+		return col;
+	}
+
+	/**
+	  * Darken [this] Color
+	  */
+	public inline function darken(amount : Float):Color {
+		return lighten(-amount);
 	}
 
 /* === Implicit Type Casting === */
