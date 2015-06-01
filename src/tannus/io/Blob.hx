@@ -4,7 +4,23 @@ import tannus.io.ByteArray;
 import tannus.sys.File;
 import tannus.ds.Maybe;
 
-class Blob {
+/**
+  * Abstract around Blob, which allows it to unify with multiple other types
+  */
+@:forward
+abstract Blob (CBlob) from CBlob to CBlob {
+	/* Constructor Function */
+	public inline function new(name:String, ?mime:Maybe<String>, ?dat:Maybe<ByteArray>):Void {
+		this = new CBlob(name, mime, dat);
+	}
+
+/* === Implicit Type Casting === */
+}
+
+/**
+  * Unerlying class for Blob
+  */
+class CBlob {
 	/* Constructor Function */
 	public function new(nam:String, ?mime:Maybe<String>, ?dat:Maybe<ByteArray>):Void {
 		name = nam;
