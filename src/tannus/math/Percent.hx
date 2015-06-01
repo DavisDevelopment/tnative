@@ -4,6 +4,7 @@ import tannus.math.TMath;
 
 import haxe.macro.Expr;
 
+@:forward
 abstract Percent (Float) from Float to Float {
 	/* Constructor Function */
 	public inline function new(f : Float):Void {
@@ -27,6 +28,14 @@ abstract Percent (Float) from Float to Float {
 	@:op(A + B)
 	public inline function plus(other : Percent):Percent {
 		return (this + other.value);
+	}
+
+	/**
+	  * Get the difference between [this] Percent and some other one
+	  */
+	@:op(A - B)
+	public inline function minus(other : Percent):Percent {
+		return (this - other.value);
 	}
 
 	/**
