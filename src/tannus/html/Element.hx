@@ -8,6 +8,7 @@ import tannus.html.ElStyles;
 
 import js.JQuery;
 
+using Lambda;
 @:forward
 abstract Element (JQuery) from JQuery to JQuery {
 	/* Constructor Function */
@@ -16,6 +17,12 @@ abstract Element (JQuery) from JQuery to JQuery {
 	}
 
 /* === Instance Fields === */
+
+	/**
+	  * Internal reference to [this], as an Element
+	  */
+	private var self(get, never):Element;
+	private inline function get_self() return new Element(this);
 
 	/**
 	  * Determine whether any actual Elements are currently being referenced
@@ -83,6 +90,40 @@ abstract Element (JQuery) from JQuery to JQuery {
 	  */
 	public inline function at(index : Int):js.html.Element {
 		return this.get( index );
+	}
+
+/* === Operator Overloading === */
+
+	/**
+	  * Add [this] Element to another
+	  */
+	@:op(A + B)
+	public inline function addToElement(other : Element):Element {
+		return this.add( other );
+	}
+
+	/**
+	  * Subtract [this] Element from another
+	  */
+	@:op(A - B)
+	public inline function subFromElement(other : Element):Element {
+		return (self - other.toArray());
+	}
+
+	/**
+	  * Subtract [this] Element from an Array of Elements
+	  */
+	@:op(A - B)
+	public inline function subFromElementArray(els : Array<Element>):Element {
+		var res:Array<Element> = toArray().filter(function( e ) {
+			return (els.has( e ));
+		});
+
+		var result:Element = new Element('');
+		for (e in res) {
+			result += e;
+		}
+		return result;
 	}
 
 /* === Type Casting === */
