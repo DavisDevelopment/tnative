@@ -40,6 +40,13 @@ abstract Tab (CTab) {
 	}
 
 	/**
+	  * Send data to [this] Tab
+	  */
+	public inline function sendMessage(data:Dynamic, ?onres:Dynamic->Void):Void {
+		Tabs.lib.sendMessage(this.id, data, {}, onres);
+	}
+
+	/**
 	  * Execute some JavaScript or CSS code in [this] Tab
 	  */
 	public inline function executeScript(path:Null<String>, code:Null<String>, ?cb:Void->Void):Void {
