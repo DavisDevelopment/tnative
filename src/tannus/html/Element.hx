@@ -81,6 +81,18 @@ abstract Element (JQuery) from JQuery to JQuery {
 	}
 
 	/**
+	  * The position of [this] Element on the 'y' axis
+	  */
+	public var y(get, set):Float;
+	private inline function get_y():Float {
+		return (this.offset().top);
+	}
+	private inline function set_y(ny : Float):Float {
+		cs('top', (ny + 'px'));
+		return y;
+	}
+
+	/**
 	  * The position of [this] Element
 	  */
 	public var position(get, set):Point;
