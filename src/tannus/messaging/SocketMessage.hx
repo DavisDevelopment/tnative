@@ -1,7 +1,6 @@
 package tannus.messaging;
 
 import tannus.messaging.MessageType;
-import tannus.messaging.Socket;
 import tannus.ds.Object;
 import tannus.ds.Memory;
 

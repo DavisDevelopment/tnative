@@ -25,13 +25,13 @@ class Message {
 	  * Create and Return a transport-safe version of [this] Message
 	  */
 	public function safe():SafeMessage {
-		return {
+		return new SafeMessage({
 			'id' : id,
 			'sender_id' : sender.id,
 			'type' : type,
 			'channel' : channel,
 			'data' : data
-		};
+		});
 	}
 
 	/**
@@ -40,6 +40,7 @@ class Message {
 	public function reply(data : Dynamic):Void {
 		var repl:Message = new Message(sender, data);
 		repl.type = Reply;
+		repl.id = id;
 
 		sender.sendToPeer( repl );
 	}
@@ -62,6 +63,7 @@ class Message {
 	
 	public var id : String;
 	public var sender_id : String;
+	public var source_id : Null<String>;
 	public var data : Object;
 	public var channel : String;
 	public var type : MessageType;

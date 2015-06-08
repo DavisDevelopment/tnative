@@ -33,6 +33,25 @@ class Messager {
 	}
 
 	/**
+	  * Connect to the peer
+	  */
+	public function connect(cb : Bool->Void):Void {
+		on('meta:connected', function(msg) {
+			var status:Bool = (cast msg.data['status']);
+
+			cb( status );
+		});
+		send('meta:connect', getConnectionData());
+	}
+
+	/**
+	  * Get the data required by the peer for validating a connection
+	  */
+	private function getConnectionData():Object {
+		return {};
+	}
+
+	/**
 	  * Send some data
 	  */
 	public function send(type:String, data:Object, ?onreply:Object->Void):Void { 
@@ -40,9 +59,10 @@ class Messager {
 		msg.type = Normal;
 		msg.channel = type;
 		
-		if (onreply != null) {
-			awaitingReply[msg.id] = onreply;
-		}
+		awaitingReply.set(msg.id, function(res : Object):Void {
+			if (onreply != null)
+				onreply( res );
+		});
 
 		sendToPeer( msg );
 	}
