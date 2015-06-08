@@ -5,6 +5,7 @@ import tannus.math.Percent;
 
 import tannus.io.Ptr;
 import tannus.io.ByteArray;
+import tannus.io.RegEx;
 
 import Std.*;
 
@@ -242,14 +243,32 @@ abstract Color (Array<Int>) {
 					return new Color(channels[0], channels[1], channels[2]);				
 
 				default:
-					throw 'ColorError: Cannot create Color from "$_s"!';
+					throw 'ColorError: Cannot create Color from "$s"!';
 			}
 		}
 
 		//- Otherwise
 		else {
-			//- Complain about it
-			throw 'ColorError: Cannot create Color from "$_s"!';
+			var s:String = _s;
+			var rgb:RegEx = ~/rgb\( ?([0-9]+), ?([0-9]+), ?([0-9]+) ?\)/i;
+			var rgba:RegEx =  ~/rgba\( ?([0-9]+), ?([0-9]+), ?([0-9]+), ?([0-9]+) ?\)/i;
+
+			/* rgb([r], [g], [b]) Notation */
+			if (rgb.match(s)) {
+				var data = rgb.matches( s )[0];
+				trace( data );
+				var i = Std.parseInt.bind(_);
+				return new Color(i(data[1]), i(data[2]), i(data[3]));
+			}
+			else if (rgba.match(s)) {
+				var data = rgba.matches( s )[0];
+				trace( data );
+				var i = Std.parseInt.bind(_);
+				return new Color(i(data[1]), i(data[2]), i(data[3]), i(data[4]));
+			}
+			else {
+				throw 'ColorError: Cannot create Color from "$s"!';
+			}
 		}
 	}
 
