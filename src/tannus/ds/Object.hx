@@ -55,6 +55,16 @@ abstract Object (Dynamic) from Dynamic to Dynamic {
 	}
 
 	/**
+	  * Create and return a clone of [this] Object
+	  */
+	public function clone():Object {
+		var c:Object = {};
+		for (k in keys)
+			c[k] = get(k);
+		return c;
+	}
+
+	/**
 	  * Do Stuff
 	  */
 	public inline function pairs():Array<{name:String, value:Dynamic}> {
@@ -66,6 +76,27 @@ abstract Object (Dynamic) from Dynamic to Dynamic {
 	  */
 	public inline function iterator():Iterator<{name:String, value:Dynamic}> {
 		return (pairs().iterator());
+	}
+
+	/**
+	  * Write another object onto [this] one
+	  */
+	@:op(A + B)
+	public function plus(other : Object):Object {
+		var res:Object = clone();
+		for (k in other.keys) {
+			if (!res.exists(k))
+				res[k] = other[k];
+		}
+		return res;
+	}
+
+	/**
+	  * Write another object onto [this] one in-place
+	  */
+	public function write(o : Object):Void {
+		for (k in o.keys)
+			set(k, o[k]);
 	}
 
 /* === Implicit Casting === */
