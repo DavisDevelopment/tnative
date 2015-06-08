@@ -42,9 +42,26 @@ abstract Duration (Dur) {
 	/**
 	  * Total Seconds of [this] Duration
 	  */
-	public var totalSeconds(get, never):Int;
+	public var totalSeconds(get, set):Int;
 	private inline function get_totalSeconds():Int {
 		return ((60 * 60 * hours) + (60 * minutes) + seconds);
+	}
+	private inline function set_totalSeconds(v : Int):Int {
+		var s:Int = v;
+		var m:Int = 0;
+		var h:Int = 0;
+		if (s >= 60) {
+			m = Math.round(s / 60);
+			s = (s % 60);
+		}
+		if (m >= 60) {
+			h = Math.round(m / 60);
+			m = (m % 60);
+		}
+		seconds = s;
+		minutes = m;
+		hours = h;
+		return totalSeconds;
 	}
 
 	/**
