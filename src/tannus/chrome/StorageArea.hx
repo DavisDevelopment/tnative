@@ -13,6 +13,9 @@ abstract StorageArea (CStorageArea) from CStorageArea {
 
 /* === Instance Methods === */
 
+	/**
+	  * Register a Listener for any change occurring on [this] Area
+	  */
 	public inline function onChange(cb : Object->Void):Void {
 		Storage.onChange(function(area, changes) {
 			if (area == 'local' && this == Storage.local) {
@@ -20,6 +23,17 @@ abstract StorageArea (CStorageArea) from CStorageArea {
 			}
 			else if (area == 'sync' && this == Storage.sync) {
 				cb( changes );
+			}
+		});
+	}
+
+	/**
+	  * Register a Listener for changes on a specific item in [this] Area
+	  */
+	public inline function onChangeField(key:String, cb:Object->Void):Void {
+		onChange(function(changes) {
+			if (changes.exists(key)) {
+				cb(changes[key]);
 			}
 		});
 	}
