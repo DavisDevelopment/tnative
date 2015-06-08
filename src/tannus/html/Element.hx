@@ -110,16 +110,12 @@ abstract Element (JQuery) from JQuery to JQuery {
 	  */
 	public var position(get, set):Point;
 	private inline function get_position():Point {
-		var pos = this.offset();
-		var z:Maybe<Int> = Std.parseInt(cs('z-index').or('0'));
-		var pt = new Point(pos.left, pos.top, z);
-		pt.z = (z || 0);
-		return pt;
+		return new Point(x, y, z);
 	}
 	private inline function set_position(np : Point):Point {
-		cs('left', np.x+'px');
-		cs('top', np.y+'px');
-		cs('z-index', np.z+'');
+		x = np.x;
+		y = np.y;
+		z = np.z;
 		return position;
 	}
 
