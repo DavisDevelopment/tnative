@@ -42,6 +42,21 @@ abstract Win (CWin) from CWin to CWin {
 		return sig;
 	}
 
+	/**
+	  * Listen for 'resize' events on [this] Window
+	  */
+	public function onResize():Signal<Area> {
+		var sig:Signal<Area> = new Signal();
+		var handlr = function(event) {
+			var area = new Area(this.innerWidth, this.innerHeight);
+
+			sig.call( area );
+		};
+		this.addEventListener('resize', handlr);
+		sig.ondelete = (function() this.removeEventListener('resize', handlr));
+		return sig;
+	}
+
 /* === Instance Fields === */
 
 	/**
