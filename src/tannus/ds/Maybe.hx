@@ -31,6 +31,13 @@ abstract Maybe<T> (Null<T>) from Null<T> {
 	}
 
 	/**
+	  * 
+	  */
+	public inline function runIf<A>(f:T->A):Null<A> {
+		return (if (exists) f(toNonNullable()) else null);
+	}
+
+	/**
 	  * Whether [this] Maybe instance is [null], accessed as a field
 	  */
 	public var exists(get, never):Bool;
