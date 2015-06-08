@@ -93,6 +93,19 @@ abstract Element (JQuery) from JQuery to JQuery {
 	}
 
 	/**
+	  * The position of [this] Element on the 'z' axis
+	  */
+	public var z(get, set):Float;
+	private inline function get_z():Float {
+		var mz:Maybe<Int> = Std.parseFloat(cs('z-index').or('0'));
+		return (mz || 0);
+	}
+	private inline function set_z(nz : Float):Float {
+		cs('z-index', (nz + ''));
+		return z;
+	}
+
+	/**
 	  * The position of [this] Element
 	  */
 	public var position(get, set):Point;
