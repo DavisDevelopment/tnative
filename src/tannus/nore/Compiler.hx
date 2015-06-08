@@ -358,6 +358,10 @@ class Compiler <T> {
 			case Check.FieldValueCheck(field, operation, val):
 				return field_value_check(field, operation, val).bind(_);
 
+			//- Validate the value of [field] with another set of Checks
+			case Check.FieldSubChecks(field, checks):
+				return field_sub_checks(field, checks).bind(_);
+
 			//- Check that [check] doesn't validate
 			case Check.InverseCheck( check ):
 				var checker = compileCheck(check);
@@ -609,6 +613,20 @@ class Compiler <T> {
 
 		return (function(o : T):Bool {
 			return (opfunc(fgetter(o), vgetter(o)));
+		});
+	}
+
+	/**
+	  * Validate field [field] of [o] using [checks]
+	  */
+	public dynamic function field_sub_checks(field:String, checks:Array<Check>):CheckFunction<T> {
+		var fgetter = Reflect.getProperty.bind(_, field);
+		var check = compile(checks);
+
+		return (function(o : T):Bool {
+			var param:Dynamic = fgetter(o);
+			
+			return check( param );
 		});
 	}
 

@@ -22,6 +22,9 @@ enum Token {
 	//- Group surrounded by Parentheses
 	TGroup(subtree : Array<Token>);
 
+	//- Sub-Selector
+	TSub(subtree : Array<Token>);
+
 	//- Tuple - A Comma-Separated structure to represent multiple values
 	TTuple(values : Array<Array<Token>>);
 

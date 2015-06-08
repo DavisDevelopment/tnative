@@ -265,6 +265,20 @@ class Lexer {
 			}
 
 			/**
+			  * Sub-Selectors
+			  */
+			else if (c == '{') {
+				try {
+					var content:String = this.group(('{'.code), ('}'.code));
+					var nodes:Array<Token> = lex(content);
+					
+					push(TSub( nodes ));
+				} catch (err : Dynamic) {
+					trace(err);
+				}
+			}
+
+			/**
 			  * == [GROUPS AND TUPLES] ==
 			  */
 			else if (c == '(') {

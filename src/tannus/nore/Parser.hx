@@ -212,9 +212,13 @@ class Parser {
 											}
 											else {
 												var val:Token = nodes.shift();
-												var value:Value = parseValue(val);
+												if (operation == '=>' && val.match(Token.TSub)) {
+													return Check.FieldSubChecks(field, parse(cast val.getParameters()[0]));
+												} else {
+													var value:Value = parseValue(val);
 
-												return Check.FieldValueCheck(field, operation, value);
+													return Check.FieldValueCheck(field, operation, value);
+												}
 											}
 										//- If [second] is ANYTHING ELSE
 										default:

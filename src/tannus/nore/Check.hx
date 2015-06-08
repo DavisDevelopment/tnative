@@ -18,6 +18,9 @@ enum Check {
 	//- Check that the result of [op] applied to [field] and [value] is [true]
 	FieldValueCheck(field:String, op:String, value:Value);
 
+	//- Check that [field] validates with [sub]
+	FieldSubChecks(field:String, sub:Array<Check>);
+
 	//- Check a list of Checks
 	GroupCheck(subchecks : Array<Check>);
 
