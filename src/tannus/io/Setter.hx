@@ -55,7 +55,10 @@ abstract Setter<T> (T -> T) from T -> T {
 	/**
 	  * Create a Setter instance conveniently
 	  */
-	public static macro function create<T>(ref : ExprOf<T>):ExprOf<Setter<T>> {
+	#if !macro
+		macro
+	#end
+	public static function create<T>(ref : ExprOf<T>):ExprOf<Setter<T>> {
 		return macro (new tannus.io.Setter(function(v) {
 			$ref = v;
 
