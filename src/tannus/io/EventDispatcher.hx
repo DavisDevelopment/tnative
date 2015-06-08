@@ -20,6 +20,14 @@ class EventDispatcher {
 	}
 
 	/**
+	  * Add a list of Signals to [this] Dispatcher
+	  */
+	public inline function addSignals(names : Array<String>):Void {
+		for (name in names)
+			addSignal( name );
+	}
+
+	/**
 	  * Determine if [this] Dispatcher is prepared to dispatch an Event by the given name
 	  */
 	public function canDispatch(name : String):Bool {
