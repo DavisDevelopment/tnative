@@ -25,6 +25,13 @@ class Runtime {
 	}
 
 	/**
+	  * Listen for incoming message, without the convenience-wrapper
+	  */
+	public static function onMessageRaw(callb : Dynamic->MessageSender->Void):Void {
+		lib.onMessage.addListener( callb );
+	}
+
+	/**
 	  * Listen for incoming messages
 	  */
 	public static function onMessage(callb : Message->Void):Void {
@@ -56,4 +63,13 @@ private typedef Message = {
 		url: String
 	};
 	var respond : Dynamic -> Void;
+};
+
+private typedef MessageSender = {
+	@:optional
+	var tab : Null<Tab>;
+	@:optional
+	var id : Null<String>;
+	@:optional
+	var url : Null<String>;
 };
