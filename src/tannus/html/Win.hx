@@ -25,6 +25,23 @@ abstract Win (CWin) from CWin to CWin {
 		this = ((w != null) ? w : win);
 	}
 
+/* === Instance Methods === */
+
+	/**
+	  * Listen for 'scroll' events on [this] Window
+	  */
+	public function onScroll():Signal<Point> {
+		var sig:Signal<Point> = new Signal();
+		var handlr = function(event) {
+			var scroll:Point = new Point(this.scrollX, this.scrollY);
+
+			sig.call( scroll );
+		};
+		this.addEventListener('scroll', handlr);
+		sig.ondelete = (function() this.removeEventListener('scroll', handlr));
+		return sig;
+	}
+
 /* === Instance Fields === */
 
 	/**
