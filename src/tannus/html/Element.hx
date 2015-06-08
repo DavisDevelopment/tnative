@@ -135,12 +135,12 @@ abstract Element (JQuery) from JQuery to JQuery {
 	  * A Rectangle representing [this] Element's position and area on the screen
 	  */
 	public var rectangle(get, set):Rectangle;
-	private inline function get_rectangle() {
+	private function get_rectangle() {
 		var r = new Rectangle(x, y, w, h);
 		r.z = z;
 		return r;
 	}
-	private inline function set_rectangle(nr : Rectangle) {
+	private function set_rectangle(nr : Rectangle) {
 		x = nr.x;
 		y = nr.y;
 		z = nr.z;
