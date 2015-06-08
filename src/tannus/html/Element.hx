@@ -103,6 +103,14 @@ abstract Element (JQuery) from JQuery to JQuery {
 	}
 
 	/**
+	  * Add [this] Element to an Array of Elements
+	  */
+	@:op(A + B)
+	public inline function addToElementArray(other : Array<Element>):Element {
+		return fromArray(toArray().concat(other));
+	}
+
+	/**
 	  * Subtract [this] Element from another
 	  */
 	@:op(A - B)
@@ -132,6 +140,13 @@ abstract Element (JQuery) from JQuery to JQuery {
 	@:to
 	public inline function toArray():Array<Element> {
 		return (this.toArray().map(function(e) return new Element(e)));
+	}
+
+	/* From Array of Elements */
+	public static inline function fromArray(els : Array<Element>):Element {
+		var el:Element = new Element('');
+		for (e in els) el += e;
+		return el;
 	}
 
 	/* To js.html.Element */
