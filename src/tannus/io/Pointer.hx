@@ -101,6 +101,14 @@ abstract Pointer<T> (TwoTuple<Getter<T>, Setter<T>>) {
 		this.two = _t;
 	}
 
+	/**
+	  * 'attach' another Pointer to [this] Pointer
+	  */
+	public macro function attach(self, other:ExprOf<T>) {
+		var settr = Setter.create(other);
+		return macro $self.attach_setter($settr);
+	}
+
 /* === Static Methods === */
 
 	/**
