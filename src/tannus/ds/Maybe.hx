@@ -46,6 +46,12 @@ abstract Maybe<T> (Null<T>) from Null<T> {
 	}
 
 	/**
+	  * [this] cast to <T>, as a field
+	  */
+	public var value(get, never):T;
+	private inline function get_value() return toNonNullable();
+
+	/**
 	  * If [this] isn't [null], returns [this], otherwise, throws [error]
 	  */
 	public inline function orDie(error : Dynamic):T {
@@ -62,7 +68,7 @@ abstract Maybe<T> (Null<T>) from Null<T> {
 	  */
 	@:to
 	public inline function toNonNullable():T {
-		if (this != null) {
+		if (exists) {
 			return this;
 		} else {
 			//throw 'TypeError: Cannot declare NULL non-nullable!';
