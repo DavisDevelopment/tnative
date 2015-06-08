@@ -4,6 +4,9 @@ import tannus.io.Byte;
 import tannus.io.ByteArray;
 import tannus.io.Ptr;
 import tannus.sys.File;
+import tannus.sys.Directory;
+import tannus.sys.Path;
+import tannus.io.Blob;
 
 import haxe.macro.Context;
 import haxe.macro.Compiler;
@@ -52,6 +55,35 @@ class CompileTime {
 		return macro $lines;
 	}
 
+	/**
+	  * Inline a File as a Blob
+	  */
+	public static macro function readBlob(path : String):ExprOf<Blob> {
+		var data:ByteArray = loadFile( path );
+		var enc:ExprOf<String> = toExpr(data.toBase64());
+		var name:Path = path;
+		name = name.name;
+		var ename:ExprOf<String> = toExpr( name );
+
+		var mime:ExprOf<String> = toExpr(tannus.sys.Mimes.getMimeType(${name.extension}));
+		
+		return macro (new tannus.io.Blob(
+			$ename, 
+			$mime, 
+			(tannus.io.ByteArray.fromBase64($enc))
+		));
+	}
+
+	/**
+	  * Inline a JSON File
+	  */
+	public static macro function readJSON(path : String):ExprOf<{}> {
+		var sdata:String = loadFile( path );
+		var data:Dynamic = haxe.Json.parse( sdata );
+
+		return toExpr( data );
+	}
+
 #if macro
 	
 	/**
@@ -74,6 +106,6 @@ class CompileTime {
 			return haxe.macro.Context.error(err, Context.currentPos());
 		}
 	}
-
+	
 #end
 }
