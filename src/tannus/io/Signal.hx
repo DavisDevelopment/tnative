@@ -9,12 +9,16 @@ class Signal<T> {
 	/* Constructor */
 	public function new():Void {
 		handlers = new Array();
+		ondelete = null;
 	}
 
 /* === Instance Fields === */
 
 	//- An Array of Handlers
 	private var handlers:Array<Handler<T>>;
+
+	//- Function to call when [delete] is called
+	public var ondelete:Null<Void->Void>;
 
 /* === Instance Methods === */
 
@@ -103,6 +107,14 @@ class Signal<T> {
 	  */
 	public function call(data : T):Void {
 		broadcast(data);
+	}
+
+	/**
+	  * 'destroy' [this] Signal
+	  */
+	public function delete():Void {
+		if (ondelete != null)
+			ondelete();
 	}
 }
 
