@@ -58,18 +58,15 @@ class Runtime {
 
 private typedef Message = {
 	var data : Dynamic;
-	var sender : {
-		id : String,
-		url: String
-	};
+	var sender : MessageSender;
 	var respond : Dynamic -> Void;
 };
 
 private typedef MessageSender = {
 	@:optional
-	var tab : Null<Tab>;
+	var tab : Maybe<Tab>;
 	@:optional
-	var id : Null<String>;
+	var id : Maybe<String>;
 	@:optional
-	var url : Null<String>;
+	var url : Maybe<String>;
 };
