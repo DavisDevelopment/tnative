@@ -97,12 +97,26 @@ abstract Element (JQuery) from JQuery to JQuery {
 	  */
 	public var z(get, set):Float;
 	private inline function get_z():Float {
-		var mz:Maybe<Int> = Std.parseFloat(cs('z-index').or('0'));
-		return (mz || 0);
+		var msz:Maybe<String> = this.css('z-index');
+		var mz:Float = Std.parseFloat(msz || '0');
+		if (Math.isNaN(mz)) mz = 0;
+		return mz;
 	}
 	private inline function set_z(nz : Float):Float {
 		cs('z-index', (nz + ''));
 		return z;
+	}
+
+	/**
+	  * The width of [this] Element
+	  */
+	public var w(get, set):Float;
+	private inline function get_w():Float {
+		return (this.width() + 0.0);
+	}
+	private inline function set_w(v : Float):Float {
+		this.width(Math.round(v));
+		return w;
 	}
 
 	/**
