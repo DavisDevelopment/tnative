@@ -1,6 +1,10 @@
 package tannus.ds;
 
 import tannus.ds.Maybe;
+import tannus.nore.ORegEx;
+import tannus.nore.Selector;
+
+import haxe.macro.Expr;
 
 /**
   * Allows for the use of any Dynamic object as if it were a Map
@@ -97,6 +101,21 @@ abstract Object (Dynamic) from Dynamic to Dynamic {
 	public function write(o : Object):Void {
 		for (k in o.keys)
 			set(k, o[k]);
+	}
+
+	/**
+	  * Determine if [this] Object is of type [type]
+	  */
+	public macro function istype(self, typ):ExprOf<Bool> {
+		return macro Std.is($self, $typ);
+	}
+
+	/**
+	  * Test [this] Object with an OReg
+	  */
+	public inline function is(oreg : String):Bool {
+		var sel:Selector<Dynamic> = oreg;
+		return sel.test( this );
 	}
 
 /* === Implicit Casting === */
