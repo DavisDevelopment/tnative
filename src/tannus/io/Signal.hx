@@ -31,6 +31,18 @@ class Signal<T> {
 	}
 
 	/**
+	  * Finds the 'Handler' instance for [f]
+	  */
+	private function getHandler(f : T->Void):Null<Handler<T>> {
+		for (h in handlers) {
+			if (h.equals(f)) {
+				return h;
+			}
+		}
+		return null;
+	}
+
+	/**
 	  * Attach a listener function to [this] Signal
 	  */
 	public function listen(f:T->Void, ?once:Bool=false):Void {
@@ -42,10 +54,32 @@ class Signal<T> {
 	}
 
 	/**
+	  * Detach a listener from [this] Signal
+	  */
+	public function ignore(f:T->Void, ?_once:Bool=false):Void {
+		var h:Null<Handler<T>> = getHandler( f );
+		if (h != null) {
+			handlers.remove( h );
+			if (_once) {
+				once(function(_v : T):Void {
+					handlers.push( h );
+				});
+			}
+		}
+	}
+
+	/**
 	  * Alias to [listen]
 	  */
 	public inline function on(f:T->Void, ?once:Bool=false):Void {
 		listen(f, once);
+	}
+
+	/**
+	  * Alias to [ignore]
+	  */
+	public inline function off(f:T->Void, ?once:Bool=false):Void {
+		ignore(f, once);
 	}
 
 	/**
