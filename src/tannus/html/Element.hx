@@ -3,6 +3,8 @@ package tannus.html;
 import tannus.ds.Maybe;
 import tannus.ds.Object;
 import tannus.io.Ptr;
+import tannus.geom.Point;
+import tannus.geom.Rectangle;
 
 import tannus.html.ElStyles;
 
@@ -64,6 +66,36 @@ abstract Element (JQuery) from JQuery to JQuery {
 			this.css(k, v);
 		}
 		return this.css(k);
+	}
+
+	/**
+	  * The position of [this] Element on the 'x' axis
+	  */
+	public var x(get, set):Float;
+	private inline function get_x():Float {
+		return (this.offset().left);
+	}
+	private inline function set_x(nx : Float):Float {
+		cs('left', (nx + 'px'));
+		return x;
+	}
+
+	/**
+	  * The position of [this] Element
+	  */
+	public var position(get, set):Point;
+	private inline function get_position():Point {
+		var pos = this.offset();
+		var z:Maybe<Int> = Std.parseInt(cs('z-index').or('0'));
+		var pt = new Point(pos.left, pos.top, z);
+		pt.z = (z || 0);
+		return pt;
+	}
+	private inline function set_position(np : Point):Point {
+		cs('left', np.x+'px');
+		cs('top', np.y+'px');
+		cs('z-index', np.z+'');
+		return position;
 	}
 
 /* === Instance Methods === */
