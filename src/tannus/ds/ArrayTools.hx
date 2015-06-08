@@ -47,4 +47,15 @@ class ArrayTools {
 			return (cast result);
 		}());
 	}
+
+	/**
+	  * Perform [action] on every item in the list
+	  */
+	public static macro function each<T>(list:ExprOf<Iterable<T>>, name, action) {
+		return macro {
+			for ($name in $list) {
+				$action;
+			}
+		};
+	}
 }
