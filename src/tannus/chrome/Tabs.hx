@@ -23,6 +23,19 @@ class Tabs {
 	}
 
 	/**
+	  * Perform a Query on all Tabs
+	  */
+	public static function query(queryStr:String, cb:Array<Tab>->Void):Void {
+		getAll(function( tabs ) {
+			var otabs:Array<Object> = (cast tabs);
+
+			var results = otabs.filter(function(t) return t.is(queryStr));
+
+			cb(cast results);
+		});
+	}
+
+	/**
 	  * Get Current Tab
 	  */
 	public static inline function getCurrent(cb : Tab->Void):Void {
