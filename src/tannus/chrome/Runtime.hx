@@ -57,9 +57,9 @@ class Runtime {
 }
 
 private typedef Message = {
-	var data : Dynamic;
+	var data : Object;
 	var sender : MessageSender;
-	var respond : Dynamic -> Void;
+	var respond : Object -> Void;
 };
 
 private typedef MessageSender = {
