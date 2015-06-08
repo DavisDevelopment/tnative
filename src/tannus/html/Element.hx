@@ -120,6 +120,18 @@ abstract Element (JQuery) from JQuery to JQuery {
 	}
 
 	/**
+	  * The height of [this] Element
+	  */
+	public var h(get, set):Float;
+	private inline function get_h():Float {
+		return (this.height() + 0.0);
+	}
+	private inline function set_h(v : Float):Float {
+		this.height(Math.round(v));
+		return h;
+	}
+
+	/**
 	  * The position of [this] Element
 	  */
 	public var position(get, set):Point;
