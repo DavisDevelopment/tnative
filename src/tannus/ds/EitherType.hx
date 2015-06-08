@@ -16,6 +16,19 @@ abstract EitherType<L, R> (Either<L, R>) {
 	private inline function get_type() return this;
 
 	/**
+	  * Macro method to more concisely perform an action based on the type of [this]
+	  */
+	public macro function switchType(self, leftName, rightName, leftAction, rightAction) {
+		return macro switch ($self.type) {
+			case Left( $leftName ):
+				$leftAction;
+
+			case Right( $rightName ):
+				$rightAction;
+		}
+	}
+
+	/**
 	  * Cast implicitly to the Left type
 	  */
 	@:to
