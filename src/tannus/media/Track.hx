@@ -1,11 +1,13 @@
 package tannus.media;
 
 import tannus.ds.Object;
+import tannus.ds.Memory;
 import tannus.media.Duration;
 
 class Track {
 	/* Constructor Function */
 	public function new(nam:String, loc:String):Void {
+		id = Memory.uniqueIdString('track-');
 		index = -1;
 		duration = new Duration();
 		name = nam;
@@ -20,6 +22,9 @@ class Track {
 
 	/* The Name of [this] Track */
 	public var name : String;
+
+	/* The Unique ID of [this] Track */
+	public var id : String;
 
 	/* The Track-Number of [this] Track */
 	public var index : Int;
