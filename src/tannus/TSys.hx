@@ -79,5 +79,19 @@ class TSys {
 			NSys.putEnv(n, v);
 		#end
 	}
+
+	/**
+	  * Stop the current Process, with the given exit code
+	  */
+	public static inline function exit(ecode : Int):Void {
+		var code:Int = ecode;
+		#if node
+			untyped __js__('process.exit(code)');
+		#elseif js
+			js.Browser.window.close();
+		#else
+			NSys.exit( ecode );
+		#end
+	}
 }
 
