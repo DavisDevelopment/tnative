@@ -18,6 +18,10 @@ import tannus.math.Nums;
 //import python.lib.Tuple;
 #end
 
+#if node
+import tannus.node.Buffer;
+#end
+
 using Lambda;
 
 /**
@@ -250,18 +254,13 @@ abstract ByteArray (Array<Byte>) {
 		return buf;
 	}
 
-	/* To NodeJS Buffer */
-	public inline function toNodeBuffer():Dynamic {
-		#if js
-		var len:Int = this.length;
-		var cl:Class<Dynamic> = untyped __js__('Buffer');
-		var buf:Dynamic = Type.createInstance(cl, [self.toArray()]);
-		
-		return buf;
-		#else
-		throw 'Cannot create NODE Buffer outside of Node!';
-		#end
-	}
+	#if node
+		/* To NodeJS Buffer */
+		@:to
+		public inline function toNodeBuffer():Buffer {
+			return new Buffer(toIntArray());
+		}
+	#end
 
 	#if python
 	/* To Python bytearray */
@@ -349,16 +348,19 @@ abstract ByteArray (Array<Byte>) {
 		}
 	#end
 
-	/* From NodeJS Buffer */
-	public static inline function fromNodeBuffer(nb : Dynamic):ByteArray {
-		var len:Int = cast nb.length;
-		var bitlist:Array<Int> = new Array();
-		for (i in 0...len) {
-			bitlist.push(cast nb[i]);
-		}
+	#if node
+		/* From NodeJS Buffer */
+		@:from
+		public static inline function fromNodeBuffer(nb : Buffer):ByteArray {
+			var len:Int = nb.length;
+			var bitlist:Array<Int> = new Array();
+			for (i in 0...len) {
+				bitlist.push( nb[i] );
+			}
 
-		return (cast bitlist);
-	}
+			return (cast bitlist);
+		}
+	#end
 
 	/* From String */
 	@:from
