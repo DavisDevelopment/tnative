@@ -97,10 +97,8 @@ class CompileTime {
 	  * Loads the contents of a File, as a ByteArray
 	  */
 	public static function loadFile(path : String) {
-		var f:File = path;
-
 		try {
-			var data = f.read();
+			var data:ByteArray = sys.io.File.getBytes(path);
 			return data;
 		} catch (err : String) {
 			return haxe.macro.Context.error(err, Context.currentPos());
