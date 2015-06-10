@@ -2,11 +2,15 @@ package tannus.xml;
 
 class Elem {
 	/* Constructor Function */
-	public function new(type : String):Void {
+	public function new(type:String, ?parent:Elem):Void {
 		tag = type;
 		text = '';
 		attr = new Map();
 		children = new Array();
+
+		if (parent != null) {
+			parent.addChild( this );
+		}
 	}
 
 /* === Instance Methods === */
@@ -55,14 +59,27 @@ class Elem {
 			f(kid);
 	}
 
-	/* Find all Elements with a [tag] of [name] */
-	public function findByName(name : String):Array<Elem> {
+	/* Find all Elems for whom [test] returns true */
+	public function query(test : Elem->Bool):Array<Elem> {
 		var res:Array<Elem> = new Array();
-		walk(function(e) {
-			if (e.tag == name)
-				res.push( e );
+		walk(function( el ) {
+			if (test( el )) {
+				res.push( el );
+			}
 		});
 		return res;
+	}
+
+	/* Find all Elements with a [tag] of [name] */
+	public function findByName(name : String):Array<Elem> {
+		return query(function(e) return (e.tag == name));
+	}
+
+	/* Find all Elems whose [key] attribute equals [val] */
+	public function findByAttribute(key:String, val:String):Array<Elem> {
+		return query(function(e) {
+			return (e.attr[key] == val);
+		});
 	}
 
 	/* Convert [this] Elem to Xml */
