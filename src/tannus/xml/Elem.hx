@@ -1,11 +1,13 @@
 package tannus.xml;
 
+import tannus.ds.Object;
+
 class Elem {
 	/* Constructor Function */
 	public function new(type:String, ?parent:Elem):Void {
 		tag = type;
 		text = '';
-		attr = new Map();
+		attr = {};
 		children = new Array();
 
 		if (parent != null) {
@@ -29,6 +31,11 @@ class Elem {
 	/* Insert an Elem onto [this] */
 	public function insertChild(child:Elem, index:Int):Void {
 		children.insert(index, child);
+	}
+
+	/* Replace one child with another */
+	public function replaceChild(oldChild:Elem, newChild:Elem):Void {
+		children[children.indexOf(oldChild)] = newChild;
 	}
 
 	/* Obtain the index of [child] in [this] */
@@ -89,7 +96,7 @@ class Elem {
 			xm.addChild(Xml.createPCData(text));
 		}
 
-		for (k in attr.keys()) {
+		for (k in attr.keys) {
 			xm.set(k, get(k));
 		}
 
@@ -143,7 +150,7 @@ class Elem {
 	public var text:String;
 
 	//- Attributes associated with [this] Elem
-	public var attr:Map<String, String>;
+	public var attr:Object;
 
 	//- Array of Elems which are children to [this]
 	public var children:Array<Elem>;
