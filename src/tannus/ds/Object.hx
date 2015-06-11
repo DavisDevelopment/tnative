@@ -105,6 +105,26 @@ abstract Object (Dynamic) from Dynamic to Dynamic {
 	}
 
 	/**
+	  * Pluck some data dopely
+	  */
+	public macro function pluck(self, firstKey:ExprOf<String>, otherKeys:Array<ExprOf<String>>) {
+		otherKeys.unshift(firstKey);
+
+		return macro $self._plk([$a{otherKeys}]);
+	}
+
+	/**
+	  * Pluck some data out of [this] Object
+	  */
+	@:noComplete
+	public function _plk(keys:Array<String>, ?mtarget:Maybe<Object>):Object {
+		var target:Object = (mtarget || {});
+		for (k in keys) 
+			target[k] = get(k);
+		return target;
+	}
+
+	/**
 	  * Determine if [this] Object is of type [type]
 	  */
 	public macro function istype(self, typ):ExprOf<Bool> {
