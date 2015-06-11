@@ -158,6 +158,11 @@ abstract ByteArray (Array<Byte>) {
 		this = (this.concat(ba));
 	}
 
+	public function append(data : ByteArray):Void {
+		for (b in data)
+			this.push( b );
+	}
+
 	/**
 	  * Convert [this] ByteArray to a DataURI
 	  */
