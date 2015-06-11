@@ -1,5 +1,6 @@
 package tannus.ds;
 
+import tannus.ds.Object;
 import tannus.ds.Maybe;
 import tannus.ds.TwoTuple;
 import tannus.ds.EitherType;
@@ -58,6 +59,25 @@ abstract Dict<K, V> (CDict<K, V>) from CDict<K, V> {
 	  */
 	public inline function exists(key : K):Bool {
 		return (get(key) != null);
+	}
+
+	/**
+	  * Append data from another Dict onto [this] one
+	  */
+	@:op(A += B)
+	public inline function write_a(other : Dict<K, V>) {
+		this.write(other);
+	}
+
+	/**
+	  * Cast [this] Dict implicitly to an Object
+	  */
+	@:to
+	public inline function toObject():Object {
+		var o:Object = {};
+		for (p in iterator()) 
+			o.set(p.key+'', p.value);
+		return o;
 	}
 }
 
@@ -145,6 +165,14 @@ class CDict<K, V> {
 	  */
 	public function removeByValue(val : V):Void {
 		pairs.remove(getPairByValue(val));
+	}
+
+	/**
+	  * Copy all data from [other] onto [this]
+	  */
+	public function write(other : Dict<K, V>):Void {
+		for (pair in other)
+			set(pair.key, pair.value);
 	}
 
 /* === Instance Fields === */
