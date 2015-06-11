@@ -1,6 +1,7 @@
 package tannus.ds;
 
 import tannus.ds.Maybe;
+import tannus.ds.Dict;
 import tannus.nore.ORegEx;
 import tannus.nore.Selector;
 
@@ -128,6 +129,15 @@ abstract Object (Dynamic) from Dynamic to Dynamic {
 			m.set(p.name, p.value);
 		}
 		return m;
+	}
+
+	/* To Dict<String, Dynamic> */
+	@:to
+	public function toTannusDict():Dict<String, Dynamic> {
+		var d:Dict<String, Dynamic> = new Dict();
+		for (p in iterator())
+			d.set(p.name, p.value);
+		return d;
 	}
 
 	#if python
