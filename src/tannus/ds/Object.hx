@@ -105,6 +105,13 @@ abstract Object (Dynamic) from Dynamic to Dynamic {
 	}
 
 	/**
+	  * Obtain a method instance
+	  */
+	public inline function method<T>(mname : String):Method<T> {
+		return new Method(get(mname), this);
+	}
+
+	/**
 	  * Pluck some data dopely
 	  */
 	public macro function pluck(self, firstKey:ExprOf<String>, otherKeys:Array<ExprOf<String>>) {
