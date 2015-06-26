@@ -2,58 +2,42 @@ package tannus.io;
 
 import haxe.macro.Expr;
 
-/**
-  * abstract class meant to roughly emulate a read-only Pointer
-  */
 @:callable
-@:generic
-abstract Getter<T> (Void -> T) from Void->T {
-	/* Constructor */
-	public inline function new(f : Void->T):Void {
+abstract Getter<T> (Get<T>) from Get<T> {
+	/* Constructor Function */
+	public inline function new(f : Get<T>):Void {
 		this = f;
 	}
-	
+
 /* === Instance Fields === */
 
 	/**
-	  * The "value" of [this] Getter as a field
+	  * The value [this] references, as a field
 	  */
-	public var value(get, never):T;
-	private inline function get_value():T return this();
+	public var v(get, never):T;
+	public inline function get_v():T {
+		return this();
+	}
 
 /* === Instance Methods === */
 
 	/**
-	  * Retrieve the 'value' of [this] Getter
-	  */
-	public inline function get():T {
-		return this();
-	}
-
-	/**
-	  * "wrap" [this] Getter is another Function
-	  */
-	public inline function wrap(wrapper : (Void->T)->T):Void {
-		var _f = this;
-		var w = wrapper.bind( _f );
-
-		this = w;
-	}
-
-	/**
-	  * Implicitly cast to the underlying Function's return-type
+	  * Get the value referenced by [this] Getter
 	  */
 	@:to
-	public function to():T {
+	public inline function get():T {
 		return (this());
 	}
 
-/* === Static Methods === */
+/* === Class Methods === */
 
 	/**
-	  * Macro to allow creation of Getters in a convenient fashion
+	  * Create a Getter to [val]
 	  */
-	public static macro function create<T>(ref : ExprOf<T>):ExprOf<Getter<T>> {
-		return macro (new tannus.io.Getter(function() return $ref));
+	public static macro function create<T>(val : ExprOf<T>):ExprOf<Getter<T>> {
+		return macro new tannus.io.Getter(function() return $val);
 	}
 }
+
+/* Alias for underlying type */
+private typedef Get<T> = Void -> T;
