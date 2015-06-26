@@ -1,127 +1,237 @@
 package tannus.io;
 
-import haxe.macro.Expr;
 import tannus.io.Getter;
 import tannus.io.Setter;
+import tannus.ds.Object;
 
-import tannus.ds.TwoTuple;
+import haxe.macro.Expr;
 
 @:generic
-abstract Pointer<T> (TwoTuple<Getter<T>, Setter<T>>) {
+abstract Pointer<T> (Ptr<T>) from Ptr<T> {
 	/* Constructor Function */
 	public inline function new(g:Getter<T>, s:Setter<T>):Void {
-		this = new TwoTuple(g, s);
+		this = new Ptr(g, s);
 	}
 
 /* === Instance Fields === */
 
 	/**
-	  * The 'value' of [this] Pointer as a field
+	  * internal reference to [this] as a Pointer
+	  */
+	private var self(get, never):Pointer<T>;
+	private inline function get_self():Pointer<T> {
+		return this;
+	}
+
+	/**
+	  * The value referenced by [this] Pointer, as a field
 	  */
 	public var value(get, set):T;
-	private function get_value():T {
-		return (this.one());
+	private inline function get_value():T {
+		return get();
 	}
-	private function set_value(nv : T):T {
-		return (this.two( nv ));
+	private inline function set_value(nv : T):T {
+		return set( nv );
 	}
 
 	/**
-	  * Alias to [value]
-	  */
-	public var _(get, set):T;
-	private inline function get__() return value;
-	private inline function set__(v : T) return (value = v);
-
-	/**
-	  * Alias to [value]
+	  * Shorter alias to 'value'
 	  */
 	public var v(get, set):T;
 	private inline function get_v() return value;
-	private inline function set_v(nv : T) return (value = nv);
+	private inline function set_v(nv) return (value = nv);
 
 	/**
 	  * The Getter for [this] Pointer
 	  */
 	public var getter(get, set):Getter<T>;
-	private inline function get_getter():Getter<T> {
-		return this.one;
-	}
-	private inline function set_getter(ng : Getter<T>):Getter<T> {
-		return (this.one = ng);
-	}
+	private inline function get_getter() return this.getter;
+	private inline function set_getter(ng) return (this.getter = ng);
 
 	/**
 	  * The Setter for [this] Pointer
 	  */
 	public var setter(get, set):Setter<T>;
-	private inline function get_setter():Setter<T> {
-		return this.two;
+	private inline function get_setter() return this.setter;
+	private inline function set_setter(ns) return (this.setter = ns);
+
+	/**
+	  * Alias to 'value'
+	  */
+	public var _(get, set):T;
+	private inline function get__() return value;
+	private inline function set__(v) return (value = v);
+
+/* === Instance Methods === */
+
+	/**
+	  * Get [this]'s value
+	  */
+	@:to
+	public inline function get():T {
+		return this.get();
 	}
-	private inline function set_setter(ns : Setter<T>):Setter<T> {
-		return (this.two = ns);
+
+	/**
+	  * Set [this]'s value
+	  */
+	@:op(A &= B)
+	public inline function set(v : T):T {
+		return this.set( v );
+	}
+
+	/**
+	  * Set [this]'s value by a Pointer
+	  */
+	@:op(A &= B)
+	public inline function setPointer(v : Pointer<T>):T {
+		return set( v );
+	}
+
+	/**
+	  * JQuery-style accessor function
+	  */
+	public function access(?v : T):T {
+		return this.access( v );
+	}
+
+	/**
+	  * Attach a Setter to [this] Pointer
+	  */
+	@:op(A += B)
+	public function attach_str(str : Setter<T>):Void {
+		setter.attach( str );
+	}
+
+	/**
+	  * Attach a Setter, macro-style
+	  */
+	public macro function attach(self, other) {
+		var setter = Setter.create(other);
+		return macro $self.attach_str(function(v) return ($other = v));
+	}
+
+	/**
+	  * Create a clone of [this] Pointer
+	  */
+	public inline function clone():Pointer<T> {
+		return new Pointer(getter, setter);
+	}
+
+	/**
+	  * Obtain a Pointer to a field of the object referenced by [this] Pointer
+	  */
+	public function field<F>(key : String):Pointer<F> {
+		var o = toObjectPointer();
+		return cast (new Pointer((function() return (o.get()[key])), (function(v) return ((o.get())[key] = v))));
+	}
+
+	/**
+	  * Convert [this] to a Getter
+	  */
+	@:to
+	public inline function toGetter():Getter<T> {
+		return getter;
+	}
+
+	/**
+	  * Convert [this] to a Setter
+	  */
+	@:to
+	public inline function toSetter():Setter<T> {
+		return setter;
+	}
+
+	/**
+	  * Create a Pointer to the value of [this] Pointer, as an Object
+	  */
+	@:to
+	public inline function toObjectPointer():Pointer<Object> {
+		return cast this;
+	}
+
+	/**
+	  * Convert [this] Pointer to a human-readable String
+	  */
+	@:to
+	public function toString():String {
+		return Std.string(get());
+	}
+
+	/**
+	  * Return the iterator for Pointers which reference Iterable data
+	  */
+	public static function iterator<T>(self : Pointer<Iterable<T>>):Iterator<T> {
+		return (self.v.iterator());
+	}
+
+/* === Class Methods === */
+
+	/**
+	  * Create and return a Pointer which references [val]
+	  */
+	public macro function create<T>(val : ExprOf<T>):ExprOf<Pointer<T>> {
+		return macro new tannus.io.Pointer(tannus.io.Getter.create($val), tannus.io.Setter.create($val));
+	}
+
+	public macro function dual<T>(gref:ExprOf<T>, sref:ExprOf<T>):ExprOf<Pointer<T>> {
+		return macro new tannus.io.Pointer(tannus.io.Getter.create($gref), tannus.io.Setter.create($sref));
+	}
+}
+
+@:generic
+private class Ptr<T> {
+	/* Constructor Function */
+	public inline function new(get:Getter<T>, set:Setter<T>):Void {
+		getter = get;
+		setter = set;
 	}
 
 /* === Instance Methods === */
 
 	/**
-	  * 'get' the value of [this] Pointer
+	  * Get the value referenced by [this] Pointer
 	  */
-	@:to
 	public inline function get():T {
 		return getter();
 	}
 
 	/**
-	  * 'set' the value of [this] Pointer
+	  * Set the value referenced by [this] Pointer
 	  */
-	@:op(A &= B)
-	public inline function set(nv : T):T {
-		return setter(nv);
+	public inline function set(value : T):T {
+		return setter( value );
 	}
 
 	/**
-	  * 'attach' another Pointer to [this] one, such that when a new value is assigned to [this] one,
-	  * that change is mirrored onto the attached Pointer
+	  * JQuery-style access-function
 	  */
-	@:op(A += B)
-	public inline function attach_ptr(other : Pointer<T>):Void {
-		var _t = this.two;
-		_t.attach(other.setter);
-		this.two = _t;
+	public function access(?nv : T):T {
+		if (nv != null) {
+			return set( nv );
+		} else {
+			return get();
+		}
 	}
+
+/* === Computed Instance Fields === */
 
 	/**
-	  * 'attach' a Setter to [this] Pointer
+	  * The value referenced by [this] Pointer
 	  */
-	@:op(A += B)
-	public inline function attach_setter(str : Setter<T>):Void {
-		var _t = this.two;
-		_t.attach( str );
-		this.two = _t;
+	public var value(get, set):T;
+	private inline function get_value():T {
+		return get();
+	}
+	private inline function set_value(nv : T):T {
+		return set( nv );
 	}
 
-	/**
-	  * 'attach' another Pointer to [this] Pointer
-	  */
-	public macro function attach(self, other:ExprOf<T>) {
-		var settr = Setter.create(other);
-		return macro $self.attach_setter($settr);
-	}
+/* === Instance Fields === */
 
-/* === Static Methods === */
+	/* The getter for [this] Pointer */
+	public var getter : Getter<T>;
 
-	/**
-	  * Create a Pointer conveniently
-	  */
-	public static macro function create<T>(ref : ExprOf<T>):ExprOf<Pointer<T>> {
-		return macro (new tannus.io.Pointer(tannus.io.Getter.create($ref), tannus.io.Setter.create($ref)));
-	}
-
-	/**
-	  * Slightly more robust Pointer creation
-	  */
-	public static macro function dual<T>(gref:ExprOf<T>, sref:ExprOf<T>):ExprOf<Pointer<T>> {
-		return macro (new tannus.io.Pointer(tannus.io.Getter.create($gref), tannus.io.Setter.create($sref)));
-	}
+	/* The setter for [this] Pointer */
+	public var setter : Setter<T>;
 }
