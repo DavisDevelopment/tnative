@@ -3,66 +3,63 @@ package tannus.io;
 import haxe.macro.Expr;
 
 @:callable
-@:generic
-abstract Setter<T> (T -> T) from T -> T {
+abstract Setter<T> (Set<T>) from Set<T> {
 	/* Constructor Function */
-	public inline function new(f : T->T):Void {
+	public inline function new(f : Set<T>):Void {
 		this = f;
 	}
 
 /* === Instance Fields === */
 
 	/**
-	  * The 'value' of [this] Setter as a field
+	  * Assign the value, as a field
 	  */
-	public var value(never, set):T;
-	private inline function set_value(nv : T):T {
-		return (this( nv ));
+	public var v(never, set):T;
+	private inline function set_v(nv : T):T {
+		return this( nv );
 	}
 
 /* === Instance Methods === */
 
 	/**
-	  * Assign a new value at the place in memory [this] Setter references
+	  * Wrap [this] Setter in another setter
 	  */
-	@:op(A &= B)
-	public inline function set(nv : T):T {
-		return (this( nv ));
+	public inline function wrap(f : SetWrap<T>):Void {
+		var self = this;
+		this = function (v : T):T {
+			return f(self, v);
+		};
 	}
 
 	/**
-	  * Wrap [this] Setter in a Function
-	  */
-	@:op(A *= B)
-	public inline function wrap(wrapper : T -> (T -> T) -> T):Void {
-		var w = wrapper.bind(_, this);
-		this = w;
-	}
-
-	/**
-	  * Attach another Setter to [this] one
+	  * Wrap another Setter around [this]
 	  */
 	@:op(A += B)
 	public inline function attach(other : Setter<T>):Void {
-		wrap(function(v:T, old:T->T):T {
-			other( v );
-			return old( v );
+		wrap(function(s, val) {
+			other( val );
+			return s( val );
 		});
 	}
 
-/* === Static Methods === */
-
 	/**
-	  * Create a Setter instance conveniently
+	  * Assign the value
 	  */
-	#if !macro
-		macro
-	#end
-	public static function create<T>(ref : ExprOf<T>):ExprOf<Setter<T>> {
-		return macro (new tannus.io.Setter(function(v) {
-			$ref = v;
+	@:op(A &= B)
+	public inline function set(v : T):T {
+		return (this( v ));
+	}
 
-			return $ref;
-		}));
+/* === Class Methods === */
+
+	public static macro function create<T> (val : ExprOf<T>):ExprOf<Setter<T>> {
+		return macro new tannus.io.Setter(function(v) {
+			return ($val = v);
+		});
 	}
 }
+
+/* Alias to the underlying type */
+private typedef Set<T> = T -> T;
+
+private typedef SetWrap<T> = Setter<T> -> T -> T;
