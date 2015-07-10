@@ -5,11 +5,13 @@ import tannus.io.Signal;
 import tannus.ds.Memory;
 
 import tannus.chrome.ContextMenu in Cm;
+import tannus.chrome.MenuEntryType in EType;
 
 class ContextMenuEntry {
 	/* Constructor Function */
 	public function new(txt:String=''):Void {
 		id = Memory.uniqueIdString('ctx-');
+		type = Normal;
 		parent_id = null;
 		title = txt;
 		click = new Signal();
@@ -47,7 +49,7 @@ class ContextMenuEntry {
 		Cm.create({
 			'id' : id,
 			'title' : title,
-			'type' : 'normal',
+			'type' : type,
 			'contexts' : ['all'],
 			'parentId' : parent_id,
 			'onclick' : function(event) {
@@ -90,6 +92,9 @@ class ContextMenuEntry {
 	
 	/* The ID of [this] Entry */
 	public var id : String;
+
+	/* The 'type' of [this] Entry */
+	public var type : EType;
 
 	/* The ID of [this] Entry's parent */
 	public var parent_id : Null<String>;
