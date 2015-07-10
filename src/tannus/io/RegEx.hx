@@ -39,4 +39,22 @@ abstract RegEx (EReg) from EReg to EReg {
 
 		return ma;
 	}
+
+	/**
+	  * Return an Array of RegExMatchs
+	  */
+	public function findAll(s : String):Array<Dynamic> {
+		var all:Array<Dynamic> = new Array();
+		this.map(s, function(e : EReg) {
+			var pos = e.matchedPos();
+
+			all.push({
+				'str' : s,
+				'pos' : e.matchedPos()
+			});
+
+			return s;
+		});
+		return all;
+	}
 }

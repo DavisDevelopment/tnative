@@ -1,161 +1,144 @@
 package tannus.io;
 
-import tannus.ds.TwoTuple;
+import tannus.io.Ptr;
 
-/**
-  * What will be the core of the event-system in the new Tannus
-  */
 class Signal<T> {
-	/* Constructor */
+	/* Constructor Function */
 	public function new():Void {
 		handlers = new Array();
-		ondelete = null;
 	}
-
-/* === Instance Fields === */
-
-	//- An Array of Handlers
-	private var handlers:Array<Handler<T>>;
-
-	//- Function to call when [delete] is called
-	public var ondelete:Null<Void->Void>;
 
 /* === Instance Methods === */
 
 	/**
-	  * Checks if a Function is already attached to [this] Signal
+	  * Adds a new Handler to the list of Handlers
 	  */
-	public function hasHandler(f : T->Void):Bool {
-		for (h in handlers) {
-			if (h.equals(f)) {
-				return true;
-			}
-		}
-		return false;
+	private inline function add(handler : Handler<T>):Void {
+		handlers.push( handler );
 	}
 
 	/**
-	  * Finds the 'Handler' instance for [f]
+	  * Listen for data on [this] Signal
 	  */
-	private function getHandler(f : T->Void):Null<Handler<T>> {
-		for (h in handlers) {
-			if (h.equals(f)) {
-				return h;
-			}
-		}
-		return null;
-	}
-
-	/**
-	  * Attach a listener function to [this] Signal
-	  */
-	public function listen(f:T->Void, ?once:Bool=false):Void {
-		var h:Handler<T> = new Handler(f, once);
-		
-		if (!hasHandler(f)) {
-			handlers.push(h);
+	public function listen(f:T->Void, once:Bool=false):Void {
+		if (!once) {
+			add(Normal(f));
+		} else {
+			var _fired:Bool = false;
+			var fired:Ptr<Bool> = Ptr.create(_fired);
+			add(Once(f, fired));
 		}
 	}
 
 	/**
-	  * Detach a listener from [this] Signal
+	  * Alias to 'listen'
 	  */
-	public function ignore(f:T->Void, ?_once:Bool=false):Void {
-		var h:Null<Handler<T>> = getHandler( f );
-		if (h != null) {
-			handlers.remove( h );
-			if (_once) {
-				once(function(_v : T):Void {
-					handlers.push( h );
-				});
-			}
-		}
-	}
-
-	/**
-	  * Alias to [listen]
-	  */
-	public inline function on(f:T->Void, ?once:Bool=false):Void {
+	public inline function on(f:T->Void, once:Bool=false):Void {
 		listen(f, once);
 	}
 
 	/**
-	  * Alias to [ignore]
+	  * Listen for data on [this] Signal, only once
 	  */
-	public inline function off(f:T->Void, ?once:Bool=false):Void {
-		ignore(f, once);
-	}
-
-	/**
-	  * Attach a listener function which will only be invoked the very next broadcast
-	  */
-	public function once(f : T->Void):Void {
+	public inline function once(f : T->Void):Void {
 		listen(f, true);
 	}
 
 	/**
-	  * Broadcast on [this] Signal
+	  * Listen for data which passes [test] on [this] Signal
 	  */
-	public function broadcast(data : T):Void {
+	public function when(test:T->Bool, f:T->Void):Void {
+		add(Tested(f, test));
+	}
+
+	/**
+	  * Remove a listener
+	  */
+	public function ignore(func : T->Void):Void {
+		var toIgnore:Array<Handler<T>> = [];
+
 		for (h in handlers) {
-			h.call( data );
+			switch (h) {
+				/* Standard Handler */
+				case Normal( f ), Once(f, _), Tested(f, _):
+					/* if [f] and [func] are the same function */
+					if (Reflect.compareMethods(f, func)) {
+						//- flag it for removal
+						toIgnore.push(h);
+					}
+
+				/* Anything Else */
+				default:
+					//- Do Nothing
+					null;
+			}
+		}
+
+		for (h in toIgnore)
+			handlers.remove( h );
+	}
+
+	/**
+	  * Alias to 'ignore'
+	  */
+	public inline function off(f : T->Void):Void {
+		ignore( f );
+	}
+
+	/**
+	  * Call a listener
+	  */
+	private function callHandler(h:Handler<T>, arg:T):Void {
+		switch (h) {
+			/* Standard Handler */
+			case Normal( f ):
+				f( arg );
+
+			/* Once Handler */
+			case Once(f, fired):
+				//- if [this] Handler has been fired
+				if (!fired.v) {
+					f( arg );
+					fired &= true;
+				}
+
+			/* Tested Handler */
+			case Tested(f, test):
+				if (test(arg)) {
+					f( arg );
+				}
 		}
 	}
 
 	/**
-	  * Alias to [broadcast]
+	  * Call all listeners
 	  */
-	public function call(data : T):Void {
-		broadcast(data);
+	public function broadcast(data : T):Void {
+		for (h in handlers) {
+			callHandler(h, data);
+		}
 	}
 
 	/**
-	  * 'destroy' [this] Signal
+	  * Alias to 'broadcast'
 	  */
-	public function delete():Void {
-		if (ondelete != null)
-			ondelete();
-	}
-}
-
-/**
-  * A class to represent an Event Listener
-  */
-class Handler<T> {
-	/* Constructor Function */
-	public function new(func:T->Void, onc:Bool=false):Void {
-		f = func;
-		once = onc;
-		_called = false;
+	public inline function call(data : T):Void {
+		broadcast(data);
 	}
 
 /* === Instance Fields === */
 
-	//- The fuction to be invoked with this handler
-	public var f:T->Void;
+	/* The Handlers attached to [this] Signal */
+	public var handlers:Array<Handler<T>>;
+}
 
-	//- Whether [this] Handler can only be invoked one time
-	public var once:Bool;
+private enum Handler<T> {
+	/* Handler which can fire any number of times */
+	Normal(func : T->Void);
 
-	//- Whether [this] Handler has already been called
-	public var _called:Bool;
+	/* Handler which only fires once */
+	Once(func:T->Void, fired:Ptr<Bool>);
 
-/* === Instance Methods === */
-
-	/**
-	  * Checks whether [this] Handler's function is the same function as [func]
-	  */
-	public function equals(other : T->Void):Bool {
-		return (Reflect.compareMethods(f, other));
-	}
-
-	/**
-	  * Invokes [this] Handler with a given argument
-	  */
-	public function call(parameter : T):Void {
-		if (!once || (once && !_called)) {
-			f(parameter);
-			_called = true;
-		}
-	}
+	/* Handler which only fires when the data passed to it matches [test] */
+	Tested(func:T->Void, test:T->Bool);
 }

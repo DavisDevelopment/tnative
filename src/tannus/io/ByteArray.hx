@@ -268,11 +268,38 @@ abstract ByteArray (Array<Byte>) {
 	#end
 
 	#if python
-	/* To Python bytearray */
-	@:to
-	public inline function toPythonByteArray():python.Bytearray {
-		return new python.Bytearray(python.Lib.toPythonIterable(toIntArray()));
-	}
+		/* To Python bytearray */
+		@:to
+		public inline function toPythonByteArray():python.Bytearray {
+			return new python.Bytearray(python.Lib.toPythonIterable(toIntArray()));
+		}
+
+		/* To Python Bytes */
+		@:to
+		public function toPythonBytes():python.Bytes {
+			//- Create new python.Bytes instance
+			var bits = new python.Bytes( this.length );
+
+			//- Write each Byte of [this] ByteArray to [bits]
+			for (i in 0...this.length) {
+				var byte:Byte = get( i );
+				bits.set(i, byte.asint);
+			}
+
+			return bits;
+		}
+
+		/* From Python Bytes */
+		@:from
+		public static function fromPythonBytes(b : python.Bytearray):ByteArray {
+			var ba:ByteArray = new ByteArray();
+
+			for (i in 0...b.length) {
+				ba[i] = b.get(i);
+			}
+
+			return ba;
+		}
 	#end
 
 	#if (flash || as3)

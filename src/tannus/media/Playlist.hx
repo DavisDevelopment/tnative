@@ -5,6 +5,7 @@ import tannus.io.ByteArray;
 
 import tannus.ds.Maybe;
 import tannus.ds.Object;
+import tannus.ds.Dict;
 
 import tannus.media.Track;
 
@@ -13,6 +14,7 @@ class Playlist {
 	public function new():Void {
 		title = 'My Playlist';
 		tracks = new Array();
+		trackList = new Dict();
 	}
 
 /* === Instance Methods === */
@@ -74,7 +76,9 @@ class Playlist {
 		} else {
 			tracks.push( t );
 		}
+
 		t.index = tracks.indexOf(t);
+		trackList[t.index] = t;
 
 		return t;
 	}
@@ -87,22 +91,9 @@ class Playlist {
 	}
 
 	/**
-	  * Get Track by either index or location
-	  */
-	public function getTrack(q : TrackQ):Maybe<Track> {
-		switch (q) {
-			case QIndex( i ):
-				return trackByIndex(i);
-
-			case QLocation( loc ):
-				return (trackByLocation(loc) || trackByName(loc));
-		}
-	}
-
-	/**
 	  * Get Track by Index
 	  */
-	private function trackByIndex(i : Int):Maybe<Track> {
+	public function getTrackByIndex(i : Int):Maybe<Track> {
 		for (t in tracks) 
 			if (t.index == i) return t;
 		return null;
@@ -111,7 +102,7 @@ class Playlist {
 	/**
 	  * Get Track by Location
 	  */
-	private function trackByLocation(loc : String):Maybe<Track> {
+	public function getTrackByLocation(loc : String):Maybe<Track> {
 		for (t in tracks)
 			if (t.location == loc) return t;
 		return null;
@@ -120,9 +111,19 @@ class Playlist {
 	/**
 	  * Get Track by Name
 	  */
-	private function trackByName(name : String):Maybe<Track> {
+	public function getTrackByName(name : String):Maybe<Track> {
 		for (t in tracks)
 			if (t.name == name) return t;
+		return null;
+	}
+
+	/**
+	  * Get Track by 'id'
+	  */
+	public function getTrackById(id : String):Maybe<Track> {
+		for (t in tracks)
+			if (t.id == id)
+				return t;
 		return null;
 	}
 
@@ -133,6 +134,9 @@ class Playlist {
 
 	/* List of Tracks in [this] Playlist */
 	public var tracks : Array<Track>;
+
+	/* Dictionary of all Tracks by 'index' */
+	public var trackList : Dict<Int, Track>;
 }
 
 /**

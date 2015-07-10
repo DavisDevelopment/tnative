@@ -158,6 +158,15 @@ abstract Object (Dynamic) from Dynamic to Dynamic {
 		return m;
 	}
 
+	/* From Map<String, Dynamic> */
+	@:from
+	public static function fromMap<T>(map : Map<String, T>):Object {
+		var o:Object = new Object({});
+		for (key in map.keys())
+			o.set(key, map[key]);
+		return o;
+	}
+
 	/* To Dict<String, Dynamic> */
 	@:to
 	public function toTannusDict():Dict<String, Dynamic> {
