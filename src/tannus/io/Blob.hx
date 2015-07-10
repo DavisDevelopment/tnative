@@ -15,6 +15,10 @@ abstract Blob (CBlob) from CBlob to CBlob {
 	}
 
 /* === Implicit Type Casting === */
+
+	public static inline function fromDataURL(durl : String):Blob {
+		return CBlob.fromDataURL(durl);
+	}
 }
 
 /**
@@ -44,6 +48,21 @@ class CBlob {
 	  */
 	public function toDataURL():String {
 		return data.toDataURI(type);
+	}
+
+/* === Static Methods === */
+
+	/**
+	  * Create a Blob from a DataURI
+	  */
+	public static function fromDataURL(durl : String):Blob {
+		durl = durl.substring(5);
+		var bits = durl.split(';');
+		var mime = bits.shift();
+		var encoded = durl.substring(durl.indexOf(',')+1, durl.length-1);
+		var data:ByteArray = ByteArray.fromBase64(encoded);
+
+		return new Blob('file', mime, data);
 	}
 
 /* === Instance Fields === */
