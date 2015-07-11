@@ -87,7 +87,30 @@ class Playlist {
 	  * Remove a Track from [this] Playlist
 	  */
 	public function removeTrack(track : Track):Bool {
-		return tracks.remove( track );
+		var status:Bool = tracks.remove( track );
+		updateIndices();
+		return status;
+	}
+
+	/**
+	  * Update the 'index' fields of all Tracks
+	  */
+	private function updateIndices():Void {
+		trackList = new Dict();
+		for (t in tracks) {
+			var i:Int = t.index = tracks.indexOf( t );
+			trackList[i] = t;
+		}
+	}
+
+	/**
+	  * Sort the tracks of [this] Playlist
+	  */
+	public function sort(pred : Track->Track->Int):Void {
+		var track_list:Array<Track> = tracks.copy();
+		haxe.ds.ArraySort.sort(track_list, pred);
+		tracks = track_list;
+		updateIndices();
 	}
 
 	/**
