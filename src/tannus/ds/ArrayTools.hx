@@ -58,4 +58,41 @@ class ArrayTools {
 			}
 		};
 	}
+
+	/**
+	  * Check for [item] in [set], using a custom tester function
+	  */
+	public static function hasf<T>(set:Iterable<T>, item:T, tester:T->T->Bool):Bool {
+		for (x in set)
+			if (tester(x, item))
+				return true;
+		return false;
+	}
+
+	/**
+	  * Obtain a copy of [set], with any/all duplicate items removed
+	  */
+	public static function unique<T>(set:Array<T>, ?tester:T->T->Bool):Array<T> {
+		if (tester == null)
+			tester = (function(x, y) return (x == y));
+
+		var results:Array<T> = new Array();
+		
+		for (item in set) {
+			if (!hasf(results, item, tester))
+				results.push( item );
+		}
+
+		return results;
+	}
+
+	/**
+	  * Flatten [set]
+	  */
+	public static function flatten<T>(set : Array<Array<T>>):Array<T> {
+		var res:Array<T> = new Array();
+		for (sub in set)
+			res = res.concat( sub );
+		return res;
+	}
 }
