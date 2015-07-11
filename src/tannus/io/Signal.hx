@@ -6,6 +6,7 @@ class Signal<T> {
 	/* Constructor Function */
 	public function new():Void {
 		handlers = new Array();
+		ondelete = (function() null);
 	}
 
 /* === Instance Methods === */
@@ -130,6 +131,9 @@ class Signal<T> {
 
 	/* The Handlers attached to [this] Signal */
 	public var handlers:Array<Handler<T>>;
+
+	/* Function invoked when [this] Signal is 'delete'd */
+	public var ondelete : Void->Void;
 }
 
 private enum Handler<T> {
