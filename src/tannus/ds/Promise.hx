@@ -392,13 +392,25 @@ class Promise<T> {
 
 		function mapper(e : Expr) {
 			switch (e.expr) {
+				/* Return Statement */
 				case EReturn( res ):
 					var result = res.map(mapper);
 					return macro accept($result);
 
+				/* Throw Statement */
 				case EThrow( err ):
 					var error = err.map(mapper);
 					return macro reject($error);
+
+				/* Meta Statement */
+				case ExprDef.EMeta(meta, ex):
+					switch (meta.name) {
+						case 'ignore':
+							return ex;
+
+						default:
+							return e;
+					}
 
 				default:
 					return e.map(mapper);
