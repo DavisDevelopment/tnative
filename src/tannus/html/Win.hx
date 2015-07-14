@@ -57,6 +57,20 @@ abstract Win (CWin) from CWin to CWin {
 		return sig;
 	}
 
+	/**
+	  * Listen for 'beforeunload' events on [this] Window
+	  */
+	public function onBeforeUnload():Signal<Float> {
+		var sig:Signal<Float> = new Signal();
+		var handlr = function(event) {
+			sig.call(Date.now().getTime());
+		};
+		
+		this.addEventListener('beforeunload', handlr);
+		sig.ondelete = (function() this.removeEventListener('beforeunload', handlr));
+		return sig;
+	}
+
 /* === Instance Fields === */
 
 	/**
