@@ -87,6 +87,15 @@ class ArrayTools {
 	}
 
 	/**
+	  * Obtain the union of two Arrays
+	  */
+	public static function union<T>(one:Array<T>, other:Array<T>):Array<T> {
+		return one.filter(function(item) {
+			return other.has( item );
+		});
+	}
+
+	/**
 	  * Flatten [set]
 	  */
 	public static function flatten<T>(set : Array<Array<T>>):Array<T> {
