@@ -114,10 +114,19 @@ abstract Object (Dynamic) from Dynamic to Dynamic {
 	/**
 	  * Pluck some data dopely
 	  */
+	/*
 	public macro function pluck(self, firstKey:ExprOf<String>, otherKeys:Array<ExprOf<String>>) {
 		otherKeys.unshift(firstKey);
 
 		return macro $self._plk([$a{otherKeys}]);
+	}
+	*/
+
+	/**
+	  * Pluck by an Array
+	  */
+	public inline function plucka(keys : Array<String>):Object {
+		return _plk( keys );
 	}
 
 	/**
