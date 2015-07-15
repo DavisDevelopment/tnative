@@ -43,6 +43,13 @@ class Tabs {
 	}
 
 	/**
+	  * Get Tab by id
+	  */
+	public static inline function get(id:Int, cb:Tab->Void):Void {
+		lib.get(id, cb);
+	}
+
+	/**
 	  * Create a new Tab
 	  */
 	public static function create(options:Object, ?cb:Tab->Void):Void {
@@ -66,6 +73,35 @@ class Tabs {
 		lib.reload(id, opts, function(tab) {
 			if (cb != null)
 				cb( tab );
+		});
+	}
+
+	/**
+	  * Duplicate a Tab
+	  */
+	public static function duplicate(id:Null<Int>, ?cb:Tab->Void):Void {
+		lib.duplicate(id, function( clone ) {
+			if (cb != null)
+				cb( clone );
+		});
+	}
+
+	/**
+	  * Move a Tab
+	  */
+	public static function move(id:Int, index:Int, ?windowId:Int, cb:Void->Void) {
+		lib.move(id, {'windowId':windowId, 'index':index}, function(tab) {
+			cb();
+		});
+	}
+
+	/**
+	  * Remove a Tab
+	  */
+	public static function remove(id:Null<Int>, ?cb:Void->Void):Void {
+		lib.remove(id, function() {
+			if (cb != null)
+				cb();
 		});
 	}
 
