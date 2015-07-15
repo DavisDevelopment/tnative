@@ -27,4 +27,13 @@ class StringUtils {
 				return res;
 		}
 	}
+
+	/**
+	  * Place some String on either end of some other
+	  */
+	public static function wrap(str:String, wrapper:String, ?end:String):String {
+		if (end == null)
+			end = wrapper;
+		return (wrapper + str + end);
+	}
 }
