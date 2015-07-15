@@ -38,6 +38,13 @@ class CWindowData {
 		focused = (o['focused'] || o['active'] || true);
 		incognito = (o['incognito'] || false);
 		type = (o['type'] || Normal);
+		left = (o['left'] || 0);
+		top = (o['top'] || 0);
+		
+		if (o['width'].exists)
+			width = (o['width']);
+		if (o['height'].exists)
+			height = (o['height']);
 	}
 
 /* === Instance Fields === */
@@ -49,4 +56,9 @@ class CWindowData {
 	public var incognito:Bool;
 
 	public var type:WindowType;
+
+	public var left:Int;
+	public var top:Int;
+	public var width:Int;
+	public var height:Int;
 }
