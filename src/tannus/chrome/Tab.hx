@@ -17,12 +17,29 @@ abstract Tab (CTab) {
 	/**
 	  * Update [this] Tab
 	  */
-	public inline function update(props:Object, ?cb:Tab->Void):Void {
-		Tabs.update(this.id, props, function(t) {
-			if (cb != null) {
-				cb( t );
-			}
-		});
+	public inline function update(props:Object, cb:Tab->Void):Void {
+		Tabs.update(this.id, props, cb);
+	}
+
+	/**
+	  * Duplicate [this] Tab
+	  */
+	public inline function duplicate(cb : Tab->Void):Void {
+		Tabs.duplicate(this.id, cb);
+	}
+
+	/**
+	  * Move [this] Tab
+	  */
+	public inline function move(offset:Int, ?window:Int, cb:Void->Void) {
+		Tabs.move(this.id, offset, window, cb);
+	}
+
+	/**
+	  * Delete [this] Tab
+	  */
+	public inline function remove(cb : Void->Void) {
+		Tabs.remove(this.id, cb);
 	}
 
 	/**
