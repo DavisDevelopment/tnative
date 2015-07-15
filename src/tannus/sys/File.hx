@@ -23,6 +23,18 @@ abstract File (CFile) {
 
 /* === Instance Methods === */
 
+	/**
+	  * Lines of content from [this] File
+	  */
+	public inline function lines(?nlines:Array<String>):Array<String> {
+		if (nlines == null)
+			return (this.read().toString().split('\n'));
+		else {
+			this.write(nlines.join('\n'));
+			return nlines;
+		}
+	}
+
 /* === Class Methods === */
 
 	/**
