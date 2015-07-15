@@ -1,11 +1,13 @@
 package tannus.chrome;
 
 import tannus.io.Ptr;
-import tannus.io.Signal;
+import tannus.io.Signal2 in Signal;
 import tannus.ds.Memory;
+import tannus.ds.Object;
 
 import tannus.chrome.ContextMenu in Cm;
 import tannus.chrome.MenuEntryType in EType;
+import tannus.chrome.Tab;
 
 class ContextMenuEntry {
 	/* Constructor Function */
@@ -52,8 +54,8 @@ class ContextMenuEntry {
 			'type' : type,
 			'contexts' : ['all'],
 			'parentId' : parent_id,
-			'onclick' : function(event) {
-				click.call( this );
+			'onclick' : function(info:Object, tab:Tab) {
+				click.call(info, tab);
 			}
 		});
 
@@ -103,7 +105,7 @@ class ContextMenuEntry {
 	public var title : String;
 
 	/* What to do when [this] Entry is Clicked */
-	public var click : Signal<ContextMenuEntry>;
+	public var click : Signal<Object, Tab>;
 
 /* === Static Fields/Methods === */
 
