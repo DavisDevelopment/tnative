@@ -45,4 +45,28 @@ class MouseEvent extends Event {
 
 	//- The Array of all Event-Modifiers
 	private var emods : Array<EventMod>;
+
+/* === Static Methods === */
+
+	/**
+	  * Create a Tannus MouseEvent from a jQuery MouseEvent
+	  */
+	public static function fromJqEvent(event : js.JQuery.JqEvent):MouseEvent {
+		var mods:Array<EventMod> = new Array();
+		if (event.shiftKey)
+			mods.push( Shift );
+		if (event.altKey)
+			mods.push( Alt );
+		if (event.ctrlKey)
+			mods.push( Control );
+		if (event.metaKey)
+			mods.push( Meta );
+		var pos:Point = new Point(event.pageX, event.pageY);
+		var result = new MouseEvent(event.type, pos, event.which, mods);
+		
+		result.onDefaultPrevented.once(function(x) event.preventDefault());
+		result.onPropogationStopped.once(function(x) event.stopPropagation());
+
+		return result;
+	}
 }
