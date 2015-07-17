@@ -1,63 +1,57 @@
 package tannus.ds;
 
-@:generic
-abstract TwoTuple<A, B> (T2<A, B>) {
+import Std.string in str;
+
+abstract TwoTuple<A, B> (Array<Dynamic>) {
 	/* Constructor Function */
 	public inline function new(a:A, b:B):Void {
-		this = {
-			'a' : a,
-			'b' : b
-		};
+		this = (untyped [a, b]);
 	}
 
 /* === Instance Fields === */
 
 	/**
-	  * The First Element of [this] Tuple
+	  * The first item in [this] Tuple
 	  */
 	public var one(get, set):A;
-	private inline function get_one():A return this.a;
-	private inline function set_one(v : A):A return (this.a = v);
+	private inline function get_one() return cast this[0];
+	private inline function set_one(v : A):A {
+		return cast (this[0] = v);
+	}
 
 	/**
-	  * The Second Element of [this] Tuple
+	  * The second item in [this] Tuple
 	  */
 	public var two(get, set):B;
-	private inline function get_two():B return this.b;
-	private inline function set_two(v:B):B return (this.b = v);
+	private inline function get_two() return cast this[1];
+	private inline function set_two(v : B):B {
+		return cast (this[1] = v);
+	}
 
 /* === Implicit Casting === */
 
-	/* Cast to a human-readable String */
-	@:to
+	/**
+	  * To human-readable String
+	  */
 	public inline function toString():String {
-		return ('(' + Std.string(one) + ', ' + Std.string(two) + ')');
+		return ('('+str(one)+', '+str(two)+')');
 	}
 
-	/* Cast to Array<Dynamic> */
+	/**
+	  * To Dynamic Array
+	  */
 	@:to
-	public inline function toDynamicArray():Array<Dynamic> {
-		var ar:Array<Dynamic> = [one, two];
-		return ar;
+	public inline function toArray():Array<Dynamic> {
+		return this;
 	}
 
-#if python
-	
-	/* Cast to python.Tuple2 */
+	#if python
+	/**
+	  * To Python Tuple2
+	  */
 	@:to
 	public inline function toPythonTuple():python.Tuple.Tuple2<A, B> {
-		return python.Tuple.Tuple2.make(one, two);
+		return new python.Tuple.Tuple2(this);
 	}
-
-	/* Cast from python.Tuple2 */
-	@:from
-	public static inline function fromPythonTuple<A, B>(pt : python.Tuple.Tuple2<A, B>):TwoTuple<A, B> {
-		return new TwoTuple(pt._1, pt._2);
-	}
-#end
+	#end
 }
-
-private typedef T2<A, B> = {
-	a : A,
-	b : B
-};
