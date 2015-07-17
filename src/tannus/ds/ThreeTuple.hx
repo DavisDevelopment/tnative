@@ -1,50 +1,66 @@
 package tannus.ds;
 
-@:generic
-abstract ThreeTuple<A, B, C> (T3<A, B, C>) {
+import Std.string in str;
+
+abstract ThreeTuple<A, B, C> (Array<Dynamic>) {
 	/* Constructor Function */
 	public inline function new(a:A, b:B, c:C):Void {
-		this = {
-			'a' : a,
-			'b' : b,
-			'c' : c
-		};
+		this = (untyped [a, b, c]);
 	}
 
 /* === Instance Fields === */
 
 	/**
-	  * The First Element of [this] Tuple
+	  * The first item in [this] Tuple
 	  */
 	public var one(get, set):A;
-	private inline function get_one():A return this.a;
-	private inline function set_one(v : A):A return (this.a = v);
+	private inline function get_one() return cast this[0];
+	private inline function set_one(v : A):A {
+		return cast (this[0] = v);
+	}
 
 	/**
-	  * The Second Element of [this] Tuple
+	  * The second item in [this] Tuple
 	  */
 	public var two(get, set):B;
-	private inline function get_two():B return this.b;
-	private inline function set_two(v:B):B return (this.b = v);
+	private inline function get_two() return cast this[1];
+	private inline function set_two(v : B):B {
+		return cast (this[1] = v);
+	}
 
 	/**
-	  * The Third Element of [this] Tuple
+	  * The third item in [this] Tuple
 	  */
 	public var three(get, set):C;
-	private inline function get_three():C return this.c;
-	private inline function set_three(v : C):C return (this.c = v);
+	private inline function get_three() return cast this[2];
+	private inline function set_three(v : C):C {
+		return cast (this[2] = v);
+	}
+
+/* === Implicit Casting === */
 
 	/**
-	  * Cast to a human-readable String
+	  * To human-readable String
+	  */
+	public inline function toString():String {
+		return ('('+str(one)+', '+str(two)+', '+str(three)')');
+	}
+
+	/**
+	  * To Dynamic Array
 	  */
 	@:to
-	public inline function toString():String {
-		return ('(' + Std.string(one) + ', ' + Std.string(two) + ', ' + Std.string(three) + ')');
+	public inline function toArray():Array<Dynamic> {
+		return this;
 	}
-}
 
-private typedef T3<A, B, C> = {
-	a : A,
-	b : B,
-	c : C
-};
+	#if python
+	/**
+	  * To Python Tuple2
+	  */
+	@:to
+	public inline function toPythonTuple():python.Tuple.Tuple3<A, B, C> {
+		return new python.Tuple.Tuple3(this);
+	}
+	#end
+}
