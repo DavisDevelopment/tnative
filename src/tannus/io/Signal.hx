@@ -87,6 +87,13 @@ class Signal<T> {
 	}
 
 	/**
+	  * Clear [this] Signal of all Handlers
+	  */
+	public inline function clear():Void {
+		handlers = new Array();
+	}
+
+	/**
 	  * Call a listener
 	  */
 	private function callHandler(h:Handler<T>, arg:T):Void {
