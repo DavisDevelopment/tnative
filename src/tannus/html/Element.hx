@@ -3,10 +3,12 @@ package tannus.html;
 import tannus.ds.Maybe;
 import tannus.ds.Object;
 import tannus.io.Ptr;
+import tannus.io.Getter;
 import tannus.geom.Point;
 import tannus.geom.Rectangle;
 
 import tannus.html.ElStyles;
+import tannus.html.Elementable;
 
 import js.JQuery;
 
@@ -57,6 +59,12 @@ abstract Element (JQuery) from JQuery to JQuery {
 		var r:Maybe<String> = cs(args[0], args[1]);
 		return (r || '');
 	}
+
+	/**
+	  * Map-Like Access to the attributes of [this] Element
+	  */
+	public var attributes(get, never):ElAttributes;
+	private function get_attributes() return new ElAttributes(cast Getter.create(this));
 
 	/**
 	  * More intuitive version of JQuery.css(k, v)
@@ -189,6 +197,13 @@ abstract Element (JQuery) from JQuery to JQuery {
 		return this.get( index );
 	}
 
+	/**
+	  * Append some shit to [this] Element
+	  */
+	public inline function appendElementable(child : Elementable):Element {
+		return (this.append(child.toElement()));
+	}
+
 /* === Operator Overloading === */
 
 	/**
@@ -205,6 +220,14 @@ abstract Element (JQuery) from JQuery to JQuery {
 	@:op(A + B)
 	public inline function addToElementArray(other : Array<Element>):Element {
 		return fromArray(toArray().concat(other));
+	}
+
+	/**
+	  * Add an Elementable object to [this] Element
+	  */
+	@:op(A + B)
+	public inline function addToElementable(other : Elementable):Element {
+		return this.add(other.toElement());
 	}
 
 	/**
