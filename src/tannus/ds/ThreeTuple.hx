@@ -43,7 +43,7 @@ abstract ThreeTuple<A, B, C> (Array<Dynamic>) {
 	  * To human-readable String
 	  */
 	public inline function toString():String {
-		return ('('+str(one)+', '+str(two)+', '+str(three)')');
+		return ('('+str(one)+', '+str(two)+', '+str(three)+')');
 	}
 
 	/**
