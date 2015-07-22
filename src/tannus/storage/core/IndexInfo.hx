@@ -6,13 +6,14 @@ import tannus.storage.core.TypeSystem in Ts;
 @:forward
 abstract IndexInfo (TIndexInfo) from TIndexInfo {
 	/* Constructor Function */
-	public inline function new(n:String, t:String, p:Bool=false, r:Bool=true, u:Bool=false):Void {
+	public inline function new(n:String, t:String, p:Bool=false, r:Bool=true, u:Bool=false, auto:Bool=false):Void {
 		this = {
 			'name' : n,
 			'type' : Ts.typeFromName(t),
 			'required' : r,
 			'primary' : p,
-			'unique' : u
+			'unique' : u,
+			'autoIncrement': auto
 		};
 	}
 }
@@ -40,6 +41,11 @@ typedef TIndexInfo = {
 	  * Whether [this] Index must be unique
 	  */
 	var unique : Bool;
+
+	/**
+	  * Whether [this] Index should be auto-incremented
+	  */
+	var autoIncrement : Bool;
 
 	/**
 	  * The 'type' of [this] Index
