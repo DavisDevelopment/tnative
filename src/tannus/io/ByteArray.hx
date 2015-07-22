@@ -267,6 +267,24 @@ abstract ByteArray (Array<Byte>) {
 		}
 	#end
 
+	#if (js && !node)
+		/**
+		  * Cast [this] ByteArray to a Uint8Array
+		  */
+		@:to
+		public function toUint8Array():js.html.Uint8Array {
+			return new js.html.Uint8Array(untyped toArray());
+		}
+
+		/**
+		  * Cast [this] ByteArray to an ArrayBuffer
+		  */
+		@:to
+		public function toArrayBuffer():js.html.ArrayBuffer {
+			return cast toUint8Array();
+		}
+	#end
+
 	#if python
 		/* To Python bytearray */
 		@:to
