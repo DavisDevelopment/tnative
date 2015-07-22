@@ -3,7 +3,9 @@ package tannus.chrome.chromedb;
 import tannus.ds.Object;
 import tannus.ds.Dict;
 import tannus.storage.core.IndexInfo;
+import tannus.storage.core.IndexType in IType;
 import tannus.storage.core.TypeSystem in Ts;
+import tannus.storage.core.TypedValue;
 
 using Lambda;
 
@@ -57,7 +59,8 @@ abstract BaseData (TBaseData) {
 		var td:TableData = {
 			'name' : name,
 			'fields' : [],
-			'rows' : []
+			'rows' : [],
+			'highest_id' : 0
 		};
 		if (this.tables.exists( name )) {
 			throw 'TableError: Table $name already exists!';
@@ -191,6 +194,18 @@ abstract TableData (TTableData) from TTableData {
 
 		for (k in fields) {
 			var info = indexInfo(k);
+			/* if this index is the primary-key */
+			if (info.primary) {
+				/* if the primary-key is auto-incremented */
+				if (info.autoIncrement) {
+					if (row[k].exists) {
+						throw 'TableError: Do not provide a "$k" field; it is auto-incremented!';
+					}
+					else {
+						row[k] = autoIncrement();
+					}
+				}
+			}
 			if (info.required) {
 				if (!row.exists(k))
 					throw 'TableError: Missing field "$k"!';
@@ -210,13 +225,33 @@ abstract TableData (TTableData) from TTableData {
 	}
 
 	/**
+	  * Auto-Increment the primary key, returning the newest id
+	  */
+	public function autoIncrement():Dynamic {
+		this.highest_id += 1;
+		var pkey = indexInfo(primary());
+		switch (pkey.type) {
+			case IType.ITInt: 
+				return this.highest_id; 
+			
+			case IType.ITString:
+				return StringTools.hex(this.highest_id);
+
+			default:
+				throw 'TableError: Cannot auto-increment a ${pkey.type} index';
+		}
+	}
+
+	/**
 	  * Select a Row by primary key
 	  */
-	public function get(id : String):Null<Object> {
+	public function get(id : Dynamic):Null<Object> {
 		var k = primary();
-		for (o in all())
+		for (o in all()) {
+			trace(o);
 			if (o[k] == id)
 				return o;
+		}
 		return null;
 	}
 
@@ -238,4 +273,5 @@ typedef TTableData = {
 	var name : String;
 	var fields : Array<IndexInfo>;
 	var rows : Array<Object>;
+	var highest_id : Int;
 };
