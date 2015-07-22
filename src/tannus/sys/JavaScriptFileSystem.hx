@@ -18,7 +18,9 @@ class JavaScriptFileSystem {
 /* === Utility Methods === */
 
 	public static function __init__():Void {
-		load();
+		#if !chromeapp
+			load();
+		#end
 	}
 
 	/**
