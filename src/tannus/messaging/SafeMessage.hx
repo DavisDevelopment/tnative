@@ -15,7 +15,7 @@ class SafeMessage {
 
 	public var id : String;
 	public var sender_id : String;
-	public var type : MessageType;
+	public var type : String;
 	public var channel : String;
 	public var data : Object;
 
@@ -54,18 +54,22 @@ class SafeMessage {
 	}
 
 	private static function isMessageType(o : Maybe<Object>):Bool {
-		if (!o.exists || !o.value.istype(Array)) {
-			return false;
-		}
-		else {
-			var type:MessageType = (cast o);
-			switch (type) {
-				case Normal, Reply, Connect:
-					return true;
-
-				default:
-					return false;
+		try {
+			if (!o.exists || !o.value.istype(String)) {
+				return false;
 			}
+			else {
+				var type:MessageType = (cast haxe.Unserializer.run(cast o));
+				switch (type) {
+					case Normal, Reply, Connect:
+						return true;
+
+					default:
+						return false;
+				}
+			}
+		} catch (error : Dynamic) {
+			return false;
 		}
 	}
 }
@@ -73,7 +77,7 @@ class SafeMessage {
 typedef TSafe = {
 	var id : String;
 	var sender_id : String;
-	var type : MessageType;
+	var type : String;
 	var channel : String;
 	var data : Object;
 };

@@ -28,9 +28,9 @@ class Message {
 		return new SafeMessage({
 			'id' : id,
 			'sender_id' : sender.id,
-			'type' : type,
+			'type' : haxe.Serializer.run(type),
 			'channel' : channel,
-			'data' : data
+			'data' : haxe.Serializer.run(data)
 		});
 	}
 
@@ -51,10 +51,10 @@ class Message {
 	  * Create a Message object from a SafeMessage
 	  */
 	public static function fromSafe(sock:Messager, saf:SafeMessage):Message {
-		var m = new Message(sock, saf.data);
+		var m = new Message(sock, haxe.Unserializer.run(cast saf.data));
 		m.id = saf.id;
 		m.sender_id = saf.sender_id;
-		m.type = saf.type;
+		m.type = haxe.Unserializer.run(saf.type);
 		m.channel = saf.channel;
 		return m;
 	}
