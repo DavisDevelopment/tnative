@@ -60,7 +60,7 @@ class Table extends Tabl {
 	/**
 	  * Get a row by id
 	  */
-	override public function row(id : String):Promise<Row> {
+	override public function row(id : Dynamic):Promise<Row> {
 		return Promise.create({
 			pull(function() {
 				var res:Null<Object> = data.get(id);
