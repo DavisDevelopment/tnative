@@ -37,9 +37,9 @@ class EventDispatcher {
 	/**
 	  * Listen for an Event on [this] Dispatcher
 	  */
-	public function on(name:String, action:Dynamic->Void, ?once:Bool):Void {
+	public function on<T>(name:String, action:T->Void, ?once:Bool):Void {
 		if (canDispatch(name)) {
-			_sigs[name].on(action, once);
+			_sigs[name].on(cast action, once);
 		} else {
 			throw 'InvalidEvent: "$name" is not a valid Event';
 		}
@@ -48,16 +48,42 @@ class EventDispatcher {
 	/**
 	  * Listen for an Event, only once
 	  */
-	public function once(name:String, action:Dynamic->Void):Void {
+	public function once<T>(name:String, action:T->Void):Void {
 		on(name, action, true);
 	}
 
 	/**
 	  * Dispatch an Event on [this] Shit
 	  */
-	public function dispatch(name:String, data:Dynamic):Void {
+	public function dispatch<T>(name:String, data:T):Void {
 		if (canDispatch(name)) {
-			_sigs[name].call( data );
+			_sigs[name].call(untyped data);
+		}
+	}
+
+	/**
+	  * Stop listening for an Event
+	  */
+	public function off(name:String, ?action:Dynamic->Void):Void {
+		var sig:Signal<Dynamic> = _sigs[name];
+		if (sig != null) {
+			if (action != null)
+				sig.off( action );
+			else
+				sig.clear();
+		}
+	}
+
+	/**
+	  * Listen for an event, conditionally
+	  */
+	public function when<T>(name:String, test:T->Bool, action:T->Void):Void {
+		if (canDispatch(name)) {
+			untyped {
+				_sigs[name].when(test, action);
+			};
+		} else {
+			throw 'InvalidEvent: "$name" is not a valid Event';
 		}
 	}
 
