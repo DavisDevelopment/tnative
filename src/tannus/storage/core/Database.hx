@@ -65,6 +65,16 @@ class Database {
 	}
 
 	/**
+	  * Delete [this] Database
+	  */
+	public function delete():BoolPromise {
+		unimp();
+		return Promise.create({
+			throw 'Not Implemented!';
+		}).bool();
+	}
+
+	/**
 	  * Throw an error
 	  */
 	private inline function error(msg : String):Void {
