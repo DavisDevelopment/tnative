@@ -119,7 +119,7 @@ class Base extends Database {
 	/**
 	  * Delete [this] Database
 	  */
-	public function delete():BoolPromise {
+	override public function delete():BoolPromise {
 		return Promise.create({
 			store.remove([name], function() {
 				return true;
