@@ -125,7 +125,7 @@ class Table {
 	/**
 	  * Obtain a Row by ID
 	  */
-	public function row(id : String):Promise<Row> {
+	public function row(id : Dynamic):Promise<Row> {
 		return Promise.create({
 			indexList().then(function( indices ) {
 				var pkey:Null<IndexInfo> = null;
