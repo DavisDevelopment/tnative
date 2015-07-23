@@ -292,6 +292,32 @@ class TypeSystem {
 	public static function lt(x:Val, y:Val) return operate('<', x, y);
 	public static function le(x:Val, y:Val) return operate('<=', x, y);
 
+	/**
+	  * Value in Array
+	  */
+	public static function vin(val:Val, list:Val):Bool {
+		var v:Dynamic = toHaxeType(val);
+		switch (list) {
+			case TVArray( vals ):
+				var arr:Array<Dynamic> = vals.map(toHaxeType);
+				return arr.has( v );
+
+			case TVDict( d ):
+				var dict:Dict<String, Dynamic> = new Dict(cast toHaxeType(d));
+				return dict.exists(cast v);
+
+			default:
+				throw 'Cannot perform "IN" clause on $list!';
+		}
+	}
+
+	/**
+	  * List has Value
+	  */
+	public static function has(list:Val, val:Val):Bool {
+		return vin(val, list);
+	}
+
 
 /* === Utility Methods === */
 
