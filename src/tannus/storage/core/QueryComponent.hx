@@ -58,6 +58,12 @@ abstract QCBoolOp (String) {
 	/* Less Than or Equal To */
 	var Le = 'le';
 
+	/* Value in Array */
+	var In = 'in';
+
+	/* Array has Value */
+	var Has = 'has';
+
 /* === Methods === */
 
 	/**
@@ -90,6 +96,12 @@ abstract QCBoolOp (String) {
 			case 'le' | '<=':
 				return Le;
 
+			case 'in':
+				return In;
+
+			case 'has' | 'contains':
+				return Has;
+
 			/* Anything Else */
 			default:
 				throw 'Cannot create a QCBoolOp value from "$str"!';
@@ -107,6 +119,8 @@ abstract QCBoolOp (String) {
 			case Ge: Ts.ge;
 			case Lt: Ts.lt;
 			case Le: Ts.le;
+			case In: Ts.vin;
+			case Has: Ts.has;
 		});
 	}
 }
