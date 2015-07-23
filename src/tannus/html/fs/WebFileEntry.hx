@@ -24,6 +24,13 @@ abstract WebFileEntry (FileEntry) from FileEntry {
 	private inline function get_fileSystem() return cast this.filesystem;
 
 /* === Instance Methods === */
+
+	/**
+	  * Do Stuff
+	  */
+	public function file():Promise<tannus.html.fs.WebFile> {
+		return cast new Promise(this.file.bind(_, _));
+	}
 	
 	/**
 	  * Read the Bytes of [this] File into memory
