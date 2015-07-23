@@ -4,6 +4,8 @@ import tannus.html.fs.WebFileEntry;
 import tannus.html.fs.WebFSEntry;
 import tannus.sys.Path;
 
+import Std.is;
+
 class FileSystem {
 	/**
 	  * Request a FileSystem
@@ -23,8 +25,14 @@ class FileSystem {
 	  * Ask the User to choose a File or Directory
 	  */
 	public static function chooseEntry(options:ChooseEntryOptions, cb:Array<WebFSEntry>->Void):Void {
-		lib.chooseEntry(options, function(entry) {
-			cb([entry]);
+		lib.chooseEntry(options, function(entry:WebFSEntry, ?entries:Array<WebFSEntry>) {
+			var all:Array<WebFSEntry> = new Array();
+			if (is(entry, Array)) {
+				all = cast entries;
+			} else all = [entry];
+			untyped all = all.shift();
+
+			cb( all );
 		});
 	}
 
