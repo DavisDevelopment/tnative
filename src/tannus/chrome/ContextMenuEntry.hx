@@ -16,6 +16,8 @@ class ContextMenuEntry {
 		type = Normal;
 		parent_id = null;
 		title = txt;
+		contexts = ['all'];
+		patterns = new Array();
 		click = new Signal();
 
 		__init();
@@ -45,6 +47,13 @@ class ContextMenuEntry {
 	}
 
 	/**
+	  * Add a URL Pattern to [this] Entry
+	  */
+	public inline function addPattern(pattern : String):Void {
+		patterns.push( pattern );
+	}
+
+	/**
 	  * 'Pack' [this] Entry into an actual ContextMenu
 	  */
 	public function pack():Void {
@@ -52,7 +61,8 @@ class ContextMenuEntry {
 			'id' : id,
 			'title' : title,
 			'type' : type,
-			'contexts' : ['all'],
+			'contexts' : contexts,
+			'documentUrlPatterns' : patterns,
 			'parentId' : parent_id,
 			'onclick' : function(info:Object, tab:Tab) {
 				click.call(info, tab);
@@ -106,6 +116,12 @@ class ContextMenuEntry {
 
 	/* What to do when [this] Entry is Clicked */
 	public var click : Signal<Object, Tab>;
+
+	/* The contexts in which to display [this] Entry */
+	public var contexts : Array<String>;
+
+	/* URL-Patterns on which [this] Entry will display */
+	public var patterns : Array<String>;
 
 /* === Static Fields/Methods === */
 
