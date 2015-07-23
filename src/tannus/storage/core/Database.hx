@@ -2,6 +2,7 @@ package tannus.storage.core;
 
 import tannus.ds.Promise;
 import tannus.ds.promises.*;
+import tannus.storage.core.QueryPromise;
 
 /**
   * Base class for Database objects
@@ -31,6 +32,17 @@ class Database {
 		unimp();
 		return Promise.create({
 			throw 'Not Implemented!';
+		});
+	}
+
+	/**
+	  * Start a Query on a given Table
+	  */
+	public function select(name : String):QueryPromise {
+		return new QueryPromise(function(accept, reject) {
+			table(name).then(function(tabl) {
+				accept(tabl.get());
+			}).unless(reject);
 		});
 	}
 
