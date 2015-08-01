@@ -60,7 +60,7 @@ class TerminalPrompt {
 				}
 			});
 
-		#elseif (python || php || neko || cpp || cs || java)
+		#elseif (php || neko || cpp || cs || java)
 
 			var stdout = Sys.stdout();
 			var stdin = Sys.stdin();
@@ -72,7 +72,6 @@ class TerminalPrompt {
 			while (true) {
 				try {
 					var s:String = stdin.readLine();
-					trace( s );
 					inp = s;
 					break;
 				} catch (e : Dynamic) {
@@ -88,6 +87,12 @@ class TerminalPrompt {
 				//- ask again
 				get();
 			}
+
+		#elseif python
+			var inp:String->String = python.Syntax.pythonCode('input');
+			var ans:String = inp(query);
+
+			answered.broadcast( ans );
 		#end
 	}
 
@@ -105,11 +110,12 @@ class TerminalPrompt {
 	  * Create and return a Promise for an answer to a prompt
 	  */
 	public static function ask(question : String):StringPromise {
-		var p = new TerminalPrompt(question);
-		return (Promise.create({
-			p.await(function(data : ByteArray) {
-				return p.answer;
+		return Promise.create({
+			var p = new TerminalPrompt(question);
+			p.answered.on(function( ans ) {
+				return ans;
 			});
-		}, false).string());
+			p.get();
+		}).string();
 	}
 }
