@@ -16,6 +16,26 @@ abstract Blob (CBlob) from CBlob to CBlob {
 
 /* === Implicit Type Casting === */
 
+	#if (js && !node)
+		/**
+		  * Convert to a native Blob
+		  */
+		@:to
+		public inline function toNativeBlob():js.html.Blob {
+			return (new js.html.Blob([untyped this.data.toArrayBuffer()], {
+				'type': this.type
+			}));
+		}
+
+		/**
+		  * Retrieve an ObjectURL for [this] Blob
+		  */
+		public inline function toObjectURL():String {
+			var courl:Dynamic = (untyped __js__('URL.createObjectURL'));
+			return (untyped courl(toNativeBlob()));
+		}
+	#end
+
 	public static inline function fromDataURL(durl : String):Blob {
 		return CBlob.fromDataURL(durl);
 	}
@@ -49,6 +69,7 @@ class CBlob {
 	public function toDataURL():String {
 		return data.toDataURI(type);
 	}
+
 
 /* === Static Methods === */
 
