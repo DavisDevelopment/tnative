@@ -5,6 +5,7 @@ import tannus.io.Ptr;
 import tannus.io.ByteArray;
 
 import tannus.internal.NSys;
+import tannus.Platform;
 
 /**
   * Wrapper around Haxe's Sys class, and implementations of those methods which are possible in Node
@@ -92,6 +93,13 @@ class TSys {
 		#else
 			NSys.exit( ecode );
 		#end
+	}
+
+	/**
+	  * Get the temp-file directory
+	  */
+	public static inline function tempDir():Path {
+		return '~/tmp/';
 	}
 }
 
