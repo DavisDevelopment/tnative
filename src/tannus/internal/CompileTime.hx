@@ -3,6 +3,7 @@ package tannus.internal;
 import tannus.io.Byte;
 import tannus.io.ByteArray;
 import tannus.io.Ptr;
+import tannus.io.Getter;
 import tannus.sys.File;
 import tannus.sys.Directory;
 import tannus.sys.Path;
@@ -17,6 +18,7 @@ import haxe.Json;
 
 using StringTools;
 using Lambda;
+using haxe.macro.ExprTools;
 
 /**
   * Class of utility macro methods
@@ -36,6 +38,15 @@ class CompileTime {
 		var seconds = toExpr(d.getSeconds());
 
 		return macro new Date($year, $month, $day, $hours, $minutes, $seconds);
+	}
+
+	/**
+	  * User name
+	  */
+	public static macro function getUserName():ExprOf<String> {
+		var p = new sys.io.Process('whoami', []);
+		var res = p.stdout.readLine();
+		return Context.makeExpr(res, Context.currentPos());
 	}
 
 	/**
@@ -77,11 +88,95 @@ class CompileTime {
 	/**
 	  * Inline a JSON File
 	  */
-	public static macro function readJSON(path : String):ExprOf<{}> {
-		var sdata:String = loadFile( path );
+	public static macro function readJSON(path:String, ?eRelToCurFile:ExprOf<Bool>):ExprOf<{}> {
+		var rel2CurrentFile:Bool = false;
+		if (eRelToCurFile.getValue() == true)
+			rel2CurrentFile = true;
+		var sdata:String;
+		if (rel2CurrentFile) {
+			var cf:Path = Context.getPosInfos(Context.currentPos()).file;
+			var cwd:Path = Sys.getCwd();
+			var cfp:Path = (cf.absolute ? cf : (cwd + cf)).normalize();
+			sdata = loadFile(cfp.directory.resolve(path).normalize());
+		} else {
+			sdata = loadFile( path );
+		}
 		var data:Dynamic = haxe.Json.parse( sdata );
 
 		return toExpr( data );
+	}
+
+	/**
+	  * Add a Resource
+	  */
+	public static macro function resource(path : String):ExprOf<Getter<ByteArray>> {
+		var epath = Context.makeExpr(path, Context.currentPos());
+		var f:File = new File(path);
+		Context.addResource(path, f.read());
+		return macro {
+			new tannus.io.Getter(function() {
+				return tannus.io.ByteArray.fromBytes(haxe.Resource.getBytes($epath));
+			});
+		};
+	}
+
+	/**
+	  * Inline the result of a BuildFile as a Blob
+	  */
+	public static macro function inlineProgram(buildFile : String):ExprOf<tannus.io.Blob> {
+		var f:File = new File(buildFile);
+		var bytes = f.read();
+		var reader = new tannus.format.hxml.Reader();
+		var buildf = reader.read( bytes );
+		var bd = buildf.getData()[0];
+
+		var _cwd:Path = Sys.getCwd();
+		_cwd = _cwd.normalize();
+		var _tdir:Path = tannus.TSys.tempDir();
+		_tdir = _tdir.normalize();
+		
+		//- alter the paths in the build-file to continue pointing to their intended location
+		bd.buildPath = (_tdir + bd.buildPath.name).normalize();
+		bd.classPaths = bd.classPaths.map(function(cp) {
+			return (cp.absolute ? cp : (_cwd + cp)).normalize();
+		});
+		bd.classPaths.push( _cwd );
+
+		//- create a Path for the HXML File
+		var bfp:Path = (_tdir + 'build.hxml');
+		//- Write the HXML Code into the HXML File
+		var hxf:File = new File(bfp);
+		hxf.write(BuildFile.fromData( bd ).toHxml());
+
+		//- Move to the temp-dir
+		Sys.setCwd( bfp.directory );
+
+		//- Tell Haxe to compile that HXML File
+		Sys.command('haxe', [bfp]);
+
+		//- Find the built File
+		var rfile:File = new File(bd.buildPath.normalize());
+		var ebytes:ExprOf<ByteArray>;
+		
+		if (rfile.exists) {
+			var content = rfile.read();
+			rfile.delete();
+			hxf.delete();
+			var encoded:String = content.toBase64();
+			var exprEncoded = Context.makeExpr(encoded, Context.currentPos());
+			Sys.setCwd(_cwd);
+			ebytes = (macro tannus.io.ByteArray.fromBase64($exprEncoded));
+		} 
+		else {
+			Sys.setCwd(_cwd);
+			Context.error('Compilation of $bfp failed!', Context.currentPos());
+			ebytes = (macro tannus.io.ByteArray.fromString(''));
+		}
+
+		var ename = Context.makeExpr(bd.buildPath.name, Context.currentPos());
+		var etype = Context.makeExpr(tannus.sys.Mimes.getMimeType(bd.buildPath.extension), Context.currentPos());
+		
+		return macro new tannus.io.Blob($ename, $etype, $ebytes);
 	}
 
 #if macro
