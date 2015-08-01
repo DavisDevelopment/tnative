@@ -67,6 +67,18 @@ abstract Element (JQuery) from JQuery to JQuery {
 	private function get_attributes() return new ElAttributes(cast Getter.create(this));
 
 	/**
+	  * Array of classes associated with [this] Element
+	  */
+	public var classes(get, set):Array<String>;
+	private inline function get_classes() {
+		return get('class').or('').split(' ');
+	}
+	private inline function set_classes(cl : Array<String>) {
+		set('class', cl.join(' '));
+		return classes;
+	}
+
+	/**
 	  * More intuitive version of JQuery.css(k, v)
 	  */
 	private function cs(k:String, ?v:Maybe<String>):Maybe<String> {
