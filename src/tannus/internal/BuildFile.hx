@@ -5,6 +5,7 @@ import tannus.sys.Path;
 
 import tannus.internal.BuildComponent;
 import tannus.internal.BuildFlag;
+import tannus.internal.BuildData;
 
 /**
   * Object-Representation of the build-process of a Haxe Application
@@ -81,8 +82,57 @@ class BuildFile {
 		return (new tannus.format.hxml.Writer().generate(this));
 	}
 
+	/**
+	  * Parse the BuildData from [this] BuildFile
+	  */
+	public function getData():Array<BuildData> {
+		var globl:Array<BuildComponent> = new Array();
+		var ast:Array<BuildComponent> = new Array();
+		var datas:Array<BuildData> = new Array();
+
+		for (comp in comps) {
+			switch (comp) {
+				case BCNext:
+					var bd = new BuildData();
+					bd.parse( ast );
+					datas.push( bd );
+					ast = new Array();
+
+				default:
+					ast.push( comp );
+			}
+		}
+
+		if (ast.length > 0) {
+			var bd = new BuildData();
+			bd.parse(ast);
+			datas.push(bd);
+			ast = new Array();
+		}
+
+		return datas;
+	}
+
 /* === Instance Fields === */
 
 	/* Array of BuildOperationComponents */
 	public var comps : Array<BuildComponent>;
+
+/* === Static Methods === */
+
+	/**
+	  * Create a BuildFile from BuildData
+	  */
+	public static function fromData(bd : BuildData):BuildFile {
+		var bf = new BuildFile();
+		bf.main(bd.mainClass);
+		bf.target(cast bd.target, bd.buildPath);
+		for (d in bd.defs)
+			bf.def( d );
+		for (cp in bd.classPaths)
+			bf.cp( cp );
+		for (l in bd.libraries)
+			bf.lib( l );
+		return bf;
+	}
 }

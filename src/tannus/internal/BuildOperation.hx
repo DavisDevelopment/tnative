@@ -37,5 +37,5 @@ class BuildOperation {
 /* === Instance Fields === */
 
 	/* Array of BuildOperationComponents */
-	private var comps : Array<
+	private var comps : Array<BuildComponent>;
 }

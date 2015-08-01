@@ -4,7 +4,7 @@ package tannus.internal;
   * Enum of all TNative Targets
   */
 @:enum
-abstract Target (String) {
+abstract Target (String) from String {
 	var Js = 'js';
 	var NodeJs = 'nodejs';
 	var Java = 'java';
