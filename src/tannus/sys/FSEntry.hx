@@ -41,6 +41,20 @@ abstract FSEntry (FSEntryType) {
 		switchType(f.delete());
 	}
 
+	/**
+	  * Get [this] Entry, as a File, if possible
+	  */
+	@:to
+	public function file():File {
+		switch (type) {
+			case File( f ):
+				return f;
+
+			case Folder( d ):
+				throw 'IOError: Cannot cast a Directory to a File!';
+		}
+	}
+
 /* === Implicit Casting === */
 
 	/* From Path */
