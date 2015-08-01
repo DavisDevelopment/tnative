@@ -10,8 +10,10 @@ abstract Directory (Path) from Path {
 	public inline function new(p:Path, ?create:Bool=false):Void {
 		this = p;
 		if (Fs.exists(this)) {
-			if (!isDirectory(this)) throw 'IOError: $p is not a Directory!';
-		} else {
+			if (!isDirectory(this)) 
+				throw 'IOError: $p is not a Directory!';
+		} 
+		else {
 			if (create) 
 				createDirectory( this );
 			else
@@ -29,6 +31,14 @@ abstract Directory (Path) from Path {
 		var entry:FSEntry = name;
 		var canRet:Bool = entry.switchType(f.exists);
 		return (canRet ? entry : null);
+	}
+
+	/**
+	  * Obtain a File by name
+	  */
+	public inline function file(name : String):File {
+		var f:File = (path + name);
+		return f;
 	}
 
 	/**
