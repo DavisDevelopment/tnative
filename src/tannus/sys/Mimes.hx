@@ -12,7 +12,7 @@ class Mimes {
 /* === Class Fields === */
 
 	/* Primitive Mime Data, Loaded from a JSON File */
-	private static var primitive:Object = {CompileTime.readJSON('tannus/src/tannus/sys/mimes.json');};
+	private static var primitive:Object = {CompileTime.readJSON('mimes.json', true);};
 
 	/* Mime Data Registry, used internally by [this] Class */
 	private static var types:Object;
