@@ -4,6 +4,7 @@ package tannus.io;
 import haxe.io.Bytes;
 import haxe.io.BytesData;
 import haxe.crypto.Base64;
+import haxe.io.FPHelper in Fp;
 
 /* "gen" imports */
 import tannus.io.Byte;
@@ -71,6 +72,20 @@ abstract ByteArray (Array<Byte>) {
 	private inline function get_empty():Bool {
 		return (this.length == 0);
 	}
+
+	/**
+	  * The 'first' Byte of [this] ByteArray
+	  */
+	public var first(get, set):Byte;
+	private inline function get_first() return (this[0]);
+	private inline function set_first(nf : Byte) return (this[0] = nf);
+
+	/**
+	  * The last Byte of [this] ByteArray
+	  */
+	public var last(get, set):Byte;
+	private inline function get_last() return (this[this.length - 1]);
+	private inline function set_last(nl : Byte) return (this[this.length-1] = nl);
 
 /* == Instance Methods == */
 
@@ -151,11 +166,47 @@ abstract ByteArray (Array<Byte>) {
 	}
 
 	/**
+	  * Get a String out of [this] ByteArray
+	  */
+	public function getString(?len : Int):String {
+		return (slice(0, (len!=null?len:this.length)).toString());
+	}
+
+	/**
+	  * Write a Float to [this] ByteArray
+	  */
+	public inline function writeFloat(f : Float):Void {
+		var b:Bytes = self.toBytes();
+		b.setFloat(this.length, f);
+		this = fromBytes( b ).toArray();
+	}
+
+	/**
+	  * Read a Float from [this] ByteArray
+	  */
+	public inline function readFloat(?i : Int):Float {
+		if (i == null)
+			i = this.length;
+		var b:Bytes = self.toBytes();
+		var res:Float = b.getFloat(this.length);
+		this = fromBytes(b).toArray();
+		return res;
+	}
+
+	/**
 	  * Write a hunk of data to [this] ByteArray in the form of a ByteArray
 	  */
 	@:op(A += B)
 	public inline function write(ba : ByteArray):Void {
 		this = (this.concat(ba));
+	}
+
+	/**
+	  * Write a sigle Byte onto [this] ByteArray
+	  */
+	@:op(A += B)
+	public inline function writeByte(b : Byte):Void {
+		this.push( b );
 	}
 
 	public function append(data : ByteArray):Void {
