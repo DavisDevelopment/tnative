@@ -132,6 +132,12 @@ abstract Path (String) from String to String {
 			return res;
 		}
 	}
+
+	/**
+	  * Reference to [this] Path as a String
+	  */
+	public var str(get, never):String;
+	private inline function get_str() return this;
 }
 
 private typedef P = haxe.io.Path;
