@@ -30,4 +30,7 @@ extern class NodeFSModule {
 
 	/* Renames file */
 	public static function renameSync(o:String, n:String):Void;
+
+	/* Open a Writable Stream to a File */
+	public static function createWriteStream(path:String, ?options:Dynamic):tannus.node.WritableStream;
 }
