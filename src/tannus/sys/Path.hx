@@ -7,7 +7,7 @@ using Lambda;
 abstract Path (String) from String to String {
 	/* Constructor */
 	public inline function new(s : String):Void {
-		this = s;
+		this = s;//.replace('~', '/home/$un/');
 	}
 
 /* === Instance Methods === */
@@ -16,7 +16,10 @@ abstract Path (String) from String to String {
 	  * "normalized" version of [this] Path
 	  */
 	public inline function normalize():Path {
-		return (P.normalize(this));
+		var res:Path = (P.normalize(this));
+		res = res.str.replace('~', '/home/$un');
+		res = P.normalize(res);
+		return res;
 	}
 
 /* === Instance Fields === */
@@ -138,6 +141,17 @@ abstract Path (String) from String to String {
 	  */
 	public var str(get, never):String;
 	private inline function get_str() return this;
+
+	private static var os(get, never):String;
+	private static inline function get_os() {
+		#if (js || flash || as3)
+			return 'web';
+		#else
+			return Sys.systemName().toLowerCase();
+		#end
+	}
+
+	private static var un:String = {tannus.internal.CompileTime.getUserName();};
 }
 
 private typedef P = haxe.io.Path;

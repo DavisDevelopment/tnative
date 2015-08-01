@@ -41,6 +41,12 @@ abstract RegEx (EReg) from EReg to EReg {
 	}
 
 	/**
+	  * Alias to 'matches'
+	  */
+	public inline function search(s : String):Array<Array<String>> 
+		return matches( s );
+
+	/**
 	  * Return an Array of RegExMatchs
 	  */
 	public function findAll(s : String):Array<Dynamic> {
@@ -56,5 +62,13 @@ abstract RegEx (EReg) from EReg to EReg {
 			return s;
 		});
 		return all;
+	}
+
+	/**
+	  * Cast to a (String -> Bool)
+	  */
+	@:to
+	public function toTester():String->Bool {
+		return (this.match.bind(_));
 	}
 }
