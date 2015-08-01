@@ -35,6 +35,19 @@ abstract File (CFile) {
 		}
 	}
 
+/* === Casting Methods === */
+
+	#if node
+		/**
+		  * To node.WritableStream
+		  */
+		@:to
+		public inline function toWritableStream():tannus.node.WritableStream {
+			return tannus.sys.node.NodeFSModule.createWriteStream(this.path);
+		}
+
+	#end
+
 /* === Class Methods === */
 
 	/**
