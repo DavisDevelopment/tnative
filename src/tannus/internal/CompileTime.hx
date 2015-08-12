@@ -50,6 +50,14 @@ class CompileTime {
 	}
 
 	/**
+	  * Parse and execute the given String
+	  */
+	public static macro function execute(code : String):Expr {
+		var e:Expr = Context.parse(code, Context.currentPos());
+		return e;
+	}
+
+	/**
 	  * Inline an entire File as Binary data
 	  */
 	public static macro function readFile(path : String):ExprOf<ByteArray> {
@@ -109,7 +117,16 @@ class CompileTime {
 	/**
 	  * Add a Resource
 	  */
-	public static macro function resource(path : String):ExprOf<Getter<ByteArray>> {
+	public static macro function resource(path:String, ?rel:ExprOf<Bool>):ExprOf<Getter<ByteArray>> {
+		var relative:Bool = false;
+		if (rel != null)
+			relative = cast rel.getValue();
+		if (relative) {
+			var curFile:Path = Context.getPosInfos(Context.currentPos()).file;
+			var cwd:Path = Sys.getCwd();
+			var cfp:Path = (curFile.absolute?curFile:(cwd + curFile)).normalize();
+			path = cfp.directory.resolve(path).normalize();
+		}
 		var epath = Context.makeExpr(path, Context.currentPos());
 		var f:File = new File(path);
 		Context.addResource(path, f.read());
