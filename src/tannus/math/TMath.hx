@@ -1,5 +1,7 @@
 package tannus.math;
 
+import tannus.ds.Maybe;
+
 class TMath {
     public static inline var E = 2.718281828459045;
     public static inline var LN2 = 0.6931471805599453;
@@ -159,5 +161,21 @@ class TMath {
         return if (value < 0) -1
             else if (value > 0) 1
             else 0;
+    }
+
+    /**
+      * Obtain the sum of all items in [list]
+      */
+    @:generic
+    public static function sum<T : Float>(list : Array<T>):T {
+	var res:Maybe<T> = null;
+	for (item in list) {
+		if (!res.exists) {
+			res = item;
+		} else {
+			res = (res.value + item);
+		}
+	}
+	return res;
     }
 }
