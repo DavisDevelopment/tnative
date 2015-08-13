@@ -47,6 +47,28 @@ class Terminal {
 				}
 				ask();
 			}).string();
+
+		#elseif python
+
+			return Promise.create({
+				function ask():Void {
+					var failed:Bool = false;
+					var answer:String = cast (untyped python.Syntax.pythonCode('input(msg)'));
+					if (tester != null) {
+						if (tester(answer))
+							return answer;
+						else
+							failed = true;
+					}
+					else {
+						return answer;
+					}
+					if (failed)
+						ask();
+				}
+				ask();
+			}, true).string();
+
 		#else
 			#error
 		#end
