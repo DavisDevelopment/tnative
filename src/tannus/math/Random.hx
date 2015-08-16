@@ -68,6 +68,14 @@ class Random {
 		return result;
 	}
 
+	/**
+	  * Choose a random construct from [_enum], and return a function to generate that construct
+	  */
+	public function enumConstruct<T>(_enum : Enum<T>):?Array<Dynamic> -> T {
+		var name:String = choice(_enum.getConstructors());
+		return Type.createEnum.bind(_enum, name, _);
+	}
+
 /* === Instance Fields === */
 
 	private var state : Int;
