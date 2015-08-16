@@ -104,4 +104,13 @@ class ArrayTools {
 			res = res.concat( sub );
 		return res;
 	}
+
+	/**
+	  * Macro-Licious Array.map
+	  */
+	public static macro function macmap<T, O>(set:ExprOf<Array<T>>, extractor:ExprOf<O>):ExprOf<Array<O>> {
+		return macro $set.map(function( item ) {
+			return $extractor;
+		});
+	}
 }
