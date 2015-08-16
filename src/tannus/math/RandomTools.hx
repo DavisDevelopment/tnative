@@ -20,6 +20,13 @@ class RandomTools {
 	  */
 	public static inline function shuffle<T>(set : Array<T>):Array<T> return rand.shuffle( set );
 
+	/**
+	  * Get random constructor from all in a given Enum
+	  */
+	public static inline function randomConstruct<T>(enumer : Enum<T>):?Array<Dynamic> -> T {
+		return rand.enumConstruct( enumer );
+	}
+
 /* === Computed Static Fields === */
 
 	private static var rand(get, never):Random;
