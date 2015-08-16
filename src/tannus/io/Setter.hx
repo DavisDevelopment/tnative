@@ -43,6 +43,16 @@ abstract Setter<T> (Set<T>) from Set<T> {
 	}
 
 	/**
+	  * Apply a transformation to [this] Setter
+	  */
+	public function transform<O>(f : O->T):Setter<O> {
+		return new Setter(function(o : O):O {
+			set(f( o ));
+			return o;
+		});
+	}
+
+	/**
 	  * Assign the value
 	  */
 	@:op(A &= B)
