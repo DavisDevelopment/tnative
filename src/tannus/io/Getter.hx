@@ -29,6 +29,13 @@ abstract Getter<T> (Get<T>) from Get<T> {
 		return (this());
 	}
 
+	/**
+	  * Apply a transformation to [this] Getter
+	  */
+	public function transform<O>(f : T->O):Getter<O> {
+		return create(f(get()));
+	}
+
 /* === Class Methods === */
 
 	/**
