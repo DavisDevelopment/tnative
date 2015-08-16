@@ -11,9 +11,7 @@ class Signal<T> {
 
 /* === Instance Methods === */
 
-	/**
-	  * Adds a new Handler to the list of Handlers
-	  */
+	/** * Adds a new Handler to the list of Handlers */
 	private inline function add(handler : Handler<T>):Void {
 		handlers.push( handler );
 	}
@@ -62,6 +60,15 @@ class Signal<T> {
 	}
 
 	/**
+	  * Every Listener
+	  */
+	public function every(wait:Int, f:T->Void):Void {
+		var _rem:Int = 0;
+		var rem:Ptr<Int> = Ptr.create( _rem );
+		add(Every(f, wait, rem));
+	}
+
+	/**
 	  * Remove a listener
 	  */
 	public function ignore(func : T->Void):Void {
@@ -70,7 +77,7 @@ class Signal<T> {
 		for (h in handlers) {
 			switch (h) {
 				/* Standard Handler */
-				case Normal( f ), Once(f, _), Tested(f, _), Counted(f, _, _):
+				case Normal( f ), Once(f, _), Tested(f, _), Counted(f, _, _), Every(f, _, _):
 					/* if [f] and [func] are the same function */
 					if (Reflect.compareMethods(f, func)) {
 						//- flag it for removal
@@ -131,6 +138,13 @@ class Signal<T> {
 					f( arg );
 					called._ += 1;
 				}
+
+			/* Every Handler */
+			case Every(f, wait, rem):
+				if (rem == wait) {
+					f( arg );
+					rem &= 0;
+				} else rem.v += 1;
 		}
 	}
 
@@ -165,6 +179,9 @@ private enum Handler<T> {
 
 	/* Handle which will only fire [count] times */
 	Counted(func:T->Void, count:Int, fired:Ptr<Int>);
+
+	/* Handler which will only fire every [rem] times */
+	Every(func:T->Void, wait:Int, remaining:Ptr<Int>);
 
 	/* Handler which only fires once */
 	Once(func:T->Void, fired:Ptr<Bool>);
