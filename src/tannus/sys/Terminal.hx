@@ -17,26 +17,27 @@ class Terminal {
 	/**
 	  * Prompt user for command-line input
 	  */
-	public static function prompt(msg:String, ?tester:String->Bool):StringPromise {
+	public static function prompt(msg:String, ?tester:String->Bool, ?callback:String->Void):Void {
+		var cb:String->Void = (callback!=null?callback:(function(s) null));
 		#if node
 			var rl:Dynamic = require('readline');
 			var opt:Object = {'input':process.stdin, 'output':process.stdout};
 
-			return Promise.create({
+			(function() {
 				function ask():Void {
 					var failed:Bool = false;
 					var i:Dynamic = rl.createInterface( opt );
 					i.question(msg, function( answer ) {
 						if (tester != null) {
 							if (tester(answer)) {
-								return answer;
+								cb( answer );
 							}
 							else {
 								failed = true;
 							}
 						}
 						else {
-							return answer;
+							cb(answer);
 						}
 
 						i.close();
@@ -46,28 +47,25 @@ class Terminal {
 					});
 				}
 				ask();
-			}).string();
+			}());
 
 		#elseif python
-
-			return Promise.create({
-				function ask():Void {
-					var failed:Bool = false;
-					var answer:String = cast (untyped python.Syntax.pythonCode('input(msg)'));
-					if (tester != null) {
-						if (tester(answer))
-							return answer;
-						else
-							failed = true;
-					}
-					else {
-						return answer;
-					}
-					if (failed)
-						ask();
+			function ask():Void {
+				var failed:Bool = false;
+				var answer:String = cast (untyped python.Syntax.pythonCode('input(msg)'));
+				if (tester != null) {
+					if (tester(answer))
+						cb( answer );
+					else
+						failed = true;
 				}
-				ask();
-			}, true).string();
+				else {
+					cb( answer );
+				}
+				if (failed)
+					ask();
+			}
+			ask();
 
 		#else
 			#error
