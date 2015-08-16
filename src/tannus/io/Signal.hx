@@ -53,6 +53,15 @@ class Signal<T> {
 	}
 
 	/**
+	  * Listen for data [n] times
+	  */
+	public function times(count:Int, f:T->Void):Void {
+		var _fired:Int = 0;
+		var fired:Ptr<Int> = Ptr.create(_fired);
+		 add(Counted(f, count, fired));
+	}
+
+	/**
 	  * Remove a listener
 	  */
 	public function ignore(func : T->Void):Void {
@@ -61,7 +70,7 @@ class Signal<T> {
 		for (h in handlers) {
 			switch (h) {
 				/* Standard Handler */
-				case Normal( f ), Once(f, _), Tested(f, _):
+				case Normal( f ), Once(f, _), Tested(f, _), Counted(f, _, _):
 					/* if [f] and [func] are the same function */
 					if (Reflect.compareMethods(f, func)) {
 						//- flag it for removal
@@ -115,6 +124,13 @@ class Signal<T> {
 				if (test(arg)) {
 					f( arg );
 				}
+
+			/* Counted Handler */
+			case Counted(f, count, called):
+				if (called._ <= count) {
+					f( arg );
+					called._ += 1;
+				}
 		}
 	}
 
@@ -146,6 +162,9 @@ class Signal<T> {
 private enum Handler<T> {
 	/* Handler which can fire any number of times */
 	Normal(func : T->Void);
+
+	/* Handle which will only fire [count] times */
+	Counted(func:T->Void, count:Int, fired:Ptr<Int>);
 
 	/* Handler which only fires once */
 	Once(func:T->Void, fired:Ptr<Bool>);

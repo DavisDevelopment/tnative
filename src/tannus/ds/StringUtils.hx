@@ -36,4 +36,11 @@ class StringUtils {
 			end = wrapper;
 		return (wrapper + str + end);
 	}
+
+	/**
+	  * Capitalize some String
+	  */
+	public static function capitalize(s : String):String {
+		return (s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase());
+	}
 }
