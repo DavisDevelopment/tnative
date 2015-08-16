@@ -3,6 +3,7 @@ package tannus.io;
 import tannus.ds.Maybe;
 
 @:forward
+/* Abstraction layer on top of the EReg type */
 abstract RegEx (EReg) from EReg to EReg {
 	/* Constructor Function */
 	public inline function new(pattern : EReg):Void {
@@ -45,6 +46,13 @@ abstract RegEx (EReg) from EReg to EReg {
 	  */
 	public inline function search(s : String):Array<Array<String>> 
 		return matches( s );
+
+	/**
+	  * Extract the first [x] matches of [this] Pattern, if any
+	  */
+	public inline function extract(str:String, n:Int=0):Null<Array<String>> {
+		return (search(str)[n]);
+	}
 
 	/**
 	  * Return an Array of RegExMatchs
