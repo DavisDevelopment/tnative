@@ -112,6 +112,13 @@ abstract Pointer<T> (Ptr<T>) from Ptr<T> {
 	}
 
 	/**
+	  * Apply a transformation to [this] Pointer
+	  */
+	public function transform<O>(mget:T->O, mset:O->T):Pointer<O> {
+		return new Pointer(getter.transform(mget), setter.transform(mset));
+	}
+
+	/**
 	  * Create a clone of [this] Pointer
 	  */
 	public inline function clone():Pointer<T> {
