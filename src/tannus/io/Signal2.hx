@@ -52,6 +52,23 @@ class Signal2<A, B> {
 	}
 
 	/**
+	  * Listen for data [count] times
+	  */
+	public function times(count:Int, f:A->B->Void):Void {
+		var _status:Int = 0;
+		add(Counted(f, count, Ptr.create(_status)));
+	}
+
+	/**
+	  * Listen for data, but only respond to said data every [wait] times
+	  */
+	public function every(wait:Int, f:A->B->Void):Void {
+		var _s:Int = 0;
+		var s:Ptr<Int> = Ptr.create(_s);
+		add(Every(f, wait, s));
+	}
+
+	/**
 	  * Remove a listener
 	  */
 	public function ignore(func : A->B->Void):Void {
@@ -60,7 +77,7 @@ class Signal2<A, B> {
 		for (h in handlers) {
 			switch (h) {
 				/* Standard Handler */
-				case Normal( f ), Once(f, _), Tested(f, _):
+				case Normal( f ), Once(f, _), Tested(f, _), Counted(f, _, _), Every(f, _, _):
 					/* if [f] and [func] are the same function */
 					if (Reflect.compareMethods(f, func)) {
 						//- flag it for removal
@@ -107,6 +124,20 @@ class Signal2<A, B> {
 				if (test(a, b)) {
 					f(a, b);
 				}
+
+			/* Counted Handler */
+			case Counted(f, max, fired):
+				if (fired._ <= max) {
+					f(a, b);
+					fired._ += 1;
+				}
+
+			/* Every Handler */
+			case Every(f, wait, rem):
+				if (rem == wait) {
+					rem &= 0;
+					f(a, b);
+				} else rem._ += 1;
 		}
 	}
 
@@ -138,6 +169,12 @@ private enum Handler<A, B> {
 
 	/* Handler which only fires once */
 	Once(func:A->B->Void, fired:Ptr<Bool>);
+
+	/* Handler which will only fire [count] times */
+	Counted(func:A->B->Void, count:Int, fired:Ptr<Int>);
+
+	/* Handler which will only fire once every [wait] attempts */
+	Every(func:A->B->Void, wait:Int, rem:Ptr<Int>);
 
 	/* Handler which only fires when the data passed to it matches [test] */
 	Tested(func:A->B->Void, test:A->B->Bool);
