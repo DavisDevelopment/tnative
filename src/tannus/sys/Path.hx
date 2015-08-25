@@ -55,9 +55,16 @@ abstract Path (String) from String to String {
 	/**
 	  * The base filename of [this] Path
 	  */
-	public var basename(get, never):String;
+	public var basename(get, set):String;
 	private inline function get_basename():String {
 		return P.withoutExtension(name);
+	}
+	private inline function set_basename(v : String):String {
+		var d:String = directory;
+		var e:String = extension;
+		this = (d + '/' + v + (e == null?'':e));
+		this = normalize().str;
+		return basename;
 	}
 
 	/**
