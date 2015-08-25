@@ -4,6 +4,9 @@ import tannus.chrome.Windows;
 import tannus.chrome.Tab;
 import tannus.ds.Object;
 
+import tannus.chrome.TabData.TabCreateData;
+import tannus.chrome.TabData.TabUpdateData;
+
 class Tabs {
 	/**
 	  * Get All Tabs
@@ -52,14 +55,14 @@ class Tabs {
 	/**
 	  * Create a new Tab
 	  */
-	public static function create(options:Object, ?cb:Tab->Void):Void {
+	public static function create(options:TabCreateData, ?cb:Tab->Void):Void {
 		lib.create(options, cb);
 	}
 
 	/**
 	  * Update a Tab
 	  */
-	public static function update(id:Null<Int>, props:Object, ?cb:Tab->Void):Void {
+	public static function update(id:Null<Int>, props:TabUpdateData, ?cb:Tab->Void):Void {
 		lib.update(id, props, function(tab) {
 			if (cb != null)
 				cb( tab );
@@ -137,7 +140,7 @@ class Tabs {
 
 			if (t != null) {
 				t.update({
-					'selected': true
+					'active': true
 				}, function(tab) {
 					if (cb != null)
 						cb( tab );
@@ -146,7 +149,7 @@ class Tabs {
 			else {
 				var opts:Object = {
 					'url'      : url,
-					'selected' : true
+					'active' : true
 				};
 
 				create(opts, function(tab) {

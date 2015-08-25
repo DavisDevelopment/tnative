@@ -5,6 +5,9 @@ import tannus.chrome.Windows;
 import tannus.chrome.Tabs;
 import tannus.ds.Object;
 
+import tannus.chrome.TabData.TabCreateData;
+import tannus.chrome.TabData.TabUpdateData;
+
 @:forward
 abstract Tab (CTab) {
 	/* Constructor Function */
@@ -17,7 +20,7 @@ abstract Tab (CTab) {
 	/**
 	  * Update [this] Tab
 	  */
-	public inline function update(props:Object, cb:Tab->Void):Void {
+	public inline function update(props:TabUpdateData, cb:Tab->Void):Void {
 		Tabs.update(this.id, props, cb);
 	}
 
