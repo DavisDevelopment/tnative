@@ -43,4 +43,18 @@ class StringUtils {
 	public static function capitalize(s : String):String {
 		return (s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase());
 	}
+
+	/**
+	  * Whether sub-string [sub] can be found in [str]
+	  */
+	public static function has(str:String, sub:String):Bool {
+		return (str.indexOf(sub) != -1);
+	}
+
+	/**
+	  * Array-Style substringing
+	  */
+	public static function slice(str:String, pos:Int, ?len:Int):String {
+		return (len != null ? str.substr(pos, len) : str.substring(pos));
+	}
 }
