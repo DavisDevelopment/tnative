@@ -103,7 +103,7 @@ class Lexer {
 				var ident:String = (c + '');
 				
 				while (true) attemptByte(this, {
-					if (bit.isAlphaNumeric()) {
+					if (bit.isAlphaNumeric() || bit == '.'.code) {
 						ident += bit;
 					} else {
 						source.back( bit );
