@@ -113,7 +113,7 @@ abstract Pointer<T> (Ref<T>) from Ref<T> {
 	  * Attach a Setter to [this] Pointer
 	  */
 	@:op(A += B)
-	private inline function attach_str(str : Setter<T>):Void {
+	public inline function attach_str(str : Setter<T>):Void {
 		var s = setter;
 		s.attach( str );
 	}
