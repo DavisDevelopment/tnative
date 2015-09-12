@@ -36,7 +36,7 @@ class Url {
 	public function toString():String {
 		search = Qs.stringify(params);
 		var base:String = ('$protocol://$hostname/$pathname');
-		base += (params.keys.length == 0 ? '' : search);
+		base += (params.keys.length == 0 ? '' : '?'+search);
 		base += (hash != '' ? '#'+hash : '');
 		return base;
 	}
