@@ -2,6 +2,7 @@ package tannus.io;
 
 import tannus.io.Getter;
 import tannus.io.Setter;
+import tannus.ds.Destructible;
 
 import tannus.ds.tuples.Tup2;
 // import tannus.ds.Object;
@@ -11,11 +12,12 @@ import haxe.macro.Expr;
 @:generic
 abstract Pointer<T> (Ref<T>) from Ref<T> {
 	/* Constructor Function */
-	public inline function new(g:Getter<T>, s:Setter<T>):Void {
+	public inline function new(g:Getter<T>, s:Setter<T>, ?d:Void->Void):Void {
 		//this = new Ref(g, s);
 		this = {
 			'get': g,
-			'set': s
+			'set': s,
+			'delete': d
 		};
 	}
 
@@ -34,8 +36,7 @@ abstract Pointer<T> (Ref<T>) from Ref<T> {
 	  */
 	public var value(get, set):T;
 	private inline function get_value():T {
-		return get();
-	}
+		return get(); }
 	private inline function set_value(nv : T):T {
 		return set( nv );
 	}
@@ -81,6 +82,21 @@ abstract Pointer<T> (Ref<T>) from Ref<T> {
 	  */
 	public var set(get, never):T->T;
 	private inline function get_set() return cast setter;
+
+	/**
+	  * Set the deleter function for [this] Pointer
+	  */
+	public inline function deleter(f : Void->Void):Void {
+		this.delete = f;
+	}
+
+	/**
+	  * Destroy [this] Pointer
+	  */
+	public inline function delete():Void {
+		if (this.delete != null)
+			this.delete();
+	}
 
 	/**
 	  * Cast to [this] Pointer's underlying type implicitly
@@ -197,4 +213,5 @@ abstract Pointer<T> (Ref<T>) from Ref<T> {
 private typedef Ref<T> = {
 	var get : Getter<T>;
 	var set : Setter<T>;
+	@:optional var delete : Void->Void;
 };
