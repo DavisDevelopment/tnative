@@ -93,7 +93,7 @@ class CObj {
 			return untyped refCache.get(key);
 		}
 		else {
-			var ref:Ptr<T> = new Ptr(get.bind(key), set.bind(key, _));
+			var ref:Ptr<T> = new Ptr(get.bind(key), set.bind(key, _), (function() remove(key)));
 			refCache.set(key, untyped ref);
 			return ref;
 		}
