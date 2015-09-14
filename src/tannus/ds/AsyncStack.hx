@@ -1,6 +1,9 @@
 package tannus.ds;
 
 import tannus.io.Signal;
+import haxe.macro.Expr;
+
+using haxe.macro.ExprTools;
 
 class AsyncStack {
 	/* Constructor Function */
@@ -17,6 +20,27 @@ class AsyncStack {
 	  */
 	public inline function push(f : Callback):Void {
 		funcs.push( f );
+	}
+
+	/**
+	  * Append some shit to the Stack
+	  */
+	public macro function append(self:Expr, action:Expr):Expr {
+		function emapper(e : Expr) {
+			switch (e.expr) {
+				case ExprDef.EContinue:
+					return macro (next());
+
+				default:
+					return e.map(emapper);
+			}
+		}
+		action = action.map(emapper);
+		return macro {
+			$self.push(function(next) {
+				$action;
+			});
+		};
 	}
 
 	/**
