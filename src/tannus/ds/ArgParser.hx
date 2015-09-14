@@ -5,6 +5,7 @@ import tannus.ds.Object;
 using StringTools;
 using Lambda;
 
+@:expose('ArgumentParser')
 class ArgParser {
 	/* Constructor Function */
 	public function new():Void {
