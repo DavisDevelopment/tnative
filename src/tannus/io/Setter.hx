@@ -35,11 +35,12 @@ abstract Setter<T> (Set<T>) from Set<T> {
 	  * Wrap another Setter around [this]
 	  */
 	@:op(A += B)
-	public inline function attach(other : Setter<T>):Void {
+	public function attach(other : Setter<T>):Setter<T> {
 		wrap(function(s, val) {
-			other( val );
-			return s( val );
+			other.set( val );
+			return s.set( val );
 		});
+		return new Setter(this);
 	}
 
 	/**
