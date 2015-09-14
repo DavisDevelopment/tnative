@@ -23,6 +23,13 @@ class Url {
 		pathname = pathname.strip(search);
 		search = (search.startsWith('?') ? search.slice(1) : search);
 		hash = (search.has('#') ? search.substring(0, search.indexOf('#')) : '');
+		if (search.has('#'))
+			search = search.substring(0, search.indexOf('#'));
+		if (hash == '') {
+			hash = pathname.has('#')?pathname.substring(pathname.indexOf('#')).strip('#'):'';
+			if (pathname.has('#'))
+				pathname = pathname.substring(0, pathname.indexOf('#'));
+		}
 		search = search.strip(hash);
 		hash = hash.slice(1);
 		params = Qs.parse(search);
