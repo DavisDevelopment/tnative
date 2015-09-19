@@ -73,7 +73,6 @@ class CObj {
 	  * Get the value of the given attribute
 	  */
 	public function get<T>(key : String):T {
-		trace(key);
 		return (untyped o.getProperty(key));
 	}
 
@@ -104,6 +103,24 @@ class CObj {
 	  */
 	public function remove(key : String):Bool {
 		return o.deleteField( key );
+	}
+
+	/**
+	  * Copy [this] Obj
+	  */
+	public function clone():Obj {
+		var klass:Null<Class<Dynamic>> = Type.getClass( o );
+		if (klass != null) {
+			var copi:Dynamic = Type.createEmptyInstance(cast klass);
+			var ocopy:Obj = copi;
+			for (k in keys()) {
+				ocopy[k] = get(k);
+			}
+			return ocopy;
+		}
+		else {
+			return R.copy(o);
+		}
 	}
 
 /* === Instance Field === */
