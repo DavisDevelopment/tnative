@@ -3,6 +3,7 @@ package tannus.nore;
 import tannus.nore.Check;
 import tannus.nore.Value;
 import tannus.internal.TypeTools;
+import tannus.io.Signal;
 
 /**
   * Class to compile a List of Check instances to "checker functions"
@@ -76,7 +77,10 @@ class Compiler <T> {
 		
 		//- Create less-than-or-equal operator
 		op(this, '<=', (left <= right));
-
+		
+		op(this, '^=', (StringTools.startsWith(left, right)));
+		op(this, "$=", (StringTools.endsWith(left, right)));
+		op(this, "*=", (Std.string(left).indexOf(right) != -1));
 	}
 
 	/**
@@ -112,6 +116,7 @@ class Compiler <T> {
 	  * Initializes all helper functions
 	  */
 	public inline function initializeHelpers():Void {
+		initHelpers.call( helper );
 		//- Utility function for determining if an object is iterable, and if so, returning it's iterator
 		function iterate(o : Dynamic):Null<Iterator<Dynamic>> {
 			//- Attempt to retrieve [o]'s iterator field
@@ -650,6 +655,8 @@ class Compiler <T> {
 		var compiler:Compiler<T> = new Compiler();
 		return compiler.compileAST( ast );
 	}
+
+	public static var initHelpers : Signal<String->HelperFunction<Dynamic>->Void> = {new Signal();};
 }
 
 private typedef CheckFunction <T> = T -> Bool;
