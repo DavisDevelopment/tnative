@@ -79,7 +79,7 @@ abstract Key (Int) from Int to Int {
 /* === Methods === */
 
     //- Data from which key-names are pulled
-    private static var raw:Object = {haxe.Json.parse(Ct.readFile('assets/keycodes.json'));};
+    private static var raw:Object = {{};/*haxe.Json.parse(Ct.readFile('assets/keycodes.json'));*/};
     
     /**
       * Obtain the 'name' of a Key as a String
