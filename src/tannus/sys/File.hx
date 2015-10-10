@@ -26,7 +26,7 @@ abstract File (CFile) {
 	/**
 	  * Lines of content from [this] File
 	  */
-	public inline function lines(?nlines:Array<String>):Array<String> {
+	public function lines(?nlines:Array<String>):Array<String> {
 		if (nlines == null)
 			return (this.read().toString().split('\n'));
 		else {
