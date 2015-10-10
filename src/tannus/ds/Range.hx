@@ -5,8 +5,8 @@ import tannus.math.TMath in N;
 class Range<T : Float> {
 	/* Constructor Function */
 	public inline function new(mi:T, ma:T):Void {
-		min = N.min(mi, ma);
-		max = N.max(mi, ma);
+		min = mi;
+		max = ma;
 	}
 
 /* === Instance Methods === */
