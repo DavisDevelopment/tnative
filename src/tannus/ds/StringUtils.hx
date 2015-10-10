@@ -57,4 +57,11 @@ class StringUtils {
 	public static function slice(str:String, pos:Int, ?len:Int):String {
 		return (len != null ? str.substr(pos, len) : str.substring(pos));
 	}
+
+	/**
+	  * Test whether the given String is empty
+	  */
+	public static inline function empty(s : String):Bool {
+		return (s.length == 0);
+	}
 }
