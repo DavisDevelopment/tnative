@@ -9,6 +9,10 @@ import tannus.sys.Path;
 import tannus.ds.Object;
 import tannus.ds.Promise;
 import tannus.ds.promises.*;
+import tannus.sys.GlobStar;
+
+using StringTools;
+using tannus.ds.StringUtils;
 
 @:forward
 abstract WebDirectoryEntry (DirectoryEntry) from DirectoryEntry {
@@ -65,6 +69,15 @@ abstract WebDirectoryEntry (DirectoryEntry) from DirectoryEntry {
 	  */
 	public inline function readEntries():ArrayPromise<WebFSEntry> {
 		return new ArrayPromise(this.createReader().readEntries.bind(_, _));
+	}
+
+	/**
+	  * Get all entries which match a given Filter
+	  */
+	public function filter(glob : GlobStar):ArrayPromise<WebFSEntry> {
+		return (readEntries().filter(function(e) {
+			return (glob.test(e.name));
+		}));
 	}
 }
 

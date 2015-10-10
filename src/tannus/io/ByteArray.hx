@@ -327,7 +327,7 @@ abstract ByteArray (Array<Byte>) {
 			return new js.html.Uint8Array(untyped toArray());
 		}
 
-		#if !chromeapp
+		//#if !chromeapp
 			/**
 			  * Cast [this] ByteArray to an ArrayBuffer
 			  */
@@ -335,7 +335,7 @@ abstract ByteArray (Array<Byte>) {
 			public function toArrayBuffer():js.html.ArrayBuffer {
 				return cast toUint8Array();
 			}
-		#end
+		//#end
 	#end
 
 	#if python

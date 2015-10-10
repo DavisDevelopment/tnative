@@ -6,6 +6,7 @@ import tannus.html.fs.WebFileSystem;
 import tannus.html.fs.WebFileWriter;
 
 import tannus.ds.Promise;
+import tannus.ds.promises.*;
 import tannus.io.ByteArray;
 
 @:forward(name, fullPath, isDirectory, isFile)
@@ -25,11 +26,28 @@ abstract WebFileEntry (FileEntry) from FileEntry {
 
 /* === Instance Methods === */
 
+
 	/**
 	  * Do Stuff
 	  */
 	public function file():Promise<tannus.html.fs.WebFile> {
 		return cast new Promise(this.file.bind(_, _));
+	}
+
+	/**
+	  * Get the size of [this] File
+	  */
+	public inline function size():Promise<Int> {
+		return file().transform(function(f) return (f.size));
+	}
+
+	/**
+	  * Get the mime-type of the File
+	  */
+	public inline function type():StringPromise {
+		return file().transform(function(f) {
+			return (f.type);
+		}).string();
 	}
 	
 	/**

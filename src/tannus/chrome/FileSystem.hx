@@ -2,7 +2,10 @@ package tannus.chrome;
 
 import tannus.html.fs.WebFileEntry;
 import tannus.html.fs.WebFSEntry;
+import tannus.html.fs.WebDirectoryEntry in Dir;
 import tannus.sys.Path;
+
+import tannus.ds.Promise;
 
 import Std.is;
 
@@ -25,14 +28,32 @@ class FileSystem {
 	  * Ask the User to choose a File or Directory
 	  */
 	public static function chooseEntry(options:ChooseEntryOptions, cb:Array<WebFSEntry>->Void):Void {
-		lib.chooseEntry(options, function(entry:WebFSEntry, ?entries:Array<WebFSEntry>) {
+		lib.chooseEntry(options, function(entry:WebFSEntry) {
 			var all:Array<WebFSEntry> = new Array();
-			if (is(entry, Array)) {
-				all = cast entries;
-			} else all = [entry];
-			untyped all = all.shift();
-
+			if (entry != null) {
+				if (Std.is(entry, Array))
+					all = all.concat(untyped entry);
+				else
+					all.push(entry);
+			}
+			var _all:Array<Array<WebFSEntry>> = untyped all;
+			all = tannus.ds.ArrayTools.flatten(_all);
 			cb( all );
+		});
+	}
+
+	/**
+	  * Get a Directory from the User
+	  */
+	public static function chooseDirectory():Promise<Dir> {
+		return Promise.create({
+			chooseEntry({type:OpenDirectory}, function(entries) {
+				var e = entries.shift();
+				if (e == null || !e.isDirectory)
+					throw 'Not a Directory!';
+				else
+					return new Dir(cast e);
+			});
 		});
 	}
 

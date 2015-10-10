@@ -2,7 +2,7 @@ package tannus.io;
 
 import haxe.io.Bytes;
 import tannus.io.Ptr;
-import tannus.io.ByteArray;
+import tannus.io.Buffer;
 import tannus.ds.Object;
 
 import tannus.io.struct.StructField in Field;
