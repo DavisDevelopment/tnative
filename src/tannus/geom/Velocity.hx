@@ -45,6 +45,24 @@ abstract Velocity (TwoTuple<Float, Angle>) {
 		return Velocity.fromVector(x * -1, y * -1);
 	}
 
+	/**
+	  * Return the sum of [this] and [that]
+	  */
+	@:op(A + B)
+	public function plus(that : Velocity):Velocity {
+		var vec:Point = (vector + that.vector);
+		return Velocity.fromVector(vec.x, vec.y);
+	}
+
+	/**
+	  * Return the difference between [this] and [that]
+	  */
+	@:op(A - B)
+	public function minus(that : Velocity):Velocity {
+		var vec:Point = (vector - that.vector);
+		return Velocity.fromVector(vec.x, vec.y);
+	}
+
 /* === Instance Fields === */
 
 	/* Speed of Movement */
