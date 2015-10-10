@@ -55,14 +55,14 @@ abstract Byte (Int) from Int to Int {
 	  * Tests whether [this] Byte would be a number in String form
 	  */
 	public inline function isNumeric():Bool {
-		return (~/[0-9]/.match(aschar));
+		return (this >= 48 && this <= 57);
 	}
 
 	/**
 	  * Tests whether [this] Byte would be a letter in String form
 	  */
 	public inline function isLetter():Bool {
-		return ((~/[A-Z]/i).match(aschar));
+		return ((this >= 65 && this <= 90) || (this >= 97 && this <= 122));
 	}
 
 	/**
