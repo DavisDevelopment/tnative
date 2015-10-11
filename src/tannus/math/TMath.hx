@@ -149,7 +149,7 @@ class TMath {
 		return lowest;
 	}
 
-	#if !js @:generic #end
+	@:generic
 	public static function clamp<T:Float> (value :T, min :T, max :T) :T
 	{
 		return if (value < min) min
