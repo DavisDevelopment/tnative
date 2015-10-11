@@ -4,6 +4,7 @@ import haxe.io.Bytes;
 import haxe.io.BytesData;
 
 import tannus.io.Byte;
+import tannus.io.ByteArray;
 
 #if (js && !node)
 
@@ -35,6 +36,18 @@ abstract Buffer (CBuffer) from CBuffer {
 		for (c in s.split(''))
 			b.writeByte( c );
 		return b;
+	}
+
+	/* to Bytes */
+	@:to
+	public inline function toBytes():Bytes {
+		return Bytes.ofData(this.getData());
+	}
+
+	/* to ByteArray */
+	@:to
+	public inline function toByteArray():ByteArray {
+		return ByteArray.fromBytes(Bytes.ofData(this.getData()));
 	}
 
 	#if (js && !node)
@@ -84,6 +97,13 @@ class CBuffer {
 	}
 
 	/**
+	  * Get the current value of [cursor]
+	  */
+	public inline function getCursor():Int {
+		return cursor;
+	}
+
+	/**
 	  * Blit another Buffer onto [this] one
 	  */
 	public function blit(pos:Int, src:Buffer, srcpos:Int, len:Int):Void {
@@ -103,7 +123,7 @@ class CBuffer {
 	  * Read an Int
 	  */
 	public function readInt():Int {
-		return bytes.get(adv());
+		return cast bytes.getInt64(adv(4));
 	}
 
 	/**
@@ -163,7 +183,7 @@ class CBuffer {
 	  * Write an Int
 	  */
 	public function writeInt(i : Int):Void {
-		bytes.set(cursor++, i);
+		bytes.setInt64(adv(4), i);
 	}
 
 	/* Write a Byte */
