@@ -150,7 +150,7 @@ class TMath {
 	}
 
 	@:generic
-	public static function clamp<T:Float> (value :T, min :T, max :T) :T
+	public static inline function clamp<T:Float> (value :T, min :T, max :T) :T
 	{
 		return if (value < min) min
 			else if (value > max) max
