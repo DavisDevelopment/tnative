@@ -22,7 +22,9 @@ class Range<T : Float> {
 	  * Clamp [v] to the bounds of [this] Range
 	  */
 	public inline function clamp(v : T):T {
-		return N.clamp(v, min, max);
+		return if (v < min) min
+			else if (v > max) max
+				else v;
 	}
 
 	/**
