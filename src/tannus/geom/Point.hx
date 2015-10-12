@@ -71,7 +71,6 @@ abstract Point (TPoint) {
 	/**
 	  * Calculate the distance between [this] and [other]
 	  */
-	@:op(A - B)
 	public function distanceFrom(other : Point):Float {
 		return Math.sqrt(Math.pow(Math.abs(x-other.x), 2) + Math.pow(Math.abs(y-other.y), 2));
 	}
@@ -82,6 +81,14 @@ abstract Point (TPoint) {
 	@:op(A + B)
 	public function plus(other : Point):Point {
 		return new Point((x + other.x), (y + other.y), (z + other.z));
+	}
+
+	/**
+	  * Calculate the difference between two points
+	  */
+	@:op(A - B)
+	public function minus(other : Point):Point {
+		return new Point((x - other.x), (y - other.y), (z - other.z));
 	}
 
 	/**

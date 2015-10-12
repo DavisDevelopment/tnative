@@ -66,6 +66,37 @@ abstract Directory (Path) from Path {
 	}
 
 	/**
+	  * Recursively walk [this] Directory
+	  */
+	public function walkRecursive(?tester : File->Bool):Array<File> {
+		var results:Array<File> = new Array();
+
+		/* for every entry in [this] Directory */
+		for (e in entries) {
+			switch (e.type) {
+				/* if that entry is a File */
+				case File( f ):
+					/* if no tester was provided */
+					if (tester == null) {
+						results.push( f );
+					}
+
+					/* if a tester was provided */
+					else {
+						if (tester(f))
+							results.push( f );
+					}
+
+				/* if that entry is a Directory */
+				case Folder( d ):
+					results = results.concat(d.walkRecursive(tester));
+			}
+		}
+
+		return results;
+	}
+
+	/**
 	  * Rename [this] Directory (Move it)
 	  */
 	public inline function rename(ndir : String):Void {

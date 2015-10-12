@@ -41,6 +41,18 @@ class CompileTime {
 	}
 
 	/**
+	  * Measure how long it takes to execute the given expression
+	  */
+	public static macro function time(action : Expr):ExprOf<Int> {
+		var ctime = macro (Date.now().getTime());
+		return macro (function() {
+			var __now = $ctime;
+			$action;
+			return Std.int($ctime - __now);
+		}());
+	}
+
+	/**
 	  * User name
 	  */
 	public static macro function getUserName():ExprOf<String> {

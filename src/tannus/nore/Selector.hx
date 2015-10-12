@@ -1,6 +1,7 @@
 package tannus.nore;
 
 import tannus.nore.ORegEx;
+import tannus.nore.Compiler;
 
 import tannus.ds.TwoTuple;
 
@@ -44,12 +45,7 @@ abstract Selector<T> (TwoTuple<String, SelectorFunction<T>>) {
 	/**
 	  * Validate [o] with Selector
 	  */
-	public inline function test(o : T):Bool {
-		return (func( o ));
-	}
-
-	/**
-	  * Filter out all elements [list] which don't validate
+	public inline function test(o : T):Bool { return (func( o )); } /** * Filter out all elements [list] which don't validate
 	  */
 	public inline function filter(list : Array<T>):Array<T> {
 		return (list.filter(func));
@@ -58,8 +54,17 @@ abstract Selector<T> (TwoTuple<String, SelectorFunction<T>>) {
 	/**
 	  * Cast [this] Selector to a String
 	  */
+	@:to
 	public inline function toString():String {
 		return ('Selector($selector)');
+	}
+
+	/**
+	  * Cast [this] Selector to a predicate Function
+	  */
+	@:to
+	public inline function toPredicate():T->Bool {
+		return func;
 	}
 
 /* === Operators === */
@@ -93,6 +98,15 @@ abstract Selector<T> (TwoTuple<String, SelectorFunction<T>>) {
 	@:from
 	public static inline function fromString<T>(s : String):Selector<T> {
 		return new Selector(s);
+	}
+
+	/**
+	  * Create a new Helper Function
+	  */
+	public static inline function helper(name:String, hf:Dynamic->Array<Dynamic>->Bool):Void {
+		Compiler.initHelpers.on(function(help) {
+			help(name, hf);
+		});
 	}
 }
 

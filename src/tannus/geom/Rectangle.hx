@@ -6,6 +6,7 @@ import tannus.geom.Shape;
 import tannus.geom.Vertices;
 
 import tannus.math.Percent;
+import tannus.ds.EitherType in Either;
 
 @:forward
 abstract Rectangle (CRectangle) from CRectangle to CRectangle {
@@ -20,6 +21,18 @@ abstract Rectangle (CRectangle) from CRectangle to CRectangle {
 	@:op(A == B)
 	public inline function eq(o : Rectangle):Bool {
 		return this.equals( o );
+	}
+
+	/* Division */
+	@:op(A / B)
+	public inline function floatDiv(o : Float):Rectangle {
+		return this.divide( o );
+	}
+
+	/* Division by Rectangle */
+	@:op(A / B)
+	public inline function rectDiv(r : Rectangle):Rectangle {
+		return this.divide( r );
 	}
 
 /* === Type Casting === */
@@ -83,6 +96,19 @@ class CRectangle implements Shape {
 			height == other.height &&
 			depth == other.depth
 		);
+	}
+
+	/**
+	  * Divide [this] Rectangle
+	  */
+	public function divide(div : Either<Float, Rectangle>):Rectangle {
+		switch (div.type) {
+			case Left( f ):
+				return new Rectangle(x, y, w/f, h/f);
+
+			case Right( r ):
+				return new Rectangle(x, y, w/r.w, h/r.h);
+		}
 	}
 
 	/**

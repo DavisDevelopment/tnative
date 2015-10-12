@@ -3,6 +3,9 @@ package tannus.sys.node;
 import tannus.io.ByteArray;
 import tannus.sys.FileStat;
 
+import tannus.sys.FileStreamOptions in Fso;
+import tannus.sys.FileReadStream in IStream;
+
 class NodeFileSystem {
 	public static inline function exists(path : String):Bool {
 		return NFS.existsSync(path);
@@ -38,6 +41,12 @@ class NodeFileSystem {
 		var c:ByteArray = read(path);
 		c = c.concat( data );
 		write(path, c);
+	}
+
+	/* create a readable stream from a File */
+	public static function istream(path:String, opts:Fso):IStream {
+		trace( opts );
+		return new IStream(path, opts);
 	}
 
 	public static function deleteFile(path : String):Void {

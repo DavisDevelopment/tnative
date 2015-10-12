@@ -11,6 +11,12 @@ import haxe.Serializer;
 import haxe.Unserializer;
 
 class Runtime {
+	/**
+	  * Reload the App
+	  */
+	public static inline function reload():Void {
+		lib.reload();
+	}
 
 	/**
 	  * Sends a message to another application/extension

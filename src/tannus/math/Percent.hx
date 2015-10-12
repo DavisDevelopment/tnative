@@ -23,6 +23,14 @@ abstract Percent (Float) from Float to Float {
 /* === Instance Methods === */
 
 	/**
+	  * The complement (or inverse) of [this] Percent
+	  */
+	@:op( !A )
+	public inline function complement():Percent {
+		return (100 - this);
+	}
+
+	/**
 	  * Add another Percent to [this] one
 	  */
 	@:op(A + B)
@@ -41,20 +49,17 @@ abstract Percent (Float) from Float to Float {
 	/**
 	  * Increment [this] Percent by one
 	  */
-	@:op(A++)
+	@:op(++A)
 	public inline function increment():Percent {
-		this++;
-		return this;
+		return ++this;
 	}
 
 	/**
 	  * Decrement [this] Percent by one
 	  */
-	@:op(A--)
 	@:op(--A)
 	public inline function decrement():Percent {
-		this--;
-		return this;
+		return --this;
 	}
 
 	/**

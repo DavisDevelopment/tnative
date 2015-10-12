@@ -169,7 +169,7 @@ abstract Vertices (Array<Point>) {
 
 	/* To Array<Point> */
 	@:to
-	public inline function toPoints():Array<Point> return this;
+	public inline function toPoints():Array<Point> return this.copy();
 
 	/* From Array<Point> */
 	@:from

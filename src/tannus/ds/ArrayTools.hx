@@ -113,4 +113,30 @@ class ArrayTools {
 			return $extractor;
 		});
 	}
+
+	/**
+	  * Get the last item in the given Array
+	  */
+	public static function last<T>(list:Array<T>, ?v:T):T {
+		if (v == null) {
+			return (list[list.length - 1]);
+		}
+		else {
+			return (list[list.length - 1] = v);
+		}
+	}
+
+	/**
+	  * Get all the items in the given Array that occur before the given value
+	  */
+	public static inline function before<T>(list:Array<T>, val:T):Array<T> {
+		return (list.slice(0, (list.indexOf(val) != -1 ? list.indexOf(val) : list.length)));
+	}
+
+	/**
+	  * Get all the items in the given Array that occur after the given value
+	  */
+	public static inline function after<T>(list:Array<T>, val:T):Array<T> {
+		return (list.slice((list.indexOf(val)!=-1 ? list.indexOf(val) + 1 : 0)));
+	}
 }

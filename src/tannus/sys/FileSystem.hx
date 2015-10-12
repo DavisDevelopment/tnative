@@ -2,6 +2,8 @@ package tannus.sys;
 
 import tannus.io.ByteArray;
 import tannus.sys.FileStat;
+import tannus.sys.Path;
+import tannus.sys.FileStreamOptions in Fso;
 
 #if flash
 
@@ -143,6 +145,13 @@ class FileSystem {
 	}
 
 	/**
+	  * Creates a readable Stream from a File
+	  */
+	public static function istream(path:String, options:Fso):IStream {
+		throw 'Error: Not implemented!';
+	}
+
+	/**
 	  * Moves the given path to a new one
 	  */
 	public static function rename(oldpath:String, newpath:String):Void {
@@ -174,3 +183,5 @@ class FileSystem {
 		private typedef F = sys.io.File;
 	#end
 #end
+
+private typedef IStream = Dynamic;

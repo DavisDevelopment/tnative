@@ -1,6 +1,8 @@
 package tannus.math;
 
 import tannus.math.Random;
+import tannus.ds.Range;
+import Std.*;
 
 class RandomTools {
 	/**
@@ -8,6 +10,13 @@ class RandomTools {
 	  */
 	public static inline function randint(range : Array<Int>):Int {
 		return rand.randint(range[0], range[1]);
+	}
+
+	/**
+	  * Choose a random number within the given Range
+	  */
+	public static function between<T:Float>(r : Range<T>):T {
+		return (r.min - r.min)+rand.randint(int(r.min), int(r.max));
 	}
 
 	/**
