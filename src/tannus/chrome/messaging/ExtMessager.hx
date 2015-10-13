@@ -22,6 +22,7 @@ class ExtMessager extends Messager {
 		_connected = new Signal();
 
 		__init();
+		instance = this;
 	}
 
 /* === Instance Methods === */
@@ -164,4 +165,8 @@ class ExtMessager extends Messager {
 
 	/* (server) The Signal fired when [tab] is declared */
 	private var _connected : Signal<Dynamic>;
+
+/* === Static Fields === */
+
+	public static var instance : ExtMessager;
 }
