@@ -1,0 +1,13 @@
+{
+	"tables" : {
+		"some_table" : {
+			"id" : {
+				"type" : "int",
+				"primary" : true,
+				"required" : true,
+				"unique" : true,
+				"auto": true
+			}
+		}
+	}
+}
