@@ -8,6 +8,8 @@ import tannus.ds.Maybe;
 import tannus.ds.Range;
 import tannus.io.Ptr;
 import tannus.io.Signal;
+import tannus.events.KeyboardEvent;
+import tannus.events.EventMod;
 
 import tannus.geom.Point;
 import tannus.geom.Rectangle;
@@ -54,6 +56,29 @@ abstract Win (CWin) from CWin to CWin {
 		};
 		this.addEventListener('resize', handlr);
 		sig.ondelete = (function() this.removeEventListener('resize', handlr));
+		return sig;
+	}
+
+	/**
+	  * Listen for 'keydown' events on [this] Window
+	  */
+	public function onKeydown():Signal<KeyboardEvent> {
+		var sig:Signal<KeyboardEvent> = new Signal();
+		function handle(event:js.html.KeyboardEvent) {
+			var mods:Array<EventMod> = new Array();
+			if (event.altKey) mods.push(Alt);
+			if (event.shiftKey) mods.push(Shift);
+			if (event.ctrlKey) mods.push(Control);
+
+			var e:KeyboardEvent = new KeyboardEvent('keydown', event.keyCode, mods);
+
+			sig.call( e );
+		}
+
+		var bod = this.document.getElementsByTagName('body').item(0);
+		bod.addEventListener('keydown', handle);
+		sig.ondelete = (function() bod.removeEventListener('keydown', handle));
+
 		return sig;
 	}
 
