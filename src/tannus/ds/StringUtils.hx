@@ -2,6 +2,7 @@ package tannus.ds;
 
 import tannus.ds.EitherType;
 import tannus.io.RegEx;
+import tannus.io.Byte;
 
 using StringTools;
 
@@ -75,6 +76,13 @@ class StringUtils {
 		if (has(s, del))
 			return s.substring(s.indexOf(del)+1);
 		else return s;
+	}
+
+	/**
+	  * Get last byte of [this] String
+	  */
+	public static function lastByte(s : String):Byte {
+		return new Byte(s.charCodeAt(s.length - 1));
 	}
 
 	/**
