@@ -4,35 +4,61 @@ import tannus.ds.QueryString in Qs;
 import tannus.ds.Object;
 import tannus.io.RegEx;
 
+import tannus.sys.Path;
+
 using StringTools;
 using tannus.ds.StringUtils;
 
+@:expose('Href')
 class Url {
 	/* Constructor Function */
 	public function new(surl : String):Void {
-		protocol = (~/([A-Z]+):/i.match(surl) ? surl.substring(0, surl.indexOf(':')+1) : null);
-		var noproto:String = surl.replace(protocol+'', '');
-		if (noproto.startsWith('//'))
-			noproto = noproto.substring(2);
-		if (protocol != null)
-			protocol = protocol.slice(0, -1);
+		//- extract the protocol (if present)
+		protocol = (~/([A-Z]+):/i.match(surl) ? surl.substring(0, surl.indexOf(':')+1) : '');
 		
-		hostname = noproto.substring(noproto.indexOf(':')+1, noproto.indexOf('/'));
-		pathname = noproto.substring(noproto.indexOf('/')+1);
-		search = (pathname.has('?') ? pathname.substring(pathname.indexOf('?')) : '');
+		//- [surl], stripped of [protocol]
+		var noproto:String = surl.strip(protocol+'').after('//');
+		protocol = protocol.before(':');
+		
+		//- if no protocol was provided, [protocol] is http
+		if (protocol.empty())
+			protocol = 'http';
+
+		//- strip the first "/" from [noproto], if "/" is the first character
+		if (noproto.startsWith('/'))
+			noproto = noproto.substring(1);
+
+		//- get the hostname
+		hostname = noproto.before('/'); //noproto.substring(noproto.indexOf(':')+1, noproto.indexOf('/'));
+		
+		//- get the pathname
+		pathname = noproto.after('/'); //noproto.substring(noproto.indexOf('/')+1);
+		
+		//- get the search-string
+		search = (pathname.has('?') ? pathname.after('?') : '');
+		
+		//- strip [search] (if not empty) from [pathname]
 		pathname = pathname.strip(search);
-		search = (search.startsWith('?') ? search.slice(1) : search);
-		hash = (search.has('#') ? search.substring(0, search.indexOf('#')) : '');
-		if (search.has('#'))
-			search = search.substring(0, search.indexOf('#'));
-		if (hash == '') {
-			hash = pathname.has('#')?pathname.substring(pathname.indexOf('#')).strip('#'):'';
-			if (pathname.has('#'))
-				pathname = pathname.substring(0, pathname.indexOf('#'));
+
+		// search = (search.startsWith('?') ? search.slice(1) : search);
+
+		//- (if possible) extract hashcode from the search-string
+		hash = (search.has('#') ? search.after('#') : '');
+		search = search.before('#');
+
+		//- (if possible AND necessary) extract hashcode from the pathname
+		if (hash.empty() && pathname.has('#')) {
+			hash = pathname.after('#');
+			pathname = pathname.before('#');
 		}
-		search = search.strip(hash);
-		hash = hash.slice(1);
+
 		params = Qs.parse(search);
+		try {
+			hashparams = Qs.parse(hash);
+		}
+		catch(err : String) {
+			hashparams = null;
+		}
 	}
 
 /* === Instance Methods === */
@@ -42,10 +68,42 @@ class Url {
 	  */
 	public function toString():String {
 		search = Qs.stringify(params);
+		hash = (hashparams != null ? Qs.stringify(hashparams) : hash+'');
 		var base:String = ('$protocol://$hostname/$pathname');
 		base += (params.keys.length == 0 ? '' : '?'+search);
 		base += (hash != '' ? '#'+hash : '');
 		return base;
+	}
+
+	/**
+	  * Creates a copy of [this]
+	  */
+	public function clone():Url {
+		return new Url(toString());
+	}
+
+/* === Computed Instance Fields === */
+
+	/**
+	  * Get the Domain-name as an Array
+	  */
+	public var domain(get, set):Array<String>;
+	private function get_domain() return hostname.split('.');
+	private function set_domain(v:Array<String>):Array<String> {
+		hostname = v.join('.');
+		return domain;
+	}
+
+	/**
+	  * get the pathname as a Path
+	  */
+	public var path(get, set):Path;
+	private inline function get_path():Path {
+		return new Path(pathname);
+	}
+	private inline function set_path(v : Path):Path {
+		pathname = v;
+		return path;
 	}
 
 /* === Instance Fields === */
@@ -53,7 +111,10 @@ class Url {
 	public var protocol : String;
 	public var hostname : String;
 	public var pathname : String;
+	
 	public var search : String;
-	public var params : Object;
 	public var hash : String;
+
+	public var params : Object;
+	public var hashparams : Null<Object>;
 }
