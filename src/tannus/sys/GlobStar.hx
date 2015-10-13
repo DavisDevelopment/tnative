@@ -138,5 +138,6 @@ class CGlobStar {
 
 enum Token {
 	TLiteral(s : String);
+	// TExtract(name : String);
 	TExpan(bits : Array<String>);
 }
