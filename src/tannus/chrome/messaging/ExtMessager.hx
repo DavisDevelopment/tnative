@@ -32,39 +32,64 @@ class ExtMessager extends Messager {
 	  */
 	private function __init():Void {
 		if (is_server) {
+			/**
+			  * When chrome.runtime fires the 'onMessage' Event
+			  */
 			Runtime.onMessage(function( msg ) {
+				/* check that [msg] is a valid SafeMessage Object */
 				if (SafeMessage.isSafeMessage(msg.data)) {
+					/* if we're not connected to anything yet */
 					if (tab == null) {
+						//- if [this] Messager is in a Pool
 						if (inPool) {
+							//- ignore input from Tabs we're already connected to
 							var existing = pool.getMessagerByTab(msg.sender.tab.value.id);
 							if (existing != null)
 								return ;
 						}
+						//- set the [tab] field to that of [msg.sender]
 						tab = msg.sender.tab.value;
+
+						//- dispatch the 'connected' Event
 						_connected.call(null);
-					} else {
+					}
+
+					/* if we're already connected to something */
+					else {
+						/* if the Message came from any other Messager than [peer] */
 						if (msg.sender.tab.value.id != tab.value.id)
 							return ;
 					}
 
+					/* decode the Message object */
 					var safe:SafeMessage = (cast msg.data);
 					var messg:Message = Message.fromSafe(this, safe);
+					trace( messg );
+
+					/* and plop it right into our sexy-ass Message-handling system */
 					receiveFromPeer( messg );
 				} 
-				else {
-					trace( msg.data );
-					msg.respond('No');
-				}
 			});
 
+			/* the first time the 'connected' Event is dispatched */
 			_connected.once(function(x) {
-				send('meta:source', {'tab': tab.value.id});
+				/* send the peer metadata */
+				send('meta:source', {
+					'tab': tab.value.id
+				});
 			});
 		}
+
+		/* if we're a "client-side" Messager */
 		else {
+			/* listen for data from the chrome.runtime.onMessage Event */
 			Runtime.onMessage(function( msg ) {
+				/* if [msg] is a valid Message */
 				if (SafeMessage.isSafeMessage(msg.data)) {
+					/* decode it into a Message object */
 					var messg:Message = Message.fromSafe(this, cast msg.data);
+
+					/* send it to be handled */
 					receiveFromPeer( messg );
 				}
 			});
@@ -106,6 +131,7 @@ class ExtMessager extends Messager {
 	override private function receiveFromPeer(msg : Message):Void {
 		incoming.call( msg );
 		switch (msg.type) {
+			/* Standard Message */
 			case Normal:
 				if (msg.channel != '') {
 					var sig:Signal<Message> = chanSig(msg.channel);
@@ -116,6 +142,14 @@ class ExtMessager extends Messager {
 				var listn = awaitingReply[msg.id];
 				if (listn != null) {
 					listn(msg.data);
+				}
+
+			case Broadcast:
+				if (is_server && inPool) {
+					var audience = pool.sockets.filter(function(s) return (s != this));
+					for (s in audience) {
+						s.send(msg.channel, msg.data, msg.reply);
+					}
 				}
 
 			default:
