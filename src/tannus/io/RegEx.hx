@@ -2,6 +2,8 @@ package tannus.io;
 
 import tannus.ds.Maybe;
 
+using StringTools;
+
 @:forward
 /* Abstraction layer on top of the EReg type */
 abstract RegEx (EReg) from EReg to EReg {
@@ -55,6 +57,13 @@ abstract RegEx (EReg) from EReg to EReg {
 	}
 
 	/**
+	  * Extract only the grouped matches
+	  */
+	public inline function extractGroups(str:String, n:Int=0):Null<Array<String>> {
+		return search(str)[0].slice(1);
+	}
+
+	/**
 	  * Return an Array of RegExMatchs
 	  */
 	public function findAll(s : String):Array<Dynamic> {
@@ -70,6 +79,34 @@ abstract RegEx (EReg) from EReg to EReg {
 			return s;
 		});
 		return all;
+	}
+
+	/**
+	  * Replace each match with some String
+	  */
+	public function replace(rtext:String, text:String) {
+		return this.map(rtext, function(e:EReg):String {
+			var i:Int = 0;
+			var whole:Null<String> = null;
+			var subs:Array<String> = [];
+			while (true) {
+				try {
+					var s:String = this.matched(i++);
+					if (whole == null)
+						whole = s;
+					else
+						subs.push( s );
+				}
+				catch (err : Dynamic) {
+					break;
+				}
+			}
+			var _t:String = text;
+			for (ii in 0...subs.length) {
+				_t = _t.replace('{{$ii}}', subs[ii]);
+			}
+			return _t;
+		});
 	}
 
 	/**
