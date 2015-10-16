@@ -15,6 +15,7 @@ class Message {
 		id = Memory.uniqueIdString('msg-');
 		sender = sock;
 		data = dat;
+		meta = {};
 		type = Normal;
 		channel = '';
 	}
@@ -30,6 +31,7 @@ class Message {
 			'sender_id' : sender.id,
 			'type' : haxe.Serializer.run(type),
 			'channel' : channel,
+		       	'meta' : haxe.Serializer.run(meta),
 			'data' : haxe.Serializer.run(data)
 		});
 	}
@@ -56,6 +58,7 @@ class Message {
 		m.sender_id = saf.sender_id;
 		m.type = haxe.Unserializer.run(saf.type);
 		m.channel = saf.channel;
+		m.meta = saf.meta;
 		return m;
 	}
 
@@ -64,9 +67,11 @@ class Message {
 	public var id : String;
 	public var sender_id : String;
 	public var source_id : Null<String>;
-	public var data : Object;
 	public var channel : String;
 	public var type : MessageType;
+
+	public var meta : Object;
+	public var data : Object;
 
 	private var sender : Messager;
 }
