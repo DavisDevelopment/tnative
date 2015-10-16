@@ -30,6 +30,20 @@ class StringUtils {
 	}
 
 	/**
+	  * Remove the first instance of [sub] from [str]
+	  */
+	public static function remove(str:String, sub:String):String {
+		var i:Int = str.indexOf(sub);
+		if (i == -1)
+			return str;
+		else if (i == 0)
+			return (str.substring(i+sub.length));
+		else {
+			return (str.substring(0, i) + str.substring(i + 1));
+		}
+	}
+
+	/**
 	  * Place some String on either end of some other
 	  */
 	public static function wrap(str:String, wrapper:String, ?end:String):String {
