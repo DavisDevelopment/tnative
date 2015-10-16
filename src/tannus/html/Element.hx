@@ -37,6 +37,14 @@ abstract Element (JQuery) from JQuery to JQuery {
 	}
 
 	/**
+	  * Check whether Element has been removed
+	  */
+	public var removed(get, never):Bool;
+	private inline function get_removed() {
+		return (this.closest('body').length < 1);
+	}
+
+	/**
 	  * textual value of [this] Element, as a field
 	  */
 	public var text(get, set):String;
@@ -210,6 +218,13 @@ abstract Element (JQuery) from JQuery to JQuery {
 	}
 
 	/**
+	  * Check whether [this] Element contains [other]
+	  */
+	public inline function contains(other : Element):Bool {
+		return (other.closest(untyped this).length > 0);
+	}
+
+	/**
 	  * Append some shit to [this] Element
 	  */
 	public inline function appendElementable(child : Elementable):Element {
@@ -271,7 +286,7 @@ abstract Element (JQuery) from JQuery to JQuery {
 	/* To Array of ELements */
 	@:to
 	public inline function toArray():Array<Element> {
-		return (this.toArray().map(function(e) return new Element(e)));
+		return ([for (i in 0...this.length) new Element(at(i))]);
 	}
 
 	/* From Array of Elements */
