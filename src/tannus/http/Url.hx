@@ -9,38 +9,46 @@ import tannus.sys.Path;
 using StringTools;
 using tannus.ds.StringUtils;
 
+@:forward
+abstract Url (CUrl) from CUrl to CUrl {
+	public inline function new(s : String) this = new CUrl(s);
+
+/* === Type Casting === */
+
+	@:to
+	public inline function toString():String return this.toString();
+
+	@:from
+	public static inline function fromString(s : String):Url return new CUrl(s);
+}
+
 @:expose('Href')
-class Url {
+class CUrl {
 	/* Constructor Function */
 	public function new(surl : String):Void {
 		//- extract the protocol (if present)
-		protocol = (~/([A-Z]+):/i.match(surl) ? surl.substring(0, surl.indexOf(':')+1) : '');
-		
-		//- [surl], stripped of [protocol]
-		var noproto:String = surl.strip(protocol+'').after('//');
-		protocol = protocol.before(':');
-		
-		//- if no protocol was provided, [protocol] is http
+		protocol = (~/^([A-Z]+):/i.match(surl) ? surl.substring(0, surl.indexOf(':')) : '');
 		if (protocol.empty())
 			protocol = 'http';
-
+		
+		//- [surl], stripped of [protocol]
+		var noproto:String = surl.remove(protocol+'://');
+		
 		//- strip the first "/" from [noproto], if "/" is the first character
 		if (noproto.startsWith('/'))
 			noproto = noproto.substring(1);
 
 		//- get the hostname
-		hostname = noproto.before('/'); //noproto.substring(noproto.indexOf(':')+1, noproto.indexOf('/'));
+		hostname = noproto.before('/');
 		
 		//- get the pathname
-		pathname = noproto.after('/'); //noproto.substring(noproto.indexOf('/')+1);
+		pathname = (noproto.has('/') ? noproto.after('/') : '');
 		
 		//- get the search-string
 		search = (pathname.has('?') ? pathname.after('?') : '');
 		
 		//- strip [search] (if not empty) from [pathname]
-		pathname = pathname.strip(search);
-
-		// search = (search.startsWith('?') ? search.slice(1) : search);
+		pathname = pathname.strip('?').strip(search);
 
 		//- (if possible) extract hashcode from the search-string
 		hash = (search.has('#') ? search.after('#') : '');
