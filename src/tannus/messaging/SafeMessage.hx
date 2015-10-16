@@ -17,6 +17,7 @@ class SafeMessage {
 	public var sender_id : String;
 	public var type : String;
 	public var channel : String;
+	public var meta : Object;
 	public var data : Object;
 
 	public var raw(get, set):TSafe;
@@ -26,6 +27,7 @@ class SafeMessage {
 			'sender_id': sender_id,
 			'type': type,
 			'channel': channel,
+			'meta': meta,
 			'data': data
 		};
 	}
@@ -61,14 +63,15 @@ class SafeMessage {
 			else {
 				var type:MessageType = (cast haxe.Unserializer.run(cast o));
 				switch (type) {
-					case Normal, Reply, Connect:
+					case Normal, Reply, Broadcast:
 						return true;
 
 					default:
 						return false;
 				}
 			}
-		} catch (error : Dynamic) {
+		}
+		catch (error : Dynamic) {
 			return false;
 		}
 	}
@@ -79,5 +82,6 @@ typedef TSafe = {
 	var sender_id : String;
 	var type : String;
 	var channel : String;
+	var meta : Object;
 	var data : Object;
 };
