@@ -2,6 +2,8 @@ package tannus.messaging;
 
 import tannus.messaging.Message;
 import tannus.messaging.MessageType;
+import tannus.messaging.Channel;
+
 import tannus.io.Ptr;
 import tannus.io.Signal;
 import tannus.ds.Memory;
@@ -68,6 +70,23 @@ class Messager {
 	}
 
 	/**
+	  * Broadcast a Message
+	  */
+	public function broadcast(type:String, data:Object, ?onreply:Object->Void):Void {
+		var msg:Message = new Message(this, data);
+		msg.type = Broadcast;
+		msg.channel = type;
+		msg.meta['fuck-me'] = true;
+		
+		awaitingReply.set(msg.id, function(res : Object) {
+			if (onreply != null)
+				onreply( res );
+		});
+
+		sendToPeer( msg );
+	}
+
+	/**
 	  * Obtain a reference to the Signal for a given channel
 	  */
 	private function chanSig(chan : String):Signal<Message> {
@@ -96,6 +115,13 @@ class Messager {
 	  */
 	public function off(chan:String, cb:Message->Void):Void {
 		chanSig(chan).off( cb );
+	}
+
+	/**
+	  * Open up a new Channel interface
+	  */
+	public function openChannel(name : String):Channel {
+		return new Channel(this, name);
 	}
 
 /* === Instance Fields === */
