@@ -9,7 +9,7 @@ import tannus.sys.FileStreamOptions in Fso;
 import tannus.sys.FileSystem in Fs;
 import tannus.ds.IntRange in Range;
 
-#if (js && node)
+#if node
 class FileReadStream extends ReadableStream<ByteArray> {
 	/* Constructor Function */
 	public function new(p:Path, opts:Fso):Void {
@@ -39,7 +39,7 @@ class FileReadStream extends ReadableStream<ByteArray> {
 			rs.on('data', function(data : Buf) {
 				trace('Stream got data');
 				if (opened && !closed) {
-					write(ByteArray.fromArrayBuffer(
+					write(ByteArray.fromNodeBuffer( data ));
 				}
 				else {
 					throw 'Error: Cannot read from closed or unopened Stream!';
