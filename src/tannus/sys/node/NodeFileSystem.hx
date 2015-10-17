@@ -4,7 +4,7 @@ import tannus.io.ByteArray;
 import tannus.sys.FileStat;
 
 import tannus.sys.FileStreamOptions in Fso;
-import tannus.sys.FileReadStream in IStream;
+import tannus.sys.FileReadStream;
 
 class NodeFileSystem {
 	public static inline function exists(path : String):Bool {
@@ -44,9 +44,8 @@ class NodeFileSystem {
 	}
 
 	/* create a readable stream from a File */
-	public static function istream(path:String, opts:Fso):IStream {
-		trace( opts );
-		return new IStream(path, opts);
+	public static function istream(path:String, opts:Fso):FileReadStream {
+		return new FileReadStream(path, opts);
 	}
 
 	public static function deleteFile(path : String):Void {
