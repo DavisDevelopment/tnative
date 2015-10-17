@@ -4,6 +4,9 @@ import tannus.io.RegEx;
 import tannus.io.ByteArray;
 import tannus.io.Byte;
 import tannus.sys.Path;
+import tannus.ds.Object;
+
+import tannus.sys.gs.*;
 
 import haxe.io.Error;
 
@@ -25,10 +28,11 @@ abstract GlobStar (CGlobStar) from CGlobStar {
 @:expose('globstar')
 class CGlobStar {
 	/* Constructor Function */
-	public function new(pattern : String):Void {
-		spat = pattern;
-
-		compile();
+	public function new(pat : String):Void {
+		spat = pat;
+		var data = Printer.compile(pat);
+		pattern = data.regex;
+		pind = data.params;
 	}
 
 /* === Instance Methods === */
@@ -36,104 +40,35 @@ class CGlobStar {
 	/**
 	  * Test a Path against [this] GlobStar
 	  */
-	public function test(path : Path):Bool {
-		return pattern.match(path.normalize().str);
+	public function test(path : String):Bool {
+		return pattern.match( path );
 	}
 
 	/**
-	  * Compile [this] GlobStar
+	  * Get match-data
 	  */
-	private function compile():Void {
-		var code:String = spat;
-		var escaped:Array<String> = [".", "^", "$", "+", "(", ")", "?"];
-		for (c in escaped)
-			code = code.replace(c, '\\${c}');
-		code = parseReplace(code);
-		if (!code.has('*') && !code.has("?")) {
-			pattern = new EReg(code, 'g');
-			return ;
-		}
+	public function match(s : String):Null<Object> {
+		var dat = pattern.search( s );
+		if (dat.length == 0)
+			return null;
 		else {
-			var single:String = '([^/]+)';
-			var double:String = '(.+)';
-
-			code = code.replace('**', double);
-			code = code.replace('*', single);
-			code = code.wrap('^', '$');
-
-			pattern = new EReg(code, 'g');
-		}
-	}
-
-	/**
-	  * Parse Replace
-	  */
-	private function parseReplace(code : String):String {
-		var tokens = parse( code );
-		var res:String = '';
-
-		for (t in tokens) {
-			switch (t) {
-				case TLiteral(s):
-					res += s;
-
-				case TExpan(bits):
-					res += bits.map(function(s) return s.wrap('(', ')')).join('|').wrap('(',')');
+			var m = dat[0];
+			var res:Object = {};
+			for (k in pind.keys()) {
+				var i = pind[k];
+				trace(i);
+				res[k] = m[i+1];
 			}
+			return res;
 		}
-
-		return res;
-	}
-
-	/**
-	  * parse the globstar
-	  */
-	private function parse(code : String):Array<Token> {
-		var b:ByteArray = code;
-		var tokens:Array<Token> = new Array();
-
-		var buf:String = '';
-
-		while (b.length > 0) {
-			var c:Byte = b.shift();
-
-			if (c == '{'.code) {
-				tokens.push(TLiteral(buf));
-				buf = '';
-				var bits = new Array();
-				while (true) {
-					c = b.shift();
-					if (c == ','.code) {
-						bits.push(buf);
-						buf = '';
-						continue;
-					}
-					else if (c == '}'.code) {
-						bits.push(buf);
-						buf = '';
-						break;
-					}
-					else {
-						buf += c;
-					}
-				}
-				tokens.push(TExpan( bits ));
-			}
-
-			else {
-				buf += c;
-			}
-		}
-		tokens.push(TLiteral(buf));
-		buf = '';
-
-		return tokens;
 	}
 
 /* === Instance Fields === */
 
 	private var spat : String;
 	private var pattern : RegEx;
+	private var pind : Map<String, Int>;
+	private var printer : Printer;
 }
 
 enum Token {
