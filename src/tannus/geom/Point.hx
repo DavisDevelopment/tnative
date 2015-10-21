@@ -93,6 +93,14 @@ abstract Point (TPoint) {
 	}
 
 	/**
+	  * Subtract [n] from [this] Point
+	  */
+	@:op(A - B)
+	public function minusFloat(n : Float):Point {
+		return new Point(x-n, y-n, z-n);
+	}
+
+	/**
 	  * Divide a Point
 	  */
 	@:op(A / B)
