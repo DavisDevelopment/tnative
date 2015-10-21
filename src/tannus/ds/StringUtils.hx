@@ -14,11 +14,11 @@ class StringUtils {
 	  * Get the Byte at index [i] in String [s]
 	  */
 	public static inline function byteAt(s:String, i:Int):Byte {
-		if (i < (s.length - 1)) {
+		if (i <= (s.length - 1)) {
 			return new Byte(s.charCodeAt( i ));
 		}
 		else {
-			throw 'IndexOutOfBoundError: $i is not within range(0, ${s.length})';
+			throw new js.Error('IndexOutOfBoundError: $i is not within range(0, ${s.length - 1})');
 		}
 	}
 
