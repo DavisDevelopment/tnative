@@ -41,7 +41,12 @@ class CGlobStar {
 	  * Test a Path against [this] GlobStar
 	  */
 	public function test(path : String):Bool {
-		return pattern.match( path );
+		var data = pattern.search( path );
+		if (data.length == 0)
+			return false;
+		else {
+			return (path.remove(data[0][0]).trim() == '');
+		}
 	}
 
 	/**
