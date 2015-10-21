@@ -4,6 +4,7 @@ import tannus.http.Url;
 import tannus.sys.GlobStar in Pattern;
 import tannus.sys.Path;
 import tannus.nore.Selector;
+import tannus.ds.Object;
 
 using StringTools;
 using tannus.ds.StringUtils;
@@ -48,10 +49,28 @@ class CUrlPattern {
 	}
 
 	/**
+	  * Get the match data for a given Url
+	  */
+	public function match(url : Url):Object {
+		if (!test(url))
+			return {};
+		
+		var o:Object = {};
+		o += hostname.match(url.hostname);
+		o += pathname.match(url.path);
+		
+		return o;
+	}
+
+	/**
 	  * Test a String of a Url against [this] Pattern
 	  */
 	public function testString(s : String):Bool {
 		return test( s );
+	}
+
+	public function matchString(s : String):Object {
+		return match(s);
 	}
 
 /* === Instance Fields === */
