@@ -5,6 +5,7 @@ import tannus.math.TMath.i;
 import tannus.math.Percent;
 import tannus.geom.Angle;
 import tannus.ds.Maybe;
+import tannus.ds.EitherType;
 
 #if python
 	import python.Tuple;
@@ -90,6 +91,18 @@ abstract Point (TPoint) {
 	public function minus(other : Point):Point {
 		return new Point((x - other.x), (y - other.y), (z - other.z));
 	}
+
+	/**
+	  * Divide a Point
+	  */
+	@:op(A / B)
+	public inline function dividePoint(p : Point) return this.dividePoint(p);
+
+	/**
+	  * Divide by a Float
+	  */
+	@:op(A / B)
+	public inline function divideFloat(d : Float) return this.divideFloat(d);
 
 	/**
 	  * Compare two Points, based on their distance from (0, 0)
@@ -278,11 +291,30 @@ abstract Point (TPoint) {
 
 /* Base Point Class */
 class TPoint {
+	/* Constructor Function */
 	public function new(_x:Float, _y:Float, _z:Float):Void {
 		x = _x;
 		y = _y;
 		z = _z;
 	}
+
+/* === Instance Methods === */
+
+	/**
+	  * Divide by another Point
+	  */
+	public function dividePoint(d : Point):Point {
+		return (new Point(x/d.x, y/d.y, (z!=0?z/d.z:0)));
+	}
+
+	/**
+	  * Divide by a Float
+	  */
+	public function divideFloat(f : Float):Point {
+		return (new Point(x/f, y/f, (z!=0?z/f:0)));
+	}
+
+/* === Instance Fields === */
 
 	public var x:Float;
 	public var y:Float;
