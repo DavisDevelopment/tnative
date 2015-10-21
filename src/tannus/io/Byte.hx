@@ -73,6 +73,20 @@ abstract Byte (Int) from Int to Int {
 	}
 
 	/**
+	  * Check whether [this] Byte is an uppercase Letter
+	  */
+	public inline function isUppercase():Bool {
+		return (this >= 65 && this <= 90);
+	}
+
+	/**
+	  * Check whether [this] Byte is a lowercase letter
+	  */
+	public inline function isLowercase():Bool {
+		return (this >= 97 && this <= 122);
+	}
+
+	/**
 	  * Tests whether [this] Byte would be a whitespace character in String form
 	  */
 	public inline function isWhiteSpace():Bool {
@@ -83,7 +97,17 @@ abstract Byte (Int) from Int to Int {
 	  * Tests whether [this] Byte is a line-breaking character
 	  */
 	public inline function isLineBreaking():Bool {
-		return Lambda.has([10, 13], asint);
+		return (this == 10 || this == 13);
+	}
+
+	/**
+	  * Check whether [this] Byte is a punctuation mark
+	  */
+	public inline function isPunctuation():Bool {
+		return Lambda.has([
+			33, 44, 45, 46,
+			58, 59, 53
+		], asint);
 	}
 
 /* === Operator Overloading === */
