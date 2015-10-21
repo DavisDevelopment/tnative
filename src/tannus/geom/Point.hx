@@ -92,6 +92,14 @@ abstract Point (TPoint) {
 	}
 
 	/**
+	  * Subtract a Float
+	  */
+	@:op(A - B)
+	public function minusFloat(n : Float):Point {
+		return minus([n, n, n]);
+	}
+
+	/**
 	  * Compare two Points, based on their distance from (0, 0)
 	  */
 	@:op(A > B)
