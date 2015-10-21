@@ -31,7 +31,10 @@ class CUrlPattern {
 		u = s;
 		protocol = u.protocol;
 		hostname = u.hostname;
-		pathname = u.pathname;
+		pathname = null;
+		if (u.pathname != '') {
+			pathname = u.pathname;
+		}
 	}
 
 /* === Instance Methods === */
@@ -43,7 +46,7 @@ class CUrlPattern {
 		return (
 			protocol.test(url.protocol) &&
 			hostname.test(url.hostname) &&
-			pathname.test(url.path) &&
+			(pathname != null ? pathname.test(url.path) : true) &&
 			(params != null ? params.test(url.params) : true)
 		);
 	}
@@ -57,8 +60,9 @@ class CUrlPattern {
 		
 		var o:Object = {};
 		o += hostname.match(url.hostname);
-		o += pathname.match(url.path);
 		
+		if (pathname != null)
+			o += pathname.match(url.path); 
 		return o;
 	}
 
@@ -79,6 +83,6 @@ class CUrlPattern {
 
 	private var protocol:Pattern;
 	private var hostname:Pattern;
-	private var pathname:Pattern;
+	private var pathname:Null<Pattern>;
 	private var params:Null<Selector<Dynamic>>;
 }
