@@ -32,4 +32,5 @@ typedef UrlData = {
 	var path : String;
 	var query : Object;
 	var hash : String;
+	function toString():String;
 };
