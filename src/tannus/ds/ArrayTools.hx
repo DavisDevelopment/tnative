@@ -139,4 +139,15 @@ class ArrayTools {
 	public static inline function after<T>(list:Array<T>, val:T):Array<T> {
 		return (list.slice((list.indexOf(val)!=-1 ? list.indexOf(val) + 1 : 0)));
 	}
+
+	/**
+	  * Repeat the given array the given number of times
+	  */
+	public static function times<T>(list:Array<T>, n:Int):Array<T> {
+		var res = list.copy();
+		for (i in 0...n-1) {
+			res = res.concat(list.copy());
+		}
+		return res;
+	}
 }
