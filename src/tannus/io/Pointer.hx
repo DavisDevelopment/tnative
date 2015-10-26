@@ -13,12 +13,7 @@ import haxe.macro.Expr;
 abstract Pointer<T> (Ref<T>) from Ref<T> {
 	/* Constructor Function */
 	public inline function new(g:Getter<T>, s:Setter<T>, ?d:Void->Void):Void {
-		//this = new Ref(g, s);
-		this = {
-			'get': g,
-			'set': s,
-			'delete': d
-		};
+		this = new Ref(g, s);
 	}
 
 /* === Instance Fields === */
@@ -52,15 +47,15 @@ abstract Pointer<T> (Ref<T>) from Ref<T> {
 	  * The Getter for [this] Pointer
 	  */
 	public var getter(get, set):Getter<T>;
-	private inline function get_getter() return this.get;
-	private inline function set_getter(ng) return (this.get = ng);
+	private inline function get_getter() return this.getter;
+	private inline function set_getter(ng) return (this.getter = ng);
 
 	/**
 	  * The Setter for [this] Pointer
 	  */
 	public var setter(get, set):Setter<T>;
-	private inline function get_setter() return this.set;
-	private inline function set_setter(ns) return (this.set = ns);
+	private inline function get_setter() return this.setter;
+	private inline function set_setter(ns) return (this.setter = ns);
 
 	/**
 	  * Alias to 'value'
@@ -75,27 +70,30 @@ abstract Pointer<T> (Ref<T>) from Ref<T> {
 	  * Function to 'get' the value of [this] Pointer
 	  */
 	public var get(get, never):Void->T;
-	private inline function get_get() return cast getter;
+	private inline function get_get() return this.get;
 
 	/**
 	  * Function to 'set' the value of [this] Pointer
 	  */
 	public var set(get, never):T->T;
-	private inline function get_set() return cast setter;
+	private inline function get_set() return this.set;
 
 	/**
-	  * Set the deleter function for [this] Pointer
+	  * Function to delete [this] Pointer
 	  */
-	public inline function deleter(f : Void->Void):Void {
-		this.delete = f;
+	public var deleter(get, set):Null<Void->Void>;
+	private inline function get_deleter():Null<Void->Void> {
+		return this.deleter;
+	}
+	private inline function set_deleter(nd : Void->Void):Null<Void->Void> {
+		return (this.deleter = nd);
 	}
 
 	/**
 	  * Destroy [this] Pointer
 	  */
 	public inline function delete():Void {
-		if (this.delete != null)
-			this.delete();
+		this.delete();
 	}
 
 	/**
@@ -131,7 +129,7 @@ abstract Pointer<T> (Ref<T>) from Ref<T> {
 	@:op(A += B)
 	public inline function attach_str(str : Setter<T>):Void {
 		var s = setter;
-		this.set = s.attach( str );
+		this.setter = s.attach( str );
 	}
 
 	/**
@@ -176,9 +174,7 @@ abstract Pointer<T> (Ref<T>) from Ref<T> {
 	  * Convert [this] Pointer to a human-readable String
 	  */
 	@:to
-	public function toString():String {
-		return Std.string(get());
-	}
+	public inline function toString() return this.toString();
 
 	/**
 	  * Return the iterator for Pointers which reference Iterable data
@@ -209,9 +205,58 @@ abstract Pointer<T> (Ref<T>) from Ref<T> {
 	}
 }
 
+@:generic
+private class Ref<T> {
+	/* Constructor Function */
+	public function new(g:Getter<T>, s:Setter<T>, ?d:Void->Void):Void {
+		getter = g;
+		setter = s;
+		deleter = d;
+	}
+
+/* === Instance Methods === */
+
+	/**
+	  * Get the value of [this] Ref
+	  */
+	public function get():T {
+		return getter.v;
+	}
+
+	/**
+	  * Set the value of [this] Ref
+	  */
+	public function set(v : T):T {
+		return setter.set( v );
+	}
+
+	/**
+	  * Delete [this] Ref
+	  */
+	public function delete():Void {
+		if (deleter != null)
+			deleter();
+	}
+
+	/**
+	  * Convert [this] to a String
+	  */
+	public function toString():String {
+		return Std.string( get() );
+	}
+
+/* === Instance Fields === */
+
+	public var getter : Getter<T>;
+	public var setter : Setter<T>;
+	public var deleter : Null<Void->Void>;
+}
+
 // private typedef Ref<T> = Tup2<Getter<T>, Setter<T>>;
+/*
 private typedef Ref<T> = {
 	var get : Getter<T>;
 	var set : Setter<T>;
 	@:optional var delete : Void->Void;
 };
+*/
