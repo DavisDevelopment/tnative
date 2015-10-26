@@ -18,7 +18,7 @@ class StringUtils {
 			return new Byte(s.charCodeAt( i ));
 		}
 		else {
-			throw new js.Error('IndexOutOfBoundError: $i is not within range(0, ${s.length - 1})');
+			throw 'IndexOutOfBoundError: $i is not within range(0, ${s.length - 1})';
 		}
 	}
 
