@@ -36,3 +36,22 @@ abstract DownloadOptions (Object) from Dynamic {
 	private inline function get_saveAs() return (this['saveAs'] || true);
 	private inline function set_saveAs(n:Bool) return (this['saveAs'] = n);
 }
+
+typedef DownloadDelta = {
+	var id : Int;
+	@:optional var url : Delta<String>;
+	@:optional var mime : Delta<String>;
+	@:optional var state : Delta<DownloadState>;
+};
+
+typedef Delta<T> = {
+	?previous:T,
+	?current:T
+};
+
+@:enum
+abstract DownloadState (String) from String to String {
+	var InProgress = 'in_progress';
+	var Complete = 'complete';
+	var Interrupted = 'interrupted';
+}
