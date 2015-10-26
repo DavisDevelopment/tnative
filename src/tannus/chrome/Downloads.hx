@@ -23,8 +23,8 @@ class Downloads {
 	/**
 	  * Observe changes on DownloadItems globally
 	  */
-	public static function onChange(callb : Object->Void):Void {
-		lib.onChanged.addListener(function(change:Object) {
+	public static function onChange(callb : DownloadDelta->Void):Void {
+		lib.onChanged.addListener(function(change:DownloadDelta) {
 			callb( change );
 		});
 	}
@@ -32,9 +32,9 @@ class Downloads {
 	/**
 	  * Observe a particular DownloadItem for changes
 	  */
-	public static function observe(oid:Int, callb:Object->Void):Void {
+	public static function observe(oid:Int, callb:DownloadDelta->Void):Void {
 		onChange(function(ch) {
-			var id:Int = ch['id'];
+			var id:Int = ch.id;
 
 			if (id == oid) {
 				callb( ch );
@@ -61,10 +61,3 @@ typedef DownloadItem = {
 	var exists : Bool;
 	var state : DownloadState;
 };
-
-@:enum
-abstract DownloadState (String) {
-	var InProgress = 'in_progress';
-	var Interrupted = 'interrupted';
-	var Complete = 'complete';
-}
