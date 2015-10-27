@@ -50,8 +50,16 @@ abstract Percent (Float) from Float to Float {
 	  * Increment [this] Percent by one
 	  */
 	@:op(++A)
-	public inline function increment():Percent {
+	public inline function preincrement():Percent {
 		return ++this;
+	}
+
+	/**
+	  * Increment [this] Percent by one
+	  */
+	@:op(A++)
+	public inline function postincrement():Percent {
+		return this++;
 	}
 
 	/**
