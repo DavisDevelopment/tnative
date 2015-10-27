@@ -14,18 +14,18 @@ abstract TwoTuple<A, B> (Array<Dynamic>) {
 	  * The first item in [this] Tuple
 	  */
 	public var one(get, set):A;
-	private inline function get_one() return cast this[0];
+	private inline function get_one():A return (untyped this[0]);
 	private inline function set_one(v : A):A {
-		return cast (this[0] = v);
+		return (untyped this[0] = v);
 	}
 
 	/**
 	  * The second item in [this] Tuple
 	  */
 	public var two(get, set):B;
-	private inline function get_two() return cast this[1];
+	private inline function get_two():B return (untyped this[1]);
 	private inline function set_two(v : B):B {
-		return cast (this[1] = v);
+		return (untyped this[1] = v);
 	}
 
 /* === Implicit Casting === */
