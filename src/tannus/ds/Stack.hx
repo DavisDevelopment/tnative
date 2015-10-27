@@ -15,8 +15,8 @@ class Stack<T> {
 	/**
 	  * Look at the next item in the Stack
 	  */
-	public function peek():T {
-		return (data[ 0 ]);
+	public function peek(d:Int = 0):T {
+		return (data[ d ]);
 	}
 
 	/**
@@ -31,6 +31,13 @@ class Stack<T> {
 	  */
 	public function add(item : T):Void {
 		data.unshift( item );
+	}
+
+	/**
+	  * Copy [this] Stack
+	  */
+	public function copy():Stack<T> {
+		return new Stack(data.copy());
 	}
 
 	/**
