@@ -1,6 +1,7 @@
 package tannus.ds;
 
 import tannus.io.Ptr;
+import tannus.ds.tuples.Tup2;
 
 import haxe.macro.Expr;
 import haxe.macro.Context;
@@ -19,8 +20,7 @@ class ArrayTools {
 	}
 
 	/**
-	  * Obtain a copy of [list] with all instances of [blacklist] removed
-	  */
+	  * Obtain a copy of [list] with all instances of [blacklist] removed */
 	public static function without<T>(list:Array<T>, blacklist:Array<T>):Array<T> {
 		var c = list.copy();
 		for (v in blacklist) {
@@ -149,5 +149,67 @@ class ArrayTools {
 			res = res.concat(list.copy());
 		}
 		return res;
+	}
+
+	/**
+	  * Get the item in the given list which scored the lowest, based on the given predicate
+	  */
+	public static function min<T>(list:Iterable<T>, predicate:T -> Float):T {
+		var m:Null<Tup2<T, Float>> = null;
+		for (x in list) {
+			var score:Float = predicate( x );
+			if (m == null || score < m._1) {
+				m = new Tup2(x, score);
+			}
+		}
+		if (m == null) {
+			throw 'Error: Iterable must not be empty!';
+		}
+		return m._0;
+	}
+
+	/**
+	  * Get the item in the given list which scored the highest, based on the given predicate
+	  */
+	public static function max<T>(list:Iterable<T>, predicate:T -> Float):T {
+		var m:Null<Tup2<T, Float>> = null;
+		for (x in list) {
+			var score:Float = predicate( x );
+			if (m == null || score > m._1) {
+				m = new Tup2(x, score);
+			}
+		}
+		if (m == null) {
+			throw 'Error: Iterable must not be empty!';
+		}
+		return m._0;
+	}
+
+	/**
+	  * Get the item in the given list which scored the lowest, based on the given predicate
+	  */
+	public static function minmax<T>(list:Iterable<T>, predicate:T -> Float):{min:T, max:T} {
+		var l:Null<Tup2<T, Float>> = null;
+		var h:Null<Tup2<T, Float>> = null;
+
+		for (x in list) {
+			var score:Float = predicate( x );
+			
+			if (l == null || score < l._1) {
+				l = new Tup2(x, score);
+			}
+
+			else if (h == null || score > h._1) {
+				h = new Tup2(x, score);
+			}
+		}
+		if (l == null || h == null) {
+			throw 'Error: Iterable must not be empty!';
+		}
+		
+		return {
+			'min': l._0,
+			'max': h._0
+		};
 	}
 }
