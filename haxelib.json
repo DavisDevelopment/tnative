@@ -1,16 +1,22 @@
 {
+    "releasenote": "\n## v0.3.0 Changelog\n---\n - created `tannus.ds.ArgParser` class\n - created `tannus.http.Url` class, which parses a url String into a useful data structure\n - created `tannus.http.UrlPattern` class, which parses a url-descriptor String, and can be used to validate urls\n - created `tannus.ds.QueryString` class, which can encode/decode url-query-strings\n",
+    "url": "http://github.com/DavisDevelopment/tnative",
+    "description": "Toolbelt libary for writing Applications (command-line and graphical) in Haxe",
+    "license": "Apache",
+    "name": "tnative",
     "tags": [
         "tannus",
         "tnative",
-        "geometry"
+        "geometry",
+        "argparse",
+        "filesystem",
+        "globstar",
+        "url",
+        "urlpattern",
+        "querystring"
     ],
     "contributors": [
         "DavisDevelopment"
     ],
-    "version": "0.2.2",
-    "url": "http://github.com/DavisDevelopment/tnative",
-    "releasenote": "Added \"_\", and \"v\" fields to tannus.io.Pointer, \"position\" field to tannus.geom.Rectangle, and created new tannus.geom.Square class",
-    "license": "Apache",
-    "name": "tnative",
-    "description": "Toolbelt libary for writing Applications (command-line and graphical) in Haxe"
+    "version": "0.3.0"
 }
