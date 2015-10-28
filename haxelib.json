@@ -1,9 +1,13 @@
 {
     "releasenote": "\n## v0.3.0 Changelog\n---\n - created `tannus.ds.ArgParser` class\n - created `tannus.http.Url` class, which parses a url String into a useful data structure\n - created `tannus.http.UrlPattern` class, which parses a url-descriptor String, and can be used to validate urls\n - created `tannus.ds.QueryString` class, which can encode/decode url-query-strings\n",
     "url": "http://github.com/DavisDevelopment/tnative",
+    "name": "tnative",
     "description": "Toolbelt libary for writing Applications (command-line and graphical) in Haxe",
     "license": "Apache",
-    "name": "tnative",
+    "contributors": [
+        "DavisDevelopment"
+    ],
+    "version": "0.3.1",
     "tags": [
         "tannus",
         "tnative",
@@ -14,9 +18,5 @@
         "url",
         "urlpattern",
         "querystring"
-    ],
-    "contributors": [
-        "DavisDevelopment"
-    ],
-    "version": "0.3.0"
+    ]
 }
