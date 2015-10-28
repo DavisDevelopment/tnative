@@ -88,4 +88,10 @@ class Ellipse implements Shape {
 		height = nr.height;
 		return rect;
 	}
+
+	/* the center of [this] Ellipse */
+	public var center(get, never):Point;
+	private inline function get_center():Point {
+		return rect.center;
+	}
 }
