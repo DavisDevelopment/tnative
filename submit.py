@@ -60,7 +60,17 @@ def set_data( changes ):
     data += unpack(changes)
     json_data = pack( data )
 
-    json.dump(json_data, open('haxelib-test.json', 'w', 1), indent=4)
+    json.dump(json_data, open('haxelib.json', 'w', 1), indent=4)
+
+# ask the user a question
+def ask( q ):
+    _ask = lambda: input(q+'(y/n)')
+    while True:
+        a = _ask().lower().strip()
+        if (a in ['y', 'n']):
+            return (True if a == 'y' else False)
+        else:
+            print('answer must be "y" or "n"')
 
 # handle version-number
 def vnumber(curr, prev='0.0.0'):
@@ -106,16 +116,18 @@ def update_info():
     ntags = input('tags (currently '+(','.join(data['tags']))+'): ')
     data['tags'] = changes['tags'] = taglist(ntags, data['tags'])
 
-    logs = []
-    while True:
-        l = input('changelog entry: ')
-        if l.strip() == '':
-            break
-        else:
-            logs.append(' - ' + l.strip())
-    data['changes'] = '\n'.join( logs )
-    release_note = vimopen(release_template.format( **data ))
-    changes['releasenote'] = release_note
+    new_rnote = ask('write new releasenote?')
+    if new_rnote:
+        logs = []
+        while True:
+            l = input('changelog entry: ')
+            if l.strip() == '':
+                break
+            else:
+                logs.append(' - ' + l.strip())
+        data['changes'] = '\n'.join( logs )
+        release_note = vimopen(release_template.format( **data ))
+        changes['releasenote'] = release_note
     return changes
 
 
