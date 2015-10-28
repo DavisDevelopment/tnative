@@ -34,6 +34,12 @@ class Range<T : Float> {
 		return 'Range($min => $max)';
 	}
 
+/* === Computed Instance Fields === */
+
+	/* the 'size' of [this] Range */
+	public var size(get, never):T;
+	private inline function get_size():T return (max - min);
+
 /* === Instance Fields === */
 	public var min:T;
 	public var max:T;
