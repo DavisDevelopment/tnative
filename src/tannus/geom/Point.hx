@@ -7,10 +7,14 @@ import tannus.geom.Angle;
 import tannus.ds.Maybe;
 import tannus.ds.EitherType;
 
+import Math.*;
+
 #if python
 	import python.Tuple;
 	import python.Tuple.Tuple2;
 #end
+
+using tannus.math.TMath;
 
 abstract Point (TPoint) {
 	/* Constructor Function */
@@ -77,6 +81,35 @@ abstract Point (TPoint) {
 	}
 
 	/**
+	  * Apply a Matrix to [this] Point
+	  */
+	public inline function transform(m : Matrix):Point {
+		return m.transformPoint(clone());
+	}
+
+	/**
+	  * Rotate [this] Point by the given Angle, around the given origin
+	  */
+	public function rotate(a:Angle, ?origin:Point):Point {
+		if (origin == null)
+			origin = new Point();
+		var s:Float = sin( a.radians );
+		var c:Float = cos( a.radians );
+		var nx:Float = (c * (x-origin.x) - s * (y-origin.y));
+		var ny:Float = (s * (x-origin.x) + c * (y-origin.y));
+		return new Point(nx, ny);
+	}
+
+	/**
+	  * Copy the state of [p] onto [this]
+	  */
+	public inline function copyFrom(p : Point):Void {
+		x = p.x;
+		y = p.y;
+		z = p.z;
+	}
+
+	/**
 	  * Calculates the 'sum' of two Points
 	  */
 	@:op(A + B)
@@ -112,6 +145,20 @@ abstract Point (TPoint) {
 	@:op(A / B)
 	public inline function divideFloat(d : Float) return this.divideFloat(d);
 
+	/* multiply by a Point */
+	@:op(A * B)
+	public inline function multPoint(p : Point) return this.multPoint(p);
+	
+	/* multiply by a Float */
+	@:op(A * B)
+	public inline function multFloat(n : Float) return this.multFloat(n);
+
+	/* negate */
+	@:op( -A )
+	public inline function negate():Point {
+		return this.multFloat( -1 );
+	}
+
 	/**
 	  * Compare two Points, based on their distance from (0, 0)
 	  */
@@ -138,7 +185,6 @@ abstract Point (TPoint) {
 	/**
 	  * Calculate the Angle that exists between two Points
 	  */
-	@:op(A % B)
 	public function angleTo(other : Point):Angle {
 		var angl:Float = TMath.angleBetween(x, y, other.x, other.y);
 		return Angle.fromDegrees( angl );
@@ -300,10 +346,10 @@ abstract Point (TPoint) {
 /* Base Point Class */
 class TPoint {
 	/* Constructor Function */
-	public function new(_x:Float, _y:Float, _z:Float):Void {
-		x = _x;
-		y = _y;
-		z = _z;
+	public function new(x:Float, y:Float, z:Float):Void {
+		_x = x;
+		_y = y;
+		_z = z;
 	}
 
 /* === Instance Methods === */
@@ -322,9 +368,35 @@ class TPoint {
 		return (new Point(x/f, y/f, (z!=0?z/f:0)));
 	}
 
+	/**
+	  * Multiply by another Point
+	  */
+	public function multPoint(p : Point):Point {
+		return new Point(x*p.x, y*p.y, z*p.z);
+	}
+
+	/**
+	  * Multiply by a Float
+	  */
+	public function multFloat(n : Float):Point {
+		return (new Point(x*n, y*n, z*n));
+	}
+
+	private function get_x():Float return (_x);
+	private function get_y():Float return (_y);
+	private function get_z():Float return (_z);
+	
+	private function set_x(v:Float):Float return (_x = v);
+	private function set_y(v:Float):Float return (_y = v);
+	private function set_z(v:Float):Float return (_z = v);
+
 /* === Instance Fields === */
 
-	public var x:Float;
-	public var y:Float;
-	public var z:Float;
+	public var x(get, set):Float;
+	public var y(get, set):Float;
+	public var z(get, set):Float;
+
+	private var _x:Float;
+	private var _y:Float;
+	private var _z:Float;
 }
