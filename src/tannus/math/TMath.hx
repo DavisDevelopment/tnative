@@ -1,6 +1,7 @@
 package tannus.math;
 
 import tannus.ds.Maybe;
+import tannus.ds.FloatRange;
 
 class TMath {
 	public static inline var E = 2.718281828459045;
@@ -147,6 +148,26 @@ class TMath {
 			lowest = min(lowest, predicate(item));
 		}
 		return lowest;
+	}
+
+	#if !js @:generic #end
+	public static function minmax<T>(items:Iterable<T>, predicate:T->Float):FloatRange {
+		var res:FloatRange = new FloatRange(Math.NaN, Math.NaN);
+		for (item in items) {
+			var score = predicate(item);
+			if (res.max < score || Math.isNaN(res.max)) {
+				res.max = score;
+			}
+			else if (res.min > score || Math.isNaN(res.min)) {
+				res.min = score;
+			}
+			if (res.min > res.max) {
+				var _t = res.max;
+				res.max = res.min;
+				res.min = _t;
+			}
+		}
+		return res;
 	}
 
 	@:generic
