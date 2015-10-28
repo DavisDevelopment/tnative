@@ -168,7 +168,8 @@ class CRectangle implements Shape {
 		var self:Rectangle = cast this;
 
 		var verts = new Vertices([
-			self.topLeft, self.topRight,
+			self.topLeft,
+			self.topRight,
 			self.bottomRight, 
 			self.bottomLeft
 		]);

@@ -51,8 +51,22 @@ class Triangle implements Shape {
 		return c;
 	}
 
+	/**
+	  * Get the vertex-list for [this] Triangle
+	  */
 	public function getVertices():Vertices {
 		return lines;
+	}
+
+/* === Computed Instance Fields === */
+
+	/* the center of [this] Triangle */
+	public var center(get, never):Point;
+	private function get_center():Point {
+		var cx:Float = ((one.x + two.x + three.x) / 3);
+		var cy:Float = ((one.y + two.y + three.y) / 3);
+		var cz:Float = ((one.z + two.z + three.z) / 3);
+		return new Point(cx, cy, cz);
 	}
 
 /* === Instance Fields === */
