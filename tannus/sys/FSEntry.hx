@@ -26,6 +26,14 @@ abstract FSEntry (FSEntryType) {
 	private function get_path():Path {
 		return switchType( f.path );
 	}
+	
+	/**
+	  * The name of [this] Entry
+	  */
+	public var name(get, never):String;
+	private inline function get_name():String {
+		return (path.name);
+	}
 
 	/**
 	  * Rename [this] Entry
@@ -42,7 +50,7 @@ abstract FSEntry (FSEntryType) {
 	}
 
 	/**
-	  * Get [this] Entry, as a File, if possible
+	  * Get [this] Entry as a File, if possible
 	  */
 	@:to
 	public function file():File {
@@ -52,6 +60,20 @@ abstract FSEntry (FSEntryType) {
 
 			case Folder( d ):
 				throw 'IOError: Cannot cast a Directory to a File!';
+		}
+	}
+	
+	/**
+	  * Get [this] Entry as a Directory, if possible
+	  */
+	@:to
+	public function folder():Directory {
+		switch ( type ) {
+			case File( f ):
+				throw 'IOError: Cannot cast a File to a Directory!';
+				
+			case Folder( d ):
+				return d;
 		}
 	}
 
@@ -69,10 +91,14 @@ abstract FSEntry (FSEntryType) {
 	}
 
 	/* From String */
+	@:from
 	public static inline function fromString(s : String):FSEntry {
 		return fromPath( s );
 	}
 
+	/**
+	  * macro-method for performing actions based on the type of entry [this] is
+	  */
 	public macro function switchType(self:ExprOf<FSEntry>, f:Expr, oth:Array<Expr>) {
 		var d:Expr = oth.shift();
 		var ff:Expr = oth.shift();
