@@ -536,6 +536,13 @@ class Lexer {
 					throw 'SyntaxError: Expected identifier, got EOL';
 				}	
 			}
+
+			/**
+			  * < Symbol
+			  */
+			else if (c == '~'.code) {
+				return TTilde;
+			}
 		} 
 		
 		//- If that fails
@@ -591,7 +598,7 @@ class Lexer {
 		return ([
 			
 			'+', '-', '*', '/',
-			'=', '!', '~', '<', '>',
+			'=', '!', '<', '>',
 			'|'
 
 		].has(c.toString()));
