@@ -40,6 +40,9 @@ enum Token {
 	//- Question-Mark (?)
 	TQuestion;
 
+	//- Tilde (~)
+	TTilde;
+
 	//- Comma
 	TComma;
 	
