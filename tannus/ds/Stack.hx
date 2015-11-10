@@ -32,12 +32,59 @@ class Stack<T> {
 	public function add(item : T):Void {
 		data.unshift( item );
 	}
+	
+	/**
+	  * Add an item to the end of [this] Stack
+	  */
+	public function under(item : T):Void {
+		data.push( item );
+	}
+	
+	/**
+	  * get/remove the last item in [this] Stack
+	  */
+	public function bottom():T {
+		return data.pop();
+	}
+	
+	/**
+	  * get/set the 'next' item in [this] Stack
+	  */
+	public function next(?item : T):T {
+		if (item != null) {
+			add( item );
+		}
+		else {
+			item = pop();
+		}
+		return item;
+	}
+	
+	/**
+	  * get/set the 'last' item in [this] Stack
+	  */
+	public function last(?item : T):T {
+		if (item != null) {
+			under( item );
+		}
+		else {
+			item = bottom();
+		}
+		return item;
+	}
 
 	/**
 	  * Copy [this] Stack
 	  */
 	public function copy():Stack<T> {
 		return new Stack(data.copy());
+	}
+	
+	/**
+	  * Iterate over [this] Stack
+	  */
+	public function iterator():StackIterator<T> {
+		return new StackIterator( this );
 	}
 
 	/**
@@ -52,4 +99,21 @@ class Stack<T> {
 
 	/* the underlying Array */
 	private var data : Array<T>;
+}
+
+@:generic
+private class StackIterator<T> {
+	public function new(s : Stack<T>):Void {
+		stack = s;
+	}
+	
+	public function hasNext():Bool {
+		return ( !stack.empty );
+	}
+	
+	public function next():T {
+		return stack.pop();
+	}
+	
+	private var stack : Stack<T>;
 }
