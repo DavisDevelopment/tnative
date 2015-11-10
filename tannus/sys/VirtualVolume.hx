@@ -138,10 +138,10 @@ class VirtualVolume {
 		name = normal(name);
 		var p:Path = name;
 		if (name == '' || name == '/') {
-			return entries.filter(function(e) {
+			return entries.filter(function(e):Bool {
 				return (e.path.root);
-			}).map(function(e) {
-				return (e.path.normalize() + '');
+			}).map(function(e):String {
+				return (e.path.normalize());
 			});
 		}
 		else if (isDirectory(name)) {
