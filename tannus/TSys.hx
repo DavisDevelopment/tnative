@@ -26,6 +26,28 @@ class TSys {
 	}
 
 	/**
+	  * Prints some data to the console
+	  */
+	public static inline function print(x : Dynamic):Void {
+		#if node
+			(untyped __js__('process.stdout.write'))(Std.string( x ));
+		#else
+			NSys.print( x );
+		#end
+	}
+
+	/**
+	  * Prints some data, followed by a newline, to the console
+	  */
+	public static inline function println(x : Dynamic):Void {
+		#if node
+			print(Std.string(x) + '\n');
+		#else
+			NSys.println( x );
+		#end
+	}
+
+	/**
 	  * Gets the Path to the current executable
 	  */
 	public static inline function executablePath():Path {
