@@ -21,6 +21,12 @@ abstract Word (String) from String {
 		return new Word(this.toUpperCase());
 	}
 
+	/* convert to a String */
+	@:to
+	public inline function toString():String {
+		return this;
+	}
+
 /* === Instance Fields === */
 
 	/* check whether [this] Word is lowercase */
