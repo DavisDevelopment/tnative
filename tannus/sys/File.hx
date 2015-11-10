@@ -113,9 +113,9 @@ class CFile {
 	/**
 	  * Get an OutputStream to [this] File
 	  */
-	public function output():OutputStream {
-		return FileSystem.ostream( path );
-	}
+	//public function output():OutputStream {
+		//return FileSystem.ostream( path );
+	//}
 
 	/**
 	  * Renames [this] File
