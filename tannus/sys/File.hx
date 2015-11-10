@@ -11,6 +11,7 @@ import tannus.sys.internal.FileContent;
 import tannus.io.Byte;
 import tannus.io.ByteArray;
 import tannus.io.Ptr;
+import tannus.io.OutputStream;
 
 @:forward
 abstract File (CFile) {
@@ -107,6 +108,13 @@ class CFile {
 	  */
 	public inline function append(data : ByteArray):Void {
 		FileSystem.append(path, data);
+	}
+
+	/**
+	  * Get an OutputStream to [this] File
+	  */
+	public function output():OutputStream {
+		return FileSystem.ostream( path );
 	}
 
 	/**
