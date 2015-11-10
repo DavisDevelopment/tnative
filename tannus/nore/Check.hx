@@ -12,6 +12,9 @@ enum Check {
 	//- Verify that an Entity is of a given type
 	TypeCheck(typename : String);
 
+	//- Verify that an Entity is either of the given type, or is of a type that is descended from the given type
+	LooseTypeCheck(typename : String);
+
 	//- Check for the existence of [field]
 	FieldExistsCheck(field : String);
 
