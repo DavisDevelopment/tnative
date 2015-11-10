@@ -19,7 +19,9 @@ typedef FileSystem = tannus.sys.JavaScriptFileSystem;
 
 #else
 
-private typedef FS = sys.FileSystem;
+import haxe.io.Output;
+import tannus.io.streams.NativeOutputStream in OStream;
+import tannus.io.OutputStream;
 
 /**
   * Wrapper around the Haxe STD's sys.FileSystem class (or, in Node's case the 'fs' module)
@@ -87,7 +89,7 @@ class FileSystem {
 				ba.append(i.asint);
 			}
 
-			var f:Dynamic = python.Syntax.pythonCode('open(path, "wb")');
+			var f:Dynamic = python.Syntax.pythonCode('open(path, "w+")');
 			f.write(ba);
 			f.close();
 		#else
@@ -152,6 +154,19 @@ class FileSystem {
 	}
 
 	/**
+	  * Create a writable Stream to a File
+	  */
+	public static function ostream(path : String):OutputStream {
+		// create a new FileOutput to [path]
+		var file_out:Output = F.write( path );
+		// wrap [file_out] in a tannus.io.streams.NativeOutputStream object
+		var nos:OStream = new OStream( file_out );
+		// wrap [nos] in a tannus.io.OutputStream object
+		var out:OutputStream = new OutputStream( nos );
+		return out;
+	}
+
+	/**
 	  * Moves the given path to a new one
 	  */
 	public static function rename(oldpath:String, newpath:String):Void {
@@ -179,9 +194,9 @@ class FileSystem {
 	}
 }
 
-	#if !python
-		private typedef F = sys.io.File;
-	#end
+private typedef FS = sys.FileSystem;
+private typedef F = sys.io.File;
+
 #end
 
 private typedef IStream = Dynamic;
