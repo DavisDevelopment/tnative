@@ -137,7 +137,7 @@ abstract Directory (Path) from Path {
 	  */
 	public var entries(get, never):Array<FSEntry>;
 	private function get_entries():Array<FSEntry> {
-		var rnames:Array<Path> = FileSystem.readDirectory(this);
+		var rnames:Array<Path> = [for (s in FileSystem.readDirectory(this)) new Path(s)];
 		var elist:Array<FSEntry> = new Array();
 		for (i in 0...rnames.length) {
 			rnames[i].directory = this;
