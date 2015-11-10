@@ -166,6 +166,23 @@ class Parser {
 				case Token.TIdent(typename), Token.TString(typename):
 					return Check.TypeCheck( typename );
 
+				//- <[String|Identifier] Type Verification
+				case Token.TTilde:
+					// get the next Check
+					var nxt:Null<Token> = token();
+					if (nxt == null) {
+						throw 'SyntaxError: Unexpected end of input!';
+					}
+					else {
+						switch ( nxt ) {
+							case TIdent(name), TString(name):
+								return LooseTypeCheck( name );
+
+							default:
+								throw 'SyntaxError: Unexpected $nxt!';
+						}
+					}
+
 				//- Field Value Checking
 				case Token.TOBracket:
 					var nodes:Array<Token> = new Array();
