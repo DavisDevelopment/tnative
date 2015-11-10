@@ -1,6 +1,9 @@
 package tannus.sys.node;
 
 import tannus.io.ByteArray;
+import tannus.node.WritableStream;
+import tannus.io.streams.NodeOutputStream;
+import tannus.io.OutputStream;
 import tannus.sys.FileStat;
 
 import tannus.sys.FileStreamOptions in Fso;
@@ -46,6 +49,18 @@ class NodeFileSystem {
 	/* create a readable stream from a File */
 	public static function istream(path:String, opts:Fso):FileReadStream {
 		return new FileReadStream(path, opts);
+	}
+
+	/* create a writable stream to a File */
+	public static function ostream(path : String):OutputStream {
+		// create a new fs.WritableStream to [path]
+		var node_wstream:WritableStream = NFS.createWriteStream( path );
+		// wrap it in a tannus.io.streams.NodeOutputStream object
+		var nos:NodeOutputStream = new NodeOutputStream( node_wstream );
+		// wrap that in a tannus.io.OutputStream object
+		var out:OutputStream = new OutputStream( nos );
+		// return that
+		return out;
 	}
 
 	public static function deleteFile(path : String):Void {
