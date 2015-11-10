@@ -68,7 +68,7 @@ class WritableStream<T> {
 	/**
 	  * Flush the Buffer
 	  */
-	public function flush():Void {
+	public function flush(?done : Void->Void):Void {
 		for (d in _buf) {
 			writeEvent.call( d );
 		}
