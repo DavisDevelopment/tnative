@@ -73,6 +73,15 @@ private class CPath {
         return P.normalize(toString());
     }
     
+    /* make [this] Path absolute */
+    public function absolutize():Path {
+        var spath:String = (toString() + '');
+        if (!spath.startsWith('/'))
+            spath = ('/' + spath);
+        trace( spath );
+        return new Path( spath );
+    }
+    
     /* expand [this] Path */
     public inline function expand():Path {
         return _expand( this );
@@ -97,6 +106,47 @@ private class CPath {
         
         //- placeholder return, so the compiler doesn't complain
         return new Path('');
+    }
+    
+    /* create a relative Path from [this] to [other] */
+    public function relative(other : Path):Path {
+        if (absolute && other.absolute) {
+            var a:Array<String> = pieces;
+            var b:Array<String> = other.pieces;
+            // pieces to keep
+            var keep:Array<String> = new Array();
+            // number of pieces to delete
+            var diffs:Int = 0;
+            // pieces to add
+            var additions:Array<String> = new Array();
+            var diffhit:Bool = false;
+            
+            for (i in 0...a.length) {
+                var mine:String = a[i];
+                var yurs:Null<String> = b[i];
+                if (mine != yurs) {
+                    diffhit = true;
+                }
+                
+                if ( !diffhit ) {
+                    keep.push( mine );
+                }
+                else {
+                    diffs++;
+                    if (yurs != null) {
+                        additions.push( yurs );
+                    }
+                }
+            }
+            
+            var respieces:Array<String> = (['..'].times(diffs).concat(additions));
+            
+            return join( respieces );
+        }
+        else {
+            err('Both Paths must be absolute!');
+        }
+        return '';
     }
     
 /* === Computed Instance Fields === */
