@@ -5,6 +5,9 @@ import tannus.nore.Value;
 import tannus.internal.TypeTools;
 import tannus.io.Signal;
 
+using Lambda;
+using tannus.ds.ArrayTools;
+
 /**
   * Class to compile a List of Check instances to "checker functions"
   */
@@ -355,6 +358,10 @@ class Compiler <T> {
 			case Check.TypeCheck( typename ):
 				return type_check(typename).bind(_);
 
+			//- Loosely Check the Type
+			case Check.LooseTypeCheck( typename ):
+				return loose_type_check(typename).bind(_);
+
 			//- Check that [field] exists
 			case Check.FieldExistsCheck( field ):
 				return field_exists_check(field).bind(_);
@@ -594,6 +601,16 @@ class Compiler <T> {
 	public dynamic function type_check <T> (typename : String):CheckFunction<T> {
 		return function(o : T):Bool {
 			return (TypeTools.typename(o) == typename);
+		};
+	}
+
+	/**
+	  * Checks whether the type of [o] either matches [typename], or is a child of [typename]
+	  */
+	public dynamic function loose_type_check<T>(name : String):CheckFunction<T> {
+		return function(o : T):Bool {
+			var h:Array<String> = TypeTools.hierarchy( o );
+			return (h.has( name ));
 		};
 	}
 
