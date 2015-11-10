@@ -147,4 +147,18 @@ class TypeTools {
 
 		return hierarchy;
 	}
+
+	/**
+	  * Get the type-hierarchy of the type of [o]
+	  */
+	public static function hierarchy(o : Dynamic):Array<String> {
+		if (Reflect.isObject( o )) {
+			var klass:Null<Class<Dynamic>> = Type.getClass( o );
+			if (klass != null) {
+				return getClassHierarchy( klass );
+			}
+		}
+		
+		return [];
+	}
 }
