@@ -3,6 +3,8 @@ package tannus.sys;
 import haxe.io.Path in P;
 
 import tannus.io.ByteArray;
+import tannus.sys.Mimes;
+import tannus.sys.Mime;
 
 using StringTools;
 using Lambda;
@@ -37,6 +39,12 @@ abstract Path (CPath) from CPath to CPath {
     @:from
     public static inline function fromString(s : String):Path {
         return new Path( s );
+    }
+    
+    /* to ByteArray */
+    @:to
+    public inline function toByteArray():ByteArray {
+    	return ByteArray.fromString(toString());
     }
     
     /* from ByteArray */
@@ -146,6 +154,17 @@ private class CPath {
     private function set_extension(v : String):String {
         s = (s.beforeLast('.') + '.$v');
         return extension;
+    }
+    
+    /* the Mime-Type (based on [extension]) of [this] Path */
+    public var mime(get, never):Null<Mime>;
+    private function get_mime():Null<Mime> {
+    	if (!extension.empty()) {
+	    	return new Mime(Mimes.getMimeType(extension));
+    	}
+    	else {
+    		return null;
+    	}
     }
     
     /* whether [this] is the root directory */
