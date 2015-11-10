@@ -94,6 +94,19 @@ class StringUtils {
 		}
 		else return s;
 	}
+	
+	/**
+	  * get all text of [s] that occurs BEFORE that last instance of [del],
+	  * or all of [s] if [del] is absent
+	  */
+	public static function beforeLast(s:String, del:String):String {
+		if (has(s, del)) {
+			return (s.substring(0, s.lastIndexOf(del)));
+		}
+		else {
+			return s;
+		}
+	}
 
 	/**
 	  * Get all text of [s] that occurs AFTER [del], or all of [s] if [del] is absent
@@ -102,6 +115,18 @@ class StringUtils {
 		if (has(s, del))
 			return s.substring(s.indexOf(del)+1);
 		else return s;
+	}
+	
+	/**
+	  * get all text of [s] that occurs AFTER the last instance of [del]
+	  */
+	public static function afterLast(s:String, del:String):String {
+		if (has(s, del)) {
+			return (s.substring(s.lastIndexOf(del) + 1));
+		}
+		else {
+			return '';
+		}
 	}
 
 	/**
