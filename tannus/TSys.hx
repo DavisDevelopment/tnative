@@ -4,6 +4,8 @@ import tannus.sys.Path;
 import tannus.io.Ptr;
 import tannus.io.ByteArray;
 
+import tannus.ds.Object;
+
 import tannus.internal.NSys;
 import tannus.Platform;
 
@@ -56,11 +58,24 @@ class TSys {
 			NSys.setCwd(_n);
 		#end
 	}
+	
+	/**
+	  * Get a Map of all environment variables
+	  */
+	public static function environment():Map<String, String> {
+		#if node
+			var node_env:Object = new Object(untyped __js__('process.env'));
+			var result:Map<String, String> = cast node_env.toMap();
+			return result;
+		#else
+			return NSys.environment();
+		#end
+	}
 
 	/**
 	  * Get the value of a particular environment variable
 	  */
-	public static inline function getEnv(vn : String):String {
+	public static function getEnv(vn : String):String {
 		var _vn:String = vn;
 		#if node
 			return Std.string(untyped __js__('process.env[_vn]'));
@@ -72,7 +87,7 @@ class TSys {
 	/**
 	  * Set the value of an environment variable
 	  */
-	public static inline function putEnv(n:String, v:String):Void {
+	public static function putEnv(n:String, v:String):Void {
 		var _n:String = n, _v:String = v;
 		#if node
 			untyped __js__('process.env[_n] = _v');
