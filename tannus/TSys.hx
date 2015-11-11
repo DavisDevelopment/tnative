@@ -51,7 +51,9 @@ class TSys {
 	  * Gets the Path to the current executable
 	  */
 	public static inline function executablePath():Path {
-		#if node
+		#if node_webkit
+			return Std.string(untyped __js__('process.execPath'));
+		#elseif node	
 			return Std.string(untyped __js__('__filename'));
 		#else
 			return NSys.executablePath();
@@ -136,7 +138,7 @@ class TSys {
 	  * Get the temp-file directory
 	  */
 	public static inline function tempDir():Path {
-		return '~/tmp/';
+		return (getEnv('HOME')+'/tmp/');
 	}
 }
 
