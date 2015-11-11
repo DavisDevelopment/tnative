@@ -62,6 +62,20 @@ abstract FSEntry (FSEntryType) {
 				throw 'IOError: Cannot cast a Directory to a File!';
 		}
 	}
+
+	/**
+	  * Check if [this] Entry is a File
+	  */
+	public inline function isFile():Bool {
+		return switchType(f, d, true, false);
+	}
+
+	/**
+	  * Check if [this] Entry is a Folder
+	  */
+	public inline function isDirectory():Bool {
+		return switchType(f, d, false, true);
+	}
 	
 	/**
 	  * Get [this] Entry as a Directory, if possible
