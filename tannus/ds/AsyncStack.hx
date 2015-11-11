@@ -41,25 +41,13 @@ class AsyncStack extends Stack<Async> {
 			callNext();
 		}
 	}
-	
-	private var completion : VoidSignal;
-}
-
-class OldAsyncStack {
-	/* Constructor Function */
-	public function new():Void {
-		funcs = new Array();
-
-		complete = new Signal();
-	}
-
-/* === Instance Methods === */
 
 	/**
+	  * [for backwards compatibility]
 	  * Add a Callback to the Stack
 	  */
-	public inline function push(f : Callback):Void {
-		funcs.push( f );
+	public inline function push(f : Async):Void {
+		under( f );
 	}
 
 	/**
@@ -82,6 +70,21 @@ class OldAsyncStack {
 			});
 		};
 	}
+	
+	private var completion : VoidSignal;
+}
+
+class OldAsyncStack {
+	/* Constructor Function */
+	public function new():Void {
+		funcs = new Array();
+
+		complete = new Signal();
+	}
+
+/* === Instance Methods === */
+
+
 
 	/**
 	  * Calls the Func at index [i], if it exists
