@@ -40,6 +40,27 @@ class NodeFileSystem {
 		return ByteArray.fromNodeBuffer(buf);
 	}
 
+	public static function copy(src:Path, dest:Path, cb:Null<Dynamic>->Void):Void {
+		var cbCalled:Bool = false;
+		function done(?err : Dynamic):Void {
+			if (!cbCalled) {
+				cbCalled = true;
+				cb( err );
+			}
+		}
+		
+		var rd = NFS.createReadStream(src, {});
+		rd.on('error', untyped done.bind(_));
+
+		var wr = NFS.createWriteStream(dest, {});
+		wr.on('error', untyped done.bind(_));
+
+		wr.on('close', function() {
+			done();
+		});
+		rd.pipe( wr );
+	}
+
 	public static function append(path:String, data:ByteArray):Void {
 		var c:ByteArray = read(path);
 		c = c.concat( data );

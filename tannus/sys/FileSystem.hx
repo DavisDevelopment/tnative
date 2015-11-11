@@ -174,6 +174,19 @@ class FileSystem {
 	}
 
 	/**
+	  * Copies [src] to [target]
+	  */
+	public static function copy(src:String, target:String, cb:Null<Dynamic>->Void):Void {
+		try {
+			var inp = F.copy(src, target);
+			cb();
+		}
+		catch (err : Dynamic) {
+			cb( err );
+		}
+	}
+
+	/**
 	  * Deletes the given file
 	  */
 	public static inline function deleteFile(path : String):Void {
