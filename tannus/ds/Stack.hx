@@ -91,7 +91,7 @@ class Stack<T> {
 	  * Test whether [this] Stack is empty
 	  */
 	public var empty(get, never):Bool;
-	private inline function get_empty():Bool {
+	private function get_empty():Bool {
 		return (data.length == 0);
 	}
 
