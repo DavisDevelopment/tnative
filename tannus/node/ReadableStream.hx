@@ -16,7 +16,7 @@ extern class ReadableStream extends EventEmitter {
 
 	function isPaused():Bool;
 
-	function pipe(dest:WritableStream, opts:{end:Bool}):Void;
+	function pipe(dest:WritableStream, ?opts:{end:Bool}):Void;
 
 	function unpipe(?dest : WritableStream):Void;
 
