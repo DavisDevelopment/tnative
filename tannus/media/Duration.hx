@@ -17,6 +17,10 @@ abstract Duration (Dur) {
 
 /* === Instance Methods === */
 
+	/**
+	  * Convert [this] Duration into a nice, sexy String
+	  */
+	@:to
 	public function toString():String {
 		var bits:Array<String> = new Array();
 		if (hours > 0) {
@@ -112,6 +116,28 @@ abstract Duration (Dur) {
 	public var seconds(get, set):Int;
 	private inline function get_seconds() return this.seconds;
 	private inline function set_seconds(ns) return (this.seconds = ns);
+
+/* === Static Methods === */
+
+	/**
+	  * Cast to Duration from Int
+	  */
+	@:from
+	public static function fromSecondsI(i : Int):Duration {
+		var d:Duration = new Duration();
+		d.totalSeconds = i;
+		return d;
+	}
+
+	/**
+	  * From Float
+	  */
+	@:from
+	public static function fromSecondsF(i : Float):Duration {
+		var d:Duration = new Duration();
+		d.totalSeconds = Math.floor( i );
+		return d;
+	}
 }
 
 /**
