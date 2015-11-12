@@ -13,8 +13,13 @@ abstract Delta<T> (Tup2<T, Null<T>>) {
 	  * Convert to a String
 	  */
 	@:to
-	public inline function toString():String {
-		return ('Delta($previous -> $current)');
+	public function toString():String {
+		var res:String = 'Delta(';
+		if (previous != null) {
+			res += 'from $previous ';
+		}
+		res += 'to $current)';
+		return res;
 	}
 
 /* === Instance Fields === */
