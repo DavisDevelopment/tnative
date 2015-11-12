@@ -3,7 +3,7 @@ package tannus.ds;
 /**
   * Stack
   */
-@:generic
+// @:generic
 class Stack<T> {
 	/* Constructor Function */
 	public function new(?dat:Array<T>):Void {
@@ -101,7 +101,6 @@ class Stack<T> {
 	private var data : Array<T>;
 }
 
-@:generic
 private class StackIterator<T> {
 	public function new(s : Stack<T>):Void {
 		stack = s;
