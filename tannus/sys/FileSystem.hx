@@ -178,8 +178,8 @@ class FileSystem {
 	  */
 	public static function copy(src:String, target:String, cb:Null<Dynamic>->Void):Void {
 		try {
-			var inp = F.copy(src, target);
-			cb();
+			F.copy(src, target);
+			cb( null );
 		}
 		catch (err : Dynamic) {
 			cb( err );
