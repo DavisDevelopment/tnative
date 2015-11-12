@@ -85,6 +85,18 @@ class CRectangle implements Shape {
 	}
 
 	/**
+	  * Copies data from [other] onto [this]
+	  */
+	public function cloneFrom(other : Rectangle):Void {
+		x = other.x;
+		y = other.y;
+		z = other.z;
+		width = other.width;
+		height = other.height;
+		depth = other.depth;
+	}
+
+	/**
 	  * Whether [other] Rectangle is equal to [this] one
 	  */
 	public function equals(other : Rectangle):Bool {
