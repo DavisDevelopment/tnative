@@ -77,9 +77,18 @@ class Elem {
 		return res;
 	}
 
+	/* find all children of [this] with a tag of [name] */
+	public function find(name : String):Array<Elem> {
+		var res = new Array();
+		for (e in children)
+			if (e.tag == name)
+				res.push( e );
+		return res;
+	}
+
 	/* Find all Elements with a [tag] of [name] */
 	public function findByName(name : String):Array<Elem> {
-		return query(function(e) return (e.tag == name));
+		return query(function(e) return (e.tag.toLowerCase() == name.toLowerCase()));
 	}
 
 	/* Find all Elems whose [key] attribute equals [val] */
