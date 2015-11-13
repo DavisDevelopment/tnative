@@ -6,7 +6,10 @@ import tannus.ds.tuples.Tup2;
 import haxe.macro.Expr;
 import haxe.macro.Context;
 
+using haxe.macro.ExprTools;
+
 using Lambda;
+
 class ArrayTools {
 	/**
 	  * Obtain an Array of Pointers from an Array of values
@@ -109,6 +112,8 @@ class ArrayTools {
 	  * Macro-Licious Array.map
 	  */
 	public static macro function macmap<T, O>(set:ExprOf<Array<T>>, extractor:ExprOf<O>):ExprOf<Array<O>> {
+		extractor = extractor.map(mapper.bind('item', _));
+
 		return macro $set.map(function( item ) {
 			return $extractor;
 		});
@@ -212,4 +217,30 @@ class ArrayTools {
 			'max': h._0
 		};
 	}
+
+	#if macro
+
+	/**
+	  * Map the shit
+	  */
+	public static function mapper(name:String, e:Expr):Expr {
+		var mappr = mapper.bind(name, _);
+		switch ( e.expr ) {
+			/* == remap (_) to the given name == */
+			case EConst(CIdent('_')):
+				return parse( name );
+
+			default:
+				return e.map( mappr );
+		}
+	}
+
+	/**
+	  * convert a haxe code String into an Expression
+	  */
+	private static function parse(s : String):Expr {
+		return Context.parse(s, Context.currentPos());
+	}
+
+	#end
 }
