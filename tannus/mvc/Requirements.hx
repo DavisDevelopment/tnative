@@ -1,7 +1,6 @@
 package tannus.mvc;
 
 import tannus.io.VoidSignal;
-import tannus.mvc.Requirement;
 
 import tannus.ds.Async;
 import tannus.ds.AsyncStack;
