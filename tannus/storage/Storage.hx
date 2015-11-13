@@ -98,7 +98,6 @@ class Storage {
 			*/
 			var rv = remote.get( key );
 			var lv = local.get( key );
-			trace('GET: [$rv, $lv]');
 
 			switch ([rv, lv]) {
 				/* == exists locally, but not remotely == */
@@ -150,9 +149,8 @@ class Storage {
 			}
 
 			local[key] = value;
-			//trace([local[key], get(key)]);
 			
-			return value; //(untyped local.set(key, value));
+			return value;
 		}
 
 		else {
@@ -199,6 +197,13 @@ class Storage {
 	public function reference<T>(key : String):Ptr<T> {
 		var ref:Ptr<Dynamic> = new Ptr(get.bind(key), set.bind(key, _), remove.bind(key));
 		return (untyped ref);
+	}
+
+	/**
+	  * Get an Array of all keys
+	  */
+	public function keys():Array<String> {
+		return (remote.keyArray().concat(local.keyArray()).unique());
 	}
 
 /* === Backend Instance Methods === */
