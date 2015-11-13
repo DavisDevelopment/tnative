@@ -64,6 +64,12 @@ abstract Pointer<T> (Ref<T>) from Ref<T> {
 	private inline function get__() return value;
 	private inline function set__(v) return (value = v);
 
+	/**
+	  * Whether [this] points to a NULL value
+	  */
+	public var exists(get, never):Bool;
+	private inline function get_exists():Bool return (get() != null);
+
 /* === Instance Methods === */
 
 	/**
