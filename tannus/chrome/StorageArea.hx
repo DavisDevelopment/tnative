@@ -1,6 +1,7 @@
 package tannus.chrome;
 
 import tannus.ds.Object;
+import tannus.ds.Delta;
 import tannus.ds.Maybe;
 import tannus.chrome.Storage;
 
@@ -16,13 +17,17 @@ abstract StorageArea (CStorageArea) from CStorageArea {
 	/**
 	  * Register a Listener for any change occurring on [this] Area
 	  */
-	public inline function onChange(cb : Object->Void):Void {
+	public inline function onChange(cb : StorageChange -> Void):Void {
 		Storage.onChange(function(area, changes) {
-			if (area == 'local' && this == Storage.local) {
-				cb( changes );
-			}
-			else if (area == 'sync' && this == Storage.sync) {
-				cb( changes );
+			switch ( area ) {
+				case 'local' if (this == Storage.local):
+					cb( changes );
+
+				case 'sync' if (this == Storage.sync):
+					cb( changes );
+
+				default:
+					null;
 			}
 		});
 	}
@@ -30,12 +35,30 @@ abstract StorageArea (CStorageArea) from CStorageArea {
 	/**
 	  * Register a Listener for changes on a specific item in [this] Area
 	  */
-	public inline function onChangeField(key:String, cb:Object->Void):Void {
-		onChange(function(changes) {
-			if (changes.exists(key)) {
-				cb(changes[key]);
+	public inline function onChangeField<T:Dynamic>(key:String, cb:Delta<T> -> Void):Void {
+		onChange(function( changes ) {
+			/* when [key] is one of the fields that was changed */
+			if (changes.exists( key )) {
+				var d:Delta<Dynamic> = changes.get( key );
+				cb(untyped d);
 			}
 		});
+	}
+
+	/**
+	  * Watch the given field
+	  */
+	public function watch<T>(key:String, cb:Delta<T> -> Void):Void {
+		onChangeField(key, function(change) {
+			trace( change );
+		});
+	}
+
+	/**
+	  * Watch the whole area
+	  */
+	public function watchAll(cb : StorageChange -> Void):Void {
+		onChange( cb );
 	}
 }
 
