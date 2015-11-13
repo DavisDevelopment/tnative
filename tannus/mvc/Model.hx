@@ -1,6 +1,7 @@
 package tannus.mvc;
 
 import tannus.storage.Storage;
+import tannus.storage.Commit;
 
 import tannus.ds.Async;
 import tannus.ds.Delta;
@@ -99,6 +100,9 @@ class Model extends EventDispatcher implements Asset {
 	public function sync(done : Void->Void):Void {
 		storage.push( done );
 	}
+	public function save():Void {
+		sync(function() null);
+	}
 
 	/**
 	  * Get the value of an attribute of [this] Model
@@ -133,6 +137,28 @@ class Model extends EventDispatcher implements Asset {
 		return had;
 	}
 	public inline function remove(key : String):Bool return removeAttribute( key );
+
+	/**
+	  * Listen for changes to [this]'s attributes
+	  */
+	public function watch(cb : Commit -> Void):Void {
+		storage.watch( cb );
+	}
+
+	/**
+	  * Listen for activity on a particular field
+	  */
+	public function watchKey(key:String, cb:Void -> Void):Void {
+		watch(function(com : Commit):Void {
+			switch ( com ) {
+				case Create(k, _), Delete(k), Change(k, _, _) if (k == key):
+					cb();
+
+				default:
+					null;
+			}
+		});
+	}
 
 	/**
 	  * Modify storage-keys
