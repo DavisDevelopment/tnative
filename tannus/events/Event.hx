@@ -11,6 +11,7 @@ class Event {
 	/* Constructor Function */
 	public function new(variety:String, bubbls:Bool=false):Void {
 		type = variety;
+		date = (Date.now().getTime());
 		_bubbles = bubbls;
 		_defaultPrevented = false;
 
@@ -53,6 +54,9 @@ class Event {
 
 	//- The type of Event [this] is
 	public var type:String;
+
+	//- The datetime of when [this] Event happened
+	public var date:Float;
 
 	//- Whether [this] Event bubbles
 	private var _bubbles:Bool;
