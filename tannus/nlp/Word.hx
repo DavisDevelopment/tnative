@@ -21,6 +21,11 @@ abstract Word (String) from String {
 		return new Word(this.toUpperCase());
 	}
 
+	/* capitalize [this] Word */
+	public inline function capitalize():Word {
+		return new Word(this.capitalize());
+	}
+
 	/* convert to a String */
 	@:to
 	public inline function toString():String {
