@@ -95,6 +95,13 @@ class Words {
 		return new Words(data.union(other.data));
 	}
 
+	/**
+	  * Join all words with [sep]
+	  */
+	public function join(sep : String):String {
+		return (data.join( sep ));
+	}
+
 /* === Instance Fields === */
 
 	private var data : Array<Word>;
