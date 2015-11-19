@@ -43,6 +43,27 @@ class FileSystem {
 	}
 
 	/**
+	  * Obtain a restorable id for an Entry
+	  */
+	public static inline function retainEntry(entry : WebFSEntry):String {
+		return lib.retainEntry( entry );
+	}
+
+	/**
+	  * Restore an Entry from an id
+	  */
+	public static inline function restoreEntry(id:String, cb:WebFSEntry->Void):Void {
+		lib.restoreEntry(id, cb);
+	}
+
+	/**
+	  * Check whether a given entry-id is restorable
+	  */
+	public static inline function isRestorable(id:String, cb:Bool->Void):Void {
+		lib.isRestorable(id, cb);
+	}
+
+	/**
 	  * Get a Directory from the User
 	  */
 	public static function chooseDirectory():Promise<Dir> {
