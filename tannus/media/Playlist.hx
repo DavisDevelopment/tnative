@@ -107,6 +107,12 @@ class Playlist {
 		return null;
 	}
 
+/* === Computed Instance Fields === */
+
+	/* the number of tracks in [this] Playlist */
+	public var length(get, never):Int;
+	private inline function get_length():Int return tracks.length;
+
 /* === Instance Fields === */
 
 	/* Title of [this] Playlist */
