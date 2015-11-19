@@ -1,25 +1,33 @@
 package tannus.ds;
 
 @:callable
-abstract Async (TAsync) from TAsync to TAsync {
-    /* Constructor Function */
-    public inline function new(f : TAsync):Void {
-        this = f;
-    }
-    
-/* === Type Casting Methods === */
+abstract Async (TAsync0) from TAsync0 to TAsync0 {
+	/* Constructor Function */
+	public inline function new(f : TAsync0):Void {
+		this = f;
+	}
 
-    /* from Task */
-    @:from
-    public static inline function fromTask(t : Task):Async {
-        return new Async(t.toAsync());
-    }
-    
-    /* to Task */
-    @:to
-    public inline function toTask():Task {
-        return new AsyncTask(cast this);
-    }
+	/* === Type Casting Methods === */
+
+	/* from Task */
+	@:from
+	public static inline function fromTask(t : Task):Async {
+		return new Async(t.toAsync());
+	}
+
+	/* to Task */
+	@:to
+	public inline function toTask():Task {
+		return new AsyncTask(cast this);
+	}
+}
+
+@:callable
+abstract Async1<T> (TAsync1<T>) from TAsync1<T> to TAsync1<T> {
+	/* Constructor Function */
+	public inline function new(f : TAsync1<T>):Void {
+		this = f;
+	}
 }
 
 private class AsyncTask extends Task {
@@ -35,5 +43,8 @@ private class AsyncTask extends Task {
     private var f : Async;
 }
 
-private typedef TAsync = AsyncComplete -> Void;
-private typedef AsyncComplete = Void -> Void;
+private typedef TAsync0 = AsyncComplete0 -> Void;
+private typedef TAsync1<T> = AsyncComplete1<T> -> Void;
+
+private typedef AsyncComplete0 = Void -> Void;
+private typedef AsyncComplete1<T> = T -> Void;
