@@ -8,13 +8,37 @@ import tannus.math.TMath;
 
 import tannus.ds.TwoTuple;
 
-/**
-  * Abstract Class to represent the velocity of an entity
-  */
-abstract Velocity (TwoTuple<Float, Angle>) {
+@:forward
+abstract Velocity (CVelocity) from CVelocity to CVelocity {
 	/* Constructor Function */
 	public inline function new(speed:Float, angle:Angle):Void {
-		this = new TwoTuple(speed, angle);
+		this = new CVelocity(speed, angle);
+	}
+
+/* === Instance Methods === */
+
+
+	@:op( !A )
+	public inline function invert():Velocity return this.invert();
+
+	@:op(A + B)
+	public inline function plus(other : Velocity):Velocity return this.plus( other );
+
+	@:op(A - B)
+	public inline function minus(other : Velocity):Velocity return this.minus( other );
+
+	@:to
+	public inline function toPoint():Point return this.vector;
+
+	@:from
+	public static inline function fromPoint(p : Point):Velocity return CVelocity.fromPoint( p );
+}
+
+class CVelocity {
+	/* Constructor Function */
+	public function new(speed:Float, angle:Angle):Void {
+		this.speed = speed;
+		this.angle = angle;
 	}
 
 /* === Instance Methods === */
@@ -24,56 +48,41 @@ abstract Velocity (TwoTuple<Float, Angle>) {
 	  */
 	private function setVector(vx:Float, vy:Float):Void {
 		var e:Point = new Point(vx, vy);
-		var l:Line = new Line([0, 0], e);
+		var l:Line = new Line(new Point(), e);
 
 		speed = l.length;
 		angle = TMath.angleBetween(0.0, 0.0, e.x, e.y);
 	}
 
 	/**
-	  * Create and return a copy of [this] Velocity
+	  * Create and return a clone of [this] Velocity
 	  */
-	public inline function clone():Velocity {
+	public function clone():Velocity {
 		return new Velocity(speed, angle);
 	}
 
 	/**
-	  * Create and return an inverted copy of [this] Velocity
+	  * Invert [this] Velocity
 	  */
-	@:op( !A )
-	public inline function inverted():Velocity {
-		return Velocity.fromVector(x * -1, y * -1);
+	public function invert():Velocity {
+		return cast fromVector(-x, -y);
 	}
 
 	/**
-	  * Return the sum of [this] and [that]
+	  * Obtain the sum of [this] Velocity and another
 	  */
-	@:op(A + B)
-	public function plus(that : Velocity):Velocity {
-		var vec:Point = (vector + that.vector);
-		return Velocity.fromVector(vec.x, vec.y);
+	public function plus(other : Velocity):Velocity {
+		return fromPoint(vector + other.vector);
 	}
 
 	/**
-	  * Return the difference between [this] and [that]
+	  * Obtain the difference between [this] Velocity and another
 	  */
-	@:op(A - B)
-	public function minus(that : Velocity):Velocity {
-		var vec:Point = (vector - that.vector);
-		return Velocity.fromVector(vec.x, vec.y);
+	public function minus(other : Velocity):Velocity {
+		return fromPoint(vector - other.vector);
 	}
 
-/* === Instance Fields === */
-
-	/* Speed of Movement */
-	public var speed(get, set):Float;
-	private inline function get_speed() return this.one;
-	private inline function set_speed(ns) return (this.one = ns);
-
-	/* Angle of Movement */
-	public var angle(get, set):Angle;
-	private inline function get_angle() return this.two;
-	private inline function set_angle(ns) return (this.two = ns);
+/* === Computed Instance Fields === */
 
 	/* Movement along the 'x' axis */
 	public var x(get, set):Float;
@@ -95,22 +104,36 @@ abstract Velocity (TwoTuple<Float, Angle>) {
 		return ny;
 	}
 
-	/* Movement represented as a Point */
+	/* Movement, represented as a Point */
 	public var vector(get, set):Point;
-	private inline function get_vector() return new Point(x, y);
-	private function set_vector(nv : Point):Point {
-		setVector(nv.x, nv.y);
+	private function get_vector():Point {
 		return new Point(x, y);
 	}
+	private function set_vector(v : Point):Point {
+		setVector(v.x, v.y);
+		return vector;
+	}
 
-/* === Class Methods === */
+/* === Instance Fields === */
+
+	public var speed : Float;
+	public var angle : Angle;
+
+/* === Static Methods === */
 
 	/**
-	  * Create a new Velocity instance from x,y vector
+	  * Create Velocity from Point
 	  */
-	public static function fromVector(x:Float, y:Float):Velocity {
-		var v = new Velocity(0, 0);
-		v.vector = new Point(x, y);
-		return v;
+	public static function fromVector(x:Float, y:Float):CVelocity {
+		return fromPoint(new Point(x, y));
+	}
+
+	/**
+	  * Create Velocity from Point
+	  */
+	public static function fromPoint(p : Point):Velocity {
+		var vel = new Velocity(0, 0);
+		vel.vector = p;
+		return vel;
 	}
 }
