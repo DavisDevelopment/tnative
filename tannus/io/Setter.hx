@@ -2,6 +2,8 @@ package tannus.io;
 
 import haxe.macro.Expr;
 
+using tannus.macro.MacroTools;
+
 @:callable
 abstract Setter<T> (Set<T>) from Set<T> {
 	/* Constructor Function */
@@ -59,6 +61,18 @@ abstract Setter<T> (Set<T>) from Set<T> {
 	@:op(A &= B)
 	public inline function set(v : T):T {
 		return (this( v ));
+	}
+
+	/**
+	  * Transform [this] Setter, macro-style
+	  */
+	public macro function map<O>(self:ExprOf<Setter<T>>, f:Expr):ExprOf<Setter<O>> {
+		var tfunc:Expr = f.mapUnderscoreTo('o');
+		tfunc = (macro function( o ) {
+			$self.set( $tfunc );
+			return o;
+		});
+		return macro new tannus.io.Setter( $tfunc );
 	}
 
 /* === Class Methods === */
