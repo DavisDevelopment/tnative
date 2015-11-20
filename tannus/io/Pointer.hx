@@ -9,6 +9,8 @@ import tannus.ds.tuples.Tup2;
 
 import haxe.macro.Expr;
 
+using tannus.macro.MacroTools;
+
 @:generic
 abstract Pointer<T> (Ref<T>) from Ref<T> {
 	/* Constructor Function */
@@ -147,9 +149,20 @@ abstract Pointer<T> (Ref<T>) from Ref<T> {
 	}
 
 	/**
+	  * Apply a transformation to [this] Pointer, macro-style
+	  */
+	public macro function transform<O>(self:ExprOf<Pointer<T>>, mget:Expr, mset:Expr):ExprOf<Pointer<O>> {
+		var fget:Expr = mget.mapUnderscoreTo('_oval');
+		var fset:Expr = mset.mapUnderscoreTo('_oval');
+		fget = macro (function(_oval) return $fget);
+		fset = macro (function(_oval) return $fset);
+		return (macro $self._transform($fget, $fset));
+	}
+
+	/**
 	  * Apply a transformation to [this] Pointer
 	  */
-	public function transform<O>(mget:T->O, mset:O->T):Pointer<O> {
+	public function _transform<O>(mget:T->O, mset:O->T):Pointer<O> {
 		return new Pointer(getter.transform(mget), setter.transform(mset));
 	}
 
