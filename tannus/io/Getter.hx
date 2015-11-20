@@ -2,6 +2,8 @@ package tannus.io;
 
 import haxe.macro.Expr;
 
+using tannus.macro.MacroTools;
+
 @:callable
 abstract Getter<T> (Get<T>) from Get<T> {
 	/* Constructor Function */
@@ -34,6 +36,15 @@ abstract Getter<T> (Get<T>) from Get<T> {
 	  */
 	public function transform<O>(f : T->O):Getter<O> {
 		return create(f(get()));
+	}
+
+	/**
+	  * macro-transform [this] Getter
+	  */
+	public macro function map<O>(self:ExprOf<Getter<T>>, trans:Expr):ExprOf<Getter<O>> {
+		var tfunc:Expr = trans.mapUnderscoreTo('v');
+		tfunc = macro (function(v) return $tfunc);
+		return (macro $self.transform( $tfunc ));
 	}
 
 /* === Class Methods === */
