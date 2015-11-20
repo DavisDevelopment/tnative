@@ -9,6 +9,8 @@ import haxe.macro.Context;
 using haxe.macro.ExprTools;
 #end
 
+using tannus.macro.MacroTools;
+
 @:forward
 abstract Value<T> (CVal<T>) from CVal<T> {
 	/* Constructor Function */
@@ -27,26 +29,17 @@ abstract Value<T> (CVal<T>) from CVal<T> {
 	public inline function toString():String return Std.string(get());
 
 	/* modify [this] Value macroliciously */
-	public macro function mod(seff:Expr, action:Expr) {
-		return CVal.mod(seff, action);
+	public macro function mod(self:ExprOf<Value<T>>, action:Expr) {
+		action = action.mapUnderscoreTo('v');
+		action = (macro function(v) return ($action));
+		return (macro $self.modify( $action ));
 	}
 
-	/* transform [this] Value */
-	/*
-	public macro function transform<V>(seff:Expr, action:Expr):ExprOf<Value<V>> {
-		function mapper(e : Expr) {
-			switch (e.expr) {
-				case EConst(CIdent('_')):
-					return macro __val;
-
-				default:
-					return e.map(mapper);
-			}
-		}
-		action = action.map(mapper);
-		return macro ($seff.transform(function(__val) return $action));
+	/* transform [this] Value macroliciously */
+	public macro function map<O>(self:ExprOf<Value<T>>, trans:Expr):ExprOf<Value<O>> {
+		var egettr:ExprOf<Getter<O>> = (macro $self.base.map($trans));
+		return (macro new tannus.ds.Value( $egettr ));
 	}
-	*/
 
 /* === Static Methods === */
 
@@ -77,29 +70,6 @@ private class CVal<T> {
 	public function transform<V>(t : T->V):CVal<V> {
 		return new CVal((new Getter(get)).transform(t));
 	}
-
-#if macro
-	/**
-	  * Add a modifier to [this] Value by macro
-	  */
-	public static function mod(self:Expr, action:Expr):Expr {
-		function mapper(e : Expr):Expr {
-			switch (e.expr) {
-				case ExprDef.EConst(CIdent('_')):
-					return macro __val;
-
-				default:
-					return e.map(mapper);
-			}
-		}
-		var act:Expr = action.map( mapper );
-		return macro {
-			$self.modify(function(__val) {
-				return $act;
-			});
-		};
-	}
-#end
 
 	/**
 	  * Get the modified base-value
