@@ -7,6 +7,7 @@ import haxe.macro.Expr;
 import haxe.macro.Context;
 
 using haxe.macro.ExprTools;
+using tannus.macro.MacroTools;
 
 using Lambda;
 
@@ -117,6 +118,16 @@ class ArrayTools {
 		return macro $set.map(function( item ) {
 			return $extractor;
 		});
+	}
+
+	/**
+	  * Macro-licious Array.filter
+	  */
+	public static macro function macfilter<T>(set:ExprOf<Array<T>>, test:Expr):ExprOf<Array<T>> {
+		test = test.mapUnderscoreTo('item');
+		test = (macro function(item) return $test);
+		
+		return (macro $set.filter( $test ));
 	}
 
 	/**
