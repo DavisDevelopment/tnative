@@ -22,7 +22,7 @@ abstract WebFileWriter (FileWriter) from FileWriter {
 	/**
 	  * Write some data to the File
 	  */
-	public inline function write(data:ByteArray, ?cb:Null<Dynamic>->Void):Void {
+	public function write(data:ByteArray, ?cb:Null<Dynamic>->Void):Void {
 		if (cb == null)
 			cb = (function(x) null);
 		this.onwriteend = function(event) {
