@@ -20,7 +20,18 @@ abstract Percent (Float) from Float to Float {
 	private inline function get_value() return this;
 	private inline function set_value(nv:Float) return (this = nv);
 
+	/* [this] as a Float, not a Percent */
+	public var delta(get, set):Float;
+	private inline function get_delta():Float return (this / 100);
+	private inline function set_delta(v : Float):Float return (this = (v * 100));
+
 /* === Instance Methods === */
+
+	/* convert to Float */
+	@:to
+	public inline function toDelta():Float {
+		return delta;
+	}
 
 	/**
 	  * The complement (or inverse) of [this] Percent
@@ -73,14 +84,21 @@ abstract Percent (Float) from Float to Float {
 	/**
 	  * Get [this] Percent "of" another number
 	  */
-	public macro function of(p:ExprOf<Percent>, other) {
+	public macro function of(p:ExprOf<Percent>, other:ExprOf<Float>):ExprOf<Float> {
 		return macro ($other * ($p.value / 100));
 	}
 
+	/**
+	  * Calculate a Percent from the relationship between [what] and [of]
+	  */
 	public static function percent(what:Float, of:Float):Percent {
 		return new Percent((what/of) * 100);
 	}
 
+	/**
+	  * Convert [this] Percent to a human-readable String
+	  */
+	@:to
 	public inline function toString():String {
 		return ('$value%');
 	}
