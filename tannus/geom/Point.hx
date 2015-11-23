@@ -86,19 +86,14 @@ abstract Point (TPoint) {
 		return m.transformPoint(this.clone());
 	}
 
-	/**
-	  * Calculates the 'sum' of two Points
-	  */
-	@:op(A + B)
-	public inline function plusPoint(other : Point):Point return this.plusPoint( other );
-
-	/**
-	  * the sum of [this] and [n]
-	  */
-	@:op(A + B)
-	public inline function plusFloat(n : Float):Point return this.plusFloat( n );
-	@:op(A + B)
-	public inline function plusInt(n : Int):Point return this.plusFloat( n );
+	/*
+	   ==============
+	   ==== NOTE ====
+	   ==============
+	   when overloading the augmented-assignment operators (+=, -=, /=, *=, etc.)
+	   the augmented-assignment method must appear BEFORE the method for it's accompanying 
+	   operator in the type-definition
+	*/
 
 	/**
 	  * Increment [this] Point by another
@@ -115,6 +110,29 @@ abstract Point (TPoint) {
 	public inline function moveByInt(n : Int):Point return this.moveByFloat( n );
 
 	/**
+	  * Calculates the 'sum' of two Points
+	  */
+	@:op(A + B)
+	public inline function plusPoint(other : Point):Point return this.plusPoint( other );
+
+	/**
+	  * the sum of [this] and [n]
+	  */
+	@:op(A + B)
+	public inline function plusFloat(n : Float):Point return this.plusFloat( n );
+	@:op(A + B)
+	public inline function plusInt(n : Int):Point return this.plusFloat( n );
+
+
+	/**
+	  * Decrement [this] by [other]
+	  */
+	@:op(A -= B)
+	public inline function iminusPoint(p : Point):Point return this.iminusPoint(p);
+	@:op(A -= B)
+	public inline function iminusFloat(n : Float):Point return this.iminusFloat(n);
+
+	/**
 	  * Calculate the difference between two points
 	  */
 	@:op(A - B)
@@ -127,14 +145,6 @@ abstract Point (TPoint) {
 	public inline function minusFloat(n : Float):Point return this.minusFloat( n );
 	@:op(A - B)
 	public inline function minusInt(n : Int):Point return this.minusFloat( n );
-
-	/**
-	  * Decrement [this] by [other]
-	  */
-	@:op(A -= B)
-	public inline function iminusPoint(p : Point):Point return this.iminusPoint(p);
-	@:op(A -= B)
-	public inline function iminusFloat(n : Float):Point return this.iminusFloat(n);
 
 	/**
 	  * Divide a Point
@@ -476,6 +486,17 @@ class TPoint {
 	  */
 	public function clamped():Point {
 		return new Point(i(x), i(y), i(z));
+	}
+
+	/**
+	  * Perform linear interpolation on [this] Point
+	  */
+	public function lerp(other:Point, weight:Float):Point {
+		return new Point(
+			TMath.lerp(x, other.x, weight),
+			TMath.lerp(y, other.y, weight),
+			TMath.lerp(z, other.z, weight)
+		);
 	}
 
 	/**
