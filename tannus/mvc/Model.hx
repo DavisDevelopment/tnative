@@ -121,6 +121,14 @@ class Model extends EventDispatcher implements Asset {
 	public inline function set<T>(key:String, value:T):T return setAttribute(key, value);
 
 	/**
+	  * Get a Pointer to an attribute of [this] Model
+	  */
+	public function attribute<T>(key : String):Ptr<T> {
+		var ref:Ptr<Dynamic> = new Ptr(getAttribute.bind(key), setAttribute.bind(key, _));
+		return (untyped ref);
+	}
+
+	/**
 	  * Check whether [this] Model has an attribute with the given name
 	  */
 	public function hasAttribute(name : String):Bool {
