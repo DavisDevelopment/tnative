@@ -89,7 +89,7 @@ class FileSystem {
 				ba.append(i.asint);
 			}
 
-			var f:Dynamic = python.Syntax.pythonCode('open(path, "w+")');
+			var f:Dynamic = python.Syntax.pythonCode('open(path, "wb+")');
 			f.write(ba);
 			f.close();
 		#else
