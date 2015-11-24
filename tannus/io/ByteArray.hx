@@ -173,6 +173,13 @@ abstract ByteArray (Array<Byte>) {
 	}
 
 	/**
+	  * Convert [this] to a ByteStack
+	  */
+	public inline function stack():ByteStack {
+		return new ByteStack(self);
+	}
+
+	/**
 	  * Write a Float to [this] ByteArray
 	  */
 	public inline function writeFloat(f : Float):Void {
