@@ -142,4 +142,20 @@ class StringUtils {
 	public static inline function empty(s : String):Bool {
 		return (s.length == 0);
 	}
+
+	/**
+	  * Repeat a String [count] times
+	  */
+	public static function times(s:String, count:Int):String {
+		if (count == 0) {
+			return '';
+		}
+		else {
+			var res:String = s;
+			for (i in 0...(--count)) {
+				res += s;
+			}
+			return res;
+		}
+	}
 }
