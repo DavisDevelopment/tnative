@@ -22,4 +22,11 @@ class ByteStack extends Stack<Byte> {
 		}
 		return res;
 	}
+
+	/**
+	  * Get a clone of [this]
+	  */
+	override public function copy():Stack<Byte> {
+		return cast new ByteStack( this.data );
+	}
 }
