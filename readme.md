@@ -13,6 +13,12 @@ but I plan to write a `graphics` package which will at least target JavaScript a
 
 ### Features / Done
 
+- Create Url type (`tannus.http.Url`) for extracting and manipulating data from url Strings
+- Create UrlPattern type (`tannus.http.UrlPattern`) for describing/validating Urls
+- Create GlobStar type (`tannus.sys.GlobStar`) for validating Paths
+- Create QueryString type (`tannus.ds.QueryString`) for encoding/decoding http query strings
+- Create Mime type (`tannus.sys.Mime`) for working with MIME-type Strings
+- Create Mimes class (`tannus.sys.Mimes`) for getting MIME-types from extension-names and vice verse
 - Unify FileSystem access across _*all*_ relevant targets
   + FileSystem class - `tannus.sys.FileSystem`
   + File type - `tannus.sys.File`
