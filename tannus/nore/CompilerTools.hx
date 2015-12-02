@@ -7,7 +7,7 @@ using Lambda;
 using tannus.ds.ArrayTools;
 using tannus.nore.ValueTools;
 
-@:access( nore.Compiler )
+@:access( tannus.nore.Compiler )
 class CompilerTools {
 	/* Constructor Function */
 	public function new(owner : Compiler):Void {
@@ -46,7 +46,7 @@ class CompilerTools {
 	  * Perform a helper-check
 	  */
 	public function helper_check(o:Object, name:String, vargs:Array<Value>):Bool {
-		var args:Array<Dynamic> = vargs.macmap(_.haxeValue(this, o).get());
+		var args:Array<Dynamic> = [for (v in vargs) v.haxeValue(this, o).get()];
 		if (c.helpers.exists( name )) {
 			var help = c.helpers.get( name );
 			return help(o, args);

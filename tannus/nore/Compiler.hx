@@ -3,7 +3,7 @@ package tannus.nore;
 import tannus.ds.Stack;
 import tannus.internal.TypeTools in Tt;
 
-import nore.Check;
+import tannus.nore.Check;
 
 import Std.*;
 

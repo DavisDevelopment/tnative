@@ -94,7 +94,7 @@ class Parser {
 
 			/* == Helper Checks == */
 			case THelper(name, argTokens):
-				var args:Array<Value> = argTokens.macmap(_.toValue());
+				var args:Array<Value> = [for (t in argTokens) t.toValue()];
 				return HelperCheck(name, args);
 
 			/* == OR Checks == */
