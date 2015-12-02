@@ -3,6 +3,8 @@ package tannus.io;
 import haxe.macro.Expr;
 import haxe.macro.Context;
 
+using tannus.ds.StringUtils;
+
 /**
   * Abstract class which allows an Integer to behave as both an integer, and a single-character String, simultaneously
   */
@@ -116,7 +118,7 @@ abstract Byte (Int) from Int to Int {
 	  * Equality Testing - Int
 	  */
 	@:op(A == B)
-	public function equalsi(other : Int):Bool {
+	public inline function equalsi(other : Int):Bool {
 		return (this == other);
 	}
 	
@@ -124,7 +126,7 @@ abstract Byte (Int) from Int to Int {
 	  * Equality Testing - String
 	  */
 	@:op(A == B)
-	public function equalss(other : String):Bool {
+	public inline function equalss(other : String):Bool {
 		return (this == other.charCodeAt(0));
 	}
 
@@ -132,12 +134,8 @@ abstract Byte (Int) from Int to Int {
 	  * Repetition
 	  */
 	@:op(A * B)
-	public function repeat(times : Int):String {
-		var s:String = '';
-		while (s.length < times) {
-			s += aschar;
-		}
-		return s;
+	public inline function repeat(times : Int):String {
+		return aschar.times(times);
 	}
 
 /* === Type Casting === */
@@ -165,11 +163,7 @@ abstract Byte (Int) from Int to Int {
 
 	@:from(String)
 	public static inline function fromString(s : String):Byte {
-		var b:Byte = 0;
-		
-		b.aschar = s;
-		
-		return b;
+		return new Byte(s.charCodeAt(0));
 	}
 
 /* === Class Methods === */
