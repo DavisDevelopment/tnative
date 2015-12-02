@@ -144,14 +144,17 @@ class CRectangle implements Shape {
 	  * Whether [rect] is 'inside' [this] Rectangle
 	  */
 	public function containsRect(o : Rectangle):Bool {
-		//- For every corner of [o]
-		for (p in o.corners) {
-			//- Check whether [this] contains that corner
-			if (containsPoint(p)) {
-				return true;
-			}
+		if (containsPoint(o.center)) {
+			return true;
 		}
-		return false;
+		else {
+			for (p in o.corners) {
+				if (containsPoint( p )) {
+					return true;
+				}
+			}
+			return false;
+		}
 	}
 
 	/**
