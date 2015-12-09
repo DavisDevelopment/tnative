@@ -64,8 +64,8 @@ class MouseEvent extends Event {
 		var pos:Point = new Point(event.pageX, event.pageY);
 		var result = new MouseEvent(event.type, pos, event.which, mods);
 		
-		result.onDefaultPrevented.once(function(x) event.preventDefault());
-		result.onPropogationStopped.once(function(x) event.stopPropagation());
+		result.onDefaultPrevented.once( event.preventDefault );
+		result.onPropogationStopped.once( event.stopPropagation );
 
 		return result;
 	}
