@@ -133,7 +133,7 @@ class TMath {
 	}
 
 	#if !js @:generic #end
-	public static inline function largest <T> (items:Iterable<T>, predicate:T -> Float):Float {
+	public static function largest<T>(items:Iterable<T>, predicate:T -> Float):Float {
 		var highest:Float = 0;
 		for (item in items) {
 			highest = max(highest, predicate(item));
@@ -142,12 +142,44 @@ class TMath {
 	}
 
 	#if !js @:generic #end
-	public static inline function smallest <T> (items:Iterable<T>, predicate:T -> Float):Float {
+	public static function smallest<T>(items:Iterable<T>, predicate:T -> Float):Float {
 		var lowest:Float = 0;
 		for (item in items) {
 			lowest = min(lowest, predicate(item));
 		}
 		return lowest;
+	}
+
+	/**
+	  * using [predicate] to 'score' each value in [items], return the value which scored the highest
+	  */
+	public static function largestItem<T>(items:Iterable<T>, predicate:T->Float):Null<T> {
+		var asarr = Lambda.array(items);
+		if (asarr.length == 0)
+			return null;
+		else if (asarr.length == 1)
+			return asarr[0];
+		else if (asarr.length == 2) {
+			var px = predicate(asarr[0]);
+			var py = predicate(asarr[1]);
+			if (px >= py)
+				return asarr[0];
+			else 
+				return asarr[1];
+		}
+		else {
+			var best:Null<{item:T, score:Float}> = null;
+			for (item in items) {
+				var score = predicate( item );
+				if (best == null || score > best.score) {
+					best = {
+						'item' : item,
+						'score': score
+					};
+				}
+			}
+			return best.item;
+		}
 	}
 
 	#if !js @:generic #end
