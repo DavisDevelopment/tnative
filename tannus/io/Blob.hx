@@ -49,7 +49,7 @@ class CBlob {
 	public function new(nam:String, ?mime:Maybe<String>, ?dat:Maybe<ByteArray>):Void {
 		name = nam;
 		type = mime || 'text/plain';
-		data = dat || new ByteArray();
+		data = dat || ByteArray.alloc(0);
 	}
 
 /* === Instance Methods === */
@@ -67,7 +67,7 @@ class CBlob {
 	  * Retrieve the DataURL of [this] Blob
 	  */
 	public function toDataURL():String {
-		return data.toDataURI(type);
+		return data.toDataUrl(type);
 	}
 
 
