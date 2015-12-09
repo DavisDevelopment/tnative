@@ -8,7 +8,7 @@ import tannus.ds.Maybe;
 class Writer {
 	/* Constructor Function */
 	public function new():Void {
-		buffer = new ByteArray();
+		buffer = ByteArray.alloc( 0 );
 	}
 
 /* === Instance Methods === */
