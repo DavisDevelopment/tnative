@@ -90,4 +90,16 @@ class Triangle implements Shape {
 
 		return la;
 	}
+
+	/**
+	  * The three Points that make up [this] Triangle, as an Array
+	  */
+	public var points(get, set):Array<Point>;
+	private inline function get_points():Array<Point> return [one, two, three];
+	private function set_points(v : Array<Point>):Array<Point> {
+		one = v[0];
+		two = v[1];
+		three = v[2];
+		return points;
+	}
 }
