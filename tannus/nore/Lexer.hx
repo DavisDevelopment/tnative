@@ -65,7 +65,7 @@ class Lexer {
 		}
 
 		/* == identifiers == */
-		else if (c.isLetter()) {
+		else if (c.isLetter() || c == '_'.code) {
 			var id:String = c;
 			advance();
 			while (!end && isIdent(next())) {
