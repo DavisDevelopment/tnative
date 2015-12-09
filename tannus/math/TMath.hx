@@ -2,6 +2,9 @@ package tannus.math;
 
 import tannus.ds.Maybe;
 import tannus.ds.FloatRange;
+import haxe.Int64;
+
+import Math.*;
 
 class TMath {
 	public static inline var E = 2.718281828459045;
@@ -218,5 +221,67 @@ class TMath {
 	  */
 	public static function standardDeviation(data : Array<Float>):Float {
 		return Math.sqrt(sampleVariance( data ));
+	}
+
+	/**
+	  * Convert 32bit integer to a floating-point value
+	  */
+	public static function i32ToFloat(i : Int):Float {
+		var sign = (1 - ((i >>> 31) << 1));
+		var exp = ((i >>> 23) & 0xFF);
+		var sig = (i & 0x7FFFFF);
+		if( sig == 0 && exp == 0 )
+			return 0.0;
+		return (sign * (1 + Math.pow(2, -23)*sig) * Math.pow(2, (exp - 127)));
+	}
+
+	/**
+	  * Convert a floating-point value to a 32bit integer
+	  */
+	public static function floatToI32(f : Float):Int {
+		if(f == 0)
+			return 0;
+		var af = (f < 0 ? -f : f);
+		var exp = floor(log( af ) / LN2);
+		if (exp < -127)
+			exp = -127 
+		else if( exp > 128 ) 
+			exp = 128;
+		var sig = (round((af / pow(2, exp) - 1) * 0x800000) & 0x7FFFFF);
+		return ((f < 0 ? 0x80000000 : 0) | ((exp + 127) << 23) | sig);
+	}
+
+	/**
+	  * Convert a 64bit integer to a Double
+	  */
+	public static function i64ToDouble(low:Int, high:Int):Float {
+		var sign = 1 - ((high >>> 31) << 1);
+		var exp = ((high >> 20) & 0x7FF) - 1023;
+		var sig = (high&0xFFFFF) * 4294967296. + (low>>>31) * 2147483648. + (low&0x7FFFFFFF);
+		if( sig == 0 && exp == -1023 )
+			return 0.0;
+		return sign*(1.0 + pow(2, -52)*sig) * pow(2, exp);
+	}
+
+	/**
+	  * Convert a Double to a 64bit integer
+	  */
+	@:access( haxe.Int64 )
+	public static function doubleToI64(v : Float):Int64 {
+		var i64:Int64 = Int64.ofInt( 0 );
+		if( v == 0 ) {
+			i64.set_low(0);
+			i64.set_high(0);
+		}
+		else {
+			var av = (v < 0 ? -v : v);
+			var exp = floor(log( av ) / LN2);
+			var sig = fround(((av / pow(2, exp)) - 1) * 4503599627370496.);
+			var sig_l = Std.int( sig );
+			var sig_h = Std.int(sig / 4294967296.0);
+			i64.set_low( sig_l );
+			i64.set_high((v < 0 ? 0x80000000 : 0) | ((exp + 1023) << 20) | sig_h);
+		}
+		return i64;
 	}
 }
