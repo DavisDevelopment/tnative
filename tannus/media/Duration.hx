@@ -2,6 +2,9 @@ package tannus.media;
 
 import tannus.ds.ThreeTuple;
 
+using StringTools;
+using tannus.ds.StringUtils;
+
 /**
   * Abstract class to represent to duration of some playable media (sound, video, slideshow, etc)
   */
@@ -23,14 +26,16 @@ abstract Duration (Dur) {
 	@:to
 	public function toString():String {
 		var bits:Array<String> = new Array();
-		if (hours > 0) {
-			bits.push('${hours}hr');
-		}
-		if (minutes > 0)
-			bits.push('${minutes}min');
-		if (seconds > 0)
-			bits.push('${seconds}sec');
-		return bits.join(' ');
+		bits.unshift(seconds+'');
+		bits.unshift(minutes+'');
+		if (hours > 0)
+			bits.unshift(hours+'');
+		bits = bits.map(function(s : String) {
+			if (s.length < 2)
+				s = ('0'.times(2 - s.length) + s);
+			return s;
+		});
+		return bits.join(':');
 	}
 
 	/**
