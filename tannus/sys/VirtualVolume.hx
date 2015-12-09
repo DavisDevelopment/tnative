@@ -254,11 +254,9 @@ class VirtualVolume {
 			bits.push(e.serialize());
 		}
 
-		var data:ByteArray = new ByteArray();
-
 		Serializer.USE_CACHE = true;
 		Serializer.USE_ENUM_INDEX = true;
-		data.write(Serializer.run( bits ));
+		var data:ByteArray = ByteArray.ofString(Serializer.run( bits ));
 		
 		return data;
 	}
