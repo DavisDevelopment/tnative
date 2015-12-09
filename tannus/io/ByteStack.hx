@@ -13,6 +13,17 @@ class ByteStack extends Stack<Byte> {
 /* === Instance Methods === */
 
 	/**
+	  * Read the next [dis] bytes
+	  */
+	public function read(dis : Int):ByteArray {
+		var data = new ByteArray();
+		for (i in 0...dis) {
+			data.push(pop());
+		}
+		return data;
+	}
+
+	/**
 	  * Read until the first instance of [delimiter]
 	  */
 	public function readUntil(delimiter : Byte):ByteArray {
@@ -21,6 +32,17 @@ class ByteStack extends Stack<Byte> {
 			res.push(pop());
 		}
 		return res;
+	}
+
+	/**
+	  * Peek ahead the next [dis] bytes
+	  */
+	public function peekAhead(dis : Int):ByteArray {
+		var data:ByteArray = new ByteArray();
+		for (i in 1...(dis + 1)) {
+			data.push(peek( i ));
+		}
+		return data;
 	}
 
 	/**
