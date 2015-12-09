@@ -84,6 +84,9 @@ abstract Color (TColor) from TColor to TColor {
 	/* From Int */
 	/* BUG -- Unfortunately, this method cannot handle alpha, and I don't know of an elegant workaround to this as of now */
 	@:from
+	public static inline function fromInt(color : Int):Color {
+		return new Color((color >> 16 & 0xFF), (color >> 8 & 0xFF), (color & 0xFF));
+	}
 
 
 	/**
@@ -138,7 +141,7 @@ private class TColor {
 			(red == other.red) &&
 			(green == other.green) &&
 			(blue == other.blue) &&
-			(alpha == other.alpha)
+			((alpha != null) ? alpha == other.alpha : true)
 		);
 	}
 
