@@ -1,11 +1,10 @@
 package tannus.sys.node;
 
 import tannus.io.ByteArray;
+import tannus.io.ByteArray.BinaryImpl;
 import tannus.sys.FileStat;
 
-import tannus.sys.FileStreamOptions in Fso;
-import tannus.sys.FileReadStream;
-
+#if (js && node)
 class NodeFileSystem {
 	public static inline function exists(path : String):Bool {
 		return NFS.existsSync(path);
@@ -29,23 +28,18 @@ class NodeFileSystem {
 	}
 
 	public static function write(path:String, data:ByteArray):Void {
-		NFS.writeFileSync(path, data.toNodeBuffer());
+		NFS.writeFileSync(path, cast(data, tannus.io.impl.JavaScriptBinary).toBuffer());
 	}
-
+	
 	public static function read(path:String, ?length:Int):ByteArray {
 		var buf = NFS.readFileSync(path);
-		return ByteArray.fromNodeBuffer(buf);
+		return BinaryImpl.fromBuffer( buf );
 	}
 
 	public static function append(path:String, data:ByteArray):Void {
 		var c:ByteArray = read(path);
 		c = c.concat( data );
 		write(path, c);
-	}
-
-	/* create a readable stream from a File */
-	public static function istream(path:String, opts:Fso):FileReadStream {
-		return new FileReadStream(path, opts);
 	}
 
 	public static function deleteFile(path : String):Void {
@@ -106,3 +100,4 @@ class NodeFileSystem {
 }
 
 private typedef NFS = tannus.sys.node.NodeFSModule;
+#end
