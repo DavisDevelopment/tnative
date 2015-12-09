@@ -18,6 +18,7 @@ extern class IncomingMessage extends ReadableStream {
 	var rawHeaders : Array<String>;
 	var trailers : Object;
 	var rawTrailers : Array<String>;
+	var statusCode : Int;
 
 	var method : Null<String>;
 	var url : Null<Path>;

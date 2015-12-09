@@ -32,10 +32,11 @@ class Writer extends tannus.format.Writer {
 	}
 
 	/* Generate TrackList */
-	private inline function genTrackList():Void {
+	private function genTrackList():Void {
 		for (t in playlist.tracks) {
-			line('#EXTINF:${t.duration},Artist - ${t.name}');
-			line(t.location);
+			line('#EXTINF:${t.duration},Artist - ${t.title}');
+			trace( t.location );
+			line( t.location );
 		}
 	}
 

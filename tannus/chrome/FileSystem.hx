@@ -6,6 +6,7 @@ import tannus.html.fs.WebDirectoryEntry in Dir;
 import tannus.sys.Path;
 
 import tannus.ds.Promise;
+import tannus.ds.promises.*;
 
 import Std.is;
 
@@ -40,6 +41,38 @@ class FileSystem {
 			all = tannus.ds.ArrayTools.flatten(_all);
 			cb( all );
 		});
+	}
+
+	/**
+	  * Obtain a restorable id for an Entry
+	  */
+	public static inline function retainEntry(entry : WebFSEntry):String {
+		return lib.retainEntry( entry );
+	}
+
+	/**
+	  * Restore an Entry from an id
+	  */
+	public static inline function restoreEntry(id:String, cb:WebFSEntry->Void):Void {
+		lib.restoreEntry(id, cb);
+	}
+
+	/**
+	  * Check whether a given entry-id is restorable
+	  */
+	public static inline function isRestorable(id:String, cb:Bool->Void):Void {
+		lib.isRestorable(id, cb);
+	}
+
+	/**
+	  * Check whether a given entry is restorable
+	  */
+	public static function canRestore(id : String):BoolPromise {
+		return Promise.create({
+			isRestorable(id, function(status : Bool) {
+				return status;
+			});
+		}).bool();
 	}
 
 	/**

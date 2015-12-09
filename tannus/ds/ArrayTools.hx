@@ -6,7 +6,11 @@ import tannus.ds.tuples.Tup2;
 import haxe.macro.Expr;
 import haxe.macro.Context;
 
+using haxe.macro.ExprTools;
+using tannus.macro.MacroTools;
+
 using Lambda;
+
 class ArrayTools {
 	/**
 	  * Obtain an Array of Pointers from an Array of values
@@ -51,9 +55,10 @@ class ArrayTools {
 	/**
 	  * Perform [action] on every item in the list
 	  */
-	public static macro function each<T>(list:ExprOf<Iterable<T>>, name, action) {
+	public static macro function each<T>(list:ExprOf<Iterable<T>>, action:Expr):Expr {
+		action = action.mapUnderscoreTo( 'item' );
 		return macro {
-			for ($name in $list) {
+			for (item in $list) {
 				$action;
 			}
 		};
@@ -109,9 +114,21 @@ class ArrayTools {
 	  * Macro-Licious Array.map
 	  */
 	public static macro function macmap<T, O>(set:ExprOf<Array<T>>, extractor:ExprOf<O>):ExprOf<Array<O>> {
+		extractor = extractor.map(mapper.bind('item', _));
+
 		return macro $set.map(function( item ) {
 			return $extractor;
 		});
+	}
+
+	/**
+	  * Macro-licious Array.filter
+	  */
+	public static macro function macfilter<T>(set:ExprOf<Array<T>>, test:Expr):ExprOf<Array<T>> {
+		test = test.mapUnderscoreTo('item');
+		test = (macro function(item) return $test);
+		
+		return (macro $set.filter( $test ));
 	}
 
 	/**
@@ -212,4 +229,46 @@ class ArrayTools {
 			'max': h._0
 		};
 	}
+
+	/**
+	  * Perform a split-filter operation on the given Array, which splits an Array in to Arrays,
+	  * one filled with those items that 'passed' the test, and the other
+	  * filled with those who 'failed'
+	  */
+	public static function splitfilter<T>(list:Array<T>, pred:T->Bool):{pass:Array<T>, fail:Array<T>} {
+		var res = {
+			'pass': new Array(),
+			'fail': new Array()
+		};
+		for (item in list) {
+			(pred(item) ? res.pass : res.fail).push( item );
+		}
+		return res;
+	}
+
+	#if macro
+
+	/**
+	  * Map the shit
+	  */
+	public static function mapper(name:String, e:Expr):Expr {
+		var mappr = mapper.bind(name, _);
+		switch ( e.expr ) {
+			/* == remap (_) to the given name == */
+			case EConst(CIdent('_')):
+				return parse( name );
+
+			default:
+				return e.map( mappr );
+		}
+	}
+
+	/**
+	  * convert a haxe code String into an Expression
+	  */
+	private static function parse(s : String):Expr {
+		return Context.parse(s, Context.currentPos());
+	}
+
+	#end
 }

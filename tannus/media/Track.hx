@@ -7,21 +7,27 @@ import tannus.media.Duration;
 class Track {
 	/* Constructor Function */
 	public function new(nam:String, loc:String):Void {
-		id = Memory.uniqueIdString('track-');
+		id = Memory.allocRandomId( 12 );
 		index = -1;
 		duration = new Duration();
-		name = nam;
+		title = nam;
 		location = loc;
-		meta = {};
+		meta = new Map();
 	}
 
 /* === Instance Methods === */
 
+	/**
+	  * Dispose of [this] Track
+	  */
+	public function dispose():Void {
+		Memory.freeRandomId( id );
+	}
 
 /* === Instance Fields === */
 
 	/* The Name of [this] Track */
-	public var name : String;
+	public var title : String;
 
 	/* The Unique ID of [this] Track */
 	public var id : String;
@@ -36,5 +42,5 @@ class Track {
 	public var location : String;
 
 	/* Metadata associated with [this] Track */
-	public var meta : Object;
+	public var meta : Map<String, Dynamic>;
 }

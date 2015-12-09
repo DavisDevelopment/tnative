@@ -44,7 +44,6 @@ class CRef<T> {
 	  */
 	public function get():T {
 		if (_value == null) {
-			trace('first get');
 			return (_value = getter.get());
 		}
 		else {

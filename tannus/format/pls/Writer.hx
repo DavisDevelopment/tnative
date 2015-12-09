@@ -40,7 +40,7 @@ class Writer extends tannus.format.Writer {
 		var i:Int = 1;
 
 		for (t in playlist.tracks) {
-			w('Title$i= ${t.name}');
+			w('Title$i= ${t.title}');
 			newline();
 
 			w('File$i=${t.location}');

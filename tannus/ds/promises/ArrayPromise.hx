@@ -1,9 +1,14 @@
 package tannus.ds.promises;
 
 import tannus.ds.Promise;
+import tannus.ds.Promise.PromiseFunction;
 
 using Lambda;
 class ArrayPromise<T> extends Promise<Array<T>> {
+	/* Constructor Function */
+	public function new(f : PromiseFunction<Array<T>>):Void {
+		super( f );
+	}
 	
 /* === Instance Methods === */
 
@@ -43,7 +48,7 @@ class ArrayPromise<T> extends Promise<Array<T>> {
 	  * Concatenate [this] Array onto another one
 	  */
 	public function concat(other : Array<T>):ArrayPromise<T> {
-		var res:ArrayPromise<T> = new ArrayPromise(function(res, err) {
+		var res:ArrayPromise<T> = new ArrayPromise<T>(function(res, err) {
 			then(function(list) {
 				res(list.concat(other));
 			});
@@ -118,7 +123,7 @@ class ArrayPromise<T> extends Promise<Array<T>> {
 	  * Create ArrayPromise<T> from Promise<Array<T>>
 	  */
 	public static inline function fromPrim<T>(pa : Promise<Array<T>>):ArrayPromise<T> {
-		return new ArrayPromise(function(res, err) {
+		return new ArrayPromise<T>(function(res, err) {
 			pa.then(res);
 			pa.unless(err);
 		});

@@ -1,118 +1,118 @@
 package tannus.nore;
 
-import tannus.nore.ORegEx;
-import tannus.nore.Compiler;
+import tannus.ds.Object;
 
-import tannus.ds.TwoTuple;
+using StringTools;
+using tannus.ds.StringUtils;
+using Lambda;
+using tannus.ds.ArrayTools;
 
-/**
-  * abstract class to represent a Selector String
-  */
-abstract Selector<T> (TwoTuple<String, SelectorFunction<T>>) {
+@:forward
+abstract Selector (CSelector) from CSelector to CSelector {
 	/* Constructor Function */
 	public inline function new(s : String):Void {
-
-		this = new TwoTuple(s, ORegEx.compile(s));
-	}
-
-/* === Instance Fields === */
-	
-	/**
-	  * Reference to the selector-string of [this] Selector
-	  */
-	public var selector(get, never) : String;
-	private inline function get_selector():String {
-		return (this.one);
-	}
-
-	/**
-	  * Reference to the selector-function of [this] Selector
-	  */
-	public var func(get, never) : SelectorFunction<T>;
-	private inline function get_func():SelectorFunction<T> {
-		return (this.two);
+		this = new CSelector( s );
 	}
 
 /* === Instance Methods === */
 
 	/**
-	  * Create and return a "clone" of [this] Selector
-	  */
-	public inline function clone():Selector<T> {
-		return (new Selector(selector));
-	}
-
-	/**
-	  * Validate [o] with Selector
-	  */
-	public inline function test(o : T):Bool { return (func( o )); } /** * Filter out all elements [list] which don't validate
-	  */
-	public inline function filter(list : Array<T>):Array<T> {
-		return (list.filter(func));
-	}
-
-	/**
-	  * Cast [this] Selector to a String
-	  */
-	@:to
-	public inline function toString():String {
-		return ('Selector($selector)');
-	}
-
-	/**
-	  * Cast [this] Selector to a predicate Function
-	  */
-	@:to
-	public inline function toPredicate():T->Bool {
-		return func;
-	}
-
-/* === Operators === */
-
-	/**
-	  * Create and return this inverse of [this] Selector
+	  * Invert [this]
 	  */
 	@:op( !A )
-	public inline function invert():Selector<T> {
-		return (new Selector('!($selector)'));
-	}
+	public inline function invert():Selector return this.invert();
 
-	/**
-	  * Create and return a combination of [one] and [other]
-	  */
+	/* add [this] and [other] */
 	@:op(A + B)
-	public static inline function add <T> (one:Selector<T>, other:Selector<T>):Selector<T> {
-		return (new Selector('(${one.selector})(${other.selector})'));
-	}
+	public inline function sum(other : Selector):Selector return this.sum(other);
 
-	/**
-	  * "subtract" [other] from [one]
-	  */
+	/* subtract [this] and [other] */
 	@:op(A - B)
-	public static inline function minus <T> (one:Selector<T>, other:Selector<T>):Selector<T> {
-		return (new Selector('(${one.selector}) !(${other.selector})'));
-	}
+	public inline function diff(other : Selector):Selector return this.diff(other);
 
-/* === Implicit Casting === */
-
-	@:from
-	public static inline function fromString<T>(s : String):Selector<T> {
-		return new Selector(s);
+	/**
+	  * Convert [this] to a predicate function
+	  */
+	@:to
+	public inline function toPredicate():Dynamic->Bool {
+		return this.f;
 	}
 
 	/**
-	  * Create a new Helper Function
+	  * Convert [this] to a String
 	  */
-	public static inline function helper(name:String, hf:Dynamic->Array<Dynamic>->Bool):Void {
-		Compiler.initHelpers.on(function(help) {
-			help(name, hf);
-		});
+	@:to
+	public inline function toString():String return this.toString();
+
+	/**
+	  * Create a Selector from a String implicitly
+	  */
+	@:from
+	public static inline function fromString(s : String):Selector {
+		return new Selector( s );
 	}
 }
 
+class CSelector {
+	/* Constructor Function */
+	public function new(sel : String):Void {
+		selector = sel;
+		f = ORegEx.compile( sel );
+	}
 
+/* === Instance Methods === */
 
-/**
-  * private typedef representing a SelectorFunction
-  */
-private typedef SelectorFunction<T> = T->Bool;
+	/**
+	  * Test an Object against [this] Selector
+	  */
+	public function test(o : Dynamic):Bool {
+		return f( o );
+	}
+
+	/**
+	  * Filter an Array by [this] Selector
+	  */
+	public function filter<T>(list : Array<T>):Array<T> {
+		return list.filter( f );
+	}
+
+	/**
+	  * Create and return a clone of [this]
+	  */
+	public function clone():Selector {
+		return new Selector(selector);
+	}
+
+	/**
+	  * Convert [this] to a String
+	  */
+	public function toString():String {
+		return 'Selector($selector)';
+	}
+
+	/**
+	  * Create and return the opposite of [this] Selector
+	  */
+	public function invert():Selector {
+		return new Selector('!($selector)');
+	}
+
+	/**
+	  * Create and return the sum of [this] and [other]
+	  */
+	public function sum(other : Selector):Selector {
+		return new Selector(selector + other.selector);
+	}
+
+	/**
+	  * Create and return the 'difference' between [this] and [other]
+	  */
+	public function diff(other : Selector):Selector {
+		return new Selector(selector + other.invert().selector);
+	}
+
+/* === Instance Fields === */
+
+	public var selector : String;
+	public var f : CheckFunction;
+}

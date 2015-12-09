@@ -151,7 +151,7 @@ abstract Object (Dynamic) from Dynamic to Dynamic {
 	  * Test [this] Object with an OReg
 	  */
 	public inline function is(oreg : String):Bool {
-		var sel:Selector<Dynamic> = oreg;
+		var sel:Selector = oreg;
 		return sel.test( this );
 	}
 

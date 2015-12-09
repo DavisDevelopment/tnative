@@ -1,699 +1,423 @@
 package tannus.nore;
 
-//- NewORE Imports
+import tannus.io.Byte;
+import tannus.io.ByteArray;
+import tannus.io.ByteStack;
+import tannus.ds.Stack;
+import tannus.io.Asserts.assert;
+
 import tannus.nore.Token;
 
-//- IO Imports
-import tannus.io.ByteArray;
-import tannus.io.ByteInput;
-import tannus.io.Byte;
-
-import haxe.macro.Expr;
-
-/* == Static Type-Extensions We'll Be Using == */
-using Lambda;
 using StringTools;
+using tannus.ds.StringUtils;
+using Lambda;
+using tannus.ds.ArrayTools;
 
-/**
-  * Lexer class - Performs lexical analysis on a ByteArray to create a Node Tree
-  */
 class Lexer {
+	/* Constructor Function */
 	public function new():Void {
-		
+		reset();
+		operators = new Array();
+
+		operator('=>');
+		operator('is');
 	}
-/* === Instance Fields === */
-	
-	//- The ByteInput [this] Lexer is currently reading from
-	public var source : ByteInput;
-
-	//- What [this] Lexer has lexed so far
-	public var tree : Array<Token>;
-
 
 /* === Instance Methods === */
 
 	/**
-	  * Attempt to retrieve the next token
+	  * Add an operator to [this]'s registry
 	  */
-	public function token(?last:Token):Null<Token> {
-		//- Attempt to retrieve the next Byte of input
-		try {
-			
-			var c:Byte = byte();
-			log( c );
-			
-			/**
-			  * Whitespace
-			  */
-			if (c.isWhiteSpace()) {
+	public inline function operator(op : String):Void {
+		operators.push( op );
+	}
+
+	/**
+	  * Tokenize the given String
+	  */
+	public function lex(s : String):Array<Token> {
+		reset();
+		bytes = new ByteStack(ByteArray.fromString( s ));
+
+		while ( !end ) {
+			var t:Null<Token> = lexNext();
+			if (t != null) {
+				tokens.push( t );
+			}
+		}
+
+		return tokens;
+	}
+
+	/**
+	  * Attempt to tokenize the next Token
+	  */
+	private function lexNext():Null<Token> {
+		var c:Byte = next();
+
+		/* == whitespace == */
+		if (c.isWhiteSpace()) {
+			advance();
+			if ( !end )
+				return lexNext();
+			else
 				return null;
+		}
+
+		/* == identifiers == */
+		else if (c.isLetter() || c == '_'.code) {
+			var id:String = c;
+			advance();
+			while (!end && isIdent(next())) {
+				id += advance();
 			}
-			
-			/**
-			  * Strings
-			    - single-quote => 39
-			    - double-quote => 34
-			    - escape-slash => 92
-			  */
-			else if (c == 34 || c == 39) {
-				//- reference to the code that started the string
-				var delimiter:Byte = (c);
-				//- variable to hold the String being created
-				var str:String = '';
-				//- whether the last byte was a slash ( \ )
-				var escaped:Bool = false;
-				
-				//- Initiate a Loop
-				while (true) {
-					attemptByte(this, {
-						log( bit );
-						if (escaped) {
-							str += bit;
-							escaped = false;
-						} else {
-							//- Escape
-							if (bit == 92) {
-								escaped = true;
-							}
-
-							else if (bit == delimiter) {
-								break;
-							}
-
-							else {
-								str += bit;
-							}
-						}
-					}, {
-						throw 'Unterminated String';
-					});
-				}
-
-				//- Create the Token and return it
-				var tk:Token = Token.TString( str );
-
-				return tk;
+			if (isOperator( id )) {
+				return TOperator( id );
 			}
-
-			/**
-			  * Identifiers
-			  */
-			else if (c.isLetter()) {
-				//- Create variable to hold identifier
-				var ident:String = (c + '');
-				
-				while (true) attemptByte(this, {
-					if (bit.isAlphaNumeric() || bit == '.'.code) {
-						ident += bit;
-					} else {
-						source.back( bit );
-						break;
-					}
-				}, {
-					
-					return Token.TIdent( ident );
-				});
-
-				var tk = Token.TIdent( ident );
-				return tk;
+			if (isKeyword( id )) {
+				return lexStructure(id.toLowerCase());
 			}
-
-			/**
-			  * === [NUMBERS] ===
-			    + Formats:
-			      - 0 => standard integer (50)
-			      - 1 => standard double (50.0)
-			      - 2 => standard hexidecimal (0x32)
-			    + Byte-Codes:
-			      - period => 46
-			      - x      => 120
-			  */
-			else if (c.isNumeric()) {
-				//- Create variable to store the string-representation of the number
-				var num_str:String = (c + '');
-				//- What format the number is being specified in
-				var format:Int = 0;
-				//- CharCodes of Letters A-F in both upper and lower case
-				var ltrCodes:Array<Int> = [97, 98, 99, 100, 101, 102, 65,66, 67, 68, 69, 70];
-
-				while (true) attemptByte(this, {
-					//- if [bit] is a standard number
-					if (bit.isNumeric()) {
-						num_str += bit;
-					}
-					
-					//- if [bit] is a period
-					else if (bit == '.') {
-						//- if the current [format] is "integer" mode, allow this
-						if (format == 0) {
-							//- and switch [format] to "double" mode
-							format = 1;
-							num_str += bit;
-						} else {
-							throw 'Unexpected "."';
-						}
-					}
-					
-					//- If [bit] is an "x"
-					else if (bit == 'x' || bit == 'X') {
-						//- if we've only gathered a 0 so far
-						if (num_str == '0' && format == 0) {
-							//- switch to hexidecimal mode
-							format = 2;
-							num_str += bit;
-						} else {
-							throw 'Unexpected "x"';
-						}
-					}
-					
-					/**
-					  * If we're in hexidecimal mode, and [bit] is any of letters A-F,
-					  * in upper or lower case
-					  */
-					else if (format == 2 && ltrCodes.has( bit )) {
-						num_str += (bit+'').toUpperCase();
-					}
-					
-					//- If [bit] is anything else
-					else {
-						//- push it back onto the stack
-						source.back( bit );
-
-						//- end the loop
-						break;
-					}
-				}, 
-				/* If [bit] couldn't be retrieved */
-				{
-					//- If the last character collected was either '.' or 'x'
-					if (num_str.endsWith('.') || num_str.endsWith('x') || num_str.endsWith('X')) {
-						throw 'Unexpected end of input';
-					}
-
-					else {
-						//- Get the numeric value of [num_str]
-						var num:Float = (switch(format) {
-							case 0, 1: (Std.parseFloat(num_str));
-							case 2: (Std.parseInt(num_str) + 0.0);
-							default:
-								throw 'Unknown numeric-declaration format $format';
-						});
-						var tk:Token = Token.TNumber( num );
-						return tk;
-					}
-				});
-
-				//- Get the numeric value of [num_str]
-				var num:Float = (switch(format) {
-					case 0, 1: (Std.parseFloat(num_str));
-					case 2: (Std.parseInt(num_str) + 0.0);
-					default:
-						throw 'Unknown numeric-declaration format $format';
-				});
-				var tk:Token = Token.TNumber( num );
-				return tk;
+			else {
+				return TConst(CIdent( id ));
 			}
-			
-			/**
-			  * == [OPERATORS] ==
-			  */
-			else if (isOperator( c )) {
-				var op_str:String = (c + '');
+		}
 
-				while (true) attemptByte(this, {
-					if (isOperator(bit)) {
-						op_str += bit;
-					}
-					else {
-						source.back(bit);
-
-						break;
-					}
-				},
-				{
-					break;
-				});
-				
-				var tk:Token = Token.TOperator( op_str );
-				return tk;
+		/* == references == */
+		else if (c == '@'.code) {
+			advance();
+			var id:String = '';
+			while (!end && isIdent(next())) {
+				id += advance();
 			}
+			return TConst(CReference( id ));
+		}
 
-			/**
-			  * Structures wrapped in Box-Brackets
-			  */
-			else if (c == '[') {
-				//- All text between the brackets
-				var content:String = this.group(('['.code), (']'.code));
-				var nodes:Array<Token> = lex( content );
-				log( nodes );
+		/* == Strings and shit == */
+		else if (['"'.code, "'".code, '`'.code].has(c)) {
+			var delimiter:Byte = advance();
+			var level:Int = (switch (delimiter) {
+				case "'".code: 1;
+				case '"'.code: 2;
+				case '`'.code: 3;
+				default: -1;
+			});
+			var str:String = bytes.readUntil( delimiter );
+			advance();
+			return TConst(CString(str, level));
+		}
 
-				switch (nodes) {
-					case [Token.TNumber(n)]:
-						return Token.TArrayAccess(n);
+		/* == Numbers == */
+		else if (c.isNumeric()) {
+			var snum:String = advance();
+			while (!end && (next().isNumeric() || next() == '.')) {
+				snum += advance();
+			}
+			return TConst(CNumber(Std.parseFloat(snum)));
+		}
 
-					case [Token.TNumber(start), Token.TColon, Token.TNumber(end)]:
-						return Token.TRangeAccess(start, end);
+		/* == Bracketed Groups == */
+		else if (c == '['.code) {
+			var sgroup:String = readGroup('[', ']');
+			var group = sub( sgroup );
+			return TBrackets( group );
+		}
+
+		/* == Boxed Groups == */
+		else if (c == '{'.code) {
+			var sg:String = readGroup('{', '}');
+			var g = sub( sg );
+			return TBoxBrackets( g );
+		}
+
+		/* === Operators === */
+		else if (isOpChar(c)) {
+			var state = save();
+			var op:String = advance();
+			while (!end && isOpChar(next())) {
+				op += advance();
+			}
+			if (isOperator( op )) {
+				return TOperator( op );
+			}
+			else {
+				switch ( op ) {
+					case '!':
+						return TNot;
 
 					default:
-						push(Token.TOBracket);
-						for (node in nodes) {
-							push( node );
-						}
-						push(Token.TCBracket);
+						throw 'SyntaxError: Invalid operator "$op"!';
 						return null;
 				}
 			}
+		}
 
-			/**
-			  * Sub-Selectors
-			  */
-			else if (c == '{') {
-				try {
-					var content:String = this.group(('{'.code), ('}'.code));
-					var nodes:Array<Token> = lex(content);
-					
-					push(TSub( nodes ));
-				} catch (err : Dynamic) {
-					trace(err);
+		/* == Tuples == */
+		else if (c == '('.code) {
+			/* == Tokenize the Tuple == */
+			var s:ByteArray = readGroup('(', ')');
+			var toklist:Array<Token> = (s.empty ? [] : sub(s.toString()));
+			var treeStack:Stack<Token> = new Stack(toklist.copy());
+			var tree:Array<Token> = new Array();
+			var hasComma:Bool = false;
+			while (!treeStack.empty) {
+				var t:Token = treeStack.pop();
+				if (!t.match(TComma)) {
+					tree.push( t );
 				}
-			}
-
-			/**
-			  * == [GROUPS AND TUPLES] ==
-			  */
-			else if (c == '(') {
-				trace( "Encountering either a group or a tuple!" );
-
-				var content:String = this.group(('('.code), (')'.code));
-				var nodes:Array<Token> = lex( content );
-				log( nodes );
-				
-				//- The new list of Tokens
-				var subtree:Array<Token> = new Array();
-
-				//- The tuple, if this is one
-				var tup:Array<Array<Token>> = new Array();
-
-				//- The 'current' index in [nodes]
-				var i:Int = 0;
-
-				//- Either 'group mode'(0) or 'tuple mode'(1)
-				var mode:Int = 0;
-
-				//- The 'last' token we encountered
-				var last:Null<Token> = null;
-
-				while ( true ) {
-					//- Get the 'next' token
-					var t:Null<Token> = nodes[i];
-					
-					//- If there isn't one
-					if (t == null) {
-						//- if [last] is defined
-						if (last != null) {
-							subtree.push( last );
-						}
-
-						//- if there's still a token in the 'buffer'
-						if (subtree.length > 0) {
-							//- Determine what to do with it
-							switch (mode) {
-								//- Group Mode
-								case 0:
-									//- Do nothing
-									null;
-
-								//- Tuple Mode
-								case 1:
-									//- add the buffer to [tup]
-									tup.push( subtree );
-									
-									//- reset the buffer
-									subtree = new Array();
-
-								//- Anything Else
-								default:
-									throw 'WTFError: Got a "mode" of $mode! How??';
-							}
-						}
-
-						//- end this loop
-						break;
-					}
-					
-					//- If we got one, determine what to do with it
-					switch ( t ) {
-						//- if it's a comma
-						case Token.TComma:
-
-							//- Set the current mode to "tuple mode"
-							mode = 1;
-
-							//- if [last] has been defined
-							if (last != null) {
-								
-								//- add it to the buffer
-								subtree.push( last );
-								
-								//- nullify it
-								last = null;
-							}
-
-							//- If there's at least one token in the buffer
-							if (subtree.length > 0) {
-								//- Add the buffer to [tup]
-								tup.push( subtree );
-
-								//- Reset the buffer
-								subtree = new Array();
-							}
-
-							//- If there was nothing in the buffer
-							else {
-								
-								//- This is incorrect syntax
-								throw 'SyntaxError: Unexpected ","!';
-							}
-
-							//- and it's preceded by another token
-							//if (last != null) {
-							//	mode = 1;
-							//	subtree.push( last );
-							//	last = null;
-
-							//	tup.push( subtree );
-							//	subtree = new Array();
-							//}
-
-						//- if it's anything else
-						default:
-							//- if we're in "group mode"
-							if (mode == 0) {
-								//- if this is the first token
-								if (i == 0) {
-									last = t;
-								} 
-								
-								//- If it is not
-								else {
-									//- if there is a 'last' token, add it to the [subtree] first
-									if (last != null) {
-										subtree.push( last );
-										last = null;
-									}
-
-									subtree.push( t );
-								}
-							}
-							
-							//- if we're in "tuple mode"
-							else if (mode == 1) {
-								
-								subtree.push( t );
-							}
-
-					}
-
-					i++;
-				}
-
-				//- now, we have our [subtree] and we've determined the [mode]
-
-				//- firstly, if there were no tokens in the subtree
-				if (subtree.length == 0 && tup.length == 0) {
-					return null;
-				}
-
-				//- Otherwise
 				else {
-					switch (mode) {
-						//- Group Mode
-						case 0:
-							//- Declare our token, which we will be returning
-							var tk:Token = Token.TGroup( subtree );
-
-							//- But, before we return it, check to see if the last Token was an Identifier
-							var last:Null<Token> = pop();
-							
-							//- If this isn't the first token of the tree
-							if (last != null) {
-								//- Determine what to do with the last Token
-								switch( last ) {
-									//- If it was an identifier
-									case Token.TIdent( id ):
-										//- Then we shall assume this to be a function-call
-										tk = Token.TCall(id, [subtree]);
-
-									//- If it was anything else
-									default:
-										null;
-								}
-							}
-
-							return tk;
-
-
-						//- Tuple Mode
-						case 1:
-							//- Declare our Token, which we will be returning
-							var tk:Token = Token.TTuple( tup );
-
-							//- But, before we return it, check to see if the last Token was an Identifier
-							var last:Null<Token> = pop();
-							
-							//- If this isn't the first token of the tree
-							if (last != null) {
-								//- Determine what to do with the last Token
-								switch( last ) {
-									//- If it was an identifier
-									case Token.TIdent( id ):
-										//- Then we shall assume this to be a function-call
-										tk = Token.TCall(id, tup);
-
-									//- If it was anything else
-									default:
-										null;
-								}
-							}
-
-							return tk;
-
-						//- Any other bullshit
-						default:
-							throw 'Error: Unrecognized mode $mode in parenthetical group parsing!';
-					}
+					hasComma = true;
 				}
 			}
 
-			/**
-			  * Hashtags
-			  */
-			else if (c == '#') {
-				return Token.THash;
+			if ( hasComma ) {
+				return TTuple( tree );
 			}
-
-			/**
-			  * Colons
-			  */
-			else if (c == ':') {
-				return Token.TColon;
+			else {
+				return TGroup( toklist );
 			}
+		}
 
-			/**
-			  * Question-Mark
-			  */
-			else if (c == '?') {
-				return Token.TQuestion;
-			}
+		/* == Commas == */
+		else if (c == ','.code) {
+			advance();
+			return TComma;
+		}
 
-			/**
-			  * Commas
-			  */
-			else if (c == ',') {
-				return Token.TComma;
-			}
+		/* == OR (|) == */
+		else if (c == '|'.code) {
+			advance();
+			return TOr;
+		}
 
-			/**
-			  * @ Symbol
-			  */
-			else if (c == '@') {
-				try {
-					//- get the next token
-					var nxt = token();
-					//- if there was a next token
-					if (nxt != null) {
-						//- determine what to do with it
-						switch (nxt) {
-							//- Identifier, Number
-							case Token.TIdent(_), Token.TNumber(_):
-								return Token.TRefence( nxt );
-							
+		/* == Colon == */
+		else if (c == ':'.code) {
+			advance();
+			canCall = true;
+			var name:Null<Token> = lexNext();
+			switch ( name ) {
+				case TConst(CIdent(name)):
+					if ( !end ) {
+						var state = save();
+						var targs:Null<Token> = lexNext();
+						switch ( targs ) {
+							case TTuple( args ):
+								trace('helper');
+								return THelper(name, args);
+
+							case TGroup(_[0] => arg):
+								trace('helper');
+								return THelper(name, [arg]);
+
 							default:
-								throw 'SyntaxError: Expected identifier or number, got $nxt!';
+								restore( state );
+								trace('helper');
+								return THelper(name, []);
 						}
 					}
-				} catch (err : String) {
-					throw 'SyntaxError: Expected identifier, got EOL';
-				}	
-			}
-		} 
-		
-		//- If that fails
-		catch (err : String) {
-			//- if it failed because we've reached the end of our input
-			if (( err+'' ) == 'Eof') {
-				//- Declare this tokenization complete
-				throw (COMPLETION_ERROR);
-			} 
-			//- if it failed for any other reason
-			else {
-				//- rethrow the error
-				throw err;
+					else {
+						trace('helper');
+						return THelper(name, []);
+					}
+
+				default:
+					throw 'SyntaxError: Expected identifier, got $name';
 			}
 		}
 
-		return null;
-	}
-
-	/**
-	  * Primary entry-point to the actual lexing process
-	  */
-	public function lexString(s : String):Array<Token> {
-		//- Initialize the state of [this] Lexer
-		source = ByteInput.fromString(s);
-		tree = new Array();
-		
-		//- Actually Perform the Analysis
-		while (true) {
-			try {
-				var tk = token();
-				log( tk );
-				if (tk != null) {
-					tree.push( tk );
-				}
-			} catch (err : String) {
-				log( err );
-				if (err == COMPLETION_ERROR) {
-					break;
-				} else {
-					throw err;
-				}
-			}
+		/* == ~ operator == */
+		else if (c == '~'.code) {
+			advance();
+			return TApprox;
 		}
 
-		return tree;
-	}
-	
-	/**
-	  * Determines whether the given Byte [c] is an operator
-	  */
-	public function isOperator(c : Byte):Bool {
-		return ([
-			
-			'+', '-', '*', '/',
-			'=', '!', '~', '<', '>',
-			'|'
-
-		].has(c.toString()));
+		/* == anything else == */
+		else {
+			throw 'SyntaxError: Unexpected "$c"!';
+		}
 	}
 
 	/**
-	  * Gets and returns the 'next' Byte in our source
+	  * Tokenize a structure
 	  */
-	public inline function byte():Null<Byte> {
-		return (source.next());
-	}
+	private function lexStructure(kw : String):Token {
+		switch ( kw ) {
+			/* == if statement == */
+			case 'if':
+				var cond = lexNext();
+				trace( cond );
+				var then = lexNext();
+				trace( then );
+				switch ( then ) {
+					case TConst(CIdent('then')):
+						var itrue = lexNext();
+						trace( itrue );
+						var ifalse = null;
+						if ( !end ) {
+							var state = save();
+							var otherwise = lexNext();
+							switch ( otherwise ) {
+								case TConst(CIdent('else')):
+									ifalse = lexNext();
+									trace( ifalse );
 
-	/**
-	  * Push a Token onto [tree]
-	  */
-	private inline function push(tk : Token):Void {
-		tree.push( tk );
-	}
+								default:
+									restore( state );
+							}
+						}
+						assert(cond != null, 'SyntaxError: Unexpected if!');
+						assert(itrue != null, 'SyntaxError: Unexpected end of input!');
+						return TIf(cond, itrue, ifalse);
 
-	/**
-	  * Pop the last-lexed token off of the Stack
-	  */
-	private inline function pop():Null<Token> {
-		return (tree.pop());
-	}
-
-	/**
-	  * Finds the entirety of the token-group specified by [group-data]
-	  * > this function makes the assumption that the first [opener] has already been found
-	  * [group-data]:
-	    + [opener] - beginning grouping-symbol
-	    + [closer] - ending grouping-symbol
-	    + [escape] - optional symbol which nullifies [opener] or [closer] when preceding them
-	  */
-	private function group(opener:Byte, closer:Byte, ?escape:Byte):String {
-		var found:String = '';
-		var state:Int = 1;
-
-		while (state > 0) attemptByte(this, {
-			if (bit == opener) {
-				state++;
-			}
-			if (bit == closer) {
-				state--;
-			}
-			if (state > 0) {
-				found += bit;
-			}
-		}, {
-			if (state > 0) {
-				throw 'Unexpected end of input';
-			} else {
-				break;
-			}
-		});
-
-		return found;
-	}
-
-	/**
-	  * Macro method to attempt to retrieve the next Byte,
-	  * allowing declaration of what to refer to that Byte as,
-	  * what to do with the Byte if successful,
-	  * and what to do on failure
-	  */
-	private static macro function attemptByte(self:Expr, useByteForStuff:Expr, handleFailure:Expr):Expr {
-		return macro {
-			try {
-				var bit = byte();
-
-				$useByteForStuff;
-			} catch (err : String) {
-				
-				if (( err+'' ) == 'Eof') {
-					
-					$handleFailure;
-				} else {
-					
-					throw err;
+					default:
+						throw 'SyntaxError: Unexpected $then!';
 				}
+			/* == A Fuck-Up Has Occurred == */
+			default:
+				throw 'FuckUpError: "$kw" is not a keyword';
+		}
+	}
+
+	/**
+	  * Read a group
+	  */
+	private function readGroup(start:Byte, end:Byte):ByteArray {
+		var c:Byte = next();
+		if (c == start) {
+			var level:Int = 1;
+			var data:ByteArray = new ByteArray();
+			advance();
+			while (level > 0) {
+				c = next();
+				if (c == start) {
+					level++;
+				}
+				else if (c == end) {
+					level--;
+				}
+
+				if (level > 0) {
+					data.push( c );
+				}
+				advance();
 			}
+			return data;
+		}
+		return new ByteArray();
+	}
+
+	/**
+	  * Tokenize a sub-tree
+	  */
+	private function sub(s : String):Array<Token> {
+		var state = save();
+		var _it:Bool = inTernary;
+		var result = lex( s );
+		restore( state );
+		inTernary = _it;
+		return result;
+	}
+
+	/**
+	  * Reset [this] to it's default state
+	  */
+	private inline function reset():Void {
+		tokens = new Array();
+		canCall = false;
+		inTernary = false;
+		bytes = new ByteStack(new ByteArray());
+	}
+
+	/**
+	  * Get the current state of [this]
+	  */
+	private function save():State {
+		return {
+			'tokens' : tokens.copy(),
+			'bytes' : cast bytes.copy(),
+			'canCall' : canCall
 		};
 	}
-	
-/* === Class Methods === */
 
 	/**
-	  * Class-Level Method to:
-	    - create a new Lexer
-	    - tokenize a String
-	    - return the node-tree
+	  * Restore [this] to a previous State
 	  */
-	public static inline function lex(s : String):Array<Token> {
-		return (new Lexer().lexString( s ));
+	private function restore(s : State):Void {
+		bytes = s.bytes;
+		tokens = s.tokens;
+		canCall = s.canCall;
 	}
 
 	/**
-	  * Alias to `trace`
+	  * Peek at the 'next' Byte in the stack
 	  */
-	public static inline function log(x : Dynamic):Void {
-		null;
+	private inline function next():Byte {
+		return bytes.peek();
 	}
 
-	private static inline var COMPLETION_ERROR:String = '::-EOI-::';
+	/**
+	  * advance to the next Byte in the stack
+	  */
+	private inline function advance():Byte {
+		return bytes.pop();
+	}
+
+	/**
+	  * Get the last-lexed Token
+	  */
+	private inline function last():Null<Token> {
+		return tokens.pop();
+	}
+
+	/**
+	  * determine whether [c] is an identifier character
+	  */
+	private function isIdent(c : Byte):Bool {
+		return (c.isAlphaNumeric() || c == '.'.code || c == '_'.code);
+	}
+
+	/**
+	  * determine whether [c] is an operator character
+	  */
+	private function isOpChar(c : Byte):Bool {
+		return [
+			'=', '!', '<', '>',
+			"$", '^'
+		].has(c.aschar);
+	}
+
+	/**
+	  * determine whether [op] is an operator
+	  */
+	private inline function isOperator(op : String):Bool {
+		return operators.has( op );
+	}
+
+	/**
+	  * determine whether [id] is a keyword
+	  */
+	private inline function isKeyword(id : String):Bool {
+		return [
+			'if'
+		].has(id.toLowerCase());
+	}
+
+/* === Computed Instance Fields === */
+
+	/* whether we're at the end of our input */
+	private var end(get, never):Bool;
+	private inline function get_end():Bool return bytes.empty;
+
+/* === Instance Fields === */
+
+	private var bytes : ByteStack;
+	private var tokens : Array<Token>;
+	private var operators : Array<String>;
+	private var canCall : Bool;
+	private var inTernary : Bool;
 }
+
+private typedef State = {
+	var tokens : Array<Token>;
+	var bytes : ByteStack;
+	var canCall : Bool;
+};

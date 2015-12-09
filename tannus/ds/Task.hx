@@ -1,59 +1,67 @@
 package tannus.ds;
 
-import tannus.io.Signal;
+import tannus.io.VoidSignal;
+import tannus.ds.Async;
 
 class Task {
 	/* Constructor Function */
 	public function new():Void {
-		complete = new Signal();
-		_abort = new Signal();
+		_doing = false;
+		onkill = new VoidSignal();
+		onfinish = new VoidSignal();
 	}
-
+	
 /* === Instance Methods === */
 
-	/**
-	  * Get current time-stamp
-	  */
-	private inline function currentTime():Int
-		return Math.floor(Date.now().getTime());
-
-	/**
-	  * Run [this] Task
-	  */
-	@:final
-	public function run():Void {
-		if (!running) {
-			running = true;
-			action( finish );
+	/* start [this] Task */
+	public function start():Void {
+		if ( !doing ) {
+			_doing = true;
+		}
+		else {
+			throw 'Error: Task already running';
 		}
 	}
-
-	/**
-	  * Actual stuff to be done
-	  */
-	dynamic public function action(done : Void->Void):Void {
+	
+	/* perform [this] Task */
+	public function perform(done : Void->Void):Void {
+		start();
+		onfinish.once( done );
+		action( finish );
+	}
+	
+	/* the primary 'action' for [this] Task */
+	private function action(done : Void->Void):Void {
 		done();
 	}
-
-	/**
-	  * Declare [this] Task 'complete'
-	  */
+	
+	/* mark [this] Task as 'finished' */
 	private function finish():Void {
-		running = false;
-		complete.call(currentTime());
+		_doing = false;
+		onfinish.call();
 	}
-
-	/**
-	  * Immediately stop the currently running Task
-	  */
-	@:final
+	
+	/* abort [this] Task */
 	public function abort():Void {
-		_abort.call(currentTime());
+		if ( doing ) {
+			onkill.call();
+		}
+		else {
+			throw 'Error: Cannot abort a Task that is not running!';
+		}
 	}
-
+	
+	/* convert [this] Task to an Async */
+	public function toAsync():Async {
+		return perform.bind( _ );
+	}
+	
 /* === Instance Fields === */
 
-	public var running : Bool = false;
-	public var complete : Signal<Int>;
-	private var _abort : Signal<Int>;
+	private var _doing : Bool;
+	public var doing(get, never):Bool;
+	private inline function get_doing() return _doing;
+	
+	private var onkill : VoidSignal;
+	private var onfinish : VoidSignal;
 }

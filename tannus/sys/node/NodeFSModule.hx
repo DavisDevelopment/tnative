@@ -33,4 +33,7 @@ extern class NodeFSModule {
 
 	/* Open a Writable Stream to a File */
 	public static function createWriteStream(path:String, ?options:Dynamic):tannus.node.WritableStream;
+
+	/* Open a Readable Stream from a File */
+	public static function createReadStream(path:String, ?options:Dynamic):tannus.node.ReadableStream;
 }

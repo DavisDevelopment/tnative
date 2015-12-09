@@ -469,9 +469,9 @@ class Promise<T> {
 	private var back : Null<Promise<Dynamic>> = null;
 }
 
-private typedef PromiseFunction<T> = Fullfill<T> -> Reject<T> -> Void;
-private typedef Fullfill<T> = T -> Void;
-private typedef Reject<T> = Dynamic -> Void;
+typedef PromiseFunction<T> = Fullfill<T> -> Reject<T> -> Void;
+typedef Fullfill<T> = T -> Void;
+typedef Reject<T> = Dynamic -> Void;
 
 /* Logical Operator Operand */
 private typedef LogOpVal<T> = EitherType<T, Promise<T>>;

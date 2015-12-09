@@ -1,7 +1,13 @@
 package tannus.sys.node;
 
 import tannus.io.ByteArray;
+<<<<<<< HEAD
 import tannus.io.ByteArray.BinaryImpl;
+=======
+import tannus.node.WritableStream;
+import tannus.io.streams.NodeOutputStream;
+import tannus.io.OutputStream;
+>>>>>>> b5c059df8d1f39d87ad27136cf47e923c02cbdfe
 import tannus.sys.FileStat;
 
 #if (js && node)
@@ -36,12 +42,53 @@ class NodeFileSystem {
 		return BinaryImpl.fromBuffer( buf );
 	}
 
+	public static function copy(src:Path, dest:Path, cb:Null<Dynamic>->Void):Void {
+		var cbCalled:Bool = false;
+		function done(?err : Dynamic):Void {
+			if (!cbCalled) {
+				cbCalled = true;
+				cb( err );
+			}
+		}
+		
+		var rd = NFS.createReadStream(src, {});
+		rd.on('error', untyped done.bind(_));
+
+		var wr = NFS.createWriteStream(dest, {});
+		wr.on('error', untyped done.bind(_));
+
+		wr.on('close', function() {
+			done();
+		});
+		rd.pipe( wr );
+	}
+
 	public static function append(path:String, data:ByteArray):Void {
 		var c:ByteArray = read(path);
 		c = c.concat( data );
 		write(path, c);
 	}
 
+<<<<<<< HEAD
+=======
+	/* create a readable stream from a File */
+	public static function istream(path:String, opts:Fso):FileReadStream {
+		return new FileReadStream(path, opts);
+	}
+
+	/* create a writable stream to a File */
+	public static function ostream(path : String):OutputStream {
+		// create a new fs.WritableStream to [path]
+		var node_wstream:WritableStream = NFS.createWriteStream( path );
+		// wrap it in a tannus.io.streams.NodeOutputStream object
+		var nos:NodeOutputStream = new NodeOutputStream( node_wstream );
+		// wrap that in a tannus.io.OutputStream object
+		var out:OutputStream = new OutputStream( nos );
+		// return that
+		return out;
+	}
+
+>>>>>>> b5c059df8d1f39d87ad27136cf47e923c02cbdfe
 	public static function deleteFile(path : String):Void {
 		NFS.unlinkSync(path);
 	}

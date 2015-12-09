@@ -85,6 +85,18 @@ class CRectangle implements Shape {
 	}
 
 	/**
+	  * Copies data from [other] onto [this]
+	  */
+	public function cloneFrom(other : Rectangle):Void {
+		x = other.x;
+		y = other.y;
+		z = other.z;
+		width = other.width;
+		height = other.height;
+		depth = other.depth;
+	}
+
+	/**
 	  * Whether [other] Rectangle is equal to [this] one
 	  */
 	public function equals(other : Rectangle):Bool {
@@ -132,14 +144,17 @@ class CRectangle implements Shape {
 	  * Whether [rect] is 'inside' [this] Rectangle
 	  */
 	public function containsRect(o : Rectangle):Bool {
-		//- For every corner of [o]
-		for (p in o.corners) {
-			//- Check whether [this] contains that corner
-			if (containsPoint(p)) {
-				return true;
-			}
+		if (containsPoint(o.center)) {
+			return true;
 		}
-		return false;
+		else {
+			for (p in o.corners) {
+				if (containsPoint( p )) {
+					return true;
+				}
+			}
+			return false;
+		}
 	}
 
 	/**
@@ -217,16 +232,34 @@ class CRectangle implements Shape {
 		return (width * height);
 	}
 
+	/* the center of [this] Rectangle along the x-axis */
+	public var centerX(get, set):Float;
+	private inline function get_centerX():Float {
+		return (x + (w / 2));
+	}
+	private inline function set_centerX(v : Float) {
+		return (x = (v - (w / 2)));
+	}
+
+	/* the center of [this] Rectangle along the y-ayis */
+	public var centerY(get, set):Float;
+	private inline function get_centerY():Float {
+		return (y + (h / 2));
+	}
+	private inline function set_centerY(v : Float) {
+		return (y = (v - (h / 2)));
+	}
+
 	/**
 	  * Point representing the 'center' of [this] Rectangle
 	  */
 	public var center(get, set):Point;
 	private inline function get_center():Point {
-		return new Point((x + (width / 2)), (y + (height / 2)));
+		return new Point(centerX, centerY);
 	}
 	private function set_center(nc : Point):Point {
-		x = (nc.x - (w / 2));
-		y = (nc.y - (h / 2));
+		centerX = nc.x;
+		centerY = nc.y;
 		return nc;
 	}
 

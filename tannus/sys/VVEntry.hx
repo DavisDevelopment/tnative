@@ -49,6 +49,7 @@ class VVEntry {
 		} else {
 			error('"$path" is a File!');
 		}
+		return [];
 	}
 
 	/**
@@ -76,6 +77,7 @@ class VVEntry {
 		} else {
 			error('"$path" cannot be read!');
 		}
+		return new ByteArray();
 	}
 
 	/**
@@ -155,16 +157,15 @@ class VVEntry {
 	  */
 	public var stats(get, never):FileStat;
 	private function get_stats():FileStat {
-		if (isFile) {
-			return {
-				'size': (read().length),
-				'ctime': cdate,
-				'mtime': mdate
-			};
-		} 
-		else {
+		// complain if [this] Entry is not a File
+		if (!isFile) {
 			error('"$path" is a Directory!');
 		}
+		return {
+			'size': (read().length),
+			'ctime': cdate,
+			'mtime': mdate
+		};
 	}
 
 	/**
@@ -229,7 +230,7 @@ class VVEntry {
 	/**
 	  * Throws an error with the given message
 	  */
-	private static inline function error(msg : String):Void {
-		throw 'IOError: $msg';
+	private static macro function error(msg) {
+		return macro throw ("IOError: " + $msg);
 	}
 }
