@@ -30,7 +30,7 @@ class QueryString {
 
 				case 'Array':
 					var arr:Array<Dynamic> = cast val;
-					arr.each(x, assert(['Number', 'String', 'Boolean'].has(tn(x)), 'TypeError: Cannot urlify non-primitive values!'));
+					arr.each(assert(['Number', 'String', 'Boolean'].has(tn(_)), 'TypeError: Cannot urlify non-primitive values!'));
 					for (x in arr) {
 						pairs.push('$key[]='+string(x).urlEncode());
 					}
