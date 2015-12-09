@@ -26,7 +26,6 @@ class ChromeStorage extends Storage {
 	  */
 	override private function _fetch(cb : Data->Void):Void {
 		area.get(null, function(data : Object) {
-			trace('ChromeStorage data loaded');
 			cb( data );
 		});
 	}
@@ -37,7 +36,6 @@ class ChromeStorage extends Storage {
 	override private function _push(map_data:Data, cb:Err->Void):Void {
 		var data:Object = map_data.toObject();
 		area.set(data, function() {
-			trace('ChromeStorage data saved');
 			cb( null );
 		});
 	}
