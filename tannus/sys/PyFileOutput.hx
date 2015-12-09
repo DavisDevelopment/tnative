@@ -12,7 +12,7 @@ class PyFileOutput extends Output {
 	/* Constructor Function */
 	public function new(p : String):Void {
 		path = p;
-		buffer = new ByteArray();
+		buffer = ByteArray.alloc( 0 );
 		cursor = 0;
 		var op:String->String->Int->Dynamic = (untyped python.Syntax.pythonCode('open', null));
 
