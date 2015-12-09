@@ -6,6 +6,7 @@ import tannus.html.fs.WebDirectoryEntry in Dir;
 import tannus.sys.Path;
 
 import tannus.ds.Promise;
+import tannus.ds.promises.*;
 
 import Std.is;
 
@@ -61,6 +62,17 @@ class FileSystem {
 	  */
 	public static inline function isRestorable(id:String, cb:Bool->Void):Void {
 		lib.isRestorable(id, cb);
+	}
+
+	/**
+	  * Check whether a given entry is restorable
+	  */
+	public static function canRestore(id : String):BoolPromise {
+		return Promise.create({
+			isRestorable(id, function(status : Bool) {
+				return status;
+			});
+		}).bool();
 	}
 
 	/**
