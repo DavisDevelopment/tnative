@@ -55,9 +55,10 @@ class ArrayTools {
 	/**
 	  * Perform [action] on every item in the list
 	  */
-	public static macro function each<T>(list:ExprOf<Iterable<T>>, name, action) {
+	public static macro function each<T>(list:ExprOf<Iterable<T>>, action:Expr):Expr {
+		action = action.mapUnderscoreTo( 'item' );
 		return macro {
-			for ($name in $list) {
+			for (item in $list) {
 				$action;
 			}
 		};
@@ -227,6 +228,22 @@ class ArrayTools {
 			'min': l._0,
 			'max': h._0
 		};
+	}
+
+	/**
+	  * Perform a split-filter operation on the given Array, which splits an Array in to Arrays,
+	  * one filled with those items that 'passed' the test, and the other
+	  * filled with those who 'failed'
+	  */
+	public static function splitfilter<T>(list:Array<T>, pred:T->Bool):{pass:Array<T>, fail:Array<T>} {
+		var res = {
+			'pass': new Array(),
+			'fail': new Array()
+		};
+		for (item in list) {
+			(pred(item) ? res.pass : res.fail).push( item );
+		}
+		return res;
 	}
 
 	#if macro
