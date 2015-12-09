@@ -3,13 +3,12 @@ package tannus.sys;
 import tannus.io.ByteArray;
 import tannus.sys.FileStat;
 import tannus.sys.Path;
-import tannus.sys.FileStreamOptions in Fso;
 
 #if flash
 
 typedef FileSystem = tannus.sys.FlashFileSystem;
 
-#elseif node
+#elseif (node && !macro)
 
 typedef FileSystem = tannus.sys.node.NodeFileSystem;
 
@@ -99,11 +98,13 @@ class FileSystem {
 	  * Opens and Returns an Output instance, bound to the given File
 	  */
 	public static function fileOutput(path : String):sys.io.FileOutput {
+		/*
 		#if python
 			return untyped (new tannus.sys.PyFileOutput( path ));
 		#else
+		*/
 			return sys.io.File.write(path, true);
-		#end
+		//#end
 	}
 
 	/**
@@ -113,12 +114,10 @@ class FileSystem {
 		#if python
 			var p:String = path;
 			var f:Dynamic = python.Syntax.pythonCode('open(p, "rb")');
-			var _data:Dynamic = (length!=null?f.read():f.read(length));
-			_data = python.Syntax.pythonCode('list(_data)');
-			var data:Array<Int> = cast _data;
+			var _data:python.Bytearray = new python.Bytearray(length!=null?f.read():f.read(length));
 			f.close();
 
-			return ByteArray.fromIntArray( data );
+			return (untyped ByteArray.ofData(_data));
 		#else
 			var b:haxe.io.Bytes = F.getBytes(path);
 			return ByteArray.fromBytes(b);
@@ -142,13 +141,6 @@ class FileSystem {
 			out.write( data );
 			out.close();
 		#end
-	}
-
-	/**
-	  * Creates a readable Stream from a File
-	  */
-	public static function istream(path:String, options:Fso):IStream {
-		throw 'Error: Not implemented!';
 	}
 
 	/**
