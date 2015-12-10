@@ -22,7 +22,7 @@ abstract Blob (CBlob) from CBlob to CBlob {
 		  */
 		@:to
 		public inline function toNativeBlob():js.html.Blob {
-			return (new js.html.Blob([untyped this.data.toArrayBuffer()], {
+			return (new js.html.Blob([untyped this.data.getData()], {
 				'type': this.type
 			}));
 		}
@@ -31,8 +31,7 @@ abstract Blob (CBlob) from CBlob to CBlob {
 		  * Retrieve an ObjectURL for [this] Blob
 		  */
 		public inline function toObjectURL():String {
-			var courl:Dynamic = (untyped __js__('URL.createObjectURL'));
-			return (untyped courl(toNativeBlob()));
+			return (untyped __js__('URL.createObjectURL'))(toNativeBlob());
 		}
 	#end
 
