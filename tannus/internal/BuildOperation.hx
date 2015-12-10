@@ -20,19 +20,21 @@ class BuildOperation {
 	/**
 	  * Set 'main' Class for [this] Build
 	  */
-	public function main(mc : String):Void
+	public inline function main(mc : String):Void
 		add(BCMain( mc ));
 
 	/**
 	  * Build with a given target to a given dest
 	  */
-	public function target(t:String, dest:String)
+	public inline function target(t:String, dest:String)
 		add(BCTarget(t, dest));
 
 	/**
 	  * Adds a Path to the class-path
 	  */
-	//public function cp(
+	public inline function cp(path : Path):Void {
+		add(BCClassPath( path ));
+	}
 
 /* === Instance Fields === */
 

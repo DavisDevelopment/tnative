@@ -14,6 +14,7 @@ class BuildFile {
 	/* Constructor Function */
 	public function new():Void {
 		comps = new Array();
+		each_comps = new Array();
 	}
 
 /* === Instance Methods === */
@@ -66,14 +67,24 @@ class BuildFile {
 	/**
 	  * Add a '--next' flag
 	  */
-	public function next()
-		add(BCNext);
+	public function next():Void {
+		add( BCNext );
+	}
+
+	/**
+	  * Add the '--each' flag
+	  */
+	public function each():Void {
+		each_comps = comps;
+		comps = new Array();
+	}
 	
 	/**
 	  * Place debug data into the code
 	  */
-	public function debug() 
-		add(BCDebug);
+	public function debug():Void {
+		add( BCDebug );
+	}
 
 	/**
 	  * Output [this] Object as the code generated from it
@@ -94,7 +105,7 @@ class BuildFile {
 			switch (comp) {
 				case BCNext:
 					var bd = new BuildData();
-					bd.parse( ast );
+					bd.parse(each_comps.concat( ast ));
 					datas.push( bd );
 					ast = new Array();
 
@@ -117,6 +128,9 @@ class BuildFile {
 
 	/* Array of BuildOperationComponents */
 	public var comps : Array<BuildComponent>;
+
+	/* array of BuildOperationComponents to be applied to all operations */
+	public var each_comps : Array<BuildComponent>;
 
 /* === Static Methods === */
 
