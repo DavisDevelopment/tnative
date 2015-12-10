@@ -87,9 +87,9 @@ class Random {
 	  */
 	public static function stringSeed(seed : String):Random {
 		var state:Int = 0;
-		var ba = tannus.io.ByteArray.fromString(seed);
+		var ba = tannus.io.ByteArray.ofString( seed );
 		for (bit in ba) {
-			seed += bit.toInt();
+			seed += bit.asint;
 		}
 		return new Random(state);
 	}
