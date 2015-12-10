@@ -8,6 +8,7 @@ import js.html.Uint8Array;
 using Lambda;
 using tannus.ds.ArrayTools;
 
+@:expose('Binary')
 class JavaScriptBinary extends Binary {
 	/* Constructor Function */
 	public function new(size:Int, data:ArrayBuffer, ?arr:Uint8Array):Void {
