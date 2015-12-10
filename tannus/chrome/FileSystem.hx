@@ -3,6 +3,7 @@ package tannus.chrome;
 import tannus.html.fs.WebFileEntry;
 import tannus.html.fs.WebFSEntry;
 import tannus.html.fs.WebDirectoryEntry in Dir;
+import tannus.html.fs.FilePromise;
 import tannus.sys.Path;
 
 import tannus.ds.Promise;
@@ -86,6 +87,29 @@ class FileSystem {
 					throw 'Not a Directory!';
 				else
 					return new Dir(cast e);
+			});
+		});
+	}
+
+	/**
+	  * Get a File from the user
+	  */
+	public static function chooseFile(writable:Bool=false, mustExist:Bool=true):FilePromise {
+		return new FilePromise(function(provide) {
+			var options:ChooseEntryOptions = {};
+			switch ([writable, mustExist]) {
+				case [true, true]:
+					options.type = OpenWritable;
+
+				case [_, false]:
+					options.type = SaveFile;
+
+				default:
+					options.type = OpenFile;
+			}
+
+			chooseEntry(options, function(entries) {
+				provide(cast entries[0]);
 			});
 		});
 	}
