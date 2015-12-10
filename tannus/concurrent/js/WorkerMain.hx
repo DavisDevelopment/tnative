@@ -13,6 +13,7 @@ import haxe.Unserializer;
 class WorkerMain {
 	/* Constructor Function */
 	public function new():Void {
+		trace( '::mainClass::' );
 		var werk:Worker = Type.createInstance(Ct.execute('::mainClass::'), [this]);
 		worker = werk;
 
