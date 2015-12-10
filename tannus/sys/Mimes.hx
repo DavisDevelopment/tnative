@@ -8,24 +8,6 @@ using Lambda;
 using StringTools;
 @:expose
 class Mimes {
-<<<<<<< HEAD
-
-/* === Class Fields === */
-
-	/* Primitive Mime Data, Loaded from a JSON File */
-	private static var primitive:Object = {{};/*CompileTime.readJSON('mimes.json', true);*/};
-
-	/* Mime Data Registry, used internally by [this] Class */
-	private static var types:Object;
-
-	/* Extension Registry */
-	private static var extensions:Object;
-
-	/* Whether [this] Class has been initialized */
-	private static var initted:Bool = false;
-
-=======
->>>>>>> b5c059df8d1f39d87ad27136cf47e923c02cbdfe
 /* === Class Methods === */
 
 	/**
