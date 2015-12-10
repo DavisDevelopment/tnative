@@ -7,7 +7,10 @@ import tannus.io.ByteArray;
 class ByteStack extends Stack<Byte> {
 	/* Constructor Function */
 	public function new(data : ByteArray):Void {
-		super(data.toArray());
+		super([]);
+
+		b = data;
+		i = 0;
 	}
 
 /* === Instance Methods === */
@@ -16,9 +19,9 @@ class ByteStack extends Stack<Byte> {
 	  * Read the next [dis] bytes
 	  */
 	public function read(dis : Int):ByteArray {
-		var data = new ByteArray();
+		var data = new ByteArray( dis );
 		for (i in 0...dis) {
-			data.push(pop());
+			data.writeByte(pop());
 		}
 		return data;
 	}
@@ -27,7 +30,7 @@ class ByteStack extends Stack<Byte> {
 	  * Read until the first instance of [delimiter]
 	  */
 	public function readUntil(delimiter : Byte):ByteArray {
-		var res:ByteArray = new ByteArray();
+		var res:ByteArray = new ByteArray( 0 );
 		while (peek() != delimiter) {
 			res.push(pop());
 		}
@@ -38,9 +41,9 @@ class ByteStack extends Stack<Byte> {
 	  * Peek ahead the next [dis] bytes
 	  */
 	public function peekAhead(dis : Int):ByteArray {
-		var data:ByteArray = new ByteArray();
+		var data:ByteArray = new ByteArray( dis );
 		for (i in 1...(dis + 1)) {
-			data.push(peek( i ));
+			data.writeByte(peek(i));
 		}
 		return data;
 	}
@@ -49,6 +52,30 @@ class ByteStack extends Stack<Byte> {
 	  * Get a clone of [this]
 	  */
 	override public function copy():Stack<Byte> {
-		return cast new ByteStack( this.data );
+		return cast new ByteStack( b );
 	}
+
+	/**
+	  * Peek at the 'next' Byte in the Stack
+	  */
+	override public function peek(dis:Int=0):Byte {
+		return b[i+dis];
+	}
+
+	/**
+	  * Advance to the next byte, and return the current one
+	  */
+	override public function pop():Byte {
+		return b[i++];
+	}
+
+	/* check whether [this] is currently finished */
+	override private function get_empty():Bool {
+		return (i >= b.length);
+	}
+
+/* === Instance Fields === */
+
+	private var b : ByteArray;
+	private var i : Int;
 }
