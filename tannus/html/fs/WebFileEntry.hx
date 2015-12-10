@@ -30,8 +30,8 @@ abstract WebFileEntry (FileEntry) from FileEntry {
 	/**
 	  * Do Stuff
 	  */
-	public function file():Promise<tannus.html.fs.WebFile> {
-		return cast new Promise(this.file.bind(_, _));
+	public inline function file():FilePromise {
+		return new FilePromise(function(give) give( this ));
 	}
 
 	/**
@@ -61,7 +61,7 @@ abstract WebFileEntry (FileEntry) from FileEntry {
 					throw error;
 				};
 				reader.onload = function(event) {
-					var data:ByteArray = ByteArray.fromArrayBuffer(cast event.target.result);
+					var data:ByteArray = ByteArray.ofData(cast event.target.result);
 					return data;
 				};
 				reader.readAsArrayBuffer(cast file);
