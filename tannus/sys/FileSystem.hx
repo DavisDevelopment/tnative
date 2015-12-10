@@ -146,29 +146,6 @@ class FileSystem {
 	}
 
 	/**
-<<<<<<< HEAD
-=======
-	  * Creates a readable Stream from a File
-	  */
-	public static function istream(path:String, options:Fso):IStream {
-		throw 'Error: Not implemented!';
-	}
-
-	/**
-	  * Create a writable Stream to a File
-	  */
-	public static function ostream(path : String):OutputStream {
-		// create a new FileOutput to [path]
-		var file_out:Output = F.write( path );
-		// wrap [file_out] in a tannus.io.streams.NativeOutputStream object
-		var nos:OStream = new OStream( file_out );
-		// wrap [nos] in a tannus.io.OutputStream object
-		var out:OutputStream = new OutputStream( nos );
-		return out;
-	}
-
-	/**
->>>>>>> b5c059df8d1f39d87ad27136cf47e923c02cbdfe
 	  * Moves the given path to a new one
 	  */
 	public static function rename(oldpath:String, newpath:String):Void {
