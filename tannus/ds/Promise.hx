@@ -12,6 +12,8 @@ import tannus.internal.TypeTools.typename;
 import Std.is;
 
 using haxe.macro.ExprTools;
+using tannus.macro.MacroTools;
+
 class Promise<T> {
 	/* Constructor Function */
 	public function new(exec:PromiseFunction<T>, ?nocall:Bool=false):Void {
@@ -91,6 +93,18 @@ class Promise<T> {
 		});
 		attach( res );
 		return res;
+	}
+
+	/**
+	  * macro-licious [then]
+	  */
+	public macro function use(self:ExprOf<Promise<T>>, action:Expr) {
+		action = action.mapUnderscoreTo('value');
+		return macro {
+			$self.then(function(value) {
+				$action;
+			});
+		};
 	}
 
 	/**
@@ -407,6 +421,11 @@ class Promise<T> {
 					switch (meta.name) {
 						case 'ignore':
 							return ex;
+
+						case 'forward':
+							return macro {
+								$ex.then( accept ).unless( reject );
+							};
 
 						default:
 							return e;
