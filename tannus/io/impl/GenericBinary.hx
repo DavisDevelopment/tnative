@@ -1,5 +1,6 @@
 package tannus.io.impl;
 
+import haxe.io.Bytes;
 import tannus.io.Byte;
 import tannus.io.BinaryData;
 
@@ -75,6 +76,13 @@ class GenericBinary extends Binary {
 	/* write a String to [this] data */
 	override public function writeString(s : String):Void {
 		write(ofString( s ));
+	}
+
+	override public function toBytes():Bytes {
+		var res:Bytes = Bytes.alloc( length );
+		for (i in 0...length)
+			res.set(i, get(i));
+		return res;
 	}
 
 	/* === Static Methods === */
