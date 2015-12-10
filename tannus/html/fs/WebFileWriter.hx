@@ -31,7 +31,7 @@ abstract WebFileWriter (FileWriter) from FileWriter {
 		this.onerror = function(error) {
 			cb( error );
 		};
-		var blob = new js.html.Blob([data.toArrayBuffer()]);
+		var blob = new js.html.Blob([cast data.getData()]);
 		this.write( blob );
 	}
 
