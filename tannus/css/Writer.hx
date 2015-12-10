@@ -49,15 +49,16 @@ class Writer {
 	/**
 	  * Write to [buffer]
 	  */
-	private inline function write(what : ByteArray):Void {
-		buffer.write( what );
+	private function write(what : ByteArray):Void {
+		buffer.append( what );
 	}
 
 	/**
 	  * Write data to [buffer], followed by newline
 	  */
-	private inline function writeln(data : ByteArray):Void {
-		write(data + '\n');
+	private function writeln(data : ByteArray):Void {
+		data.push( '\n' );
+		buffer.append( data );
 	}
 
 /* === Instance Fields === */

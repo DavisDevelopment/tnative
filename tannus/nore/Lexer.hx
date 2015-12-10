@@ -37,7 +37,7 @@ class Lexer {
 	  */
 	public function lex(s : String):Array<Token> {
 		reset();
-		bytes = new ByteStack(ByteArray.fromString( s ));
+		bytes = new ByteStack(ByteArray.ofString( s ));
 
 		while ( !end ) {
 			var t:Null<Token> = lexNext();

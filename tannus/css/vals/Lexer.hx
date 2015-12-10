@@ -53,8 +53,10 @@ class Lexer {
 	  * Attempt to parse the next Value
 	  */
 	private function parseNext():Value {
-		if (end)
+		if (end) {
 			eof();
+			return Value.VNumber( 0 );
+		}
 		else {
 			/* Whitespace */
 			if (cur.isWhiteSpace()) {
@@ -65,10 +67,10 @@ class Lexer {
 			/* Identifiers, References, and Function-Calls */
 			else if (cur.isLetter() || cur == '_'.code || cur == '@'.code) {
 				var ident:ByteArray = '';
-				ident += cur;
+				ident.push( cur );
 				advance();
 				while (!end && (cur.isLetter() || cur.isNumeric() || cur == '_'.code)) {
-					ident += cur;
+					ident.push( cur );
 					advance();
 				}
 
@@ -192,7 +194,7 @@ class Lexer {
 							null;
 					}
 					if (l > 0) {
-						stup += cur;
+						stup.push( cur );
 					}
 					advance();
 				}
@@ -224,6 +226,7 @@ class Lexer {
 
 			else {
 				unex( cur );
+				return Value.VNumber( 0 );
 			}
 		}
 	}

@@ -44,7 +44,7 @@ abstract Path (CPath) from CPath to CPath {
     /* to ByteArray */
     @:to
     public inline function toByteArray():ByteArray {
-    	return ByteArray.fromString(toString());
+    	return ByteArray.ofString(toString());
     }
     
     /* from ByteArray */
