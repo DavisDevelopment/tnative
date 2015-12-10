@@ -25,22 +25,12 @@ class Binary {
 
 	/* get the byte at the given index */
 	public function get(index : Int):Byte {
-		if (index > (length - 1) || index < 0) {
-			throw 'IndexOutOfBoundsError: Cannot access Binary[$index]!';
-		}
-		else {
-			return 0;
-		}
+		return 0;
 	}
 
 	/* set the byte at the given index */
 	public function set(index:Int, value:Byte):Byte {
-		if (index > (length - 1) || index < 0) {
-			throw 'IndexOutOfBoundsError: Cannot access Binary[$index]!';
-		}
-		else {
-			return 0;
-		}
+		return 0;
 	}
 
 	/* read a 32bit integer from the given index */
