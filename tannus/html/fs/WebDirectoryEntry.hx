@@ -9,6 +9,7 @@ import tannus.sys.Path;
 import tannus.ds.Object;
 import tannus.ds.Promise;
 import tannus.ds.promises.*;
+import tannus.ds.AsyncStack;
 import tannus.sys.GlobStar;
 
 using StringTools;
@@ -72,12 +73,39 @@ abstract WebDirectoryEntry (DirectoryEntry) from DirectoryEntry {
 	}
 
 	/**
-	  * Get all entries which match a given Filter
+	  * Get an Array of all FileEntries recursively
 	  */
-	public function filter(glob : GlobStar):ArrayPromise<WebFSEntry> {
-		return (readEntries().filter(function(e) {
-			return (glob.test(e.name));
-		}));
+	public function walk(?tester : WebFileEntry->Bool):ArrayPromise<WebFileEntry> {
+		return Promise.create({
+			var stack:AsyncStack = new AsyncStack();
+			var files:Array<WebFileEntry> = new Array();
+			readEntries().then(function( entries ) {
+				for (e in entries) {
+					stack.push(function( done ) {
+						if ( e.isFile ) {
+							if (tester == null || tester(cast e)) {
+								files.push(cast e);
+							}
+							done();
+						}
+						else if ( e.isDirectory ) {
+							var p = new WebDirectoryEntry(cast e).walk(tester);
+							p.then(function(dfiles) {
+								files = files.concat( dfiles );
+								done();
+							});
+							p.unless(function(error) {
+								throw error;
+							});
+						}
+					});
+				}
+
+				stack.run(function() {
+					return files;
+				});
+			}).unless(function(error) throw error);
+		}).array();
 	}
 }
 
