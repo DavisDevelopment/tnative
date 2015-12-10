@@ -87,7 +87,7 @@ class OutputStream {
 	  * Write a String to [this] Stream
 	  */
 	public function writeString(s : String):Void {
-		write(ByteArray.fromString( s ));
+		write(ByteArray.ofString( s ));
 	}
 
 /* === Instance Fields === */
