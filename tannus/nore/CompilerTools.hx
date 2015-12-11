@@ -38,7 +38,8 @@ class CompilerTools {
 			return (Tt.typename(o) == type);
 		}
 		else {
-			return (Tt.hierarchy(o).has( type ));
+			var tc:Class<Dynamic> = Type.resolveClass( type );
+			return Std.is(o, tc);
 		}
 	}
 
