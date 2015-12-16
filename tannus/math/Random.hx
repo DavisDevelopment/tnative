@@ -1,8 +1,13 @@
 package tannus.math;
 
 import tannus.math.TMath;
+import tannus.math.TMath.*;
+import tannus.math.Ratio;
+
+import Math.*;
 
 using Lambda;
+using tannus.ds.ArrayTools;
 
 class Random {
 	/* Constructor Function */
@@ -39,6 +44,22 @@ class Random {
 	  */
 	public function randint(min:Int, max:Int):Int {
 		return Math.floor(nextFloat() * (max - min + 1) + min);
+	}
+
+	/**
+	  * get random boolean value where [prob] is the probability that the value will be 'true'
+	  */
+	public function randchance(prob : Ratio):Bool {
+		var choices:Array<Int> = [for (i in 0...ceil(prob.bottom)) i];
+		var correct:Array<Int> = new Array();
+		var clen:Int = ceil(prob.top);
+		while (correct.length < clen) {
+			var cnum:Int = choice( choices );
+			if (!correct.has( cnum )) {
+				correct.push( cnum );
+			}
+		}
+		return (correct.has(randint(floor(prob.top), floor(prob.bottom))));
 	}
 
 	/**
