@@ -4,12 +4,14 @@ import js.Browser.window in win;
 import js.html.Window in CWin;
 
 import tannus.ds.Object;
+import tannus.ds.Obj;
 import tannus.ds.Maybe;
 import tannus.ds.Range;
 import tannus.io.Ptr;
 import tannus.io.Signal;
 import tannus.events.KeyboardEvent;
 import tannus.events.EventMod;
+import tannus.html.fs.WebFileSystem;
 
 import tannus.geom.Point;
 import tannus.geom.Rectangle;
@@ -94,6 +96,28 @@ abstract Win (CWin) from CWin to CWin {
 		this.addEventListener('beforeunload', handlr);
 		sig.ondelete = (function() this.removeEventListener('beforeunload', handlr));
 		return sig;
+	}
+
+	/**
+	  * Request a FileSystem for use
+	  */
+	public function requestFileSystem(size:Int, cb:WebFileSystem->Void):Void {
+		untyped {
+			var self:Obj = this;
+			var rfs:Dynamic = self['requestFileSystem'];
+			if (rfs == null) {
+				rfs = self['webkitRequestFileSystem'];
+			}
+			rfs(self['PERSISTENT'], size, cb);
+		};
+	}
+
+	/**
+	  * Expose some value globally
+	  */
+	public inline function expose(name:String, value:Dynamic):Void {
+		var self:Obj = this;
+		self[name] = value;
 	}
 
 /* === Instance Fields === */
