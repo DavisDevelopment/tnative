@@ -53,5 +53,41 @@ class MacroTools {
 		return Context.parse(s, Context.currentPos());
 	}
 
+	/**
+	  * all interfaces implemented by the given classtype
+	  */
+	public static function classHierarchy(ct : ClassType):Array<ClassType> {
+		var results:Array<ClassType> = new Array();
+		if (ct.superClass != null) {
+			var parent = ct.superClass.t.get();
+			results.push( parent );
+			results = results.concat(classHierarchy( parent ));
+		}
+		return results;
+	}
+
+	/**
+	  * check whether [ctype] is a subclass of [base]
+	  */
+	public static function subClassOf(ctype:ClassType, base:ClassType):Bool {
+		if (!base.isInterface) {
+			var hier = classHierarchy( ctype );
+			for (c in hier) {
+				if (c.pack.join('.') == base.pack.join('.')) {
+					return true;
+				}
+			}
+			return false;
+		}
+		else return false;
+	}
+
+	/**
+	  * get the full name of the given class-type
+	  */
+	public static function fullName(ct : ClassType):String {
+		return ct.pack.concat([ct.name]).join('.');
+	}
+
 	#end
 }
