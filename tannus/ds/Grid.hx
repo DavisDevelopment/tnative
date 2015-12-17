@@ -21,12 +21,18 @@ class Grid<T> {
 /* === Instance Methods === */
 
 	/* set the given value at the given position */
-	public function set(x:Int, y:Int, value:T):T {
-		return data.set(index(x, y), value);
+	public function set(x:Int, y:Int, value:Null<T>):Null<T> {
+		if (!((x >= w || x < 0) || (y >= h || y < 0))) {
+			return data.set(index(x, y), value);
+		} else return value;
 	}
 
 	/* get the value stored at the given position */
-	public function get(x:Int, y:Int):T {
+	public function get(x:Int, y:Int):Null<T> {
+		if ((x >= w || x < 0) || (y >= h || y < 0)) {
+			return null;
+		}
+
 		return data.get(index(x, y));
 	}
 
@@ -37,6 +43,11 @@ class Grid<T> {
 			remove(pos.x, pos.y);
 		};
 		return ref;
+	}
+
+	/* get the value at the given position */
+	public inline function valueAt(pos : GridPos):Null<T> {
+		return get(pos.x, pos.y);
 	}
 
 	/* delete the value at the given coordinates */
@@ -73,7 +84,7 @@ class Grid<T> {
 
 	public var w:Int;
 	public var h:Int;
-	public var data:Vector<T>;
+	public var data : Vector<T>;
 }
 
 /* class used for iteration over a grid */
@@ -125,13 +136,16 @@ private class GridPosIterator<T> {
 
 	/* whether there is a 'next item' in [this] Iterator */
 	public function hasNext():Bool {
-		return !(x == (grid.w - 1) && y == (grid.h - 1));
+		return !(
+			(x == grid.w) &&
+			(y == grid.h)
+		);
 	}
 
 	/* the 'next item' in [this] Iterator */
 	public function next():GridPos {
 		var pos:GridPos = new GridPos(x, y);
-		if (x >= (grid.w - 1)) {
+		if (x == grid.w) {
 			x = 0;
 			y++;
 		}
@@ -154,6 +168,14 @@ class GridPos {
 		_x = x;
 		_y = y;
 	}
+
+/* === Instance Methods === */
+
+	/* the Pos to the left of [this] one */
+	public inline function left():GridPos return new GridPos(x-1, y);
+	public inline function right():GridPos return new GridPos(x+1, y);
+	public inline function top():GridPos return new GridPos(x, y-1);
+	public inline function bottom():GridPos return new GridPos(x, y+1);
 
 /* === Computed Instance Fields === */
 
