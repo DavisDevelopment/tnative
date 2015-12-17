@@ -6,6 +6,8 @@ import tannus.internal.TypeTools in Tt;
 using Lambda;
 using tannus.ds.ArrayTools;
 using tannus.nore.ValueTools;
+using StringTools;
+using tannus.ds.StringUtils;
 
 @:access( tannus.nore.Compiler )
 class CompilerTools {
@@ -41,6 +43,14 @@ class CompilerTools {
 			var tc:Class<Dynamic> = Type.resolveClass( type );
 			return Std.is(o, tc);
 		}
+	}
+
+	/**
+	  * Check that [o]'s type-name ends with [type]
+	  */
+	public function checkShortType(o:Object, type:String):Bool {
+		var className:String = Tt.typename(o).split('.').last();
+		return (className == type);
 	}
 
 	/**

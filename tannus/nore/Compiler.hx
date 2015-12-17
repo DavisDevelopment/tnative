@@ -70,6 +70,10 @@ class Compiler {
 			case LooseTypeCheck( type ):
 				return tools.checkType.bind(_, type, true);
 
+			/* == Shorthand Type Check == */
+			case ShortTypeCheck( type ):
+				return tools.checkShortType.bind(_, type);
+
 			/* == Nested Check == */
 			case NestedCheck(sop, value):
 				if (operators.exists( sop )) {

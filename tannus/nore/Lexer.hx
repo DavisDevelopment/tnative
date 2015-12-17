@@ -224,6 +224,18 @@ class Lexer {
 			}
 		}
 
+		/* == .. operator == */
+		else if (c == '.'.code) {
+			advance();
+			if (next() == '.'.code) {
+				advance();
+				return TDoubleDot;
+			}
+			else {
+				throw 'SyntaxError: Expected ".", got ${next()}';
+			}
+		}
+
 		/* == ~ operator == */
 		else if (c == '~'.code) {
 			advance();

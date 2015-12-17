@@ -18,6 +18,7 @@ enum Token {
 	TOr;
 	TNot;
 	TApprox;
+	TDoubleDot;
 }
 
 enum Const {

@@ -3,6 +3,7 @@ package tannus.nore;
 enum Check {
 	TypeCheck(t : String);
 	LooseTypeCheck(t : String);
+	ShortTypeCheck(t : String);
 	NestedCheck(op:String, value:Value);
 
 	FieldExistsCheck(name : String);

@@ -55,6 +55,17 @@ class Parser {
 						throw 'SyntaxError: Unexpected $t!';
 				}
 
+			/* == Shorthand Type Check == */
+			case TDoubleDot:
+				t = token();
+				switch ( t ) {
+					case TConst(CIdent( type )):
+						return ShortTypeCheck( type );
+
+					default:
+						throw 'SyntaxError: Unexpected $t!';
+				}
+
 			/* == Field Checks == */
 			case TBrackets( group ):
 				switch ( group ) {
