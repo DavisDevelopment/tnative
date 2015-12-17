@@ -50,17 +50,16 @@ class Random {
 	/**
 	  * get random boolean value where [prob] is the probability that the value will be 'true'
 	  */
-	public function randchance(prob : Ratio):Bool {
-		var choices:Array<Int> = [for (i in 0...ceil(prob.bottom)) i];
+	public function randchance(top:Int, bottom:Int):Bool {
+		var choices:Array<Int> = [for (i in 0...bottom) i];
 		var correct:Array<Int> = new Array();
-		var clen:Int = ceil(prob.top);
-		while (correct.length < clen) {
+		while (correct.length < top) {
 			var cnum:Int = choice( choices );
 			if (!correct.has( cnum )) {
 				correct.push( cnum );
 			}
 		}
-		return (correct.has(randint(floor(prob.top), floor(prob.bottom))));
+		return (correct.has(randint(top, bottom)));
 	}
 
 	/**
