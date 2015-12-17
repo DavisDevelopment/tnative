@@ -5,6 +5,7 @@ import tannus.html.fs.WebFSEntry;
 import tannus.html.fs.WebDirectoryEntry in Dir;
 import tannus.html.fs.FilePromise;
 import tannus.sys.Path;
+import tannus.internal.TypeTools.typename;
 
 import tannus.ds.Promise;
 import tannus.ds.promises.*;
@@ -32,14 +33,16 @@ class FileSystem {
 	public static function chooseEntry(options:ChooseEntryOptions, cb:Array<WebFSEntry>->Void):Void {
 		lib.chooseEntry(options, function(entry:WebFSEntry) {
 			var all:Array<WebFSEntry> = new Array();
+			var tn:String = typename( entry );
 			if (entry != null) {
-				if (Std.is(entry, Array))
+				if (tn == 'Array') {
 					all = all.concat(untyped entry);
-				else
+				}
+				else {
 					all.push(entry);
+				}
 			}
-			var _all:Array<Array<WebFSEntry>> = untyped all;
-			all = tannus.ds.ArrayTools.flatten(_all);
+			trace( all );
 			cb( all );
 		});
 	}
