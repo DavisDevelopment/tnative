@@ -500,6 +500,23 @@ class TPoint {
 	}
 
 	/**
+	  * create and return a Point whose data is the result of mutating [this]'s data by [f]
+	  */
+	public function mutate(f : Float -> Float):Point {
+		return new Point(f(x), f(y), f(z));
+	}
+
+	/**
+	  * mutate [this] in-place
+	  */
+	public function imutate(f : Float->Float):Point {
+		x = f( x );
+		y = f( y );
+		z = f( z );
+		return cast this;
+	}
+
+	/**
 	  * Check for equality between [this] and [other]
 	  */
 	public function equals(other : Point):Bool {
