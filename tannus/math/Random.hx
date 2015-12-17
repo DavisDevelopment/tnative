@@ -9,6 +9,7 @@ import Math.*;
 using Lambda;
 using tannus.ds.ArrayTools;
 
+@:expose('Random')
 class Random {
 	/* Constructor Function */
 	public function new(?seed:Int):Void {
@@ -102,6 +103,7 @@ class Random {
 			copy.remove(el);
 			result.push(el);
 		}
+		result.push(copy.pop());
 		return result;
 	}
 
