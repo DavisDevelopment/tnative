@@ -143,6 +143,22 @@ abstract Duration (Dur) {
 		d.totalSeconds = Math.floor( i );
 		return d;
 	}
+
+	/**
+	  * from String
+	  */
+	@:from
+	public static function fromString(s : String):Duration {
+		var data = s.trim().split(':').map( Std.parseInt );
+		switch( data ) {
+			case [m, s]:
+				return new Duration(s, m);
+			case [h, m, s]:
+				return new Duration(s, m, h);
+			default:
+				throw 'Invalid Duration string "$s"';
+		}
+	}
 }
 
 /**
