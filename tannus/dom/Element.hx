@@ -4,6 +4,7 @@ import js.html.Element in JElement;
 import js.Browser.document;
 import js.html.DOMParser;
 
+import tannus.geom.*;
 import tannus.ds.Object;
 import tannus.ds.Obj;
 
@@ -85,10 +86,35 @@ class CElement {
 	}
 
 	/**
+	  * get only the [n]th item of [this], as an Element
+	  */
+	public inline function at(n : Int):Element {
+		return new Element(els[n]);
+	}
+
+	/**
+	  * check if [this] Selection is a parent of any Element that would match [sel]
+	  */
+	public function contains(sel : String):Bool {
+		var sub = find( sel );
+		return !sub.empty;
+	}
+
+	/**
 	  * Test [this] Element against the given CSS-Selector
 	  */
 	public function is(sel : String):Bool {
 		return first.matches( sel );
+	}
+
+	/**
+	  * Get the children of the current selection
+	  */
+	public function children():Element {
+		var rels = els.macmap([for (i in 0..._.children.length) cast _.children.item(i)]).flatten();
+		var res = new Element(null);
+		res.els = rels;
+		return res;
 	}
 
 	/**
@@ -295,6 +321,26 @@ class CElement {
 		}
 	}
 
+	/**
+	  * iterate over all selected items, as Element instances
+	  */
+	public function iterator():Iterator<Element> {
+		return new ElIter( this );
+	}
+
+	/**
+	  * the client-rectangle of [this] Element
+	  */
+	public function rect():Rectangle {
+		if ( !empty ) {
+			var cr = first.getBoundingClientRect();
+			return new Rectangle(cr.x, cr.y, cr.width, cr.height);
+		}
+		else {
+			return new Rectangle(0, 0, 0, 0);
+		}
+	}
+
 /* === Internal Methods === */
 
 	/**
@@ -323,6 +369,7 @@ class CElement {
 	  * Determine the context from the given String
 	  */
 	private function determineStringContext(s : String):Void {
+		s = s.trim();
 		if (s.startsWith('<')) {
 			els = parseDocument( s );
 		}
@@ -362,10 +409,20 @@ class CElement {
 
 /* === Computed Instance Fields === */
 
+	/* the number of selected elements */
+	public var length(get, never):Int;
+	private inline function get_length():Int return els.length;
+
 	/* whether nothing is currently selected */
 	public var empty(get, never):Bool;
 	private inline function get_empty():Bool {
-		return els.empty();
+		return (length <= 0);
+	}
+
+	/* whether [this] actually references any nodes */
+	public var exists(get, never):Bool;
+	private inline function get_exists():Bool {
+		return !empty;
 	}
 
 	/* the first selected element */
@@ -418,7 +475,7 @@ class CElement {
 	/* the textual content of [this] ELement */
 	public var text(get, set):String;
 	private function get_text():String {
-		if ( !empty ) {
+		if ( exists ) {
 			var result:String = '';
 			for (e in els) {
 				result += e.textContent;
@@ -457,7 +514,7 @@ class CElement {
 	public static function parseDocument(code : String):Array<JElement> {
 		var parser = new DOMParser();
 		var doc = parser.parseFromString(code, js.html.SupportedType.TEXT_HTML);
-		var nl = doc.querySelectorAll('body *');
+		var nl = doc.querySelectorAll('body *, head *');
 		var results:Array<JElement> = new Array();
 		for (i in 0...nl.length) {
 			var item = nl.item( i );
@@ -465,7 +522,7 @@ class CElement {
 				results.push(cast item);
 			}
 		}
-		return results;
+		return results.unique();
 	}
 
 	private static inline var DATAKEY:String = '__tandata';
