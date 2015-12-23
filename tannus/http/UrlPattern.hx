@@ -84,5 +84,5 @@ class CUrlPattern {
 	private var protocol:Pattern;
 	private var hostname:Pattern;
 	private var pathname:Null<Pattern>;
-	private var params:Null<Selector<Dynamic>>;
+	private var params:Null<Selector>;
 }
