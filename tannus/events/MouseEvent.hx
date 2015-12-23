@@ -69,4 +69,25 @@ class MouseEvent extends Event {
 
 		return result;
 	}
+
+	/**
+	  * Create a Tannus MouseEvent from a native JavaScript MouseEvent
+	  */
+	public static function fromJsEvent(event : js.html.MouseEvent):MouseEvent {
+		var mods:Array<EventMod> = new Array();
+		if (event.shiftKey)
+			mods.push( Shift );
+		if (event.altKey)
+			mods.push( Alt );
+		if (event.ctrlKey)
+			mods.push( Control );
+		if (event.metaKey)
+			mods.push( Meta );
+		var pos = new Point(event.pageX, event.pageY);
+		var e = new MouseEvent(event.type, pos, event.which, mods);
+		e.onCancelled.once(event.preventDefault);
+		e.onDefaultPrevented.once(event.preventDefault);
+		e.onPropogationStopped.once(event.stopPropagation);
+		return e;
+	}
 }
