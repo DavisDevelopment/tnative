@@ -27,7 +27,15 @@ class Rule {
 	  * Add a Property to [this] Rule
 	  */
 	public function set(name:String, value:Dynamic):Void {
-		properties.push(new Property(name, Std.string(value)));
+		if (exists( name )) {
+			var p = getProp(name);
+			p.value = Std.string( value );
+		}
+		else {
+			var p = new Property(name, Std.string(value));
+			properties.push( p );
+		}
+		changed();
 	}
 
 	/**
@@ -56,6 +64,13 @@ class Rule {
 				return prop;
 		}
 		return null;
+	}
+
+	/**
+	  * announce a change to [this] rule
+	  */
+	private inline function changed():Void {
+		sheet.changed();
 	}
 
 /* === Instance Fields === */
