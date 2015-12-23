@@ -46,6 +46,18 @@ class Lexer {
 			return nextWord();
 		}
 
+		/*
+		else if (c == '('.code) {
+			advance();
+			var lvl = 1;
+			while (!buffer.empty && lvl > 0) {
+				c = next();
+				if (c == '('.code)
+					lvl++
+			}
+		}
+		*/
+
 		else if (buffer.empty) {
 			return null;
 		}
