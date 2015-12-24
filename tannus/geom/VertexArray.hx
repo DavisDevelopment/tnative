@@ -164,7 +164,7 @@ class VertexArray {
 	/**
 	  * Get a Stack of Points
 	  */
-	private function pointStack():Stack<Point> {
+	public function pointStack():Stack<Point> {
 		var rdat = data.copy();
 		rdat.reverse();
 		return new Stack<Point>( rdat );
