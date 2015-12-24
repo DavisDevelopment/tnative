@@ -51,7 +51,7 @@ class CVelocity {
 		var l:Line = new Line(new Point(), e);
 
 		speed = l.length;
-		angle = TMath.angleBetween(0.0, 0.0, e.x, e.y);
+		angle = new Angle(TMath.angleBetween(0.0, 0.0, e.x, e.y));
 	}
 
 	/**
