@@ -8,6 +8,9 @@ import tannus.geom.Vertices;
 import tannus.math.Percent;
 import tannus.ds.EitherType in Either;
 
+import Math.*;
+import tannus.math.TMath.*;
+
 @:forward
 abstract Rectangle (CRectangle) from CRectangle to CRectangle {
 	/* Constructor Function */
@@ -190,6 +193,19 @@ class CRectangle implements Shape {
 		]);
 
 		return verts;
+	}
+
+	/**
+	  * get an Array of Rectangles, representing the z-layers of [this] one
+	  */
+	public function layers():Array<Rectangle> {
+		var results:Array<Rectangle> = new Array();
+		for (i in round(z)...round(z + depth)) {
+			var layer = new Rectangle(x, y, w, h);
+			layer.z = i;
+			results.push( layer );
+		}
+		return results;
 	}
 
 	/**
