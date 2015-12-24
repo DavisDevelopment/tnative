@@ -38,7 +38,9 @@ class Model extends EventDispatcher implements Asset {
 		if (cb != null)
 			onready( cb );
 		readyReqs.meet(function() {
-			_ready.fire();
+			sync(function() {
+				_ready.fire();
+			});
 		});
 	}
 
