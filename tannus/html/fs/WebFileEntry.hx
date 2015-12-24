@@ -79,6 +79,13 @@ abstract WebFileEntry (FileEntry) from FileEntry {
 			this.createWriter((function(writer) return writer), (function(err) throw err));
 		});
 	}
+
+	/**
+	  * delete [this] file
+	  */
+	public inline function remove(?cb : Void->Void):Void {
+		this.remove( cb );
+	}
 }
 
 typedef FileEntry = {
