@@ -50,6 +50,13 @@ class Line {
 	}
 
 	/**
+	  * do the stuff
+	  */
+	public inline function along(d : Float):Point {
+		return start.lerp(end, d);
+	}
+
+	/**
 	  * Obtain an Array of Points between [start] and [end]
 	  */
 	public function getVertices():Vertices {
