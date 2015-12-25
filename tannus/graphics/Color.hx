@@ -149,12 +149,12 @@ private class TColor {
 	  * Mix [this] Color with another one
 	  */
 	public function mix(t:TColor, weight:Percent):Color {
-		var ratio:Float = weight.of( 1 );
+		var ratio:Float = weight.of( 1.0 );
 		return new TColor(
-			int(red + (t.red - red) * ratio),
-			int(green + (t.green - green) * ratio),
-			int(blue + (t.blue - blue) * ratio),
-			int(alpha + (t.alpha - alpha) * ratio)
+			int(red.lerp(t.red, ratio)),
+			int(green.lerp(t.green, ratio)),
+			int(blue.lerp(t.blue, ratio)),
+			alpha
 		);
 	}
 
