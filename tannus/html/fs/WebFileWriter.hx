@@ -42,6 +42,13 @@ abstract WebFileWriter (FileWriter) from FileWriter {
 		seek(this.length);
 		write(data, cb);
 	}
+
+	/**
+	  * set the file's length to the provided integer
+	  */
+	public inline function truncate(len : Int):Void {
+		this.truncate( len );
+	}
 }
 
 typedef FileWriter = {
@@ -51,4 +58,5 @@ typedef FileWriter = {
 	
 	function write(blob:js.html.Blob):Void;
 	function seek(pos : Int):Void;
+	function truncate(len : Int):Void;
 };
