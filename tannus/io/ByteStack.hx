@@ -52,7 +52,9 @@ class ByteStack extends Stack<Byte> {
 	  * Get a clone of [this]
 	  */
 	override public function copy():Stack<Byte> {
-		return cast new ByteStack( b );
+		var c = new ByteStack( b );
+		c.i = i;
+		return c;
 	}
 
 	/**
@@ -72,6 +74,13 @@ class ByteStack extends Stack<Byte> {
 	/* check whether [this] is currently finished */
 	override private function get_empty():Bool {
 		return (i >= b.length);
+	}
+
+	/**
+	  * Set the [i] field of [this] Stack
+	  */
+	public function seek(pos : Int):Void {
+		i = pos;
 	}
 
 /* === Instance Fields === */
