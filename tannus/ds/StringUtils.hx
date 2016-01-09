@@ -75,7 +75,14 @@ class StringUtils {
 	  * Whether sub-string [sub] can be found in [str]
 	  */
 	public static function has(str:String, sub:String):Bool {
-		return (str.indexOf(sub) != -1);
+		var i:Int;
+		try {
+			i = str.indexOf( sub );
+		}
+		catch (err : Dynamic) {
+			i = -1;
+		}
+		return (i != -1);
 	}
 
 	/**
@@ -112,9 +119,12 @@ class StringUtils {
 	  * Get all text of [s] that occurs AFTER [del], or all of [s] if [del] is absent
 	  */
 	public static function after(s:String, del:String):String {
-		if (has(s, del))
-			return s.substring(s.indexOf(del)+1);
-		else return s;
+		if (has(s, del)) {
+			return s.substring(s.indexOf( del ) + del.length);
+		}
+		else {
+			return s;
+		}
 	}
 	
 	/**
@@ -122,7 +132,7 @@ class StringUtils {
 	  */
 	public static function afterLast(s:String, del:String):String {
 		if (has(s, del)) {
-			return (s.substring(s.lastIndexOf(del) + 1));
+			return (s.substring(s.lastIndexOf(del) + del.length));
 		}
 		else {
 			return '';
