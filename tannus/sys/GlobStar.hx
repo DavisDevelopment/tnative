@@ -41,6 +41,7 @@ class CGlobStar {
 	  * Test a Path against [this] GlobStar
 	  */
 	public function test(path : String):Bool {
+		return pattern.match(path);
 		var data = pattern.search( path );
 		if (data.length == 0)
 			return false;
@@ -53,7 +54,7 @@ class CGlobStar {
 	  * Get match-data
 	  */
 	public function match(s : String):Null<Object> {
-		var dat = pattern.search( s );
+		var dat = pattern.matches( s );
 		if (dat.length == 0)
 			return null;
 		else {
@@ -61,7 +62,6 @@ class CGlobStar {
 			var res:Object = {};
 			for (k in pind.keys()) {
 				var i = pind[k];
-				trace(i);
 				res[k] = m[i+1];
 			}
 			return res;
