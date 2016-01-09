@@ -78,7 +78,6 @@ private class CPath {
         var spath:String = (toString() + '');
         if (!spath.startsWith('/'))
             spath = ('/' + spath);
-        trace( spath );
         return new Path( spath );
     }
     
