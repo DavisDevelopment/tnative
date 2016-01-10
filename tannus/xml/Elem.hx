@@ -1,13 +1,14 @@
 package tannus.xml;
 
 import tannus.ds.Object;
+import tannus.ds.Obj;
 
 class Elem {
 	/* Constructor Function */
 	public function new(type:String, ?parent:Elem):Void {
 		tag = type;
 		text = '';
-		attr = {};
+		attributes = {};
 		children = new Array();
 
 		if (parent != null) {
@@ -43,19 +44,31 @@ class Elem {
 		return children.indexOf(child);
 	}
 
-	/* Get the value of an attribute of [this] Elem */
+	/* Get the value of an attributesibute of [this] Elem */
 	public function get(key : String):Null<String> {
-		return attr[key];
+		return attributes[key];
 	}
 
-	/* Set the value of an attribute */
-	public function set(key:String, val:String):Void {
-		attr.set(key, val);
+	/* Set the value of an attributesibute */
+	public function set(key:String, val:String):String {
+		attributes.set(key, val);
+		return get( key );
 	}
 
-	/* Check whether [this] has an attribute */
+	/* Check whether [this] has an attributesibute */
 	public function exists(key : String):Bool {
-		return attr.exists(key);
+		return attributes.exists(key);
+	}
+
+	/**
+	  * batch-set attributes on [this] Elem
+	  */
+	public function attr(_batch : Dynamic):Elem {
+		var batch:Obj = Obj.fromDynamic( _batch );
+		for (key in batch.keys()) {
+			set(key, Std.string(batch[key]));
+		}
+		return this;
 	}
 
 	/* Apply [f] recursively to all children of [this] */
@@ -91,10 +104,10 @@ class Elem {
 		return query(function(e) return (e.tag.toLowerCase() == name.toLowerCase()));
 	}
 
-	/* Find all Elems whose [key] attribute equals [val] */
+	/* Find all Elems whose [key] attributesibute equals [val] */
 	public function findByAttribute(key:String, val:String):Array<Elem> {
 		return query(function(e) {
-			return (e.attr[key] == val);
+			return (e.attributes[key] == val);
 		});
 	}
 
@@ -105,7 +118,7 @@ class Elem {
 			xm.addChild(Xml.createPCData(text));
 		}
 
-		for (k in attr.keys) {
+		for (k in attributes.keys) {
 			xm.set(k, get(k));
 		}
 
@@ -119,8 +132,8 @@ class Elem {
 	/**
 	  * Output [this] DOM as an XML String
 	  */
-	public function print(?pretty:Bool=false):String {
-		return haxe.xml.Printer.print(toXml(), pretty);
+	public function print(pretty:Bool = false):String {
+		return tannus.xml.Printer.print(this, pretty);
 	}
 
 /* === Static Fields === */
@@ -159,7 +172,7 @@ class Elem {
 	public var text:String;
 
 	//- Attributes associated with [this] Elem
-	public var attr:Object;
+	public var attributes:Object;
 
 	//- Array of Elems which are children to [this]
 	public var children:Array<Elem>;

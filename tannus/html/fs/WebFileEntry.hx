@@ -86,6 +86,18 @@ abstract WebFileEntry (FileEntry) from FileEntry {
 	public inline function remove(?cb : Void->Void):Void {
 		this.remove( cb );
 	}
+
+	/**
+	  * get the directory that [this] file is in
+	  */
+	public inline function getDirectory():Promise<WebDirectoryEntry> {
+		return Promise.create({
+			this.getParent(function(parent) {
+				if ( parent.isDirectory )
+					return cast parent;
+			}, (function(err) throw err));
+		});
+	}
 }
 
 typedef FileEntry = {

@@ -38,7 +38,7 @@ class WebFile {
 			reader.onerror = function(error : Dynamic):Void {
 				throw error;
 			};
-			reader.onloadend = function(event) {
+			reader.onload = function(event) {
 				var data:ByteArray = ByteArray.ofData(cast event.target.result);
 				return data;
 			};

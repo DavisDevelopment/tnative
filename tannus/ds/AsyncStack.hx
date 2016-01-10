@@ -59,6 +59,12 @@ class AsyncStack extends Stack<Async> {
 				case ExprDef.EContinue:
 					return macro (next());
 
+				case ExprDef.EMeta(s, {expr:ECall(f, args), pos:pos}) if (s.name == 'await'):
+					return {
+						'expr': ECall(f, args.concat([macro next])),
+						'pos' : pos
+					};
+
 				default:
 					return e.map(emapper);
 			}

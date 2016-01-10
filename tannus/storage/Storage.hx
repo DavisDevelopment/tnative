@@ -49,6 +49,7 @@ class Storage {
 
 			/* PUSH the data to the remote */
 			_push(fdata, function(err : Err) {
+				trace('pushed successfully');
 				/* if any errors occurred */
 				if (err != null) {
 					throw err;
