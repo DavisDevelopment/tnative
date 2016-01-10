@@ -6,6 +6,7 @@ import tannus.html.fs.WebFileSystem;
 import tannus.html.fs.WebFileWriter;
 
 import tannus.ds.Promise;
+import tannus.ds.Object;
 import tannus.ds.promises.*;
 import tannus.io.ByteArray;
 
@@ -35,6 +36,22 @@ abstract WebFileEntry (FileEntry) from FileEntry {
 	}
 
 	/**
+	  * get the associated WebFile object
+	  */
+	public function getFile(cb : WebFile->Void):Void {
+		var self = o;
+		if (self.exists('_file')) {
+			cb(untyped self['_file']);
+		}
+		else {
+			this.file(function( f ) {
+				self['_file'] = f;
+				cb(cast f);
+			}, function(err) throw err);
+		}
+	}
+
+	/**
 	  * Get the size of [this] File
 	  */
 	public inline function size():Promise<Int> {
@@ -55,7 +72,7 @@ abstract WebFileEntry (FileEntry) from FileEntry {
 	  */
 	public function read():Promise<ByteArray> {
 		return Promise.create({
-			this.file(function(file) {
+			getFile(function( file ) {
 				var reader = new FileReader();
 				reader.onerror = function(error) {
 					throw error;
@@ -65,8 +82,6 @@ abstract WebFileEntry (FileEntry) from FileEntry {
 					return data;
 				};
 				reader.readAsArrayBuffer(cast file);
-			}, function(error) {
-				throw error;
 			});
 		});
 	}
@@ -76,8 +91,15 @@ abstract WebFileEntry (FileEntry) from FileEntry {
 	  */
 	public function writer():Promise<WebFileWriter> {
 		return Promise.create({
-			this.createWriter((function(writer) return writer), (function(err) throw err));
+			createWriter((function(writer) return writer), (function(err) throw err));
 		});
+	}
+
+	/**
+	  * Obtain a writer
+	  */
+	public function createWriter(onsuccess:WebFileWriter->Void, ?onerror:Dynamic->Void):Void {
+		this.createWriter(function(fw : FileWriter) onsuccess( fw ), onerror);
 	}
 
 	/**
@@ -98,6 +120,9 @@ abstract WebFileEntry (FileEntry) from FileEntry {
 			}, (function(err) throw err));
 		});
 	}
+
+	private var o(get, never):Object;
+	private inline function get_o():Object return new Object(this);
 }
 
 typedef FileEntry = {
@@ -107,6 +132,6 @@ typedef FileEntry = {
 	function file(onSuccess:File->Void, ?onFailure:Dynamic->Void):Void;
 
 	/* Get a Writer for [this] File */
-	function createWriter(onSuccess:WebFileWriter->Void, ?onFailure:Dynamic->Void):Void;
+	function createWriter(onSuccess:FileWriter->Void, ?onFailure:Dynamic->Void):Void;
 }
 

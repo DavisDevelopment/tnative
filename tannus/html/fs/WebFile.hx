@@ -36,7 +36,7 @@ class WebFile {
 				len = size;
 			var reader:FileReader = new FileReader();
 			reader.onerror = function(error : Dynamic):Void {
-				throw error;
+				throw error.target.error;
 			};
 			reader.onload = function(event) {
 				var data:ByteArray = ByteArray.ofData(cast event.target.result);
