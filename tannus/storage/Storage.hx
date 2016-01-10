@@ -44,6 +44,7 @@ class Storage {
 	public function push(done : Void->Void):Void {
 		/* FETCH the data from the remote */
 		_fetch(function(fdata : Data):Void {
+			trace('fetched successfully');
 			/* apply local commits to the remote data */
 			fdata = _applyCommits(fdata, commits);
 
