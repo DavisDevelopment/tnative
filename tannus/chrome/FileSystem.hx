@@ -118,6 +118,19 @@ class FileSystem {
 	}
 
 	/**
+	  * Get a File object to save to
+	  */
+	public static function saveAs():FilePromise {
+		return new FilePromise(function( provide ) {
+			chooseEntry({type: SaveFile}, function(entries) {
+				if (entries.length > 0) {
+					provide(cast entries[0]);
+				}
+			});
+		});
+	}
+
+	/**
 	  * Get the Full Path to a File
 	  */
 	public static function getDisplayPath(entry:WebFileEntry, cb:Path->Void):Void {
