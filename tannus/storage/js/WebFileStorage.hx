@@ -7,6 +7,7 @@ import tannus.io.Signal;
 import tannus.io.ByteArray;
 import tannus.html.fs.WebFileEntry;
 import tannus.html.fs.WebFile;
+import tannus.html.fs.WebFileWriter;
 
 import haxe.Json;
 
@@ -18,8 +19,8 @@ class WebFileStorage extends Storage {
 		super();
 
 		fe = _f;
-		trace( fe );
 		f = null;
+		writer = null;
 	}
 
 /* === Instance Methods === */
@@ -29,13 +30,28 @@ class WebFileStorage extends Storage {
 	  */
 	private function getFile(cb : WebFile -> Void):Void {
 		if (f == null) {
-			fe.file().then(function(file) {
+			fe.file().then(function( file ) {
 				f = file;
 				cb( f );
 			});
 		}
 		else {
 			cb( f );
+		}
+	}
+
+	/**
+	  * get the Writer
+	  */
+	private function getWriter(cb : WebFileWriter->Void):Void {
+		if (writer == null) {
+			fe.writer().then(function(w) {
+				writer = w;
+				cb( writer );
+			});
+		}
+		else {
+			cb( writer );
 		}
 	}
 
@@ -61,37 +77,25 @@ class WebFileStorage extends Storage {
 	}
 
 	/**
-	  * clear the meta-file
-	  */
-	private function clearFile(done : Void->Void):Void {
-		var name = (fe.fullPath + fe.name);
-		fe.getDirectory().then(function(parent) {
-			fe.remove(function() {
-				parent.createFile( name ).then(function( _f ) {
-					fe = _f;
-					f = null;
-					done();
-				});
-			});
-		});
-	}
-
-	/**
 	  * push local data
 	  */
 	override private function _push(mdata:Data, cb:Err->Void):Void {
 		var start = Date.now().getTime();
-		clearFile(function() {
-			fe.writer().then(function( writer ) {
-				var o:Object = mdata.toObject();
-				var sdata:String = Json.stringify(o, null, '    ');
-				var data:ByteArray = ByteArray.ofString( sdata );
-				writer.write(data, function(err) {
-					var end = Date.now().getTime();
-					var took = (end - start);
-					trace('metadata PUSH operation took ${took}ms to complete');
-					cb( err );
-				});
+		getWriter(function( writer ) {
+			trace('got writer object');
+			var o:Object = mdata.toObject();
+			var sdata:String = Json.stringify(o, null, '    ');
+			var data:ByteArray = ByteArray.ofString( sdata );
+			writer.write(data, function(err : Null<Dynamic>) {
+				if (err != null) {
+					throw err;
+				}
+				writer.truncate( writer.position );
+				f = null;
+				var end = Date.now().getTime();
+				var took = (end - start);
+				trace('metadata PUSH operation took ${took}ms to complete');
+				cb( err );
 			});
 		});
 	}
@@ -99,5 +103,6 @@ class WebFileStorage extends Storage {
 /* === Instance Fields === */
 
 	private var fe : WebFileEntry;
+	private var writer : Null<WebFileWriter>;
 	private var f : Null<WebFile>;
 }
