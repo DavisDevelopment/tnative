@@ -45,6 +45,7 @@ class Task {
 	public function abort():Void {
 		if ( doing ) {
 			onkill.call();
+			_doing = false;
 		}
 		else {
 			throw 'Error: Cannot abort a Task that is not running!';
