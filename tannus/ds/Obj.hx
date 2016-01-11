@@ -5,6 +5,8 @@ import tannus.io.Ptr;
 import Reflect in R;
 
 using Reflect;
+using Lambda;
+using tannus.ds.ArrayTools;
 
 @:forward
 abstract Obj (CObj) from CObj {
@@ -103,6 +105,29 @@ class CObj {
 	  */
 	public function remove(key : String):Bool {
 		return o.deleteField( key );
+	}
+
+	/**
+	  * create and return an object with a subset of the properties/values attached to [this] one
+	  */
+	public function pluck(keys : Array<String>):Obj {
+		var o:Dynamic = {};
+		var copy:Obj = Obj.fromDynamic( o );
+		for (k in this.keys())
+			if (keys.has( k ))
+				copy.set(k, get( k ));
+		return copy;
+	}
+
+	/**
+	  * create a new anonymous object with the same properties/property-values as [this]
+	  */
+	public function rawclone():Obj {
+		var o:Dynamic = {};
+		var copy:Obj = Obj.fromDynamic( o );
+		for (k in keys())
+			copy.set(k, get(k));
+		return copy;
 	}
 
 	/**
