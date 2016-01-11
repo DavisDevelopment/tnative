@@ -21,7 +21,7 @@ class Elem {
 	/* Append an Elem to [this] */
 	public function addChild(child : Elem):Void {
 		children.push( child );
-		child.parent = child;
+		child.parent = this;
 	}
 
 	/* Remove an Elem from [this] */
@@ -41,7 +41,11 @@ class Elem {
 
 	/* Obtain the index of [child] in [this] */
 	public function indexOfChild(child : Elem):Int {
-		return children.indexOf(child);
+		for (i in 0...children.length)
+			if (children[i] == child)
+				return i;
+		return -1;
+
 	}
 
 	/* Get the value of an attributesibute of [this] Elem */
@@ -134,6 +138,13 @@ class Elem {
 	  */
 	public function print(pretty:Bool = false):String {
 		return tannus.xml.Printer.print(this, pretty);
+	}
+
+	/**
+	  * method called just before [this] Node is stringified
+	  */
+	private function _pre_print():Void {
+		null;
 	}
 
 /* === Static Fields === */
