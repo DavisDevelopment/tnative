@@ -6,6 +6,7 @@ import tannus.ds.Stack;
 using tannus.ds.StringUtils;
 using tannus.ds.ArrayTools;
 
+@:access(tannus.xml.Elem)
 class Printer {
 	/* Constructor Function */
 	public function new():Void {
@@ -24,6 +25,7 @@ class Printer {
 		buffer = '';
 		history = new Stack();
 
+		preprocess( e );
 		genElem( e );
 
 		return buffer;
@@ -32,7 +34,7 @@ class Printer {
 	/**
 	  * Generate the code for an Element
 	  */
-	private function genElem(e:Elem, indent:Int=0):Void {
+	public dynamic function genElem(e:Elem, indent:Int=0):Void {
 		var pre:String = space.times( indent );
 		if ( pretty )
 			indent++;
@@ -73,6 +75,15 @@ class Printer {
 	}
 
 	/**
+	  * walk the DOM and invoke pre-processing operations
+	  */
+	private function preprocess(e : Elem):Void {
+		e._pre_print();
+		for (child in e.children)
+			preprocess( child );
+	}
+
+	/**
 	  * Get Element text
 	  */
 	private function getElemText(e:Elem, indent:Int):String {
@@ -106,14 +117,14 @@ class Printer {
 	/**
 	  * Write some text to [buffer]
 	  */
-	private inline function write(s : String):Void {
+	public dynamic function write(s : String):Void {
 		buffer += s;
 	}
 
 	/**
 	  * Write some text, followed by a newline
 	  */
-	private inline function writeln(s : String):Void {
+	public inline function writeln(s : String):Void {
 		write(s + '\n');
 	}
 
