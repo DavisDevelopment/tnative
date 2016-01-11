@@ -101,6 +101,13 @@ class ArrayTools {
 	}
 
 	/**
+	  * obtain the intersection of two Arrays
+	  */
+	public static inline function intersection<T>(one:Array<T>, two:Array<T>):Array<T> {
+		return ((one.length < two.length) ? macfilter(one, !two.has( _ )) : macfilter(two, !one.has( _ )));
+	}
+
+	/**
 	  * Flatten [set]
 	  */
 	public static function flatten<T>(set : Array<Array<T>>):Array<T> {
