@@ -48,6 +48,77 @@ class Elem {
 
 	}
 
+	/**
+	  * get the index of [this] element
+	  */
+	public function index():Int {
+		if (parent != null)
+			return parent.indexOfChild( this );
+		else
+			return -1;
+	}
+
+	/**
+	  * replace [this] Element with the given one
+	  */
+	public function replaceWith(other : Elem):Void {
+		if (parent != null) {
+			parent.replaceChild(this, other);
+		}
+	}
+
+	/**
+	  * add the given element as a child of [this] one
+	  */
+	public inline function append(child : Elem):Void {
+		addChild( child );
+	}
+
+	/**
+	  * add the given element as a child of [this] one, before all the other children
+	  */
+	public function prepend(child : Elem):Void {
+		addChild( child );
+		children.remove( child );
+		children.insert(0, child);
+	}
+
+	/**
+	  * insert the [what] before [before]
+	  */
+	public function insertBefore(what:Elem, before:Elem):Void {
+		addChild( what );
+		children.remove( what );
+		children.insert(indexOfChild(before), what);
+	}
+
+	/**
+	  * insert [what] after [after]
+	  */
+	public function insertAfter(what:Elem, after:Elem):Void {
+		addChild( what );
+		children.remove( what );
+		children.insert(indexOfChild(after) + 1, what);
+	}
+
+	/**
+	  * insert what after [this]
+	  */
+	public function after(what : Elem):Void {
+		if (parent != null) {
+			parent.insertAfter(what, this);
+		}
+	}
+
+	/**
+	  * insert what before [this]
+	  */
+	public function before(what : Elem):Void {
+		if (parent != null) {
+			parent.insertBefore(what, this);
+		}
+	}
+
 	/* Get the value of an attributesibute of [this] Elem */
 	public function get(key : String):Null<String> {
 		return attributes[key];
