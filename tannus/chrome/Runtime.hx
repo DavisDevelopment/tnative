@@ -62,15 +62,15 @@ class Runtime {
 	private static inline function get_lib():Dynamic return untyped __js__('chrome.runtime');
 }
 
-private typedef Message = {
+typedef Message = {
 	var data : Object;
 	var sender : MessageSender;
 	var respond : Object -> Void;
 };
 
-private typedef MessageSender = {
+typedef MessageSender = {
 	@:optional
-	var tab : Maybe<Tab>;
+	var tab : Tab;
 	@:optional
 	var id : Maybe<String>;
 	@:optional
