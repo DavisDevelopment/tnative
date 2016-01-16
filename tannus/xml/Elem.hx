@@ -70,7 +70,7 @@ class Elem {
 	/**
 	  * add the given element as a child of [this] one
 	  */
-	public inline function append(child : Elem):Void {
+	public function append(child : Elem):Void {
 		addChild( child );
 	}
 
