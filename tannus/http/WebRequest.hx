@@ -5,10 +5,11 @@ import tannus.io.VoidSignal;
 import tannus.ds.Obj;
 
 import js.html.XMLHttpRequest;
+import js.html.XMLHttpRequestResponseType in Nrt;
 import js.html.ArrayBuffer;
 import js.html.Blob;
 
-class WebRequest {
+class WebRequest extends EventDispatcher {
 	/* Constructor Function */
 	public function new():Void {
 		super();
@@ -89,6 +90,9 @@ class WebRequest {
 			case Done:
 				done();
 				complete = true;
+
+			default:
+				null;
 		}
 	}
 
@@ -115,7 +119,7 @@ class WebRequest {
 	/* the response type of [this] shit */
 	public var responseType(get, set):ResponseType;
 	private inline function get_responseType():ResponseType return cast(req.responseType, String);
-	private inline function set_responseType(v : ResponseType):ResponseType return (req.responseType = v);
+	private inline function set_responseType(v : ResponseType):ResponseType return untyped(req.responseType = cast v);
 
 /* === Instance Fields === */
 
