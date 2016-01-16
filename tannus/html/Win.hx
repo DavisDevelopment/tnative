@@ -8,6 +8,8 @@ import tannus.ds.Obj;
 import tannus.ds.Maybe;
 import tannus.ds.Range;
 import tannus.io.Ptr;
+import tannus.io.Setter;
+import tannus.io.Getter;
 import tannus.io.Signal;
 import tannus.events.KeyboardEvent;
 import tannus.events.EventMod;
@@ -120,6 +122,29 @@ abstract Win (CWin) from CWin to CWin {
 		self[name] = value;
 	}
 
+	/**
+	  * expose a Getter
+	  */
+	public inline function exposeGetter<T>(name:String, get:Getter<T>):Void {
+		untyped (this.__defineGetter__(name, get));
+	}
+
+	/**
+	  * expose a Setter
+	  */
+	public inline function exposeSetter<T>(name:String, set:Setter<T>):Void {
+		untyped this.__defineSetter__(name, set);
+	}
+
+	/**
+	  * expose a Pointer
+	  */
+	public inline function exposeRef<T>(name:String, ref:Ptr<T>):Void {
+		exposeGetter(name, ref.getter);
+		exposeSetter(name, ref.setter);
+	}
+
+
 /* === Instance Fields === */
 
 	/**
@@ -129,6 +154,12 @@ abstract Win (CWin) from CWin to CWin {
 	private inline function get_viewport():Rectangle {
 		return new Rectangle(this.scrollX, this.scrollY, this.innerWidth, this.innerHeight);
 	}
+
+	/**
+	  * [this] Window, as an object
+	  */
+	public var self(get, never):Obj;
+	private inline function get_self():Obj return Obj.fromDynamic( this );
 
 /* === Static Fields === */
 
