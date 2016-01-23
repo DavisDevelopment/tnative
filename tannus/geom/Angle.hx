@@ -38,6 +38,8 @@ class CAngle {
 	/* Constructor Function */
 	public function new(_v : Float):Void {
 		v = _v;
+		while (v < 0)
+			v = (360 - abs( v ));
 	}
 
 /* === Instance Methods === */
