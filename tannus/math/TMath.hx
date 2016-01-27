@@ -6,6 +6,7 @@ import haxe.Int64;
 
 import Math.*;
 
+@:expose('TMath')
 class TMath {
 	public static inline var E = 2.718281828459045;
 	public static inline var LN2 = 0.6931471805599453;
@@ -45,9 +46,12 @@ class TMath {
 	}
 
 	/** Determines and Returns the angle between two points */
-	#if !js @:generic #end
-	inline public static function angleBetween<T : Float> (x1:T, y1:T, x2:T, y2:T):Float {
-		return (toDegrees(Math.atan2(y2 - y1, x2 - x1)));	
+	public static function angleBetween(x1:Float, y1:Float, x2:Float, y2:Float):Float {
+		var degs:Float = (toDegrees(Math.atan2(y2 - y1, x2 - x1)));	
+		while (degs < 0) {
+			degs = (360 - Math.abs(degs));
+		}
+		return degs;
 	}
 
 	#if !js @:generic #end
