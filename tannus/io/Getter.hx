@@ -32,6 +32,14 @@ abstract Getter<T> (Get<T>) from Get<T> {
 	}
 
 	/**
+	  * Convert [this] to a String
+	  */
+	@:to
+	public inline function toString():String {
+		return Std.string(this());
+	}
+
+	/**
 	  * Apply a transformation to [this] Getter
 	  */
 	public function transform<O>(f : T->O):Getter<O> {
@@ -45,6 +53,19 @@ abstract Getter<T> (Get<T>) from Get<T> {
 		var tfunc:Expr = trans.mapUnderscoreTo('v');
 		tfunc = macro (function(v) return $tfunc);
 		return (macro $self.transform( $tfunc ));
+	}
+
+	/**
+	  * Add [this] to the type it returns
+	  */
+	@:op(A + B)
+	@:commutative
+	public static inline function addNumber<T:Float>(get:Getter<T>, val:T):T {
+		return (get.get() + val);
+	}
+	@:op(A + B)
+	public static inline function addString(get:Getter<String>, val:String):String {
+		return (get.get() + val);
 	}
 
 /* === Class Methods === */
