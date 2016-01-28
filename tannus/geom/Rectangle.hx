@@ -1,5 +1,7 @@
 package tannus.geom;
 
+import tannus.io.Ptr;
+
 import tannus.geom.Point;
 import tannus.geom.Area;
 import tannus.geom.Shape;
@@ -196,6 +198,19 @@ class CRectangle implements Shape {
 	}
 
 	/**
+	  * Obtain an Array of Pointers to the corners of [this] Rectangle
+	  */
+	public function getCornerPointers():Array<Ptr<Point>> {
+		var result:Array<Ptr<Point>> = [
+			Ptr.create( topLeft ),
+			Ptr.create( topRight ),
+			Ptr.create( bottomLeft ),
+			Ptr.create( bottomRight )
+		];
+		return result;
+	}
+
+	/**
 	  * get an Array of Rectangles, representing the z-layers of [this] one
 	  */
 	public function layers():Array<Rectangle> {
@@ -282,32 +297,53 @@ class CRectangle implements Shape {
 	/**
 	  * The top-right corner
 	  */
-	public var topRight(get, never):Point;
+	public var topRight(get, set):Point;
 	private inline function get_topRight():Point {
 		return new Point((x + width), y);
-	} 
+	}
+	private function set_topRight(v : Point):Point {
+		x = (v.x - width);
+		y = v.y;
+		return topRight;
+	}
+
 	/**
 	  * The top-left corner
 	  */
-	public var topLeft(get, never):Point;
+	public var topLeft(get, set):Point;
 	private inline function get_topLeft():Point {
 		return new Point(x, y);
+	}
+	private function set_topLeft(v : Point):Point {
+		x = v.x;
+		y = v.y;
+		return topLeft;
 	}
 
 	/**
 	  * The bottom-left corner
 	  */
-	public var bottomLeft(get, never):Point;
+	public var bottomLeft(get, set):Point;
 	private inline function get_bottomLeft():Point {
 		return new Point(x, (y + height));
+	}
+	private function set_bottomLeft(v : Point):Point {
+		x = v.x;
+		y = (v.y - height);
+		return bottomLeft;
 	}
 
 	/**
 	  * The bottom-right
 	  */
-	public var bottomRight(get, never):Point;
+	public var bottomRight(get, set):Point;
 	private inline function get_bottomRight():Point {
 		return new Point((x + width), (y + height));
+	}
+	private function set_bottomRight(v : Point):Point {
+		x = (v.x - w);
+		y = (v.y - h);
+		return bottomRight;
 	}
 
 	/**
