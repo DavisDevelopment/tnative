@@ -30,8 +30,13 @@ class CWebFileWriter {
 
 /* === Instance Methods === */
 
-	public inline function seek(pos : Int):Void {
-		w.seek( pos );
+	public function seek(pos : Int):Void {
+		try {
+			w.seek( pos );
+		}
+		catch (err : Dynamic) {
+			onerror.call( err );
+		}
 	}
 
 	public function write(data:ByteArray, ?cb:Null<Dynamic>->Void):Void {
