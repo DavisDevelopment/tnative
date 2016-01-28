@@ -21,7 +21,7 @@ using tannus.math.TMath;
 using tannus.macro.MacroTools;
 
 @:forward
-abstract Point (TPoint) {
+abstract Point (TPoint) from TPoint to TPoint {
 	/* Constructor Function */
 	public inline function new(?x:Float=0, ?y:Float=0, ?z:Float=0):Void {
 		this = new TPoint(x, y, z);
@@ -184,7 +184,7 @@ abstract Point (TPoint) {
 	}
 
 	@:op(A == B)
-	public inline function equals(p : Point):Bool return this.equals(p);
+	public inline function equals(p : Point):Bool return this.equals( p );
 
 	@:op(A != B)
 	public inline function nequals(p : Point):Bool return this.nequals(p);
@@ -351,7 +351,7 @@ abstract Point (TPoint) {
 }
 
 /* Base Point Class */
-class TPoint {
+class TPoint implements tannus.ds.Comparable<TPoint> {
 	/* Constructor Function */
 	public function new(x:Float, y:Float, z:Float):Void {
 		_x = x;
