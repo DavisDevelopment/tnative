@@ -323,12 +323,30 @@ abstract Point (TPoint) {
 	}
 
 	/**
+	  * Create a linked Point, from a Ptr<Point>
+	  */
+	public static function createLinkedFromPointRef(p : Ptr<Point>):Point {
+		var x:Ptr<Float> = Ptr.create( p.v.x );
+		var y:Ptr<Float> = Ptr.create( p.v.y );
+		var z:Ptr<Float> = Ptr.create( p.v.z );
+		return createLinked(x, y, z);
+	}
+
+	/**
 	  * Create a linked Point, implicitly
 	  */
 	public static macro function linked(x:ExprOf<Float>, others:Array<ExprOf<Float>>):ExprOf<Point> {
 		var args:Array<ExprOf<Ptr<Float>>> = ([x].concat(others)).map(function(e) return e.pointer());
 		var result:ExprOf<Point> = (macro tannus.geom.Point.createLinked( $a{args} ));
 		return result;
+	}
+
+	/**
+	  * Create a linked Point from a pointer
+	  */
+	public static macro function linkedFromPointer(point : ExprOf<Point>):ExprOf<Point> {
+		var ref:ExprOf<Ptr<Point>> = (macro tannus.io.Ptr.create( $point ));
+		return macro tannus.geom.Point.createLinkedFromPointRef( $ref );
 	}
 }
 
