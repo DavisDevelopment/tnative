@@ -24,6 +24,13 @@ class Track {
 		Memory.freeRandomId( id );
 	}
 
+	/**
+	  * set the duration of [this] Track
+	  */
+	private function set_duration(v : Duration):Duration {
+		return (duration = v);
+	}
+
 /* === Instance Fields === */
 
 	/* The Name of [this] Track */
@@ -36,7 +43,7 @@ class Track {
 	public var index : Int;
 
 	/* The Duration of [this] Track, in Seconds */
-	public var duration : Duration;
+	public var duration(default, set): Duration;
 
 	/* The Path or URL to [this] Track */
 	public var location : String;
