@@ -6,6 +6,12 @@ import haxe.Int64;
 
 import Math.*;
 
+import haxe.macro.Expr;
+import haxe.macro.Context;
+
+using haxe.macro.ExprTools;
+using tannus.macro.MacroTools;
+
 @:expose('TMath')
 class TMath {
 	public static inline var E = 2.718281828459045;
@@ -118,6 +124,13 @@ class TMath {
 	/** Perform a linear interpolation between two numbers */
 	public static inline function lerp<T:Float> (a:T, b:T, x:Float):Float {
 		return a + x * (b - a);
+	}
+
+	/**
+	  * Check whether [n] is "almost" equal to [v]
+	  */
+	public static inline function almostEquals<T:Float>(n:T, v:T, threshold:T):Bool {
+		return (abs(n - v) <= threshold);
 	}
 
 	/** Cast from Float to Int */
@@ -319,5 +332,23 @@ class TMath {
 			i64.set_high((v < 0 ? 0x80000000 : 0) | ((exp + 1023) << 20) | sig_h);
 		}
 		return i64;
+	}
+
+	/**
+	  * Get the largest element in the given Array
+	  */
+	public static macro function macmax<T>(list:ExprOf<Array<T>>, test:Expr):ExprOf<T> {
+		test = test.mapUnderscoreTo( 'val' );
+		test = (macro function(val) return $test);
+		return macro tannus.math.TMath.max($list, $test);
+	}
+
+	/**
+	  * get the smallest element in the given Array
+	  */
+	public static macro function macmin<T>(list:ExprOf<Array<T>>, test:Expr):ExprOf<T> {
+		test = test.mapUnderscoreTo( 'v' );
+		test = (macro function(v) return $test);
+		return macro tannus.ds.ArrayTools.min($list, $test);
 	}
 }
