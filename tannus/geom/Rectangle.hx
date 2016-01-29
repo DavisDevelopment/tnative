@@ -163,6 +163,16 @@ class CRectangle implements Shape {
 	}
 
 	/**
+	  * Enlarge [this] Rectangle by the given amount
+	  */
+	public function enlarge(dw:Float, dh:Float):Void {
+		w += dw;
+		h += dh;
+		x -= (dw / 2);
+		y -= (dh / 2);
+	}
+
+	/**
 	  * Vectorize [this] Rectangle
 	  */
 	public function vectorize(r : Rectangle):Rectangle {
