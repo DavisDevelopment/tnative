@@ -19,6 +19,27 @@ class MacroTools {
 	}
 
 	/**
+	  * Check whether the given Expression contains a return
+	  */
+	public static function hasReturn(e : Expr):Bool {
+		var ret:Bool = false;
+		
+		function walker(ee : Expr):Void {
+			switch ( ee.expr ) {
+				case ExprDef.EReturn( _ ):
+					ret = true;
+
+				default:
+					null;
+			}
+		}
+		
+		e.iter( walker );
+		
+		return ret;
+	}
+
+	/**
 	  * Pointer-ify an expression
 	  */
 	public static function pointer<T>(e : ExprOf<T>):ExprOf<tannus.io.Ptr<T>> {
