@@ -13,6 +13,43 @@ using Lambda;
 
 class ArrayTools {
 	/**
+	  * Determine whether all items in the given Array are equal
+	  */
+	public static function equal<T>(a : Array<T>):Bool {
+		for (i in 0...a.length) {
+			for (j in i...a.length) {
+				if (a[i] != a[j]) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	/**
+	  * macro-licious array equality
+	  */
+	public static macro function macequal<T>(a:ExprOf<Array<T>>, extractor:Expr):ExprOf<Bool> {
+		var f:Expr = extractor.mapUnderscoreTo( 'item' );
+		var rets = f.hasReturn();
+		if ( rets ) 
+			f = (macro function(item) $f);
+		else
+			f = (macro function(item) return $f);
+		return (macro (function(list) {
+			var f = $f;
+			for (i in 0...list.length) {
+				for (j in i...list.length) {
+					if (f(list[i]) != f(list[j])) {
+						return false;
+					}
+				}
+			}
+			return true;
+		})( $a ));
+	}
+
+	/**
 	  * Obtain an Array of Pointers from an Array of values
 	  */
 	public static function pointerArray<T>(a : Array<T>):Array<Ptr<T>> {
