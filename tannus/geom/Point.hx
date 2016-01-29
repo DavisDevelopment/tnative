@@ -7,6 +7,7 @@ import tannus.geom.Angle;
 import tannus.ds.Maybe;
 import tannus.ds.EitherType;
 import tannus.io.Ptr;
+import tannus.io.Getter;
 
 import haxe.macro.Expr;
 
@@ -325,7 +326,7 @@ abstract Point (TPoint) from TPoint to TPoint {
 	/**
 	  * Create a linked Point, from a Ptr<Point>
 	  */
-	public static function createLinkedFromPointRef(p : Ptr<Point>):Point {
+	public static function createLinkedFromPointRef(p : Getter<Point>):Point {
 		var x:Ptr<Float> = Ptr.create( p.v.x );
 		var y:Ptr<Float> = Ptr.create( p.v.y );
 		var z:Ptr<Float> = Ptr.create( p.v.z );
@@ -345,7 +346,7 @@ abstract Point (TPoint) from TPoint to TPoint {
 	  * Create a linked Point from a pointer
 	  */
 	public static macro function linkedFromPointer(point : ExprOf<Point>):ExprOf<Point> {
-		var ref:ExprOf<Ptr<Point>> = (macro tannus.io.Ptr.create( $point ));
+		var ref:ExprOf<Ptr<Point>> = (macro tannus.io.Getter.create( $point ));
 		return macro tannus.geom.Point.createLinkedFromPointRef( $ref );
 	}
 }
