@@ -37,18 +37,6 @@ abstract File (CFile) {
 	}
 
 /* === Casting Methods === */
-
-	#if node
-		/**
-		  * To node.WritableStream
-		  */
-		@:to
-		public inline function toWritableStream():tannus.node.WritableStream {
-			return tannus.sys.node.NodeFSModule.createWriteStream(this.path);
-		}
-
-	#end
-
 /* === Class Methods === */
 
 	/**
@@ -108,6 +96,13 @@ class CFile {
 	  */
 	public inline function append(data : ByteArray):Void {
 		FileSystem.append(path, data);
+	}
+
+	/**
+	  * Write a String to [this] File
+	  */
+	public inline function writeString(s : String):Void {
+		FileSystem.write(path.toString(), ByteArray.ofString(s));
 	}
 
 	/**
