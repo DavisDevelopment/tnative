@@ -28,12 +28,12 @@ class NodeFileSystem {
 	}
 
 	public static function write(path:String, data:ByteArray):Void {
-		NFS.writeFileSync(path, cast(data, tannus.io.impl.JavaScriptBinary).toBuffer());
+		NFS.writeFileSync(path, data.getData());
 	}
 	
 	public static function read(path:String, ?length:Int):ByteArray {
 		var buf = NFS.readFileSync(path);
-		return BinaryImpl.fromBuffer( buf );
+		return ByteArray.ofData( buf );
 	}
 
 	public static function copy(src:Path, dest:Path, cb:Null<Dynamic>->Void):Void {
