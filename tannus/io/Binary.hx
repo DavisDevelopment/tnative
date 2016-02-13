@@ -159,6 +159,15 @@ class Binary {
 		return position;
 	}
 
+	/* write a 32-bit integer to the end of [this] data */
+	public function pushInt32(i : Int):Int {
+		seek( length );
+		grow( 4 );
+		setData( b );
+		writeInt32( i );
+		return position;
+	}
+
 	/* add a Byte to the beginning of [this] data */
 	public function unshift(c : Byte):Int {
 		shiftRight( 1 );
