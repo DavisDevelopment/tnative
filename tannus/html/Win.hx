@@ -161,6 +161,9 @@ abstract Win (CWin) from CWin to CWin {
 	public var self(get, never):Obj;
 	private inline function get_self():Obj return Obj.fromDynamic( this );
 
+	public var document(get, never):js.html.HTMLDocument;
+	private inline function get_document():js.html.HTMLDocument return cast this.document;
+
 /* === Static Fields === */
 
 	/**
