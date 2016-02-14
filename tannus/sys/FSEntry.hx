@@ -66,14 +66,14 @@ abstract FSEntry (FSEntryType) {
 	/**
 	  * Check if [this] Entry is a File
 	  */
-	public inline function isFile():Bool {
+	public function isFile():Bool {
 		return switchType(f, d, true, false);
 	}
 
 	/**
 	  * Check if [this] Entry is a Folder
 	  */
-	public inline function isDirectory():Bool {
+	public function isDirectory():Bool {
 		return switchType(f, d, false, true);
 	}
 	
