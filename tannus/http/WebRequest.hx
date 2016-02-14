@@ -1,5 +1,6 @@
 package tannus.http;
 
+import tannus.html.Win;
 import tannus.io.EventDispatcher;
 import tannus.io.VoidSignal;
 import tannus.ds.Obj;
@@ -8,6 +9,7 @@ import js.html.XMLHttpRequest;
 import js.html.XMLHttpRequestResponseType in Nrt;
 import js.html.ArrayBuffer;
 import js.html.Blob;
+import js.html.Document;
 
 class WebRequest extends EventDispatcher {
 	/* Constructor Function */
@@ -15,6 +17,7 @@ class WebRequest extends EventDispatcher {
 		super();
 
 		req = new XMLHttpRequest();
+		_listen();
 	}
 
 /* === Instance Methods === */
@@ -52,6 +55,14 @@ class WebRequest extends EventDispatcher {
 	}
 
 	/**
+	  * Wait for the response, as a Blob
+	  */
+	public inline function loadAsBlob(cb : Blob -> Void):Void {
+		responseType = TBlob;
+		onres( cb );
+	}
+
+	/**
 	  * Wait for the response, as an ArrayBuffer
 	  */
 	public inline function loadAsArrayBuffer(cb : ArrayBuffer -> Void):Void {
@@ -60,10 +71,18 @@ class WebRequest extends EventDispatcher {
 	}
 
 	/**
+	  * wait for the response, as a Document
+	  */
+	public inline function loadAsDocument(cb : Document -> Void):Void {
+		responseType = TDoc;
+		onres( cb );
+	}
+
+	/**
 	  * wait for a response
 	  */
 	private function onres(cb : Dynamic -> Void):Void {
-		if ( !complete ) {
+		if ( complete ) {
 			cb( req.response );
 		}
 		else {
@@ -87,13 +106,22 @@ class WebRequest extends EventDispatcher {
 			case HeadersReceived:
 				trace(req.getAllResponseHeaders());
 
-			case Done:
-				done();
-				complete = true;
-
 			default:
 				null;
 		}
+	}
+
+	/**
+	  * listen to events ocurring on [req]
+	  */
+	private function _listen():Void {
+		/* request has finished loading */
+		req.addEventListener('load', function(event) {
+			complete = true;
+			Win.current.setTimeout(function() {
+				done();
+			}, 10);
+		});
 	}
 
 	/**
