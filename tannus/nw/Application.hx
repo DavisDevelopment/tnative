@@ -8,7 +8,6 @@ import tannus.ds.Obj;
 
 import tannus.node.Buffer;
 import tannus.io.ByteArray;
-import tannus.io.impl.JavaScriptBinary;
 
 class Application extends NApp {
 	/* Constructor Function */
@@ -18,8 +17,6 @@ class Application extends NApp {
 		appwin = NWin.get();
 		argv = App.argv;
 		manifest = Obj.fromDynamic( App.manifest );
-
-		trace( App.dataPath );
 	}
 
 /* === Instance Methods === */
@@ -45,12 +42,12 @@ class Application extends NApp {
 		var opts:Dynamic = {};
 		if (options != null) {
 			opts.cwd = options.cwd;
-			opts.input = (options.input != null ? cast(options.input, JavaScriptBinary).toBuffer() : null);
+			opts.input = (options.input != null ? options.input.getData() : null);
 			opts.env = options.env;
 			opts.shell = options.shell;
 		}
 		var buffr = tannus.node.ChildProcess.execSync(command, opts);
-		return cast JavaScriptBinary.fromBuffer( buffr );
+		return ByteArray.ofData( buffr );
 	}
 
 /* === Computed Instance Fields === */
