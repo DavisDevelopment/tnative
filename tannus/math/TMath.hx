@@ -351,4 +351,20 @@ class TMath {
 		test = (macro function(v) return $test);
 		return macro tannus.ds.ArrayTools.min($list, $test);
 	}
+
+	/**
+	 * macro-licious 'sum'
+	 */
+	public static macro function macsum<T>(list:ExprOf<Array<T>>, ext:Expr):ExprOf<Float> {
+		ext = ext.mapUnderscoreTo('v');
+		var f:ExprOf<T -> Float> = (macro function(v) return $ext);
+		return macro (function() {
+			var res:Float = 0;
+			var extract = $f;
+			for (value in $list) {
+				res += extract( value );
+			}
+			return res;
+		}());
+	}
 }
