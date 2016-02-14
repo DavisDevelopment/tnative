@@ -168,4 +168,16 @@ class StringUtils {
 			return res;
 		}
 	}
+
+	/**
+	  * determine whether [this] String is made up entirely of numeric characters
+	  */
+	public static function isNumeric(s : String):Bool {
+		for (i in 0...s.length) {
+			if (!byteAt(s, i).isNumeric()) {
+				return false;
+			}
+		}
+		return true;
+	}
 }
