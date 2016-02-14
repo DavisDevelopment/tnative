@@ -340,7 +340,7 @@ class TMath {
 	public static macro function macmax<T>(list:ExprOf<Array<T>>, test:Expr):ExprOf<T> {
 		test = test.mapUnderscoreTo( 'val' );
 		test = (macro function(val) return $test);
-		return macro tannus.math.TMath.max($list, $test);
+		return macro tannus.ds.ArrayTools.max($list, $test);
 	}
 
 	/**

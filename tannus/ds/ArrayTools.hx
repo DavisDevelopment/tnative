@@ -158,10 +158,11 @@ class ArrayTools {
 	  * Macro-Licious Array.map
 	  */
 	public static macro function macmap<T, O>(set:ExprOf<Array<T>>, extractor:ExprOf<O>):ExprOf<Array<O>> {
-		extractor = extractor.map(mapper.bind('item', _));
-
+		extractor = extractor.mapUnderscoreTo( 'item' );
+		var hasret:Bool = extractor.hasReturn();
+		var body:Expr = (hasret ? extractor : (macro return $extractor));
 		return macro $set.map(function( item ) {
-			return $extractor;
+			$body;
 		});
 	}
 

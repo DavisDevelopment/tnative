@@ -27,6 +27,7 @@ abstract File (CFile) {
 	/**
 	  * Lines of content from [this] File
 	  */
+	/*
 	public function lines(?nlines:Array<String>):Array<String> {
 		if (nlines == null)
 			return (this.read().toString().split('\n'));
@@ -35,6 +36,7 @@ abstract File (CFile) {
 			return nlines;
 		}
 	}
+	*/
 
 /* === Casting Methods === */
 /* === Class Methods === */
@@ -106,13 +108,6 @@ class CFile {
 	}
 
 	/**
-	  * Get an OutputStream to [this] File
-	  */
-	//public function output():OutputStream {
-		//return FileSystem.ostream( path );
-	//}
-
-	/**
 	  * Renames [this] File
 	  */
 	public inline function rename(newpath : Path):Void {
@@ -124,6 +119,37 @@ class CFile {
 	  */
 	public inline function delete():Void {
 		FileSystem.deleteFile(path);
+	}
+
+/* === Fancy Instance Methods === */
+
+	/**
+	  * Get or set the lines of [this] File
+	  */
+	public function lines(?list : Array<String>):Array<String> {
+		/* read the lines */
+		if (list == null) {
+			var res:Array<String> = new Array();
+			var buf:String = '';
+			var data = read();
+			for (byte in data) {
+				if (byte.isLineBreaking()) {
+					res.push( buf );
+					buf = '';
+				}
+				else {
+					buf += byte.aschar;
+				}
+			}
+			if (buf.length != 0) {
+				res.push( buf );
+			}
+			return res;
+		}
+		else {
+			write(ByteArray.ofString(list.join('\n')));
+			return list;
+		}
 	}
 
 /* === Computed Instance Fields === */

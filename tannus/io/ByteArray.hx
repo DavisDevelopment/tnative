@@ -31,6 +31,13 @@ abstract ByteArray (Binary) from Binary to Binary {
 	@:to
 	public inline function toArray():Array<Byte> return this.toArray();
 
+	/* append a String */
+	@:op(A += B)
+	public inline function expandByString(s : String):ByteArray {
+		return this.appendString( s );
+	}
+
+	/* append [other] */
 	@:op(A += B)
 	public inline function expand(other : ByteArray):ByteArray {
 		return this.append( other );
@@ -79,8 +86,10 @@ abstract ByteArray (Binary) from Binary to Binary {
 
 #if python
 	typedef BinaryImpl = tannus.io.impl.PythonBinary;
-#elseif js
-	typedef BinaryImpl = tannus.io.impl.JavaScriptBinary;
+#elseif (js && !node)
+	typedef BinaryImpl = tannus.io.impl.BrowserBinary;
+#elseif (js && node)
+	typedef BinaryImpl = tannus.io.impl.NodeBinary;
 #else
 	typedef BinaryImpl = tannus.io.impl.GenericBinary;
 #end

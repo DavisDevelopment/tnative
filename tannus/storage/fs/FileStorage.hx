@@ -6,11 +6,14 @@ import tannus.ds.Delta;
 import tannus.io.Signal;
 import tannus.io.ByteArray;
 import tannus.sys.Path;
+import tannus.sys.File;
 
 import haxe.Json;
+/*
 import haxe.io.Bytes;
 import sys.FileSystem in Fs;
 import sys.io.File;
+*/
 
 using tannus.ds.MapTools;
 
@@ -20,6 +23,7 @@ class FileStorage extends Storage {
 		super();
 
 		this.path = path;
+		file = new File( path );
 	}
 
 /* === Instance Methods === */
@@ -30,7 +34,7 @@ class FileStorage extends Storage {
 	private function getData():String {
 		var res:String = '';
 		try {
-			res += File.getContent( path );
+			res += file.read();
 		}
 		catch (err : Dynamic) {
 			null;
@@ -59,7 +63,7 @@ class FileStorage extends Storage {
 		var error:Err = null;
 		try {
 			var str:String = Json.stringify(data, null, '    ');
-			File.saveContent(path, str);
+			file.writeString( str );
 		}
 		catch (err : Dynamic) {
 			error = err;
@@ -70,4 +74,5 @@ class FileStorage extends Storage {
 /* === Instance Fields === */
 
 	private var path : Path;
+	private var file : File;
 }

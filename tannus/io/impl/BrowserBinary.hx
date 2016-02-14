@@ -9,7 +9,7 @@ using Lambda;
 using tannus.ds.ArrayTools;
 
 @:expose('Binary')
-class JavaScriptBinary extends Binary {
+class BrowserBinary extends Binary {
 	/* Constructor Function */
 	public function new(size:Int, data:ArrayBuffer, ?arr:Uint8Array):Void {
 		super(size, data);
@@ -33,7 +33,7 @@ class JavaScriptBinary extends Binary {
 
 	/* get a subset of [this] data */
 	override public function sub(index:Int, size:Int):Binary {
-		return new JavaScriptBinary(size, b.slice(index, (index + size)));
+		return new BrowserBinary(size, b.slice(index, (index + size)));
 	}
 
 	/* get a 'slice' of [this] data */
@@ -41,7 +41,7 @@ class JavaScriptBinary extends Binary {
 		if (end == null) {
 			end = length;
 		}
-		return new JavaScriptBinary((end - start), b.slice(start, end));
+		return new BrowserBinary((end - start), b.slice(start, end));
 	}
 
 	/* copy another chunk of data onto [this] one */
@@ -75,7 +75,7 @@ class JavaScriptBinary extends Binary {
 	/* concatenate [this] data with [other] */
 	override public function concat(other : ByteArray):ByteArray {
 		var lensum:Int = (length + other.length);
-		var sum = new JavaScriptBinary(lensum, new ArrayBuffer(lensum));
+		var sum = new BrowserBinary(lensum, new ArrayBuffer(lensum));
 		sum.blit(0, this, 0, length);
 		sum.blit(length, other, 0, other.length);
 		return sum;
@@ -100,20 +100,20 @@ class JavaScriptBinary extends Binary {
 	/* === Static Methods === */
 
 	/* create new empty data of given size */
-	public static function alloc(size : Int):JavaScriptBinary {
+	public static function alloc(size : Int):BrowserBinary {
 		var list:Uint8Array = new Uint8Array( size );
 		var data = list.buffer;
-		return new JavaScriptBinary(size, data, list);
+		return new BrowserBinary(size, data, list);
 	}
 
 	/* create new Binary from existing data */
-	public static function ofData(d : BinaryData):JavaScriptBinary {
+	public static function ofData(d : BinaryData):BrowserBinary {
 		var copy = cast(d, ArrayBuffer).slice(0);
-		return new JavaScriptBinary(d.byteLength, copy);
+		return new BrowserBinary(d.byteLength, copy);
 	}
 
 	/* create a new Binary from a String */
-	public static function ofString(s : String):JavaScriptBinary {
+	public static function ofString(s : String):BrowserBinary {
 		if (s == '') {
 			throw 'Error: Dealing with empty Strings is too much bullshit';
 		}
@@ -145,19 +145,19 @@ class JavaScriptBinary extends Binary {
 			}
 		}
 		var tarr:Uint8Array = new Uint8Array( a );
-		return new JavaScriptBinary(a.length, tarr.buffer);
+		return new BrowserBinary(a.length, tarr.buffer);
 	}
 
 	/* create a new Binary from a Buffer */
-	public static function fromBuffer(b : tannus.node.Buffer):JavaScriptBinary {
-		var jsb:JavaScriptBinary = alloc(b.length);
+	public static function fromBuffer(b : tannus.node.Buffer):BrowserBinary {
+		var jsb:BrowserBinary = alloc(b.length);
 		for (i in 0...b.length)
 			jsb.set(i, b[i]);
 		return jsb;
 	}
 
 	/* create a new Binary from Bytes */
-	public static function fromBytes(b : haxe.io.Bytes):JavaScriptBinary {
+	public static function fromBytes(b : haxe.io.Bytes):BrowserBinary {
 		return ofData(untyped b.getData());
 	}
 
@@ -167,7 +167,7 @@ class JavaScriptBinary extends Binary {
 	}
 	
 	/* create a Binary from a base-64 encoded String */
-	public static function fromBase64(s : String):JavaScriptBinary {
+	public static function fromBase64(s : String):BrowserBinary {
 		return fromBytes(haxe.crypto.Base64.decode(s));
 	}
 }
