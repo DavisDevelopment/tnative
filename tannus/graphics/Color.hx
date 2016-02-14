@@ -8,9 +8,12 @@ import tannus.io.ByteArray;
 import tannus.io.RegEx;
 
 import Std.*;
+import Math.*;
+import tannus.math.TMath;
 
 using StringTools;
 using tannus.ds.StringUtils;
+using tannus.ds.ArrayTools;
 using tannus.math.TMath;
 
 /**
@@ -219,6 +222,73 @@ private class TColor {
 		return new TColor(255-red, 255-green, 255-blue, alpha);
 	}
 
+	/**
+	  * calculate the luminance of [this] Color
+	  */
+	public inline function luminance():Float {
+		return ((0.2126 * red) + (0.7152 * green) + (0.0722 * blue));
+	}
+
+	/**
+	  * calculate the brightness of [this] Color
+	  */
+	public inline function brightness():Int {
+		return int(((red * 299) + (green * 587) + (blue * 114)) / 1000);
+	}
+
+	/**
+	  * convert [this] Color to the HSL scheme
+	  */
+	public function toHsl():Hsl {
+		var chan = [red, green, blue].macmap(bound(_, 255));
+		var r:Int = chan[0], g:Int = chan[1], b:Int = chan[2];
+		var cmax = chan.max(function(n) return n);
+		var cmin = chan.min(function(n) return n);
+		var l = (cmax + cmin) / 2;
+		var h:Float, s:Float;
+		if (cmax == cmin) {
+			h = s = 0;
+		}
+		else {
+			var d = (cmax - cmin);
+			s = (d > 0.5 ? (d / (2 - cmax - cmin)) : (d / (cmax + cmin)));
+			if (cmax == r)
+				h = ((g - b) / d + (g < b ? 6 : 0)); 
+			else if (cmax == g) 
+				h = ((b - r) / d + 2);
+			else if (cmax == b)
+				h = ((r - g) / d + 4);
+			else
+				h = 0;
+			h /= 6;
+		}
+
+		return {
+			'hue': h,
+			'saturation': s,
+			'lightness': l
+		};
+	}
+
+	/**
+	  * greyscale [this] Color
+	  */
+	public function greyscale():Color {
+		var gray = clone();
+		var avg = int(gray.channels.average());
+		gray.channels = [avg, avg, avg];
+		return gray;
+	}
+
+	/**
+	  * do some number magic
+	  */
+	private function bound(n:Int, max:Int):Int {
+		if (abs(n - max) < 0.000001)
+			return 1;
+		return int((n % max) / (max + 0.0));
+	}
+
 /* === Computed Instance Fields === */
 
 	/* red component */
@@ -247,6 +317,16 @@ private class TColor {
 	private inline function get_alpha() return _alpha;
 	private inline function set_alpha(v : Null<Int>):Null<Int> {
 		return (_alpha = (v!=null?v.clamp(0, 255):null));
+	}
+
+	/* all channels */
+	public var channels(get, set):Array<Int>;
+	private inline function get_channels():Array<Int> return [red, green, blue];
+	private function set_channels(v : Array<Int>):Array<Int> {
+		red = v[0];
+		green = v[1];
+		blue = v[2];
+		return channels;
 	}
 
 /* === Instance Fields === */
@@ -358,3 +438,9 @@ private class TColor {
 		#end
 	}
 }
+
+typedef Hsl = {
+	hue : Float,
+	saturation : Float,
+	lightness : Float
+};
