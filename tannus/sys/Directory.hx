@@ -14,7 +14,7 @@ abstract Directory (Path) from Path {
 				throw 'IOError: $p is not a Directory!';
 		} 
 		else {
-			if (create) 
+			if ( create ) 
 				createDirectory( this );
 			else
 				throw 'IOError: $p is not a File or a Directory!';
@@ -39,6 +39,13 @@ abstract Directory (Path) from Path {
 	public inline function file(name : String):File {
 		var f:File = (path + name);
 		return f;
+	}
+
+	/**
+	  * Obtain a Directory by name
+	  */
+	public inline function dir(name:String, ?createIfNecessary:Bool):Directory {
+		return new Directory((path + name), createIfNecessary);
 	}
 
 	/**
@@ -94,6 +101,26 @@ abstract Directory (Path) from Path {
 		}
 
 		return results;
+	}
+
+	/**
+	  * search [this] Directory with GlobStar
+	  */
+	public function search(pattern:GlobStar, recursive:Bool=false):Array<File> {
+		if ( !recursive ) {
+			var results:Array<File> = new Array();
+			for (e in entries) {
+				if (e.isFile() && pattern.test( e.path )) {
+					results.push(e.file());
+				}
+			}
+			return results;
+		}
+		else {
+			return walkRecursive(function(f : File):Bool {
+				return pattern.test( f.path );
+			});
+		}
 	}
 
 	/**
