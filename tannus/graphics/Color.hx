@@ -11,10 +11,13 @@ import Std.*;
 import Math.*;
 import tannus.math.TMath;
 
+import haxe.macro.Expr;
+
 using StringTools;
 using tannus.ds.StringUtils;
 using tannus.ds.ArrayTools;
 using tannus.math.TMath;
+using tannus.macro.MacroTools;
 
 /**
   * Class to represent a color in either RGB or RGBA
@@ -116,15 +119,27 @@ abstract Color (TColor) from TColor to TColor {
 	}
 
 	#end
+
+	/* create linked color */
+	public static inline function _linked(r:Ptr<Int>, g:Ptr<Int>, b:Ptr<Int>, ?a:Ptr<Int>):Color {
+		return cast new LinkedColor(r, g, b, a);
+	}
+
+	public static macro function linked(r:ExprOf<Int>, others:Array<ExprOf<Int>>):ExprOf<Color> {
+		var args:Array<ExprOf<Ptr<Int>>> = ([r].concat(others)).map(function(e) return e.pointer());
+		return macro tannus.graphics.Color._linked( $a{args} );
+	}
 }
 
 private class TColor {
 	/* Constructor Function */
-	public function new(r:Int=0, g:Int=0, b:Int=0, ?a:Int):Void {
-		red = r;
-		green = g;
-		blue = b;
-		alpha = a;
+	public function new(r:Int=0, g:Int=0, b:Int=0, ?a:Int, noset:Bool=false):Void {
+		if ( !noset ) {
+			red = r;
+			green = g;
+			blue = b;
+			alpha = a;
+		}
 	}
 
 /* === Instance Methods === */
@@ -134,6 +149,16 @@ private class TColor {
 	  */
 	public function clone():TColor {
 		return new TColor(red, green, blue, alpha);
+	}
+
+	/**
+	  * copy data from [other] onto [this]
+	  */
+	public function copyFrom(other : Color):Void {
+		red = other.red;
+		green = other.green;
+		blue = other.blue;
+		alpha = other.alpha;
 	}
 
 	/**
@@ -293,29 +318,29 @@ private class TColor {
 
 	/* red component */
 	public var red(get, set):Int;
-	private inline function get_red() return _red;
-	private inline function set_red(v : Int):Int {
+	private function get_red() return _red;
+	private function set_red(v : Int):Int {
 		return (_red = v.clamp(0, 255));
 	}
 
 	/* green component */
 	public var green(get, set):Int;
-	private inline function get_green() return _green;
-	private inline function set_green(v : Int):Int {
+	private function get_green() return _green;
+	private function set_green(v : Int):Int {
 		return (_green = v.clamp(0, 255));
 	}
 
 	/* blue component */
 	public var blue(get, set):Int;
-	private inline function get_blue() return _blue;
-	private inline function set_blue(v : Int):Int {
+	private function get_blue() return _blue;
+	private function set_blue(v : Int):Int {
 		return (_blue = v.clamp(0, 255));
 	}
 
 	/* alpha component */
 	public var alpha(get, set):Null<Int>;
-	private inline function get_alpha() return _alpha;
-	private inline function set_alpha(v : Null<Int>):Null<Int> {
+	private function get_alpha() return _alpha;
+	private function set_alpha(v : Null<Int>):Null<Int> {
 		return (_alpha = (v!=null?v.clamp(0, 255):null));
 	}
 
@@ -437,6 +462,44 @@ private class TColor {
 			return StringTools.hex(val, digits);
 		#end
 	}
+}
+
+/**
+  * Color whose 'red', 'green', 'blue', and 'alpha' fields are bound to external data
+  */
+class LinkedColor extends TColor {
+	/* Constructor Function */
+	public function new(r:Ptr<Int>, g:Ptr<Int>, b:Ptr<Int>, ?a:Ptr<Int>):Void {
+		super(0, 0, 0, null, true);
+		_a = Ptr.to( null );
+		_r = r;
+		_g = g;
+		_b = b;
+		if (a != null) {
+			_a = a;
+		}
+	}
+
+/* === Instance Methods === */
+
+	override private function get_red():Int return _r.get();
+	override private function set_red(v : Int):Int return _r.set(v.clamp(0, 255));
+
+	override private function get_green():Int return _g.get();
+	override private function set_green(v : Int):Int return _g.set(v.clamp(0, 255));
+
+	override private function get_blue():Int return _b.get();
+	override private function set_blue(v : Int):Int return _b.set(v.clamp(0, 255));
+
+	override private function get_alpha():Null<Int> return _a.get();
+	override private function set_alpha(v : Null<Int>):Null<Int> return _a.set(v.clamp(0, 255));
+
+/* === Instance Fields === */
+
+	private var _r : Ptr<Int>;
+	private var _g : Ptr<Int>;
+	private var _b : Ptr<Int>;
+	private var _a : Ptr<Null<Int>>;
 }
 
 typedef Hsl = {
