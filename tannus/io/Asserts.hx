@@ -36,4 +36,14 @@ class Asserts {
 			}
 		};
 	}
+
+	/**
+	  * verify that the given value is non-null
+	  */
+	public static macro function nn<T>(value:ExprOf<T>, action:Expr) {
+		action = action.mapUnderscoreTo(value.toString());
+		return macro if ($value != null) {
+			$action;
+		};
+	}
 }
