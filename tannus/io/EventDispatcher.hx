@@ -28,6 +28,21 @@ class EventDispatcher {
 	}
 
 	/**
+	  * get a Signal
+	  */
+	private function getSignal(name : String):Signal<Dynamic> {
+		if (!canDispatch( name )) {
+			if ( __checkEvents ) {
+				throw 'InvalidEvent: "$name" is not a valid Event';
+			}
+			else {
+				_sigs[name] = new Signal();
+			}
+		}
+		return _sigs[ name ];
+	}
+
+	/**
 	  * Determine if [this] Dispatcher is prepared to dispatch an Event by the given name
 	  */
 	public function canDispatch(name : String):Bool {
@@ -38,11 +53,7 @@ class EventDispatcher {
 	  * Listen for an Event on [this] Dispatcher
 	  */
 	public function on<T>(name:String, action:T->Void, ?once:Bool):Void {
-		if (canDispatch(name)) {
-			_sigs[name].on(cast action, once);
-		} else {
-			throw 'InvalidEvent: "$name" is not a valid Event';
-		}
+		getSignal( name ).on(cast action, once);
 	}
 
 	/**
@@ -56,38 +67,31 @@ class EventDispatcher {
 	  * Dispatch an Event on [this] Shit
 	  */
 	public function dispatch<T>(name:String, data:T):Void {
-		if (canDispatch(name)) {
-			_sigs[name].call(untyped data);
-		}
+		getSignal( name ).call(untyped data);
 	}
 
 	/**
 	  * Stop listening for an Event
 	  */
 	public function off(name:String, ?action:Dynamic->Void):Void {
-		var sig:Signal<Dynamic> = _sigs[name];
-		if (sig != null) {
-			if (action != null)
-				sig.off( action );
-			else
-				sig.clear();
-		}
+		var sig:Signal<Dynamic> = getSignal( name );
+		if (action != null)
+			sig.off( action );
+		else
+			sig.clear();
 	}
 
 	/**
 	  * Listen for an event, conditionally
 	  */
 	public function when<T>(name:String, test:T->Bool, action:T->Void):Void {
-		if (canDispatch(name)) {
-			untyped {
-				_sigs[name].when(test, action);
-			};
-		} else {
-			throw 'InvalidEvent: "$name" is not a valid Event';
-		}
+		untyped {
+			getSignal( name ).when(test, action);
+		};
 	}
 
 /* === Instance Fields === */
 
 	private var _sigs:Map<String, Signal<Dynamic>>;
+	private var __checkEvents : Bool = true;
 }
