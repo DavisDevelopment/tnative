@@ -1,6 +1,7 @@
 package tannus.dom;
 
 import tannus.ds.Object;
+import tannus.ds.Obj;
 import tannus.ds.EitherType;
 import tannus.dom.Element;
 
@@ -37,6 +38,15 @@ abstract Styles (CStyles) from CStyles to CStyles {
 	@:op(A += B)
 	public inline function write(o : Object):Void {
 		this.write( o );
+	}
+
+	@:op(A |= B)
+	public function pluck(keys : Array<String>):Object {
+		var props:Object = {};
+		for (key in keys) {
+			props.set(key, get( key ));
+		}
+		return props;
 	}
 }
 
