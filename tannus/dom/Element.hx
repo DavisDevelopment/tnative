@@ -118,6 +118,32 @@ class CElement {
 	}
 
 	/**
+	  * Check whether [this] Element is a descendent of [mparent]
+	  */
+	public function isParentOf(mchild : Element):Bool {
+		if (!empty && !mchild.empty) {
+			var node:Null<js.html.Node> = mchild.first.parentNode;
+			while (node != null) {
+				if (node == first) {
+					return true;
+				}
+				node = node.parentNode;
+			}
+			return false;
+		}
+		else {
+			return false;
+		}
+	}
+
+	/**
+	  * Check whether [this] Element is a child of [mparent]
+	  */
+	public function isDescendantOf(mparent : Element):Bool {
+		return mparent.isParentOf( this );
+	}
+
+	/**
 	  * Append [child] to [this] Element
 	  */
 	public function append(child : Element):Void {
@@ -497,6 +523,17 @@ class CElement {
 	public var tagname(get, never):String;
 	private function get_tagname():String {
 		return (empty ? '' : first.tagName.toLowerCase());
+	}
+
+	/* the parent of [this] element (if any) */
+	public var parent(get, never):Null<Element>;
+	private function get_parent():Null<Element> {
+		if (!empty && (first.parentElement != null)) {
+			return new Element( first.parentElement );
+		}
+		else {
+			return null;
+		}
 	}
 
 /* === Instance Fields === */
