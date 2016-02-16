@@ -55,7 +55,7 @@ class StyleSheet {
 	/**
 	  * Obtain the Rule with the given name
 	  */
-	private function getRule(sel : String):Null<Rule> {
+	public function getRule(sel : String):Null<Rule> {
 		for (rule in rules)
 			if (rule.selector == sel)
 				return rule;
