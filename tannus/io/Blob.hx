@@ -1,8 +1,11 @@
 package tannus.io;
 
 import tannus.io.ByteArray;
+import tannus.io.Asserts.nn;
 import tannus.sys.File;
-import tannus.ds.Maybe;
+import tannus.sys.Path;
+import tannus.sys.Mime;
+import tannus.sys.Mimes;
 
 /**
   * Abstract around Blob, which allows it to unify with multiple other types
@@ -10,7 +13,7 @@ import tannus.ds.Maybe;
 @:forward
 abstract Blob (CBlob) from CBlob to CBlob {
 	/* Constructor Function */
-	public inline function new(name:String, ?mime:Maybe<String>, ?dat:Maybe<ByteArray>):Void {
+	public inline function new(name:String, ?mime:Mime, ?dat:ByteArray):Void {
 		this = new CBlob(name, mime, dat);
 	}
 
@@ -36,7 +39,7 @@ abstract Blob (CBlob) from CBlob to CBlob {
 	#end
 
 	public static inline function fromDataURL(durl : String):Blob {
-		return CBlob.fromDataURL(durl);
+		return CBlob.fromDataURL( durl );
 	}
 }
 
@@ -45,10 +48,18 @@ abstract Blob (CBlob) from CBlob to CBlob {
   */
 class CBlob {
 	/* Constructor Function */
-	public function new(nam:String, ?mime:Maybe<String>, ?dat:Maybe<ByteArray>):Void {
+	public function new(nam:String, ?mime:Mime, ?dat:ByteArray):Void {
 		name = nam;
-		type = mime || 'text/plain';
-		data = dat || ByteArray.alloc(0);
+		nn(mime, type = _);
+		if (type == null) {
+			var np = new Path( name );
+			type = Mimes.getMimeType( np.extension );
+		}
+		if (type == null) {
+			type = 'text/plain';
+		}
+		data = new ByteArray();
+		nn(dat, data = _);
 	}
 
 /* === Instance Methods === */
@@ -87,7 +98,7 @@ class CBlob {
 
 /* === Instance Fields === */
 
-	public var name:String;
-	public var type:String;
-	public var data:ByteArray;
+	public var name : String;
+	public var type : Mime;
+	public var data : ByteArray;
 }
