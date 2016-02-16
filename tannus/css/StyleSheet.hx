@@ -5,6 +5,8 @@ import tannus.ds.Object;
 import tannus.io.VoidSignal;
 import tannus.io.ByteArray;
 
+using tannus.ds.ArrayTools;
+
 class StyleSheet {
 	/* Constructor Function */
 	public function new():Void {
@@ -63,6 +65,26 @@ class StyleSheet {
 	}
 
 	/**
+	  * Create and return a clone of [this] StyleSheet
+	  */
+	public function clone():StyleSheet {
+		var c = new StyleSheet();
+		c.rules = rules.macmap(_.clone( c ));
+		return c;
+	}
+
+	/**
+	  * get (effectively) the sum of [this] StyleSheet and [other]
+	  */
+	public function concat(other : StyleSheet):StyleSheet {
+		var sum = new StyleSheet();
+		for (r in rules.concat(other.rules)) {
+			sum.rules.push(r.clone( sum ));
+		}
+		return sum;
+	}
+
+	/**
 	  * Obtain the String Representation of [this] StyleSheet
 	  */
 	public function toString():String {
@@ -99,4 +121,13 @@ class StyleSheet {
 
 	/* signal fired when [this] StyleSheet changes */
 	private var _update : VoidSignal;
+
+/* === Static Methods === */
+
+	/**
+	  * Create a StyleSheet from the given css-code
+	  */
+	public static inline function fromCSS(code : String):StyleSheet {
+		return Parser.quickParse(Lexer.quickLex( code ));
+	}
 }

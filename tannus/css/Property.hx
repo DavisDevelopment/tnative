@@ -24,6 +24,13 @@ class Property {
 		return (value = hunks.join(' '));
 	}
 
+	/**
+	  * create and return a clone of [this] Property
+	  */
+	public inline function clone():Property {
+		return new Property(name, value);
+	}
+
 /* === Computed Instance Fields === */
 
 	/**

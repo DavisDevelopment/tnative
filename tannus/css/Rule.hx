@@ -3,6 +3,8 @@ package tannus.css;
 import tannus.css.*;
 import tannus.ds.Object;
 
+using tannus.ds.ArrayTools;
+
 @:access(tannus.css.StyleSheet)
 class Rule {
 	/* Constructor Function */
@@ -76,6 +78,13 @@ class Rule {
 				return prop;
 		}
 		return null;
+	}
+
+	/**
+	  * create and return a clone of [this] Rule
+	  */
+	public inline function clone(?nsheet : StyleSheet):Rule {
+		return new Rule((nsheet != null ? nsheet : sheet), selector, properties.macmap(_.clone()));
 	}
 
 	/**
