@@ -20,7 +20,9 @@ class Rule {
 	public function child(childSel:String, ?props:Object):Rule {
 		var sel:String = [selector, ' ', childSel].join('');
 
-		return sheet.rule(sel, props);
+		var kid = sheet.rule(sel, props);
+		kid.parentRule = this;
+		return kid;
 	}
 
 	/**
@@ -55,6 +57,16 @@ class Rule {
 		else return null;
 	}
 
+	/* get the Property object for the given property */
+	public function property(name : String):Property {
+		var p:Property = getProp( name );
+		if (p == null) {
+			p = new Property(name, '');
+			properties.push( p );
+		}
+		return p;
+	}
+
 	/**
 	  * Get a Property
 	  */
@@ -78,4 +90,6 @@ class Rule {
 	public var selector : String;
 	public var sheet : StyleSheet;
 	public var properties : Array<Property>;
+
+	public var parentRule : Null<Rule> = null;
 }
