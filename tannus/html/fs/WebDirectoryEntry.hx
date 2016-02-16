@@ -73,8 +73,40 @@ abstract WebDirectoryEntry (DirectoryEntry) from DirectoryEntry {
 	}
 
 	/**
+	  * get an Array of all FileEntries recursively
+	  */
+	public function walk(cb:Array<WebFileEntry>->Void, ?filter:WebFileEntry->Bool):Void {
+		var all:Array<WebFileEntry> = new Array();
+		readEntries().then(function( entries ) {
+			var stack = new AsyncStack();
+			for (e in entries) {
+				stack.push(function(done) {
+					if ( e.isFile ) {
+						var add = (filter == null || filter(new WebFileEntry(cast e)));
+						if ( add ) {
+							all.push(new WebFileEntry(cast e));
+						}
+						done();
+					}
+					else {
+						var _f:WebDirectoryEntry = new WebDirectoryEntry(cast e);
+						_f.walk(function( sub ) {
+							all = all.concat( sub );
+							done();
+						}, filter);
+					}
+				});
+			}
+			stack.run(function() {
+				cb( all );
+			});
+		});
+	}
+
+	/**
 	  * Get an Array of all FileEntries recursively
 	  */
+	/*
 	public function walk(?tester : WebFileEntry->Bool):ArrayPromise<WebFileEntry> {
 		return Promise.create({
 			var stack:AsyncStack = new AsyncStack();
@@ -107,6 +139,7 @@ abstract WebDirectoryEntry (DirectoryEntry) from DirectoryEntry {
 			}).unless(function(error) throw error);
 		}).array();
 	}
+	*/
 }
 
 typedef DirectoryEntry = {
