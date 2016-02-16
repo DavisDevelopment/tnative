@@ -83,6 +83,13 @@ class ByteStack extends Stack<Byte> {
 		i = pos;
 	}
 
+	/**
+	  * Get a ByteArray of all bytes that have yet to be read
+	  */
+	public function getByteArray():ByteArray {
+		return b.copy();
+	}
+
 /* === Instance Fields === */
 
 	private var b : ByteArray;
