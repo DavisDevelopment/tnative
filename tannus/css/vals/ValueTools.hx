@@ -6,6 +6,8 @@ import tannus.ds.Dict;
 
 import tannus.css.Value;
 
+using StringTools;
+using tannus.ds.StringUtils;
 using Lambda;
 using tannus.ds.ArrayTools;
 
@@ -13,17 +15,17 @@ class ValueTools {
 	/**
 	  * Get the textual representation of a Value
 	  */
-	public static function toString(v:Null<Value>, vars:Dict<String, Value>, funcs:Dict<String, Array<Value>->Value>):String  {
+	public static function toString(v : Null<Value>):String  {
 		if (v == null) {
 			throw 'CSSError: Cannot convert a null-Value to String!';
 		}
 		else switch ( v ) {
 			/* Identifier */
-			case VIdent(id):
+			case VIdent( id ):
 				return id;
 
 			/* String */
-			case VString(str):
+			case VString( str ):
 				return haxe.Json.stringify( str );
 
 			/* Number */
@@ -37,10 +39,12 @@ class ValueTools {
 
 			/* Variable Reference */
 			case VRef( name ):
-				return toString(vars[name], vars, funcs);
+				//return toString(vars[name], vars, funcs);
+				return '@$name';
 
 			/* Function Call */
 			case VCall(name, args):
+				/*
 				var func:Null<Array<Value>->Value> = funcs[name];
 				if (func != null) {
 					var val:Value = func( args );
@@ -49,6 +53,9 @@ class ValueTools {
 				else {
 					throw 'CSSError: Function $name is not defined';
 				}
+				*/
+				var sargs = args.macmap(toString( _ )).join(', ');
+				return '$name($sargs)';
 
 			default:
 				throw 'CSSError: Cannot convert $v to String!';
