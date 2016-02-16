@@ -1,6 +1,8 @@
 package tannus.media;
 
 import tannus.ds.ThreeTuple;
+import Math.*;
+import tannus.math.TMath.*;
 
 using StringTools;
 using tannus.ds.StringUtils;
@@ -56,20 +58,10 @@ abstract Duration (Dur) {
 		return ((60 * 60 * hours) + (60 * minutes) + seconds);
 	}
 	private inline function set_totalSeconds(v : Int):Int {
-		var s:Int = v;
-		var m:Int = 0;
-		var h:Int = 0;
-		if (s >= 60) {
-			m = Math.round(s / 60);
-			s = (s % 60);
-		}
-		if (m >= 60) {
-			h = Math.round(m / 60);
-			m = (m % 60);
-		}
-		seconds = s;
-		minutes = m;
-		hours = h;
+		hours = floor(v / 3600);
+		v = (v - hours * 3600);
+		minutes = floor(v / 60);
+		seconds = (v - minutes * 60);
 		return totalSeconds;
 	}
 
