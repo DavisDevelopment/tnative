@@ -95,6 +95,14 @@ class Line {
 	private inline function set_end(ne) return (two = ne);
 
 	/**
+	  * the midpoint of [this] Line
+	  */
+	public var mid(get, never):Point;
+	private inline function get_mid():Point {
+		return start.lerp(end, 0.5);
+	}
+
+	/**
 	  * the Angle between [start] and [end]
 	  */
 	public var angle(get, never):Angle;
