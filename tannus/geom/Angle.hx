@@ -25,6 +25,12 @@ abstract Angle (CAngle) from CAngle to CAngle {
 	@:to
 	public inline function toFloat():Float return this.toFloat();
 
+	@:op(A + B)
+	public inline function plusAngle(o : Angle):Angle return new Angle(this.degrees + o.degrees);
+
+	@:op(A + B)
+	public inline function plusFloat(o : Float):Angle return new Angle(this.degrees + o);
+
 	/**
 	  * cast from a Float
 	  */
