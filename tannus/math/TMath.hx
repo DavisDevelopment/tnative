@@ -52,12 +52,8 @@ class TMath {
 	}
 
 	/** Determines and Returns the angle between two points */
-	public static function angleBetween(x1:Float, y1:Float, x2:Float, y2:Float):Float {
-		var degs:Float = (toDegrees(Math.atan2(y2 - y1, x2 - x1)));	
-		while (degs < 0) {
-			degs = (360 - Math.abs(degs));
-		}
-		return degs;
+	public static inline function angleBetween(x1:Float, y1:Float, x2:Float, y2:Float):Float {
+		return (toDegrees(Math.atan2(y2 - y1, x2 - x1)));
 	}
 
 	#if !js @:generic #end
