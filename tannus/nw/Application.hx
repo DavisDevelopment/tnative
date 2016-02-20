@@ -35,21 +35,6 @@ class Application extends NApp {
 		App.closeAllWindows();
 	}
 
-	/**
-	  * execute a shell command, and get the output
-	  */
-	public function system(command:String, ?options:SystemOptions):ByteArray {
-		var opts:Dynamic = {};
-		if (options != null) {
-			opts.cwd = options.cwd;
-			opts.input = (options.input != null ? options.input.getData() : null);
-			opts.env = options.env;
-			opts.shell = options.shell;
-		}
-		var buffr = tannus.node.ChildProcess.execSync(command, opts);
-		return ByteArray.ofData( buffr );
-	}
-
 /* === Computed Instance Fields === */
 
 	public var win(get, never):Win;
@@ -60,10 +45,3 @@ class Application extends NApp {
 	public var appwin : NWin;
 	public var manifest : Obj;
 }
-
-private typedef SystemOptions = {
-	?cwd : String,
-	?input : ByteArray,
-	?env : Dynamic,
-	?shell : String
-};
