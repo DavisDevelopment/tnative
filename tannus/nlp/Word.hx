@@ -3,6 +3,7 @@ package tannus.nlp;
 using StringTools;
 using tannus.ds.StringUtils;
 
+@:forward(length)
 abstract Word (String) from String {
 	/* Constructor Function */
 	public inline function new(s : String):Void {
