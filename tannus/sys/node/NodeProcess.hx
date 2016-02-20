@@ -6,7 +6,7 @@ import tannus.sys.node.NodeNativeProcess;
 import tannus.sys.node.NodeNativeProcess.NodeChildProcess;
 
 import tannus.io.ByteArray;
-import tannus.io.impl.JavaScriptBinary;
+import tannus.io.impl.NodeBinary;
 import tannus.io.Signal;
 import tannus.sys.Path;
 import tannus.ds.Object;
@@ -50,7 +50,7 @@ class NodeProcess implements IProcess {
 
 		/* Give the child-process it's input, if any */
 		if (input.length > 0) {
-			var buf = cast(input, JavaScriptBinary).toBuffer();
+			var buf = input.getData();
 			nat.stdin.write( buf );
 		}
 
@@ -58,10 +58,10 @@ class NodeProcess implements IProcess {
 		nat.stdout.on('data', function(rawData : Buffer) {
 			//- Convert the data to a ByteArray
 			// var chunk:ByteArray = ByteArray.fromNodeBuffer(rawData);
-			var chunk:ByteArray = cast JavaScriptBinary.fromBuffer( rawData );
+			var chunk:ByteArray = ByteArray.ofData( rawData );
 
 			//- Append it to 'output'
-			output.write( chunk );
+			output.expand( chunk );
 		});
 
 		/* Wait until the child-process has completed */
