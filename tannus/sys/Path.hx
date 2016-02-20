@@ -196,7 +196,10 @@ private class CPath {
 		return new Path( sdir );
 	}
 	private function set_directory(v : Path):Path {
-		s = join([v.toString(), name]).toString();
+		s = sjoin([v.toString(), name]).toString();
+		if (v.absolute && !s.startsWith('/')) {
+			s = ('/' + s);
+		}
 		return directory;
 	}
 
