@@ -225,6 +225,12 @@ class CFile {
 		#end
 	}
 
+	/* the stats for [this] File */
+	public var stats(get, never):FileStat;
+	private inline function get_stats():FileStat {
+		return FileSystem.stat( _path );
+	}
+
 /* === Instance Fields === */
 
 	//- The path to [this] File
