@@ -74,6 +74,12 @@ abstract Element (JQuery) from JQuery to JQuery {
 	public var attributes(get, never):ElAttributes;
 	private function get_attributes() return new ElAttributes(cast Getter.create(this));
 
+	/* map-like access to the data of [this] Element */
+	public var edata(get, never):ElData;
+	private function get_edata():ElData {
+		return new ElData(cast Getter.create( this ));
+	}
+
 	/**
 	  * Array of classes associated with [this] Element
 	  */
