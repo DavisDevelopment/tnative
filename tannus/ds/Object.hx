@@ -37,6 +37,13 @@ abstract Object (Dynamic) from Dynamic to Dynamic {
 	}
 
 	/**
+	  * Raw Field Access
+	  */
+	public inline function rawget<T>(key : String):Null<T> {
+		return untyped Reflect.getProperty(this, key);
+	}
+
+	/**
 	  * Field Assignment
 	  */
 	@:arrayAccess
