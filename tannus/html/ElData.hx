@@ -33,7 +33,7 @@ abstract ElData (Getter<Element>) {
 
 	/* get a Pointer to a property of [this] */
 	public inline function reference<T>(key : String):Ptr<T> {
-		return Ptr.create(self[ key ]);
+		return untyped Ptr.create(self[ key ]);
 	}
 
 /* === Instance Fields === */
