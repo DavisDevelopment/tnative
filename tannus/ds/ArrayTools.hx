@@ -11,6 +11,7 @@ using tannus.macro.MacroTools;
 
 using Lambda;
 
+@:expose( 'ArrayTools' )
 class ArrayTools {
 	/**
 	  * Determine whether all items in the given Array are equal
@@ -289,6 +290,17 @@ class ArrayTools {
 			(pred(item) ? res.pass : res.fail).push( item );
 		}
 		return res;
+	}
+
+	/**
+	  * convert a pair of Arrays into an Array of pairs
+	  */
+	public static function zip<A, B>(left:Array<A>, right:Array<B>):Array<Tup2<A, B>> {
+		var pairs:Array<Tup2<A, B>> = new Array();
+		for (i in 0...left.length) {
+			pairs.push(new Tup2(left[i], right[i]));
+		}
+		return pairs;
 	}
 
 	#if macro
