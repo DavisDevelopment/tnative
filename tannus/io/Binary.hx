@@ -8,6 +8,8 @@ import tannus.sys.Mime;
 import tannus.math.TMath;
 import haxe.Int64;
 
+import Math.*;
+
 using Lambda;
 using StringTools;
 using tannus.ds.StringUtils;
@@ -265,9 +267,10 @@ class Binary {
 
 	/* reverse [this] data in-place */
 	public function reverse():Void {
-		for (i in 0...length) {
-			var ri:Int = (length - (i + 1));
-			set(ri, get( ri ));
+		for (i in 0...floor(length / 2)) {
+			var temp = get( i );
+			set(i, get(length - i - 1));
+			set((length - i - 1), temp);
 		}
 	}
 
