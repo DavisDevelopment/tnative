@@ -1,6 +1,8 @@
 package tannus.ds;
 
 import tannus.io.Ptr;
+import tannus.io.Getter;
+import tannus.io.Setter;
 
 import Reflect in R;
 
@@ -147,6 +149,32 @@ class CObj {
 			return R.copy(o);
 		}
 	}
+
+#if js
+
+	/**
+	  * add a JavaScript 'getter' method to [o]
+	  */
+	public inline function defineGetter<T>(key:String, getter:Getter<T>):Void {
+		get( '__defineGetter__' )(key, getter);
+	}
+
+	/**
+	  * add a JavaScript 'setter' method to [o]
+	  */
+	public inline function defineSetter<T>(key:String, setter:Setter<T>):Void {
+		get( '__defineSetter__' )(key, setter);
+	}
+
+	/**
+	  * add a pointer as a property to [o]
+	  */
+	public inline function defineProperty<T>(name:String, pointer:Ptr<T>):Void {
+		defineGetter(name, pointer.getter);
+		defineSetter(name, pointer.setter);
+	}
+
+#end
 
 /* === Instance Field === */
 
