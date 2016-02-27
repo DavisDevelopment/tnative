@@ -113,7 +113,8 @@ class Compiler {
 				var getit = tools.get.bind(_, name);
 				var test = sub( block );
 				return function(o : Dynamic):Bool {
-					return (test(getit(o)));
+					var ctx = getit( o );
+					return (test( ctx ));
 				};
 
 			/* == Helper Function Check == */
@@ -316,11 +317,12 @@ class Compiler {
 	  * Compile a sub-tree
 	  */
 	private function sub(checkList : Array<Check>):CheckFunction {
-		var state = save();
-		reset();
-		var result = compile( checkList );
-		restore( state );
-		return result;
+		var subc = new Compiler();
+		subc.tools = tools;
+		subc.operators = copyOperators();
+		subc.helpers = copyHelpers();
+		var f = subc.compile( checkList );
+		return f;
 	}
 
 	/**
