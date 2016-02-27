@@ -352,7 +352,7 @@ class TMath {
 	 * macro-licious 'sum'
 	 */
 	public static macro function macsum<T>(list:ExprOf<Array<T>>, ext:Expr):ExprOf<Float> {
-		ext = ext.mapUnderscoreTo('v');
+		ext = ext.mapUnderscoreTo( 'v' );
 		var f:ExprOf<T -> Float> = (macro function(v) return $ext);
 		return macro (function() {
 			var res:Float = 0;
