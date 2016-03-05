@@ -275,6 +275,7 @@ private class CPath {
 	/* join the given array into a Path */
 	public static function join(list : Array<Path>):Path {
 		var bits:Array<String> = new Array();
+		var resroot = (list[0] != null && list[0].absolute);
 
 		for (path in list) {
 			bits = bits.concat( path.pieces );
@@ -282,6 +283,9 @@ private class CPath {
 		bits = bits.filter(function(s) return (s != null && !s.empty()));
 
 		var sum:Path = new Path(bits.join('/')).normalize();
+		if ( resroot ) {
+			sum = sum.absolutize();
+		}
 		return sum;
 	}
 
