@@ -2,6 +2,7 @@ package tannus.dom;
 
 import tannus.ds.Object;
 import tannus.ds.Obj;
+import tannus.io.Ptr;
 import tannus.ds.EitherType;
 import tannus.dom.Element;
 
@@ -28,6 +29,13 @@ abstract Styles (CStyles) from CStyles to CStyles {
 	@:arrayAccess
 	public inline function set(name:String, value:Dynamic):String {
 		return this.set(name, value);
+	}
+
+	/**
+	  * get a Pointer to the given Style
+	  */
+	public inline function ref(name : String):Ptr<String> {
+		return new Ptr(this.get.bind( name ), this.set.bind(name, _));
 	}
 
 	@:to
