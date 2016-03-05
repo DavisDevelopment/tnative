@@ -187,6 +187,13 @@ class CElement {
 	}
 
 	/**
+	  * insert an element after the given element
+	  */
+	public inline function insertAfter(child:Element, after:Element):Void {
+		first.insertBefore(child.first, after.first.nextSibling);
+	}
+
+	/**
 	  * Insert the given content after each selected Element
 	  */
 	public function after(content : Element):Void {
@@ -208,6 +215,22 @@ class CElement {
 				e.parentElement.insertBefore(c, e);
 			}
 		}
+	}
+
+	/**
+	  * replace the given child with the given Element
+	  */
+	public function replaceChild(child:Element, repl:Element):Void {
+		if ( !empty ) {
+			first.replaceChild(repl.first, child.first);
+		}
+	}
+
+	/**
+	  * replace [this] with the given Element
+	  */
+	public inline function replaceWith(other : Element):Void {
+		parent.replaceChild(this, other);
 	}
 
 	/**
