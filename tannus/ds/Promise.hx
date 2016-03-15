@@ -422,6 +422,18 @@ class Promise<T> {
 						case 'ignore':
 							return ex;
 
+						case 'promise':
+							switch ( ex.expr ) {
+								case ExprDef.ECall(efunc, args):
+									args = args.concat([yes, no]);
+									return {
+										'expr': ECall(efunc, args),
+										'pos': ex.pos
+									};
+								default:
+									return ex;
+							}
+
 						case 'forward':
 							return macro {
 								$ex.then( accept ).unless( reject );
