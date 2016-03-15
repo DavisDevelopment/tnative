@@ -129,6 +129,15 @@ class CompileTime {
 	}
 
 	/**
+	  * Inline a data-uri
+	  */
+	public static macro function readDataURI(path:String, type:String):ExprOf<String> {
+		var sdata = loadFile( path );
+		var uri = ('data:$type;base64,' + sdata.base64Encode());
+		return toExpr( uri );
+	}
+
+	/**
 	  * Add a Resource
 	  */
 	public static macro function resource(path:String, ?rel:ExprOf<Bool>):ExprOf<Getter<ByteArray>> {
