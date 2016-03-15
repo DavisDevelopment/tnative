@@ -8,6 +8,14 @@ using haxe.macro.ExprTools;
 using haxe.macro.ExprTools.ExprArrayTools;
 
 class MacroTools {
+	/**
+	  * get the given a Pointer to the given Expression
+	  */
+	public static macro function asReference<T>(e : ExprOf<T>):ExprOf<tannus.io.Ptr<T>> {
+		var ref:Expr = pointer( e );
+		return macro $ref;
+	}
+
 	#if macro
 
 	/**
@@ -15,7 +23,12 @@ class MacroTools {
 	  */
 	public static function mapUnderscoreTo(e:Expr, repl:String):Expr {
 		var erep = parse( repl );
-		return e.map(map_us.bind(_, erep));
+		switch ( e.expr ) {
+			case EConst(CIdent( '_' )):
+				return erep;
+			default:
+				return e.map(map_us.bind(_, erep));
+		}
 	}
 
 	/**
