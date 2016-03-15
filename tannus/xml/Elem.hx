@@ -119,6 +119,44 @@ class Elem {
 		}
 	}
 
+	/**
+	  * Check whether [child] is a child of [this]
+	  */
+	public function hasChild(child : Elem):Bool {
+		for (e in children) {
+			if (e == child) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	  * Check whether [child] is a descendent of [this]
+	  */
+	public function hasDescendendant(child : Elem):Bool {
+		for (e in descend()) {
+			if (e == child) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	  * check whether [this] is a child of [par]
+	  */
+	public function childOf(par : Elem):Bool {
+		return par.hasChild( this );
+	}
+
+	/**
+	  * check whether [this] is a descendant of [par]
+	  */
+	public function descendantOf(par : Elem):Bool {
+		return return par.hasDescendendant( this );
+	}
+
 	/* Get the value of an attributesibute of [this] Elem */
 	public function get(key : String):Null<String> {
 		return attributes[key];
@@ -148,10 +186,25 @@ class Elem {
 
 	/* Apply [f] recursively to all children of [this] */
 	public function walk(f : Elem->Void):Void {
-		if (parent != null)
-			f(this);
-		for (kid in children)
-			f(kid);
+		if (parent != null) {
+			f( this );
+		}
+
+		for (kid in children) {
+			f( kid );
+		}
+	}
+
+	/**
+	  * Get all descendants of [this] Elem
+	  */
+	public function descend():Array<Elem> {
+		var all:Array<Elem> = new Array();
+		for (c in children) {
+			all.push( c );
+			all = all.concat(c.descend());
+		}
+		return all;
 	}
 
 	/* Find all Elems for whom [test] returns true */
