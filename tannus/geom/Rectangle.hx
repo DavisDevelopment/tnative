@@ -224,6 +224,21 @@ class CRectangle implements Shape {
 	}
 
 	/**
+	  * get the rotated dimensions of [this] Rectangle
+	  */
+	public function rotated(angle : Angle):Rectangle {
+		var rads = angle.radians;
+
+		/* calculate new width */
+		var nw:Float = (abs(width * sin( rads ) + abs(height * cos( rads ))));
+
+		/* calculate new height */
+		var nh:Float = (abs(width * cos( rads ) + abs(height * sin( rads ))));
+
+		return new Rectangle(x, y, nw, nh);
+	}
+
+	/**
 	  * Vectorize [this] Rectangle
 	  */
 	public function vectorize(r : Rectangle):Rectangle {
