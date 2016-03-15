@@ -254,7 +254,7 @@ class Compiler {
 			return (lessThan(x, y) || eq(x, y));
 		});
 		
-		operator('has', function(x, y) {
+		function has(x:Dynamic, y:Dynamic):Bool {
 			if (is(x, String)) {
 				return (cast(x, String).has(string(y)));
 			}
@@ -264,7 +264,22 @@ class Compiler {
 			else {
 				return false;
 			}
-		});
+		}
+		operator('has', has);
+		operator('contains', has);
+
+		function regtest(x:Dynamic, y:Dynamic):Bool {
+			switch ([x, y].map(Tt.typename.bind(_))) {
+				case [_, 'String']:
+					var reg:EReg = new EReg(string( y ), '');
+					return reg.match(string( x ));
+
+				default:
+					return false;
+			}
+		}
+
+		operator('~=', regtest);
 	}
 
 	/**
