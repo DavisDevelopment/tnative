@@ -173,6 +173,57 @@ class CRectangle implements Shape {
 	}
 
 	/**
+	  * Move [this] Rectangle by the given amount
+	  */
+	public function move(dx:Float, dy:Float):Void {
+		x += dx;
+		y += dy;
+	}
+
+	/**
+	  * Scale [this] Rectangle such that the relationship between [w] and [h] remain the same
+	  */
+	public function scale(?sw:Float, ?sh:Float):Void {
+		if (sw != null) {
+			var ratio:Float = (sw / width);
+			width = sw;
+			height = (ratio * height);
+		}
+		else if (sh != null) {
+			var ratio:Float = (sh / height);
+			width = (ratio * width);
+			height = sh;
+		}
+		else {
+			return ;
+		}
+	}
+
+	/**
+	  * create and return a scaled copy of [this]
+	  */
+	public function scaled(?sw:Float, ?sh:Float):Rectangle {
+		var s:Rectangle = clone();
+		s.scale(sw, sh);
+		return s;
+	}
+
+	/**
+	  * Scale [this] Rectangle to be [amount]% of its current size
+	  */
+	public function percentScale(amount : Percent):Void {
+		w = amount.of( w );
+		h = amount.of( h );
+	}
+
+	/**
+	  * Create and return a scaled version of [this] Rectangle
+	  */
+	public inline function percentScaled(amount : Percent):Rectangle {
+		return new Rectangle(x, y, amount.of( w ), amount.of( h ));
+	}
+
+	/**
 	  * Vectorize [this] Rectangle
 	  */
 	public function vectorize(r : Rectangle):Rectangle {
