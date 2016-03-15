@@ -97,12 +97,15 @@ class Random {
 		var copy:Array<T> = set.copy();
 		var result:Array<T> = new Array();
 
-		while (copy.length != 1) {
-			var el:T = choice(copy);
-			copy.remove(el);
-			result.push(el);
+		if (copy.length > 0) {
+			while (copy.length != 1) {
+				var el:T = choice(copy);
+				copy.remove(el);
+				result.push(el);
+			}
+			result.push(copy.pop());
 		}
-		result.push(copy.pop());
+
 		return result;
 	}
 
