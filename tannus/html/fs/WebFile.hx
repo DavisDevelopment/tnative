@@ -55,10 +55,13 @@ class WebFile {
 	/**
 	  * get an 'Object URL' for [this] File
 	  */
-	public inline function getObjectURL():String {
-		untyped {
-			return Win.current.webkitURL.createObjectURL(file);
-		};
+	public function getObjectURL():String {
+		if (_objectUrl == null) {
+			var w = Win.current;
+			var getter:NFile -> String = (untyped __js__('(w.URL || w.webkitURL).createObjectURL.bind(w)'));
+			_objectUrl = getter( file );
+		}
+		return _objectUrl;
 	}
 
 /* === Computed Instance Fields === */
@@ -84,29 +87,5 @@ class WebFile {
 /* === Instance Fields === */
 
 	private var file : NFile;
-}
-
-@:forward
-abstract OldWebFile (NFile) from NFile {
-	/* Constructor Function */
-	public inline function new(f : NFile):Void {
-		this = f;
-	}
-
-/* === Instance Fields === */
-
-	/* The MIME Type of [this] File */
-	public var type(get, never):Mime;
-	private inline function get_type() return new Mime(this.type);
-
-/* === Instance Methods === */
-
-	/**
-	  * Create an ObjectUrl
-	  */
-	public inline function getObjectURL():String {
-		untyped {
-			return Win.current.webkitURL.createObjectURL(this);
-		};
-	}
+	private var _objectUrl : Null<String> = null;
 }
