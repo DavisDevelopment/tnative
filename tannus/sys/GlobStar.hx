@@ -15,22 +15,22 @@ using tannus.ds.StringUtils;
 
 @:forward
 abstract GlobStar (CGlobStar) from CGlobStar {
-	public inline function new(s : String):Void {
-		this = new CGlobStar(s);
+	public inline function new(s : String, flags:String=''):Void {
+		this = new CGlobStar(s, flags);
 	}
 
 	@:from
-	public static inline function fromString(s : String):GlobStar {
-		return new GlobStar(s);
+	public static inline function fromString(s:String, flags:String=''):GlobStar {
+		return new GlobStar(s, flags);
 	}
 }
 
 @:expose('globstar')
 class CGlobStar {
 	/* Constructor Function */
-	public function new(pat : String):Void {
+	public function new(pat:String, flags:String):Void {
 		spat = pat;
-		var data = Printer.compile(pat);
+		var data = Printer.compile(pat, flags);
 		pattern = data.regex;
 		pind = data.params;
 	}
