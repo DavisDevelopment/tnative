@@ -9,6 +9,22 @@ using haxe.macro.ExprTools.ExprArrayTools;
 
 class MacroTools {
 	/**
+	  * create a Getter to the given Expression
+	  */
+	public static macro function asGetter<T>(e : ExprOf<T>):ExprOf<tannus.io.Getter<T>> {
+		e = macro tannus.io.Getter.create( $e );
+		return macro $e;
+	}
+
+	/**
+	  * create a Setter to the given Expression
+	  */
+	public static macro function asSetter<T>(e : ExprOf<T>):ExprOf<tannus.io.Setter<T>> {
+		e = macro tannus.io.Setter.create( $e );
+		return macro $e;
+	}
+
+	/**
 	  * get the given a Pointer to the given Expression
 	  */
 	public static macro function asReference<T>(e : ExprOf<T>):ExprOf<tannus.io.Ptr<T>> {
