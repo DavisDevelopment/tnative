@@ -103,6 +103,36 @@ abstract WebFileEntry (FileEntry) from FileEntry {
 	}
 
 	/**
+	  * Move [this] Entry
+	  */
+	@:access( tannus.html.fs.WebDirectoryEntry )
+	public function moveTo(parent:WebDirectoryEntry, ?name:String):Promise<WebFileEntry> {
+		return Promise.create(@promise this.moveTo(parent, name));
+	}
+
+	/**
+	  * Copy [this] Entry
+	  */
+	public function copyTo(parent:WebDirectoryEntry, ?name:String):Promise<WebFileEntry> {
+		return Promise.create(@promise this.copyTo(parent, name));
+	}
+
+	/**
+	  * Rename [this] Entry
+	  */
+	public function rename(newname : String):Promise<WebFileEntry> {
+		return Promise.create({
+			var pp = getDirectory();
+			pp.then(function( parent ) {
+				@forward moveTo(this, parent, newname);
+			});
+			pp.unless(function( error ) {
+				throw error;
+			});
+		});
+	}
+
+	/**
 	  * delete [this] file
 	  */
 	public inline function remove(?cb : Void->Void):Void {
