@@ -334,9 +334,9 @@ class TMath {
 	  * Get the largest element in the given Array
 	  */
 	public static macro function macmax<T>(list:ExprOf<Array<T>>, test:Expr):ExprOf<T> {
-		test = test.mapUnderscoreTo( 'val' );
-		test = (macro function(val) return $test);
-		return macro tannus.ds.ArrayTools.max($list, $test);
+		var testf = test.mapUnderscoreTo( 'val' );
+		testf = (macro function(val) return $testf);
+		return macro tannus.ds.ArrayTools.max($list, $testf);
 	}
 
 	/**
