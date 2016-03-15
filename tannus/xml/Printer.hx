@@ -36,8 +36,9 @@ class Printer {
 	  */
 	public dynamic function genElem(e:Elem, indent:Int=0):Void {
 		var pre:String = space.times( indent );
-		if ( pretty )
+		if ( pretty ) {
 			indent++;
+		}
 		var parts = [for (name in e.attributes.keys) (name+'="'+Std.string(e.attributes.get(name))+'"')];
 		var open:String = '<${e.tag}';
 		if (parts.length > 0) {
@@ -59,7 +60,13 @@ class Printer {
 		else {
 			write(pre + open);
 			write( txt );
-			writeln(pre + close);
+			if (lines.length > 1) {
+				writeln(pre + close);
+			}
+			else {
+				writeln( close );
+			}
+
 			/*
 			else {
 				var node:String = '<${e.tag}';
