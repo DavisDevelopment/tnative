@@ -140,6 +140,7 @@ class Parser {
 					toks.push( telse );
 				var chl = sub( toks );
 				return Type.createEnum(Check, 'TernaryCheck', chl);
+
 			/* == Anything Else == */
 			default:
 				throw 'SyntaxError: Unexpected $t!';
@@ -204,6 +205,22 @@ class Parser {
 
 	private var tokens : Stack<Token>;
 	private var tree : Array<Check>;
+
+/* === Static Methods === */
+
+	/**
+	  * shorthand to parse the given Token tree
+	  */
+	public static inline function parseTokens(tree : Array<Token>):Array<Check> {
+		return (new Parser().parse( tree ));
+	}
+
+	/**
+	  * shorthand to parse the given String
+	  */
+	public static inline function parseString(s : String):Array<Check> {
+		return parseTokens(Lexer.lexString( s ));
+	}
 }
 
 private typedef State = {
