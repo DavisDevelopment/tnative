@@ -19,8 +19,10 @@ class Lexer {
 		reset();
 		operators = new Array();
 
-		operator('=>');
-		operator('is');
+		operator( '=>' );
+		operator( 'is' );
+		operator( 'has' );
+		operator( 'contains' );
 	}
 
 /* === Instance Methods === */
@@ -426,6 +428,15 @@ class Lexer {
 	private var operators : Array<String>;
 	private var canCall : Bool;
 	private var inTernary : Bool;
+
+/* === Static Methods === */
+
+	/**
+	  * Shorthand to tokenize a String
+	  */
+	public static inline function lexString(s : String):Array<Token> {
+		return (new Lexer().lex( s ));
+	}
 }
 
 private typedef State = {
