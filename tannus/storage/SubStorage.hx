@@ -1,8 +1,10 @@
 package tannus.storage;
 
+import tannus.io.Signal;
 import tannus.ds.Obj;
 import tannus.ds.Object;
 import tannus.storage.Storage;
+import tannus.storage.Commit;
 
 import haxe.Serializer;
 import haxe.Unserializer;
@@ -21,6 +23,7 @@ class SubStorage extends Storage {
 		this.parent = parent;
 		key = null;
 		prefix = null;
+		autoPush = true;
 	}
 
 /* === Instance Methods === */
@@ -74,11 +77,60 @@ class SubStorage extends Storage {
 	}
 
 	/**
+	  * watch for commits
+	  */
+	override private function _remoteCommitSignal():Signal<Commit> {
+		var sig = new Signal();
+		parent.watch(function(commit) {
+			switch ( commit ) {
+				case Commit.Change(key, prev, next):
+					if (relevantKey( key )) {
+						sig.call(Change(localKey(key), prev, next));
+					}
+
+				case Create(key, value):
+					if (relevantKey( key )) {
+						sig.call(Create(localKey( key ), value));
+					}
+
+				case Delete( key ):
+					if (relevantKey( key )) {
+						sig.call(Delete(localKey( key )));
+					}
+			}
+		});
+		return sig;
+	}
+
+	private function relevantKey(k : String):Bool {
+		if (key != null) {
+			return (k == key);
+		}
+		else if (prefix != null) {
+			return (k.startsWith( prefix ));
+		}
+		else {
+			return false;
+		}
+	}
+
+	private inline function localKey(k : String):String {
+		if (prefix != null) {
+			return k.after( prefix );
+		}
+		else {
+			return k;
+		}
+	}
+
+	/**
 	  * assign a value
 	  */
 	override public function set<T>(key:String, value:T):T {
 		var res = super.set(key, value);
-		push(function() null);
+		if ( autoPush ) {
+			push(function() null);
+		}
 		return res;
 	}
 
@@ -87,4 +139,5 @@ class SubStorage extends Storage {
 	private var parent : Storage;
 	public var key : Null<String>;
 	public var prefix : Null<String>;
+	public var autoPush : Bool;
 }
