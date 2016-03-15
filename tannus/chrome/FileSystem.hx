@@ -120,11 +120,19 @@ class FileSystem {
 	/**
 	  * Get a File object to save to
 	  */
-	public static function saveAs():FilePromise {
-		return new FilePromise(function( provide ) {
-			chooseEntry({type: SaveFile}, function(entries) {
+	public static function saveAs(?name : String):Promise<WebFileEntry> {
+		return Promise.create({
+			var options:ChooseEntryOptions = {
+				'type' : SaveFile,
+		       		'suggestedName' : name
+			};
+
+			chooseEntry(options, function(entries) {
 				if (entries.length > 0) {
-					provide(cast entries[0]);
+					return (cast entries[0]);
+				}
+				else {
+					throw 'No File Selected';
 				}
 			});
 		});
