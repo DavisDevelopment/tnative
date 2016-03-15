@@ -75,16 +75,29 @@ abstract WebDirectoryEntry (DirectoryEntry) from DirectoryEntry {
 	/**
 	  * get an Array of all FileEntries recursively
 	  */
-	public function walk(cb:Array<WebFileEntry>->Void, ?filter:WebFileEntry->Bool):Void {
+	public function walk(cb:Array<WebFileEntry>->Void, ?filter:WebFileEntry->Bool, ?step:WebFileEntry->Bool):Void {
 		var all:Array<WebFileEntry> = new Array();
 		readEntries().then(function( entries ) {
 			var stack = new AsyncStack();
+			var broken:Bool = false;
 			for (e in entries) {
 				stack.push(function(done) {
+					if ( broken ) {
+						done();
+						return ;
+					}
+
 					if ( e.isFile ) {
 						var add = (filter == null || filter(new WebFileEntry(cast e)));
 						if ( add ) {
-							all.push(new WebFileEntry(cast e));
+							var wfe = new WebFileEntry(cast e);
+							if (step != null) {
+								var continu = step( wfe );
+								if ( !continu ) {
+									broken = true;
+								}
+							}
+							all.push( wfe );
 						}
 						done();
 					}
