@@ -44,13 +44,11 @@ class Storage {
 	public function push(done : Void->Void):Void {
 		/* FETCH the data from the remote */
 		_fetch(function(fdata : Data):Void {
-			trace('fetched successfully');
 			/* apply local commits to the remote data */
 			fdata = _applyCommits(fdata, commits);
 
 			/* PUSH the data to the remote */
 			_push(fdata, function(err : Err) {
-				trace('pushed successfully');
 				/* if any errors occurred */
 				if (err != null) {
 					throw err;
