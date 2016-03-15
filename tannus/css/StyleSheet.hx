@@ -65,6 +65,45 @@ class StyleSheet {
 	}
 
 	/**
+	  * Add a @font-face Rule to [this] StyleSheet
+	  * this method bypasses the standard procedure of merging rules with the same selector
+	  */
+	public function fontFace(family:String, source:String):FontFace {
+		var r:Rule = new Rule(this, '@font-face');
+		r.set('font-family', family);
+		r.set('src', 'url("$source")');
+		rules.push( r );
+		changed();
+		return r;
+	}
+
+	/**
+	  * Get the FontFace with the provided name
+	  */
+	public function getFontFace(family : String):Null<FontFace> {
+		for (font in getAllFontFaces()) {
+			if (font.family == family) {
+				return font;
+			}
+		}
+		return null;
+	}
+
+	/**
+	  * Check whether a FontFace exists with the given name
+	  */
+	public function hasFontFace(name : String):Bool {
+		return (getFontFace( name ) != null);
+	}
+
+	/**
+	  * Get all FontFace Rules
+	  */
+	public function getAllFontFaces():Array<FontFace> {
+		return rules.macfilter(_.selector == '@font-face');
+	}
+
+	/**
 	  * Create and return a clone of [this] StyleSheet
 	  */
 	public function clone():StyleSheet {
