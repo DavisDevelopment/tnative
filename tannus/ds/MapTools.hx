@@ -82,6 +82,15 @@ class MapTools {
 	}
 
 	/**
+	  * Copy data from [source] to [o]
+	  */
+	public static function pull<K,V>(o:Map<K, V>, source:Map<K, V>):Void {
+		for (key in source.keys()) {
+			o[ key ] = source[ key ];
+		}
+	}
+
+	/**
 	  * Convert a Map to an Object
 	  */
 	public static function toObject<T>(self : Map<String, T>):Object {
