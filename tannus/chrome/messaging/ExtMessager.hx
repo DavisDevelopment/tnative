@@ -1,6 +1,5 @@
 package tannus.chrome.messaging;
 
-import tannus.messaging.*;
 import tannus.ds.Object;
 import tannus.ds.Memory;
 import tannus.ds.Maybe;
@@ -9,6 +8,8 @@ import tannus.io.Signal;
 import tannus.chrome.Runtime;
 import tannus.chrome.Tabs;
 import tannus.chrome.Tab;
+import tannus.messaging.*;
+import tannus.messaging.Message;
 import Std.*;
 
 import tannus.chrome.messaging.BGServer in Server;
@@ -41,30 +42,32 @@ class ExtMessager extends Messager {
 					/* if we're not connected to anything yet */
 					if (tab == null) {
 						//- if [this] Messager is in a Pool
-						if (inPool) {
+						if ( inPool ) {
 							//- ignore input from Tabs we're already connected to
-							var existing = pool.getMessagerByTab(msg.sender.tab.value.id);
-							if (existing != null)
+							var existing = pool.getMessagerByTab( msg.sender.tab.id );
+							if (existing != null) {
 								return ;
+							}
 						}
+
 						//- set the [tab] field to that of [msg.sender]
-						tab = msg.sender.tab.value;
+						tab = msg.sender.tab;
 
 						//- dispatch the 'connected' Event
-						_connected.call(null);
+						_connected.call( null );
 					}
 
 					/* if we're already connected to something */
 					else {
 						/* if the Message came from any other Messager than [peer] */
-						if (msg.sender.tab.value.id != tab.value.id)
+						if (msg.sender.tab.value.id != tab.value.id) {
 							return ;
+						}
 					}
 
 					/* decode the Message object */
 					var safe:SafeMessage = (cast msg.data);
 					var messg:Message = Message.fromSafe(this, safe);
-					trace( messg );
 
 					/* and plop it right into our sexy-ass Message-handling system */
 					receiveFromPeer( messg );
@@ -85,19 +88,13 @@ class ExtMessager extends Messager {
 			/* listen for data from the chrome.runtime.onMessage Event */
 			Runtime.onMessage(function( msg ) {
 				/* if [msg] is a valid Message */
-				if (SafeMessage.isSafeMessage(msg.data)) {
+				if (SafeMessage.isSafeMessage( msg.data )) {
 					/* decode it into a Message object */
 					var messg:Message = Message.fromSafe(this, cast msg.data);
 
 					/* send it to be handled */
 					receiveFromPeer( messg );
 				}
-			});
-
-			on('meta:source', function( msg ) {
-				var tabid:Int = cast msg.data['tab'];
-
-				trace('I am in Tab $tabid');
 			});
 		}
 
