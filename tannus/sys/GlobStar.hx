@@ -20,8 +20,8 @@ abstract GlobStar (CGlobStar) from CGlobStar {
 	}
 
 	@:from
-	public static inline function fromString(s:String, flags:String=''):GlobStar {
-		return new GlobStar(s, flags);
+	public static inline function fromString(s : String):GlobStar {
+		return new GlobStar( s );
 	}
 }
 
