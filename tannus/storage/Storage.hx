@@ -203,7 +203,23 @@ class Storage {
 	  * Get an Array of all keys
 	  */
 	public function keys():Array<String> {
-		return (remote.keyArray().concat(local.keyArray()).unique());
+		return (remote.keyArray().concat(local.keyArray()).unique()).without( deleted );
+	}
+
+	/**
+	  * Get the current state, as it would be pushed to the remote
+	  */
+	public function getState():Data {
+		return _applyCommits(remote != null ? remote : new Data(), commits);
+	}
+
+	/**
+	  * reset [this] back to the last pull
+	  */
+	public function rollback():Void {
+		local = new Map();
+		deleted = new Array();
+		commits = new Array();
 	}
 
 /* === Backend Instance Methods === */
