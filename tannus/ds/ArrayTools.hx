@@ -66,9 +66,11 @@ class ArrayTools {
 	public static function without<T>(list:Array<T>, blacklist:Array<T>):Array<T> {
 		var c = list.copy();
 		for (v in blacklist) {
-			while (true)
-				if (!c.remove(v))
+			while ( true ) {
+				if (!c.remove( v )) {
 					break;
+				}
+			}
 		}
 		return c;
 	}
