@@ -44,11 +44,24 @@ class CAngle {
 	/* Constructor Function */
 	public function new(_v : Float):Void {
 		v = _v;
+		/*
 		while (v < 0)
 			v = (360 - abs( v ));
+		*/
 	}
 
 /* === Instance Methods === */
+
+	/**
+	  * Get the compliment of [this] Angle
+	  */
+	public inline function compliment():Angle {
+		return new Angle(360 - v);
+	}
+
+	public inline function invert():Angle {
+		return new Angle( -v );
+	}
 
 	/**
 	  * convert [this] to a String
