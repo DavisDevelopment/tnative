@@ -82,6 +82,16 @@ abstract Key (Int) from Int to Int {
     var F10 = 121;
     var F11 = 122;
     var F12 = 123;
+    var Number0 = 48;
+    var Number1 = 49;
+    var Number2 = 50;
+    var Number3 = 51;
+    var Number4 = 52;
+    var Number5 = 53;
+    var Number6 = 54;
+    var Number7 = 55;
+    var Number8 = 56;
+    var Number9 = 57;
 
 /* === Fields === */
 
