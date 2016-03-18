@@ -78,18 +78,49 @@ class ArrayTools {
 	/**
 	  * Obtain the first item in [list] Array which matches the given pattern
 	  */
-	public static macro function firstMatch<T>(list:ExprOf<Array<T>>, itemName, itemTest) {
-		return macro (function() {
-			var result:Dynamic = null;
-			for ($itemName in $list) {
-				var passed:Bool = ($itemTest);
-				if (passed) {
-					result = $itemName;
-					break;
-				}
+	public static function firstMatch<T>(list:Array<T>, test:T->Bool):Null<T> {
+		for (item in list) {
+			if (test( item )) {
+				return item;
 			}
-			return (cast result);
-		}());
+		}
+		return null;
+	}
+
+	/**
+	  * Obtain the index of the first item in [list] Array which matches the given pattern
+	  */
+	public static function firstMatchIndex<T>(list:Array<T>, test:T->Bool):Int {
+		for (index in 0...list.length) {
+			if (test(list[index])) {
+				return index;
+			}
+		}
+		return -1;
+	}
+
+	/**
+	  * macro-licious firstMatch
+	  */
+	public static macro function macfirstMatch<T>(list:ExprOf<Array<T>>, test:Expr):ExprOf<Null<T>> {
+		test = test.mapUnderscoreTo( 'item' );
+		if (!test.hasReturn()) {
+			test = macro return $test;
+		}
+		test = macro (function(item) $test);
+		return macro tannus.ds.ArrayTools.firstMatch($list, $test);
+	}
+
+	/**
+	  * macro-licious firstMatchIndex
+	  */
+	public static macro function macfirstMatchIndex<T>(list:ExprOf<Array<T>>, test:Expr):ExprOf<Int> {
+		test = test.mapUnderscoreTo( 'item' );
+		if (!test.hasReturn()) {
+			test = macro return $test;
+		}
+		test = macro (function(item) $test);
+		return macro tannus.ds.ArrayTools.firstMatchIndex($list, $test);
 	}
 
 	/**
@@ -283,7 +314,7 @@ class ArrayTools {
 	  * one filled with those items that 'passed' the test, and the other
 	  * filled with those who 'failed'
 	  */
-	public static function splitfilter<T>(list:Array<T>, pred:T->Bool):{pass:Array<T>, fail:Array<T>} {
+	public static function splitfilter<T>(list:Array<T>, pred:T->Bool):SplitFilterResult<T> {
 		var res = {
 			'pass': new Array(),
 			'fail': new Array()
@@ -292,6 +323,18 @@ class ArrayTools {
 			(pred(item) ? res.pass : res.fail).push( item );
 		}
 		return res;
+	}
+
+	/**
+	  * macro-licious split-filter
+	  */
+	public static macro function macsplitfilter<T>(list:ExprOf<Array<T>>, test:Expr):ExprOf<SplitFilterResult<T>> {
+		test = test.mapUnderscoreTo( 'item' );
+		if (!test.hasReturn()) {
+			test = macro return $test;
+		}
+		test = macro (function(item) $test);
+		return macro tannus.ds.ArrayTools.splitfilter($list, $test);
 	}
 
 	/**
@@ -331,3 +374,5 @@ class ArrayTools {
 
 	#end
 }
+
+typedef SplitFilterResult<T> = {pass:Array<T>, fail:Array<T>};
