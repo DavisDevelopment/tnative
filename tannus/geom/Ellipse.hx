@@ -8,7 +8,10 @@ import tannus.math.TMath;
 import tannus.geom.Shape;
 import tannus.geom.Vertices;
 
-class Ellipse implements Shape {
+import Math.*;
+import tannus.math.TMath.*;
+
+class Ellipse implements Shape implements PathComponent {
 	/* Constructor Function */
 	public function new(x:Float, y:Float, w:Float, h:Float):Void {
 		pos = new Point(x, y);
@@ -46,19 +49,44 @@ class Ellipse implements Shape {
 	/**
 	  * Creates and returns a list of all Points along the circumference of [this] Ellipse
 	  */
-	public function getPoints():Array<Point> {
+	public function getPoints(?curvePrecision : Int):Array<Point> {
 		var curves = calculateCurves();
 		var points:Array<Point> = new Array();
 
 		for (curve in curves) {
-			points = points.concat(curve.getPoints());
+			points = points.concat(curve.getPoints( curvePrecision ));
 		}
 		
 		return points;
 	}
 
-	public function getVertices() {
-		return new Vertices(getPoints());
+	/**
+	  * get [this] Ellipse's VertexArray
+	  */
+	public function getVertices(?precision : Int):Vertices {
+		return new Vertices(getPoints( precision ));
+	}
+
+	/**
+	  * add [this] Ellipse to a Path
+	  */
+	public function addToPath(path : Path):Void {
+		var ep = new Path();
+		var curves = calculateCurves();
+		for (b in curves) {
+			ep.addBezier( b );
+		}
+		path.addPath( ep );
+	}
+
+	/**
+	  * check whether the given point is inside [this] Ellipse
+	  */
+	public function containsPoint(p : Point):Bool {
+		var m = center;
+		var dx = abs(p.x - m.x);
+		var dy = abs(p.y - m.y);
+		return ((((dx * dx) / (width * width)) + ((dy * dy) / (height * height))) <= 1);
 	}
 
 /* === Instance Fields === */
