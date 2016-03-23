@@ -200,7 +200,7 @@ abstract Point (TPoint) from TPoint to TPoint {
 	/**
 	  * Devectorize [this] Point, based on a given Rectangle
 	  */
-	public inline function devectorize(r : Rectangle):Point {
+	public function devectorize(r : Rectangle):Point {
 		var px:Percent = new Percent(x), py:Percent = new Percent(y);
 		return new Point(px.of(r.w), py.of(r.h));
 	}
