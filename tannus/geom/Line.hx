@@ -4,6 +4,7 @@ import tannus.geom.Point;
 import tannus.geom.Rectangle;
 import tannus.geom.Vertices;
 import tannus.geom.Velocity;
+import tannus.math.Ratio;
 
 import tannus.math.Percent;
 import tannus.math.TMath;
@@ -71,6 +72,18 @@ class Line {
 	}
 
 /* === Computed Instance Fields === */
+
+	/* the slope of [this] Line */
+	public var slope(get, never):Float;
+	private inline function get_slope():Float {
+		return ((one.y - two.y) / (one.x - two.x));
+	}
+
+	/* the slope ratio */
+	public var slopeRatio(get, never):Ratio;
+	private inline function get_slopeRatio():Ratio {
+		return new Ratio((one.y - two.y), (one.x - two.x));
+	}
 
 	/**
 	  * The 'length' of [this] Line
