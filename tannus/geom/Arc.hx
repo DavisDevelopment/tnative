@@ -5,12 +5,14 @@ import tannus.geom.Point;
 import tannus.geom.Rectangle;
 import tannus.geom.Line;
 import tannus.geom.Angle;
-
 import tannus.math.Percent;
+
+import Math.*;
+import tannus.math.TMath.*;
 
 class Arc {
 	/* Constructor Function */
-	public function new(x:Float, y:Float, rad:Float, start:Angle, end:Angle, ?cc:Bool=false):Void {
+	public function new(center:Point, rad:Float, start:Angle, end:Angle, ?cc:Bool=false):Void {
 		pos = new Point(x, y);
 		radius = rad;
 		start_angle = start;
@@ -24,7 +26,7 @@ class Arc {
 	  * Create and return a 'clone' of [this] Arc
 	  */
 	public inline function clone():Arc {
-		return new Arc(pos.x, pos.y, radius, start_angle, end_angle, !clockwise);
+		return new Arc(pos, radius, start_angle, end_angle, !clockwise);
 	}
 
 	/**
@@ -54,39 +56,35 @@ class Arc {
 	}
 
 	/**
-	  * Calculate the Array of Lines which make up [this] Arc
+	  * Calculate the points along [this] Arc
 	  */
-	public function getLines(?precision:Int = 1):Array<Line> {
-		//- Calculate Difference between the angles
-		var diff:Angle = (end_angle.degrees);
-
-		//- Calculate the number of steps
-		var steps:Int = Math.round(diff.degrees * precision);
-
-		//- Declare Variable to hold our current angle
-		var angle:Angle = start_angle;
-
-		var px:Float = (x + radius * Math.cos(angle.radians));
-		var py:Float = (y + radius * Math.sin(angle.radians));
-
-		var xr:Getter<Float> = Getter.create(x + radius * Math.cos(angle.radians));
-		var yr:Getter<Float> = Getter.create(y + radius * Math.sin(angle.radians));
-
-		var lines:Array<Line> = new Array();
-
-		for (i in 0...steps) {
-			angle = (start_angle.degrees + (diff.degrees / steps * i));
-
-			var startp:Point = new Point(px, py);
-			var endp:Point = new Point(xr, yr);
-
-			px = xr;
-			py = yr;
-
-			lines.push(new Line(startp, endp));
+	public function calculateVertices(?precision : Int):Vertices {
+		var va:Vertices = new Vertices();
+		var rang:Float = (end_angle.degrees - start_angle.degrees);
+		if (precision == null) {
+			precision = floor( rang );
 		}
 
-		return lines;
+		var i:Int = 0;
+		var v:Velocity = new Velocity(radius, 0);
+	
+		while (i < precision) {
+			var deg:Float = (start_angle.degrees + (i * (rang / precision)));
+			v.angle = deg;
+			va.push(pos.plusPoint( v.vector ));
+
+			i++;
+		}
+
+		return va;
+	}
+
+	/**
+	  * Calculate the Array of Lines which make up [this] Arc
+	  */
+	public function getLines(?precision : Int):Array<Line> {
+		var verts = calculateVertices( precision );
+		return verts.calculateLines();
 	}
 
 /* === Computed Instance Fields === */
