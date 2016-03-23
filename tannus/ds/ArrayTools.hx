@@ -348,6 +348,13 @@ class ArrayTools {
 		return pairs;
 	}
 
+	/**
+	  * build a Grid<T> from an Array<Array<T>>
+	  */
+	public static inline function gridify<T>(arr : Array<Array<T>>):Grid<T> {
+		return tannus.ds.Grid.fromArray2( arr );
+	}
+
 	#if macro
 
 	/**
