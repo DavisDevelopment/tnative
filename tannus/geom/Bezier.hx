@@ -56,9 +56,7 @@ class Bezier {
 	/**
 	  * Calculates the 'x' position of the curve at a given degree of completion
 	  */
-	public function getPointX(pt : Percent):Float {
-		var t:Float = pt.of( 1 );
-
+	public function getPointX(t : Float):Float {
 		//- start and end are special cases
 		if (t == 0) {
 			return start.x;
@@ -81,9 +79,7 @@ class Bezier {
 	/**
 	  * Calculates the 'y' position of the curve at a given degree of completion
 	  */
-	public function getPointY(pt : Percent):Float {
-		var t:Float = pt.of( 1 );
-
+	public function getPointY(t : Float):Float {
 		//- start and end are special cases
 		if (t == 0) {
 			return start.y;
@@ -106,20 +102,20 @@ class Bezier {
 	/**
 	  * Calculates the position of the curve at a given point of completion
 	  */
-	public inline function getPoint(t : Percent):Point {
-		return new Point(getPointX(t), getPointY(t));
+	public inline function getPoint(t : Float):Point {
+		return new Point(getPointX( t ), getPointY( t ));
 	}
 
 	/**
 	  * Creates and returns a list of all Points along [this] Bezier
 	  */
-	public inline function getPoints(?prec:Int):Array<Point> {
+	public inline function getPoints(?prec : Int):Array<Point> {
 		var results:Array<Point> = new Array();
 		var precision:Int = (prec != null ? prec : PRECISION);
 		var i:Int = 0;
 
 		while (i < precision) {
-			var pt:Point = getPoint((i / precision) * 100);
+			var pt:Point = getPoint(i / precision);
 			results.push( pt );
 			i++;
 		}
