@@ -340,12 +340,32 @@ class TMath {
 	}
 
 	/**
+	  * Get the largest element in the given Array
+	  */
+	public static macro function macmaxe<T>(list:ExprOf<Array<T>>, test:Expr):ExprOf<Float> {
+		var testf = test.mapUnderscoreToExpr(macro val);
+		testf = (macro function(val) return $testf);
+		var res = macro tannus.ds.ArrayTools.max($list, $testf);
+		var eres = test.mapUnderscoreToExpr( res );
+		return macro $eres;
+	}
+
+	/**
 	  * get the smallest element in the given Array
 	  */
 	public static macro function macmin<T>(list:ExprOf<Array<T>>, test:Expr):ExprOf<T> {
 		test = test.mapUnderscoreTo( 'v' );
 		test = (macro function(v) return $test);
 		return macro tannus.ds.ArrayTools.min($list, $test);
+	}
+	
+	/**
+	  * get the smallest element in the given Array
+	  */
+	public static macro function macmine<T>(list:ExprOf<Array<T>>, test:Expr):ExprOf<Float> {
+		var testf = test.mapUnderscoreTo( 'v' );
+		testf = (macro function(v) return $test);
+		return test.mapUnderscoreToExpr(macro tannus.ds.ArrayTools.min($list, $testf));
 	}
 
 	/**
