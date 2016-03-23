@@ -9,92 +9,121 @@ import tannus.geom.HitMask;
 import tannus.ds.IntRange;
 import tannus.math.TMath in N;
 
+using Lambda;
+using tannus.ds.ArrayTools;
+using tannus.math.TMath;
+
 class Path {
 	/* Constructor Function */
 	public function new():Void {
-		verts = new Array();
+		commands = new Array();
 	}
 
 /* === Instance Methods === */
 
-	/* Add a Shape onto [this] Path */
-	public function add(shape : Shape):Void {
-		verts.push(shape.getVertices());
+	/* add a vertex */
+	public inline function vertex(x:Float, y:Float):Void {
+		addPoint(new Point(x, y));
 	}
 
-	/**
-	  * Do Stuff
-	  */
-	public function getLines():Array<Line> {
-		var all_lines:Array<Line> = new Array();
-
-		for (v in verts) {
-			all_lines = all_lines.concat(v.toLines());
-		}
-
-		return all_lines;
+	/* add a single vertex */
+	public inline function addPoint(p : Point):Void {
+		cmd(PCPoint( p ));
 	}
 
-	/**
-	  * Get Points
-	  */
-	public function getPoints():Array<Point> {
-		var lines = getLines();
-		var points:Array<Point> = new Array();
-
-		for (line in lines) {
-			points = points.concat(line.getVertices().toPoints());
-		}
-
-		for (p in points) p.clamp();
-		return points;
+	/* draw a line */
+	public inline function line(start:Point, end:Point):Void {
+		addLine(new Line(start, end));
 	}
 
-	/**
-	  * Map the Points into something useful
-	  */
-	public function getHitmask():HitMask {
-		var reg:Map<Int, Array<Int>> = new Map();
-		var points = getPoints();
+	public inline function addLine(line : Line):Void {
+		cmd(PCLine( line ));
+	}
 
-		for (p in points) {
-			var x:Int = p.ix;
-			var y:Int = p.iy;
-			
-			if (reg[y] == null)
-				reg[y] = new Array();
-			reg[y].push(x);
+	public inline function arc(center:Point, radius:Float, start_angle:Angle, end_angle:Angle, counterClockwise:Bool=false):Void {
+		addArc(new Arc(center, radius, start_angle, end_angle, counterClockwise));
+	}
+
+	public inline function addArc(arc : Arc):Void {
+		cmd(PCArc( arc ));
+	}
+
+	public inline function bezier(ctrl1:Point, ctrl2:Point, goal:Point):Void {
+		addBezier(new Bezier(new Point(), ctrl1, ctrl2, goal));
+	}
+
+	public inline function addBezier(b : Bezier):Void {
+		cmd(PCBezier( b ));
+	}
+
+	public function addPath(sub : Path):Void {
+		if (sub != this) {
+			cmd(PCSub( sub ));
 		}
+	}
 
-		var ranges:Map<Int, IntRange> = new Map();
-		var keys:Array<Int> = [for (y in reg.keys()) y];
-		var yrange:IntRange = (cast N.range(keys));
-		var xrange:IntRange = new IntRange(0,1);
+	public inline function add(component : PathComponent):Void {
+		component.addToPath( this );
+	}
 
-		for (y in keys) {
-			var xs:Array<Int> = reg[y];
-			var xr:IntRange;
+	/* add a command to the list */
+	private inline function cmd(c : PathCommand):Void commands.push( c );
 
-			if (xs.length == 1) {
-				null;
-			}
-			else {
-				if (xs.length == 2) {
-					xr = new IntRange(xs[0], xs[1]);
+	/**
+	  * Create and return a Vertices object from the given Command
+	  */
+	private function commandVertices(c:PathCommand, cursor:Null<Point>, ?precision:Int):Vertices {
+		switch ( c ) {
+			case PCPoint( point ):
+				_verts.push( point );
+
+			case PCLine( line ):
+				return new Vertices([line.start, line.end]);
+
+			case PCArc( arc ):
+				if (cursor != null) {
+					arc.pos.copyFrom( cursor );
 				}
-				else {
-					xr = cast N.range( xs );
+				return arc.calculateVertices( precision );
+
+			case PCBezier( bezier ):
+				if (cursor != null) {
+					bezier.start.copyFrom( cursor );
 				}
-				xrange.min = N.min(xrange.min, xr.min);
-				xrange.max = N.max(xrange.max, xr.max);
-				ranges[y] = xr;
-			}
+				return bezier.getPoints( precision );
+
+			case PCSub( sub ):
+				return sub.calculateVertices( precision );
 		}
 
-		var crect:Rectangle = new Rectangle(xrange.min, yrange.min, (xrange.max - xrange.min), (yrange.max - yrange.min));
-		return new HitMask(crect, ranges);
+		return _verts;
+	}
+
+	/**
+	  * compute the vertex-array described by [this] path
+	  */
+	public function calculateVertices(?precision : Int):Vertices {
+		_verts = new Vertices();
+		for (cmd in commands) {
+			var curs:Null<Point> = _verts[_verts.length - 1];
+			var cmd_verts = commandVertices(cmd, curs, precision);
+			if (cmd_verts != _verts) {
+				_verts.append( cmd_verts );
+			}
+		}
+		return _verts;
 	}
 
 /* === Instance Fields === */
-	public var verts:Array<Vertices>;
+	
+	private var _verts : Null<Vertices> = null;
+	private var commands : Array<PathCommand>;
+}
+
+enum PathCommand {
+	PCPoint(pt : Point);
+	PCLine(line : Line);
+	PCArc(arc : Arc);
+	PCBezier(bez : Bezier);
+	PCSub(path : Path);
 }
