@@ -13,6 +13,9 @@ import tannus.ds.EitherType in Either;
 import Math.*;
 import tannus.math.TMath.*;
 
+using Lambda;
+using tannus.ds.ArrayTools;
+
 @:forward
 abstract Rectangle (CRectangle) from CRectangle to CRectangle {
 	/* Constructor Function */
@@ -239,6 +242,72 @@ class CRectangle implements Shape {
 	}
 
 	/**
+	  * Split [this] Rectangle into [count] pieces, either vertically or horizontally
+	  */
+	public function split(count:Int, vertical:Bool=true):Array<Rectangle> {
+		var all:Array<Rectangle> = new Array();
+		if ( vertical ) {
+			var ph:Float = (h / count);
+			for (i in 0...count) {
+				all.push(new Rectangle(x, (y + (i * ph)), w, ph));
+			}
+		}
+		else {
+			var pw:Float = (w / count);
+			for (i in 0...count) {
+				all.push(new Rectangle((x + (i * pw)), y, pw, h));
+			}
+		}
+		return all;
+	}
+
+	/**
+	  * Split [this] Rectangle into [count]^2 pieces, stored in a two-dimensional Array
+	  */
+	public function split2(count : Int):Array<Array<Rectangle>> {
+		return split(count, true).map(function(r) return r.split(count, false));
+	}
+
+	/**
+	  * bisect [this] Rectangle into two Triangles
+	  */
+	public function bisect(mode : Bool = true):Array<Triangle> {
+		var pair:Array<Triangle> = new Array();
+		if ( mode ) {
+			pair.push(new Triangle(topLeft, topRight, bottomRight));
+			pair.push(new Triangle(topLeft, bottomLeft, bottomRight));
+		}
+		else {
+			pair.push(new Triangle(topRight, bottomRight, bottomLeft));
+			pair.push(new Triangle(bottomLeft, topLeft, topRight));
+		}
+		return pair;
+	}
+
+	/**
+	  * crop [this] Rectangle, returning the 'cropped off' Rectangles created by the crop
+	  */
+	public function crop(cr : Rectangle):Null<RectangleTrimmings> {
+		var corners = cr.corners.map( containsPoint );
+		if (corners.has( false )) {
+			return null;
+		}
+
+		var left = new Rectangle(x, y, (cr.x - x), h);
+		var top = new Rectangle(cr.x, y, cr.w, (cr.y - y));
+		var bottom = new Rectangle(cr.x, (cr.y + cr.h), cr.w, (y + h));
+		bottom.height -= bottom.y;
+		var right = new Rectangle((cr.x + cr.w), y, 0, h);
+		right.width = ((x + width) - right.x);
+		return {
+			'top': top,
+			'left': left,
+			'bottom': bottom,
+			'right': right
+		};
+	}
+
+	/**
 	  * Vectorize [this] Rectangle
 	  */
 	public function vectorize(r : Rectangle):Rectangle {
@@ -260,7 +329,7 @@ class CRectangle implements Shape {
 	/**
 	  * Obtain [this] Rect's vertices
 	  */
-	public function getVertices():Vertices {
+	public function getVertices(?precision : Int):Vertices {
 		var self:Rectangle = cast this;
 
 		var verts = new Vertices([
@@ -461,3 +530,10 @@ class CRectangle implements Shape {
 		return Percent.percent(what, of);
 	}
 }
+
+typedef RectangleTrimmings = {
+	top : Rectangle,
+	left : Rectangle,
+	bottom : Rectangle,
+	right : Rectangle
+};
