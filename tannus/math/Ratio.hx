@@ -41,6 +41,16 @@ class CRatio {
 
 /* === Instance Methods === */
 
+	/* get the value of [bottom] when [top] = [topValue] */
+	public inline function bottomValue(topValue : Float):Float {
+		return ((topValue / top) * bottom);
+	}
+
+	/* get the value of [top] when [bottom]=[bottomValue] */
+	public inline function topValue(bottomValue : Float):Float {
+		return ((bottomValue / bottom) * top);
+	}
+
 	/**
 	  * get the float-value of [this] Ratio
 	  */
@@ -67,6 +77,11 @@ class CRatio {
 	  */
 	public function equals(other : Ratio):Bool {
 		return (toFloat() == other.toFloat());
+	}
+
+	/* the reciprocal of [this] ratio */
+	public inline function reciprocal():Ratio {
+		return new Ratio(1, toFloat());
 	}
 
 /* === Computed Instance Fields === */
