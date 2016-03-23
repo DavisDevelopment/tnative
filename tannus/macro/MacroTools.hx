@@ -48,6 +48,18 @@ class MacroTools {
 	}
 
 	/**
+	  * Replace all references to '_' with [repl]
+	  */
+	public static function mapUnderscoreToExpr(e:Expr, repl:Expr):Expr {
+		switch ( e.expr ) {
+			case EConst(CIdent( '_' )):
+				return repl;
+			default:
+				return e.map(map_us.bind(_, repl));
+		}
+	}
+
+	/**
 	  * Check whether the given Expression contains a return
 	  */
 	public static function hasReturn(e : Expr):Bool {
