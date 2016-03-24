@@ -122,4 +122,13 @@ class Ellipse implements Shape implements PathComponent {
 	private inline function get_center():Point {
 		return rect.center;
 	}
+
+/* === Static Methods === */
+
+	/**
+	  * Create an Ellipse from a Rectangle
+	  */
+	public static inline function fromRectangle(r : Rectangle):Ellipse {
+		return new Ellipse(r.x, r.y, r.w, r.h);
+	}
 }
