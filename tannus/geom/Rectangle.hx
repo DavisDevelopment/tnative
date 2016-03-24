@@ -285,6 +285,13 @@ class CRectangle implements Shape {
 	}
 
 	/**
+	  * bisect [this] Rectangle into four Triangles
+	  */
+	public function bisect2():Array<Triangle> {
+		return bisect().map(function(t) return t.bisect()).flatten();
+	}
+
+	/**
 	  * crop [this] Rectangle, returning the 'cropped off' Rectangles created by the crop
 	  */
 	public function crop(cr : Rectangle):Null<RectangleTrimmings> {
