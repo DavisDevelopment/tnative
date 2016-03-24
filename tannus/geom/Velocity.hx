@@ -82,6 +82,14 @@ class CVelocity {
 		return fromPoint(vector - other.vector);
 	}
 
+	/**
+	  * perform linear interpolation on [this] Velocity
+	  */
+	public function lerp(other:Velocity, weight:Float):Velocity {
+		var vec = vector.lerp(other.vector, weight);
+		return fromPoint( vec );
+	}
+
 /* === Computed Instance Fields === */
 
 	/* Movement along the 'x' axis */
