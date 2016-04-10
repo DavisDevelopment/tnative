@@ -51,6 +51,79 @@ class ArrayTools {
 	}
 
 	/**
+	  * compare two Arrays
+	  */
+	public static function compare<T>(left:Array<T>, right:Array<T>, ?predicate:T -> T -> Bool):Bool {
+		/* if the two arrays are not of the same size */
+		if (left.length != right.length) {
+			/* they cannot be equal */
+			return false;
+		}
+		/* if the two arrays are the same size */
+		else {
+			/* if [predicate] was not provided */
+			if (predicate == null) {
+				/* use the default */
+				predicate = (function(x, y) return (x == y));
+			}
+
+			/* for every index in the two arrays */
+			for (i in 0...left.length) {
+				/* get item in [left] at the current index */
+				var l = left[ i ];
+				/* get the item in [right] at the current index */
+				var r = right[ i ];
+				/* if [predicate] returns false */
+				if (!predicate(l, r)) {
+					/* then the two arrays are not equal */
+					return false;
+				}
+			}
+
+			/* 
+			   If the function makes it this far, then either the arrays were both empty, 
+			   or [predicate] returned 'true' for all values. In either case, the two arrays
+			   can be said to be equivalent
+			 */
+			return true;
+		}
+	}
+
+	/**
+	  * macro-licious 'compare'
+	  */
+	public static macro function maccompare<T>(left:ExprOf<Array<T>>, right:ExprOf<Array<T>>, args:Array<Expr>):ExprOf<Bool> {
+		var predicate:Null<Expr> = args[0];
+		if (predicate == null) {
+			predicate = (macro null);
+		}
+		else {
+			var le:Array<Expr> = [macro x];
+			var re:Array<Expr> = [macro y];
+			
+			/* if a fourth and fifth argument are provided, use them as the expressions for [x] and [y] */
+			if (args[1] != null && args[2] != null) {
+				le.push(args[1]);
+				re.push(args[2]);
+			}
+
+			/* map all instances of [le] and [re] to 'left' and 'right' respectively */
+			predicate = predicate.replaceMultiple(le, macro left);
+			predicate = predicate.replaceMultiple(re, macro right);
+
+			/* add a 'return' expression to [predicate], if one is not already present */
+			if (!predicate.hasReturn()) {
+				predicate = (macro return $predicate);
+			}
+
+			/* wrap [predicate] in a function definition */
+			predicate = (macro function(left, right) $predicate);
+		}
+
+		return macro tannus.ds.ArrayTools.compare($left, $right, $predicate);
+	}
+
+	/**
 	  * Obtain an Array of Pointers from an Array of values
 	  */
 	public static function pointerArray<T>(a : Array<T>):Array<Ptr<T>> {
