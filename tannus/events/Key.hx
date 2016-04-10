@@ -96,21 +96,5 @@ abstract Key (Int) from Int to Int {
 /* === Fields === */
 
     public var name(get, never):String;
-    private inline function get_name() return nameof(this);
-
-/* === Methods === */
-
-    //- Data from which key-names are pulled
-    private static var raw:Object = {{};/*haxe.Json.parse(Ct.readFile('assets/keycodes.json'));*/};
-    
-    /**
-      * Obtain the 'name' of a Key as a String
-      */
-    public static function nameof(key : Key):Null<String> {
-	for (pair in raw.pairs()) {
-		if (pair.value == key)
-			return pair.name;
-	}
-	return null;
-    }
+    private inline function get_name() return KeyTools.getName( this );
 }
