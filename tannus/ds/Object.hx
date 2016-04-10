@@ -184,6 +184,7 @@ abstract Object (Dynamic) from Dynamic to Dynamic {
 	}
 
 	/* To Dict<String, Dynamic> */
+	/*
 	@:to
 	public function toTannusDict():Dict<String, Dynamic> {
 		var d:Dict<String, Dynamic> = new Dict();
@@ -191,6 +192,7 @@ abstract Object (Dynamic) from Dynamic to Dynamic {
 			d.set(p.name, p.value);
 		return d;
 	}
+	*/
 
 	#if python
 		/* To Dict<String, Dynamic> */
