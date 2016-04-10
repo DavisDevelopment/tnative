@@ -11,6 +11,10 @@ import tannus.io.ByteArray;
 import tannus.html.Win;
 import tannus.sys.Mime;
 
+import tannus.math.TMath.*;
+
+using tannus.math.TMath;
+
 class WebFile {
 	/* Constructor Function */
 	public function new(f : NFile):Void {
@@ -47,9 +51,23 @@ class WebFile {
 				reader.readAsArrayBuffer(cast file);
 			}
 			else {
-				reader.readAsArrayBuffer(slice(pos, (pos+len), type));
+				reader.readAsArrayBuffer(slice(pos, (pos + len), type));
 			}
 		});
+	}
+
+	/**
+	  * Create and return a new FileReader instance attached to [this]
+	  */
+	public inline function createReader():WebFileReader {
+		return new WebFileReader( this );
+	}
+
+	/**
+	  * Create and return a ReadableByteStream bound to [this] File
+	  */
+	public function createReadableStream():WebFileInputStream {
+		return new WebFileInputStream( this );
 	}
 
 	/**
@@ -88,4 +106,45 @@ class WebFile {
 
 	private var file : NFile;
 	private var _objectUrl : Null<String> = null;
+}
+
+class WebFileReader {
+	public function new(f : WebFile):Void {
+		file = f;
+		r = new FileReader();
+		offset = 0;
+	}
+
+	/* move [offset] to the given value */
+	public inline function seek(pos : Int):Int {
+		return (offset = pos.clamp(0, file.size));
+	}
+
+	/* read a chunk of data */
+	public function read(?size:Int, provide:ByteArray->Void, reject:Dynamic->Void):Void {
+		if (size == null) {
+			size = (file.size - offset);
+		}
+		size = min(size, (file.size - offset));
+
+		r.onload = (function(event) {
+			offset += size;
+			if (offset == file.size) {
+				r = null;
+			}
+
+			try {
+				provide(ByteArray.ofData(cast event.target.result));
+			}
+			catch (error : Dynamic) {
+				reject( error );
+			}
+		});
+		r.onerror = reject.bind( _ ); //(function(error) reject( error ));
+		r.readAsArrayBuffer(file.slice(offset, (offset + size)));
+	}
+
+	private var file : WebFile;
+	private var r : FileReader;
+	private var offset : Int;
 }
