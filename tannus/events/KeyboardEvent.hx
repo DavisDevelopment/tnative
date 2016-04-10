@@ -19,6 +19,15 @@ class KeyboardEvent extends Event {
 		metaKey = mods.has(Meta);
 	}
 
+/* === Instance Methods === */
+
+	/**
+	  * get the list of modifiers
+	  */
+	override public function getModifiers():Array<EventMod> {
+		return mods.copy();
+	}
+
 /* === Instance Fields === */
 
 	public var keyCode : Int;
