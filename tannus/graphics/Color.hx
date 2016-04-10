@@ -6,6 +6,7 @@ import tannus.math.Percent;
 import tannus.io.Ptr;
 import tannus.io.ByteArray;
 import tannus.io.RegEx;
+import tannus.geom.Point;
 
 import Std.*;
 import Math.*;
@@ -131,7 +132,8 @@ abstract Color (TColor) from TColor to TColor {
 	}
 }
 
-private class TColor {
+@:expose( 'Color' )
+private class TColor implements tannus.ds.Comparable<TColor> {
 	/* Constructor Function */
 	public function new(r:Int=0, g:Int=0, b:Int=0, ?a:Int, noset:Bool=false):Void {
 		if ( !noset ) {
@@ -265,8 +267,8 @@ private class TColor {
 	  * convert [this] Color to the HSL scheme
 	  */
 	public function toHsl():Hsl {
-		var chan = [red, green, blue].macmap(bound(_, 255));
-		var r:Int = chan[0], g:Int = chan[1], b:Int = chan[2];
+		var chan = [red, green, blue].macmap(_ / 255.0);
+		var r:Float = chan[0], g:Float = chan[1], b:Float = chan[2];
 		var cmax = chan.max(function(n) return n);
 		var cmin = chan.min(function(n) return n);
 		var l = (cmax + cmin) / 2;
@@ -293,6 +295,83 @@ private class TColor {
 			'saturation': s,
 			'lightness': l
 		};
+	}
+
+	/**
+	  * get the XYZ values of [this] Color
+	  */
+	public function getXYZ():Point {
+		var vals = [red, green, blue].macmap(_ / 255);
+		vals = vals.macmap({
+			if (_ > 0.04045) {
+				return pow(((_ + 0.0555) / 1.055), 2.4);
+			}
+			else {
+				return (_ / 12.92);
+			}
+		});
+		vals = vals.macmap(_ * 100);
+		var r = vals[0];
+		var g = vals[1];
+		var b = vals[2];
+
+		var x = ((r * 0.4124) + (g * 0.3576) + (b * 0.1805));
+		var y = ((r * 0.2126) + (g * 0.7152) + (b * 0.0722));
+		var z = ((r * 0.0193) + (g * 0.1192) + (b * 0.9505));
+
+		return new Point(x, y, z);
+	}
+
+	/**
+	  * get the LAB values of [this] Color
+	  */
+	public function getLab():Lab {
+		var p = getXYZ();
+		var vals = [(p.x / 95.047), (p.y / 100), (p.z / 108.883)];
+		vals = vals.macmap({
+			if (_ > 0.008856) {
+				pow(_, (1 / 3));
+			}
+			else {
+				((7.787 * _) + (16 / 116));
+			}
+		});
+		var l = (116 * vals[1] - 16);
+		var a = (500 * (vals[0] - vals[1]));
+		var b = (200 * (vals[1] - vals[2]));
+		return {
+			'l': l,
+			'a': a,
+			'b': b
+		};
+	}
+
+	/**
+	  * get the delta-e between [this] Color and other 
+	  */
+	public function cie1994(other : Color):Float {
+		var x = this.getLab();
+		var y = other.getLab();
+		var k2:Float = 0.015;
+		var k1:Float = 0.045;
+		var kl:Float = 1;
+		var kh:Float = 1;
+		var kc:Float = 1;
+		var c1 = sqrt(x.a * x.a + x.b * x.b);
+		var c2 = sqrt(y.a * y.a + y.b * y.b);
+		var sh = (1 + k2 * c1);
+		var sc = (1 + k1 * c1);
+		var sl = 1;
+		var da = (x.a - y.a);
+		var db = (x.b - y.b);
+		var dc = (c1 - c2);
+		var dl = (x.l - y.l);
+		var dh = sqrt(pow(da, 2) + pow(db, 2) + pow(dc, 2));
+		return (sqrt(
+			pow((dl / (kl * sl)), 2) + 
+			pow((dc / (kc * sc)), 2) + 
+			pow((dh / (kh * sh)), 2)
+		) / 10);
 	}
 
 	/**
@@ -506,4 +585,10 @@ typedef Hsl = {
 	hue : Float,
 	saturation : Float,
 	lightness : Float
+};
+
+typedef Lab = {
+	l : Float,
+	a : Float,
+	b : Float
 };
