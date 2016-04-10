@@ -36,8 +36,37 @@ class MediaGalleries {
 	/**
 	  * Get the metadata for the given File
 	  */
-	public static function getMetadata(mediaFile:WebFile, callback:MetaData->Void):Void {
-		lib.getMetadata(mediaFile.file, callback);
+	public static function getMetadata(mediaFile:Dynamic, callback:MetaData->Void):Void {
+		lib.getMetadata(mediaFile, null, callback);
+	}
+
+	/**
+	  * perform a Scan
+	  */
+	public static function scan(?complete:ScanResults->Void, ?progress:ScanResults->Void):Void {
+		lib.onScanProgress.addListener(function(details : ScanResults):Void {
+			switch ( details.type ) {
+				case Finish:
+					if (complete != null) {
+						complete( details );
+					}
+
+				default:
+					null;
+			}
+
+			if (progress != null) {
+				progress( details );
+			}
+		});
+		lib.startMediaScan();
+	}
+
+	/**
+	  * Scan mediaGalleries
+	  */
+	public static function createScanner():MediaGalleryScanner {
+		return new MediaGalleryScanner();
 	}
 
 /* === Static Fields === */
@@ -69,3 +98,19 @@ typedef FileSystemMetadata = {
 	galleryId : String,
 	isAvailable : Bool
 };
+
+typedef ScanResults = {
+	var type : ResultType;
+	@:optional var galleryCount : Int;
+	@:optional var audioCount : Int;
+	@:optional var imageCount : Int;
+	@:optional var videoCount : Int;
+};
+
+@:enum
+abstract ResultType (String) {
+	var Start = 'start';
+	var Cancel = 'cancel';
+	var Finish = 'finish';
+	var Error = 'error';
+}
