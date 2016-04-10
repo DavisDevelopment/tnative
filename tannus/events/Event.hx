@@ -47,6 +47,13 @@ class Event {
 		onPropogationStopped.fire();
 	}
 
+	/**
+	  * get the list of modifiers for [this] Event
+	  */
+	public function getModifiers():Array<EventMod> {
+		return new Array();
+	}
+
 /* === Computed Instance Fields === */
 
 	/**
