@@ -64,6 +64,7 @@ abstract ElAttributes (Getter<Element>) {
 	/**
 	  * Get a Dict of all attributes
 	  */
+	/*
 	@:to
 	public function toDict():Dict<String, String> {
 		var d:Dict<String, String> = new Dict();
@@ -74,6 +75,7 @@ abstract ElAttributes (Getter<Element>) {
 		}
 		return d;
 	}
+	*/
 
 /* === Instance Fields === */
 
