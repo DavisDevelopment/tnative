@@ -110,7 +110,7 @@ abstract Win (CWin) from CWin to CWin {
 			if (rfs == null) {
 				rfs = self['webkitRequestFileSystem'];
 			}
-			rfs(self['PERSISTENT'], size, cb);
+			rfs(self['TEMPORARY'], size, cb);
 		};
 	}
 
