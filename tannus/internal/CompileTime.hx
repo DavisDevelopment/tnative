@@ -81,6 +81,16 @@ class CompileTime {
 		return macro tannus.io.ByteArray.fromBase64($enc);
 	}
 
+	/**
+	  * Inline an entire File as Binary data
+	  */
+	public static macro function readFileAsString(path : String):ExprOf<String> {
+		var data:ByteArray = loadFile( path );
+		var enc:ExprOf<String> = toExpr(data.toString());
+
+		return macro $enc;
+	}
+
 	public static macro function readLines(path : String):ExprOf<Array<String>> {
 		var data:String = loadFile(path);
 		var lines:ExprOf<Array<String>> = toExpr(data.split('\n'));
