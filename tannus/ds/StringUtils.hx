@@ -4,11 +4,17 @@ import tannus.ds.EitherType;
 import tannus.io.RegEx;
 import tannus.io.Byte;
 
+import haxe.macro.Expr;
+import haxe.macro.Context;
+
 using StringTools;
+using haxe.macro.ExprTools;
+using tannus.macro.MacroTools;
 
 /**
   * Class with additional tools for manipulating Strings
   */
+@:expose( 'StringTools' )
 class StringUtils {
 	/**
 	  * Get the Byte at index [i] in String [s]
@@ -20,6 +26,34 @@ class StringUtils {
 		else {
 			throw 'IndexOutOfBoundError: $i is not within range(0, ${s.length - 1})';
 		}
+	}
+
+	/**
+	  * Perform byte-by-byte mapping of the given String
+	  */
+	public static function byteMap(s:String, f:Byte -> Byte):String {
+		var res:String = '';
+		for (i in 0...s.length) {
+			res += f(byteAt(s, i));
+		}
+		return res;
+	}
+
+	/**
+	  * macro-licious byteMap
+	  */
+	public static macro function macbyteMap(s:ExprOf<String>, f:Expr):ExprOf<String> {
+		switch ( f.expr ) {
+			case EConst(CIdent( '_' )):
+				f = (macro char);
+			default:
+				f = f.mapUnderscoreToExpr(macro char);
+		}
+		if (!f.hasReturn()) {
+			f = (macro return $f);
+		}
+		f = (macro function(char) $f);
+		return macro tannus.ds.StringUtils.byteMap($s, $f);
 	}
 
 	/**
@@ -67,8 +101,33 @@ class StringUtils {
 	/**
 	  * Capitalize some String
 	  */
-	public static function capitalize(s : String):String {
-		return (s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase());
+	public static function capitalize(s:String, fancy:Bool=false):String {
+		if ( !fancy ) {
+			return (s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase());
+		}
+		else {
+			var res:String = '';
+			// whether the last Byte was an alphanumeric character
+			var lwan:Bool = false;
+			for (i in 0...s.length) {
+				var c = byteAt(s, i);
+				if (c.isAlphaNumeric()) {
+					if (c.isLetter()) {
+						var l = c.aschar;
+						res += (lwan ? l.toLowerCase() : l.toUpperCase());
+					}
+					else {
+						res += c;
+					}
+					lwan = true;
+				}
+				else {
+					res += c;
+					lwan = false;
+				}
+			}
+			return res;
+		}
 	}
 
 	/**
