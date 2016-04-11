@@ -66,8 +66,8 @@ class WebFile {
 	/**
 	  * Create and return a ReadableByteStream bound to [this] File
 	  */
-	public function createReadableStream():WebFileInputStream {
-		return new WebFileInputStream( this );
+	public inline function input():WebFileInput {
+		return new WebFileInput( this );
 	}
 
 	/**
