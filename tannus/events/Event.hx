@@ -20,9 +20,25 @@ class Event {
 		onCancelled = new VoidSignal();
 		onDefaultPrevented = new VoidSignal();
 		onPropogationStopped = new VoidSignal();
+		_onCopy = new Signal();
 	}
 
 /* === Instance Methods === */
+
+	/**
+	  * Create and return a clone of [this] Event
+	  */
+	public function clone(deep:Bool = false):Event {
+		var c = Reflect.copy( this );
+		
+		c.onCancelled = (deep ? onCancelled.clone() : new VoidSignal());
+		c.onDefaultPrevented = (deep ? onDefaultPrevented.clone() : new VoidSignal());
+		c.onPropogationStopped = (deep ? onPropogationStopped.clone() : new VoidSignal());
+
+		_onCopy.call( c );
+
+		return c;
+	}
 
 	/**
 	  * Cancel [this] Event
@@ -97,4 +113,7 @@ class Event {
 
 	//- Signal which fires when [this] Event gets cancelled
 	private var onCancelled : VoidSignal;
+
+	//- Signal fired when a clone of [this] Event is created, with that clone as the data
+	private var _onCopy : Signal<Event>;
 }
