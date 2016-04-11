@@ -62,13 +62,6 @@ class MediaGalleries {
 		lib.startMediaScan();
 	}
 
-	/**
-	  * Scan mediaGalleries
-	  */
-	public static function createScanner():MediaGalleryScanner {
-		return new MediaGalleryScanner();
-	}
-
 /* === Static Fields === */
 
 	private static var lib(get, never):Dynamic;
