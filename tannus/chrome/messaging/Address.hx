@@ -82,7 +82,21 @@ class CAddress implements Comparable<CAddress> {
 	  * Pull additional information from a Message
 	  */
 	public inline function getMessageInfo(msg : SocketMessage):Void {
-		id = msg.sender_id;
+		data.id = msg.sender_id;
+	}
+
+	/**
+	  * Convert [this] into a human-readable String
+	  */
+	public function toString():String {
+		var s:String = '';
+		if (app != null)
+			s += '#($app)';
+		if (tab != null)
+			s += ':${tab.id}';
+		if (id != null)
+			s += '@$id';
+		return s;
 	}
 
 /* === Computed Instance Fields === */
