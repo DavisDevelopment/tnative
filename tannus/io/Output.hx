@@ -5,8 +5,8 @@ import tannus.io.Signal;
 
 import tannus.internal.Error;
 
-@:allow(tannus.io.StreamAccessor)
-class WritableStream<T> {
+@:allow(tannus.io.IOAccessor)
+class Output<T> {
 	/* Constructor Function */
 	public function new():Void {
 		//writeEvent = new Signal();
@@ -34,7 +34,7 @@ class WritableStream<T> {
 	/**
 	  * Pause [this] Stream
 	  */
-	public function pause():Void {
+	public inline function pause():Void {
 		paused = true;
 	}
 
@@ -42,7 +42,7 @@ class WritableStream<T> {
 	  * Resume [this] Stream
 	  */
 	public function resume():Void {
-		if (paused) {
+		if ( paused ) {
 			paused = false;
 			flush();
 		}
@@ -79,7 +79,7 @@ class WritableStream<T> {
 	/**
 	  * Flush the Buffer
 	  */
-	public function flush(?done : Void->Void):Void {
+	public function flush(?done : Void -> Void):Void {
 		var stack = new tannus.ds.AsyncStack();
 		while (__b.length > 0) {
 			stack.push(__write.bind(__b.shift(), _));
