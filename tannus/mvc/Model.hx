@@ -37,6 +37,7 @@ class Model extends EventDispatcher implements Asset {
 	public function init(?cb : Void -> Void):Void {
 		if (cb != null)
 			onready( cb );
+		
 		readyReqs.meet(function() {
 			sync(function() {
 				_ready.fire();
@@ -149,6 +150,14 @@ class Model extends EventDispatcher implements Asset {
 	public inline function remove(key : String):Bool return removeAttribute( key );
 
 	/**
+	  * Get an Array of the names of all attributes
+	  */
+	public inline function allAttributes():Array<String> {
+		return storage.keys();
+	}
+	public inline function keys():Array<String> return allAttributes();
+
+	/**
 	  * Listen for changes to [this]'s attributes
 	  */
 	public function watch(cb : Commit -> Void):Void {
@@ -227,7 +236,7 @@ class Model extends EventDispatcher implements Asset {
 	private var assets : Array<Asset>;
 
 	/* signal fired when [storage] becomes usable */
-	private var readyReqs : Requirements;
+	public var readyReqs : Requirements;
 
 	/* signal fired when [this] Model becomes 'ready' */
 	private var _ready : VoidSignal;
