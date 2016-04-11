@@ -84,10 +84,19 @@ class MouseEvent extends Event {
 		if (event.metaKey)
 			mods.push( Meta );
 		var pos = new Point(event.pageX, event.pageY);
+		
 		var e = new MouseEvent(event.type, pos, event.which, mods);
 		e.onCancelled.once(event.preventDefault);
 		e.onDefaultPrevented.once(event.preventDefault);
 		e.onPropogationStopped.once(event.stopPropagation);
+		function copyEvent(copy : Event):Void {
+			copy.onCancelled.once(event.preventDefault);
+			copy.onDefaultPrevented.once(event.preventDefault);
+			copy.onPropogationStopped.once(event.stopPropagation);
+			copy._onCopy.on( copyEvent );
+		}
+		e._onCopy.on( copyEvent );
+
 		return e;
 	}
 }
