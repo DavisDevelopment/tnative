@@ -219,11 +219,12 @@ class TMath {
 	}
 
 	@:generic
-	public static inline function clamp<T:Float> (value :T, min :T, max :T) :T
-	{
-		return if (value < min) min
+	public static inline function clamp<T:Float>(value:T, min:T, max:T):T {
+		return (
+			if (value < min) min
 			else if (value > max) max
-				else value;
+			else value
+		);
 	}
 
 	public static function sign (value : Float):Int {
@@ -244,6 +245,17 @@ class TMath {
 			} else {
 				res = (res.value + item);
 			}
+		}
+		return res;
+	}
+
+	/**
+	  * Obtain the sum of all items in [list]
+	  */
+	public static function sumf<T>(set:Iterable<T>, extractor:T->Float):Float {
+		var res:Null<Float> = null;
+		for (item in set) {
+			res = (res != null ? (res + extractor( item )) : extractor( item ));
 		}
 		return res;
 	}
@@ -371,16 +383,12 @@ class TMath {
 	/**
 	 * macro-licious 'sum'
 	 */
-	public static macro function macsum<T>(list:ExprOf<Array<T>>, ext:Expr):ExprOf<Float> {
-		ext = ext.mapUnderscoreTo( 'v' );
-		var f:ExprOf<T -> Float> = (macro function(v) return $ext);
-		return macro (function() {
-			var res:Float = 0;
-			var extract = $f;
-			for (value in $list) {
-				res += extract( value );
-			}
-			return res;
-		}());
+	public static macro function macsum<T>(list:ExprOf<Iterable<T>>, ext:Expr):ExprOf<Float> {
+		ext = ext.mapUnderscoreToExpr(macro item);
+		if (!ext.hasReturn()) {
+			ext = macro return $ext;
+		}
+		var f:ExprOf<T -> Float> = (macro function(item) $ext);
+		return macro tannus.math.TMath.sumf($list, $f);
 	}
 }
