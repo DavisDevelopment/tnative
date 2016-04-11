@@ -1,17 +1,18 @@
 package tannus.chrome.messaging;
 
 import tannus.http.Url;
-import tannus.messaging.Message;
+import tannus.messaging.Message in SocketMessage;
+import tannus.ds.Comparable;
 
 import tannus.chrome.Runtime;
 import tannus.chrome.Runtime.Message in ChromeMessage;
 import tannus.chrome.Runtime.MessageSender;
 
 @:forward
-abstract Address (TAddress) to TAddress {
+abstract Address (CAddress) from CAddress to CAddress {
 	/* Constructor Function */
 	public inline function new(data : TAddress):Void {
-		this = data;
+		this = new CAddress( data );
 	}
 
 /* === Instance Methods === */
@@ -20,11 +21,8 @@ abstract Address (TAddress) to TAddress {
 	  * Check for equality between two Addresses
 	  */
 	@:op(A == B)
-	public static inline function equals(a:Address, b:Address):Bool {
-		return (
-			((a.id == null && b.id == null) || a.id == b.id) &&
-			((a.tab == null && b.tab == null) || (a.tab.id == b.tab.id))
-		);
+	public inline function equals(other : Address):Bool {
+		return this.equals( other );
 	}
 
 /* === Instance Fields === */
@@ -42,16 +40,74 @@ abstract Address (TAddress) to TAddress {
 	  */
 	@:from
 	public static function fromChromeMessage(msg : ChromeMessage):Address {
-		var addr:TAddress = {};
-		addr.id = msg.sender.id;
-		addr.tab = msg.sender.tab;
-		addr.bg = (addr.tab == null);
-		return new Address( addr );
+		return new Address({
+			'app': msg.sender.id,
+			'tab': msg.sender.tab
+		});
 	}
 }
 
+class CAddress implements Comparable<CAddress> {
+	/* Constructor Function */
+	public function new(d : TAddress):Void {
+		data = d;
+	}
+
+/* === Instance Methods === */
+
+	/**
+	  * Compare [this] to [other]
+	  */
+	public function equals(other : CAddress):Bool {
+		if (app == other.app) {
+			return ((bg && other.bg) || (tab != null && other.tab != null && tab.id == other.tab.id));
+		}
+		else {
+			return false;
+		}
+	}
+
+	/**
+	  * create and return a copy of [this]
+	  */
+	public function clone():Address {
+		return new Address({
+			'app': app,
+		       	'id': id,
+		        'tab': tab
+		});
+	}
+
+	/**
+	  * Pull additional information from a Message
+	  */
+	public inline function getMessageInfo(msg : SocketMessage):Void {
+		id = msg.sender_id;
+	}
+
+/* === Computed Instance Fields === */
+
+	public var app(get, never):Null<String>;
+	private inline function get_app():Null<String> return data.app;
+
+	public var id(get, never):Null<String>;
+	private inline function get_id():Null<String> return data.id;
+
+	public var tab(get, never):Null<Tab>;
+	private inline function get_tab():Null<Tab> return data.tab;
+
+	public var bg(get, never):Bool;
+	private inline function get_bg():Bool return (data.bg != null ? data.bg : (tab == null));
+
+/* === Instance Fields === */
+
+	/* the underlying data Object */
+	private var data : TAddress;
+}
+
 typedef TAddress = {
-	@:optional var bg : Bool;
-	@:optional var tab : Tab;
-	@:optional var id : String;
+	?bg : Bool,
+	?tab : Tab,
+	?app : String,
+	?id : String
 };
