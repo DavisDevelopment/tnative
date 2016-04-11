@@ -37,8 +37,11 @@ class ExtMessager extends Messager {
 			  * When chrome.runtime fires the 'onMessage' Event
 			  */
 			Runtime.onMessage(function( msg ) {
+				/* get the Address of the Sender */
+				var senderAddress:Address = Address.fromChromeMessage( msg );
+
 				/* check that [msg] is a valid SafeMessage Object */
-				if (SafeMessage.isSafeMessage(msg.data)) {
+				if (SafeMessage.isSafeMessage( msg.data )) {
 					/* if we're not connected to anything yet */
 					if (tab == null) {
 						//- if [this] Messager is in a Pool
@@ -68,10 +71,13 @@ class ExtMessager extends Messager {
 					/* decode the Message object */
 					var safe:SafeMessage = (cast msg.data);
 					var messg:Message = Message.fromSafe(this, safe);
+					senderAddress.getMessageInfo( messg );
 
 					/* and plop it right into our sexy-ass Message-handling system */
 					receiveFromPeer( messg );
 				} 
+
+				trace( senderAddress );
 			});
 
 			/* the first time the 'connected' Event is dispatched */
