@@ -5,6 +5,7 @@ import Type;
 /**
   * === Class for Determining the Type of an Object, or other various information regarding Type ===
   */
+@:expose('TypeTools')
 class TypeTools {
 /* === Class-Level Methods === *
 
@@ -59,21 +60,23 @@ class TypeTools {
 				//- The String which will be returned
 				var results:String = '$enumName.${valueNames[index]}';
 
+				return results;
+
 				//- The arguments passed to the construct which created [o]
-				var args:Array<Dynamic> = Type.enumParameters(cast o);
+				//var args:Array<Dynamic> = Type.enumParameters(cast o);
 
 				//- If there were no arguments
-				if (args.length == 0) {
-					return results;
-				} 
+				//if (args.length == 0) {
+				//	return results;
+				//} 
 				
 				//- If there *were* arguments
-				else {
+				//else {
 					//- The String representations of all of those arguments
-					var reps:Array<String> = [for (x in args) Std.string(x)];
-					results += ('(' + reps.join(', ') + ')');
-					return results;
-				}
+					//var reps:Array<String> = [for (x in args) Std.string(x)];
+					//results += ('(' + reps.join(', ') + ')');
+					//return results;
+				//}
 			
 			/* If [o] is a class, enum, etc */
 			case ValueType.TObject:
