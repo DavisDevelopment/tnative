@@ -3,8 +3,8 @@ package tannus.io;
 /**
   * base-class for providing providing data to a 'reader' in chunks, rather than all at once
   */
-@:allow( tannus.io.StreamAccessor )
-class ReadableStream<T> {
+@:allow( tannus.io.IOAccessor )
+class Input<T> {
 	/* Constructor Functoin */
 	public function new():Void {
 		__b = new Array();
@@ -12,26 +12,9 @@ class ReadableStream<T> {
 
 		opened = false;
 		closed = false;
-		paused = false;
 	}
 
 /* === Instance Methods === */
-
-	/**
-	  * listen for data on [this] Stream
-	  */
-	/*
-	public function ondata(cb : T->Void):Void {
-		dataEvent.on( cb );
-	}
-
-	/**
-	  * listen for errors on [this] Stream
-	  */
-	/*
-	public function onerror(cb : String->Void):Void {
-		errorEvent.on( cb );
-	}
 
 	/**
 	  * read a 'chunk' from [this] Stream
@@ -77,6 +60,31 @@ class ReadableStream<T> {
 	}
 
 	/**
+	  * Read all available chunks
+	  */
+	public function readAll(?onchunk:T->Void, ?onerror:Err->Void, ?oncomplete:Void->Void):Void {
+		if (onchunk == null)
+			onchunk = (function(data) null);
+		if (onerror == null)
+			onerror = (function(error) throw error);
+		if (oncomplete == null)
+			oncomplete = (function() null);
+		
+		function step(data : T):Void {
+			onchunk( data );
+
+			if ( eoi ) {
+				oncomplete();
+			}
+			else {
+				read(step, onerror);
+			}
+		}
+
+		read(step, onerror);
+	}
+
+	/**
 	  * Open [this] Stream
 	  */
 	public function open(?cb : Void->Void):Void {
@@ -88,6 +96,17 @@ class ReadableStream<T> {
 	  */
 	public function close():Void {
 		closed = true;
+	}
+
+	/**
+	  * Forward all data to the given Output
+	  */
+	public function pipe(o : Output<T>):Void {
+		function onchunk(chunk : T) {
+			o.write( chunk );
+		}
+		
+		readAll( onchunk );
 	}
 
 	/**
@@ -104,27 +123,6 @@ class ReadableStream<T> {
 		__eoi = true;
 	}
 
-	/**
-	  * Either buffer or provide some data
-	  */
-	/*
-	private inline function write(d : T):Void {
-		(paused ? buffer : provide)( d );
-	}
-	*/
-
-	/**
-	  * Flush the Buffer
-	  */
-	/*
-	private function flush():Void {
-		for (item in _buffer) {
-			dataEvent.call( item );
-		}
-		_buffer = new Array();
-	}
-	*/
-
 /* === Computed Instance Fields === */
 
 	public var eoi(get, never):Bool;
@@ -135,7 +133,6 @@ class ReadableStream<T> {
 	private var __b : Array<T>;
 	private var opened : Bool;
 	private var closed : Bool;
-	private var paused : Bool;
 	private var __eoi : Bool;
 }
 
