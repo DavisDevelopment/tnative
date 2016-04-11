@@ -15,6 +15,7 @@ using tannus.ds.StringUtils;
 using Lambda;
 using tannus.ds.ArrayTools;
 using tannus.math.TMath;
+using tannus.macro.MacroTools;
 
 class Table extends Model {
 	/* Constructor Function */
@@ -246,7 +247,7 @@ class Table extends Model {
 	  * Create a new Table on the given Storage
 	  */
 	public static function create(store:Storage, spec:TableSpec, cb:Table->Void):Void {
-		var tstore:SubStorage = new SubStorage( store );
+		var tstore:SubStorage = new SubStorage(store.asGetter());
 		tstore.autoPush = false;
 		tstore.prefix = 'table:${spec.name}.';
 		tstore.fetch(function() {
@@ -257,6 +258,18 @@ class Table extends Model {
 				var table:Table = new Table( tstore );
 				table.init(cb.bind( table ));
 			});
+		});
+	}
+
+	/**
+	  * open a Table by name on the given Storage
+	  */
+	public static function open(store:Storage, name:String, cb:Table->Void):Void {
+		var ts = new SubStorage(store.asGetter());
+		ts.prefix = 'table:$name';
+		ts.fetch(function() {
+			var table = new Table( ts );
+			table.init(cb.bind( table ));
 		});
 	}
 }
