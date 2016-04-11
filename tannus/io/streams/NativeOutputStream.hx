@@ -4,30 +4,20 @@ import haxe.io.Output;
 
 import tannus.io.*;
 
-class NativeOutputStream extends WritableStream<Byte> {
+class NativeOutputStream extends WritableStream<ByteArray> {
 	/* Constructor Function */
 	public function new(o : Output):Void {
 		super();
 
 		out = o;
-
-		__init();
 	}
 
 /* === Instance Methods === */
 
-	/**
-	  * Initialize [this] Stream
-	  */
-	private inline function __init():Void {
-		writeEvent.on( forward );
-	}
-
-	/**
-	  * Forward written Bytes to [out]
-	  */
-	private function forward(c : Byte):Void {
-		out.writeByte( c );
+	override private function __write(data:ByteArray, cb:Void->Void):Void {
+		out.write(data.toBytes());
+		out.flush();
+		cb();
 	}
 
 	/**
@@ -36,6 +26,7 @@ class NativeOutputStream extends WritableStream<Byte> {
 	override public function flush(?done : Void->Void):Void {
 		super.flush();
 		out.flush();
+
 		if (done != null) {
 			done();
 		}
