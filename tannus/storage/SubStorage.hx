@@ -5,6 +5,7 @@ import tannus.ds.Obj;
 import tannus.ds.Object;
 import tannus.storage.Storage;
 import tannus.storage.Commit;
+import tannus.io.Getter;
 
 import haxe.Serializer;
 import haxe.Unserializer;
@@ -17,10 +18,10 @@ using tannus.ds.MapTools;
 
 class SubStorage extends Storage {
 	/* Constructor Function */
-	public function new(parent : Storage):Void {
+	public function new(paref : Getter<Storage>):Void {
 		super();
 
-		this.parent = parent;
+		_parent = paref;
 		key = null;
 		prefix = null;
 		autoPush = true;
@@ -66,6 +67,9 @@ class SubStorage extends Storage {
 		else if (prefix != null) {
 			for (key in data.keys()) {
 				parent.set((prefix + key), data[key]);
+			}
+			for (key in deleted) {
+				parent.remove(globalKey( key ));
 			}
 			parent.push(function() {
 				cb( null );
@@ -123,6 +127,15 @@ class SubStorage extends Storage {
 		}
 	}
 
+	private inline function globalKey(k : String):String {
+		if (prefix != null) {
+			return (prefix + k);
+		}
+		else {
+			return k;
+		}
+	}
+
 	/**
 	  * assign a value
 	  */
@@ -134,10 +147,16 @@ class SubStorage extends Storage {
 		return res;
 	}
 
+/* === Computed Instance Fields === */
+
+	private var parent(get, never):Storage;
+	private inline function get_parent():Storage return _parent.get();
+
 /* === Instance Fields === */
 
-	private var parent : Storage;
 	public var key : Null<String>;
 	public var prefix : Null<String>;
 	public var autoPush : Bool;
+
+	private var _parent : Getter<Storage>;
 }
