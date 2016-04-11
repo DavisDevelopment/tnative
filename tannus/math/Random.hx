@@ -80,8 +80,8 @@ class Random {
 	/**
 	 * choose a random number of items from [set]
 	 */
-	public function sample<T>(set : Array<T>):Array<T> {
-		var sampleSize:Int = randint(0, set.length);
+	public function sample<T>(set:Array<T>, ?size:Int):Array<T> {
+		var sampleSize:Int = (size == null ? randint(0, set.length) : size);
 		var items:Array<T> = new Array();
 		while (items.length < sampleSize) {
 			var ritem:T = choice( set );
