@@ -9,8 +9,8 @@ import tannus.internal.Error;
 class WritableStream<T> {
 	/* Constructor Function */
 	public function new():Void {
-		writeEvent = new Signal();
-		_buf = new Array();
+		//writeEvent = new Signal();
+		__b = new Array();
 
 		opened = closed = paused = false;
 	}
@@ -51,13 +51,17 @@ class WritableStream<T> {
 	/**
 	  * Write some data onto [this] Stream
 	  */
-	public function write(data : T):Void {
-		if (writable) {
-			if (paused) {
-				_buf.push(data);
+	public function write(data:T, ?onwritten:Void->Void):Void {
+		if ( writable ) {
+			if ( paused ) {
+				__b.push( data );
 			}
 			else {
-				writeEvent.call( data );
+				if (onwritten == null) {
+					onwritten = (function() null);
+				}
+
+				__write(data, onwritten);
 			}
 		}
 		else {
@@ -66,12 +70,32 @@ class WritableStream<T> {
 	}
 
 	/**
+	  * method used internally to write data
+	  */
+	private function __write(data:T, onwritten:Void->Void):Void {
+		throw 'Not implemented';
+	}
+
+	/**
 	  * Flush the Buffer
 	  */
 	public function flush(?done : Void->Void):Void {
-		for (d in _buf) {
-			writeEvent.call( d );
+		var stack = new tannus.ds.AsyncStack();
+		while (__b.length > 0) {
+			stack.push(__write.bind(__b.shift(), _));
 		}
+		stack.run(function() {
+			if (done != null) {
+				done();
+			}
+		});
+	}
+
+	/**
+	  * Add the given data to the Buffer
+	  */
+	private inline function buffer(data : T):Void {
+		__b.push( data );
 	}
 
 	/**
@@ -91,8 +115,7 @@ class WritableStream<T> {
 
 /* === Instance Fields === */
 
-	private var writeEvent : Signal<T>;
-	private var _buf : Array<T>;
+	private var __b : Array<T>;
 
 	private var opened : Bool;
 	private var closed : Bool;
