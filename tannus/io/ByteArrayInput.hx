@@ -3,12 +3,12 @@ package tannus.io;
 import tannus.io.Byte;
 import tannus.io.ByteArray;
 
-import tannus.io.ReadableStream;
+import tannus.io.Input;
 
 using Lambda;
 using tannus.ds.ArrayTools;
 
-class ReadableByteStream extends ReadableStream<ByteArray> {
+class ByteArrayInput extends Input<ByteArray> {
 	/* Constructor Function */
 	public function new():Void {
 		super();
@@ -61,6 +61,59 @@ class ReadableByteStream extends ReadableStream<ByteArray> {
 			}
 		}, reject);
 	}
+
+	/**
+	  * Move to the given offset
+	  */
+	public function seek(offset:Int, ?done:Void->Void):Void {
+		if (done == null) {
+			done = (function() null);
+		}
+
+		__seek(offset, done);
+	}
+
+	/**
+	  * internal method to move to the given offset
+	  */
+	private function __seek(offset:Int, done:Void->Void):Void {
+		__position( offset );
+		done();
+	}
+
+	/**
+	  * forward all data on [this] Input to the given Output
+	  */
+	override public function pipe(o : Output<ByteArray>):Void {
+		if (Std.is(o, ByteArrayOutput)) {
+			var bo:ByteArrayOutput = cast o;
+			bo.seek( position );
+			bo.truncate( length );
+		}
+
+		super.pipe( o );
+	}
+
+	/**
+	  * get the number of available chunks
+	  */
+	private function __size():Int {
+		return -1;
+	}
+
+	private function __position(?v : Int):Int {
+		return -1;
+	}
+
+/* === Computed Instance Fields === */
+
+	/* the number of available chunks */
+	public var length(get, never):Int;
+	private inline function get_length():Int return __size();
+
+	public var position(get, set):Int;
+	private inline function get_position():Int return __position();
+	private inline function set_position(v : Int):Int return __position( v );
 
 /* === Instance Fields === */
 
