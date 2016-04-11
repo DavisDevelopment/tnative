@@ -12,6 +12,31 @@ class VoidSignal {
 
 /* === Instance Methods === */
 
+	/**
+	  * Create and return a clone of [this] Signal
+	  */
+	public function clone():VoidSignal {
+		var c = new VoidSignal();
+		for (h in handlers) {
+			switch ( h ) {
+				case Normal( f ):
+					c.add(Normal(f.bind()));
+
+				case Counted(f, count, fired):
+					c.add(Counted(f.bind(), count, Ptr.to( fired )));
+
+				case Once(f, fired):
+					if ( !fired._ ) {
+						c.add(Once(f.bind(), Ptr.to( false )));
+					}
+
+				case Every(f, wait, remaining):
+					c.add(Every(f.bind(), wait, Ptr.to( remaining )));
+			}
+		}
+		return c;
+	}
+
 	/* Adds a new Handler to the List */
 	private inline function add(h : Handler):Void {
 		handlers.push( h );
