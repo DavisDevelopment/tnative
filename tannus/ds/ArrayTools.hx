@@ -323,7 +323,7 @@ class ArrayTools {
 	/**
 	  * Get the item in the given list which scored the lowest, based on the given predicate
 	  */
-	public static function min<T>(list:Iterable<T>, predicate:T -> Float):T {
+	public static function min<T>(list:Iterable<T>, predicate:T -> Float):Null<T> {
 		var m:Null<Tup2<T, Float>> = null;
 		for (x in list) {
 			var score:Float = predicate( x );
@@ -332,7 +332,8 @@ class ArrayTools {
 			}
 		}
 		if (m == null) {
-			throw 'Error: Iterable must not be empty!';
+			//throw 'Error: Iterable must not be empty!';
+			return null;
 		}
 		return m._0;
 	}
@@ -340,7 +341,7 @@ class ArrayTools {
 	/**
 	  * Get the item in the given list which scored the highest, based on the given predicate
 	  */
-	public static function max<T>(list:Iterable<T>, predicate:T -> Float):T {
+	public static function max<T>(list:Iterable<T>, predicate:T -> Float):Null<T> {
 		var m:Null<Tup2<T, Float>> = null;
 		for (x in list) {
 			var score:Float = predicate( x );
@@ -349,7 +350,8 @@ class ArrayTools {
 			}
 		}
 		if (m == null) {
-			throw 'Error: Iterable must not be empty!';
+			//throw 'Error: Iterable must not be empty!';
+			return null;
 		}
 		return m._0;
 	}
