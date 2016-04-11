@@ -60,6 +60,20 @@ class MacroTools {
 	}
 
 	/**
+	  * Replace all instances of [what] with [with] in [e]
+	  */
+	public static function replace(e:Expr, what:Expr, with:Expr):Expr {
+		return e.map(replacer.bind(_, [what], with));
+	}
+
+	/**
+	  * Replace all instances of the items in [whats] with [with]
+	  */
+	public static function replaceMultiple(e:Expr, whats:Array<Expr>, with:Expr):Expr {
+		return e.map(replacer.bind(_, whats, with));
+	}
+
+	/**
 	  * Check whether the given Expression contains a return
 	  */
 	public static function hasReturn(e : Expr):Bool {
@@ -106,6 +120,21 @@ class MacroTools {
 			default:
 				return e.map( mapper );
 		}
+	}
+
+	/**
+	  * replacer function
+	  */
+	private static function replacer(e:Expr, whats:Array<Expr>, with:Expr):Expr {
+		var mapper = replacer.bind(_, whats, with);
+
+		for (what in whats) {
+			if (e.expr.equals( what.expr )) {
+				return with;
+			}
+		}
+
+		return e.map( mapper );
 	}
 
 	/**
