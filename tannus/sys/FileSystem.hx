@@ -18,9 +18,8 @@ typedef FileSystem = tannus.sys.JavaScriptFileSystem;
 
 #else
 
-import haxe.io.Output;
-import tannus.io.streams.NativeOutputStream in OStream;
-import tannus.io.OutputStream;
+import haxe.io.Output in NOutput;
+import tannus.io.*;
 
 /**
   * Wrapper around the Haxe STD's sys.FileSystem class (or, in Node's case the 'fs' module)
@@ -100,13 +99,7 @@ class FileSystem {
 	  * Opens and Returns an Output instance, bound to the given File
 	  */
 	public static function fileOutput(path : String):sys.io.FileOutput {
-		/*
-		#if python
-			return untyped (new tannus.sys.PyFileOutput( path ));
-		#else
-		*/
-			return sys.io.File.write(path, true);
-		//#end
+		return sys.io.File.write(path, true);
 	}
 
 	/**
