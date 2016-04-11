@@ -11,6 +11,8 @@ import tannus.html.fs.WebFile;
 import tannus.html.fs.WebFileWriter;
 
 import haxe.Json;
+import haxe.Serializer;
+import haxe.Unserializer;
 
 using tannus.ds.MapTools;
 
@@ -75,7 +77,9 @@ class WebFileStorage extends Storage {
 						}
 						var odata:Object = Json.parse(data.toString());
 						unlock();
-						cb( odata );
+						var mdata:Data = cast odata.toMap();
+						mdata = decode( mdata );
+						cb( mdata );
 					});
 				}
 			});
@@ -93,8 +97,7 @@ class WebFileStorage extends Storage {
 			var start = Date.now().getTime();
 			lock();
 			getWriter(function( writer ) {
-				trace('got writer object');
-				var o:Object = mdata.toObject();
+				var o:Object = encode( mdata ).toObject();
 				var sdata:String = Json.stringify(o, null, '    ');
 				var data:ByteArray = ByteArray.ofString( sdata );
 				writer.write(data, function(err : Null<Dynamic>) {
@@ -124,6 +127,24 @@ class WebFileStorage extends Storage {
 	private function unlock():Void {
 		_locked = false;
 		_onunlocked.fire();
+	}
+
+	private function encode(data : Data):Data {
+		var enc = new Data();
+		Serializer.USE_CACHE = true;
+		Serializer.USE_ENUM_INDEX = true;
+		for (key in data.keys()) {
+			enc[key] = Serializer.run(data[ key ]);
+		}
+		return enc;
+	}
+
+	private function decode(data : Data):Data {
+		var dec = new Data();
+		for (key in data.keys()) {
+			dec[key] = Unserializer.run(Std.string(data[ key ]));
+		}
+		return dec;
 	}
 
 	public inline function isLocked():Bool return _locked;
