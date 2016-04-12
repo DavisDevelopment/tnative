@@ -7,7 +7,7 @@ import haxe.io.Bytes;
 @:forward
 abstract ByteArray (Binary) from Binary to Binary {
 	/* Constructor Function */
-	public inline function new(size:Int=0):Void {
+	public inline function new(size : Int = 0):Void {
 		this = cast BinaryImpl.alloc( size );
 	}
 
@@ -57,7 +57,7 @@ abstract ByteArray (Binary) from Binary to Binary {
 
 	/* build a new Binary of the given size */
 	public static inline function alloc(size : Int):ByteArray {
-		return new ByteArray(cast BinaryImpl.alloc( size ));
+		return cast BinaryImpl.alloc( size );
 	}
 
 	/* build a Binary from some BinaryData */
@@ -91,5 +91,5 @@ abstract ByteArray (Binary) from Binary to Binary {
 #elseif (js && node)
 	typedef BinaryImpl = tannus.io.impl.NodeBinary;
 #else
-	typedef BinaryImpl = tannus.io.impl.GenericBinary;
+	typedef BinaryImpl = tannus.io.impl.BytesBinary;
 #end

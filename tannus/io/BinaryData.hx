@@ -8,5 +8,5 @@ package tannus.io;
 #elseif (js && node)
 	typedef BinaryData = tannus.node.Buffer;
 #else
-	typedef BinaryData = Array<Int>;
+	typedef BinaryData = haxe.io.Bytes;
 #end
