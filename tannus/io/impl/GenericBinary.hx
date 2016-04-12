@@ -88,8 +88,8 @@ class GenericBinary extends Binary {
 	/* === Static Methods === */
 
 	/* create an empty Binary of the specified size */
-	public static inline function alloc(size : Int):GenericBinary {
-		return new GenericBinary(size, [0].times(size));
+	public static function alloc(size : Int):GenericBinary {
+		return new GenericBinary(size, [0].times( size ));
 	}
 
 	/* create a new Binary around the given data */
