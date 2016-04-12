@@ -2,6 +2,7 @@ package tannus.io;
 
 import tannus.io.BinaryData;
 import tannus.io.impl.BinaryIterator;
+import tannus.io.impl.BinaryError;
 
 import tannus.io.Byte;
 import tannus.sys.Mime;
@@ -27,11 +28,17 @@ class Binary {
 
 	/* get the byte at the given index */
 	public function get(index : Int):Byte {
+		if (index >= length || index < 0) {
+			outOfBounds();
+		}
 		return 0;
 	}
 
 	/* set the byte at the given index */
 	public function set(index:Int, value:Byte):Byte {
+		if (index >= length || index < 0) {
+			outOfBounds();
+		}
 		return 0;
 	}
 
@@ -50,7 +57,7 @@ class Binary {
 
 	/* read a 64bit integer */
 	public inline function getInt64(i : Int):Int64 {
-		return Int64.make(getInt32(i + 4), getInt32(i));
+		return Int64.make(getInt32(i + 4), getInt32( i ));
 	}
 
 	/* write a 64bit integer */
@@ -60,16 +67,20 @@ class Binary {
 	}
 
 	/* read a Double */
+	/*
 	public inline function getDouble(i : Int):Float {
-		return TMath.i64ToDouble(getInt32(i), getInt32(i + 4));
+		return TMath.i64ToDouble(getInt32( i ), getInt32(i + 4));
 	}
+	*/
 
 	/* write a Double */
+	/*
 	public function setDouble(i:Int, v:Float):Void {
 		var _i = TMath.doubleToI64( v );
 		setInt32(i, _i.low);
 		setInt32(i+4, _i.high);
 	}
+	*/
 
 	/* read a Float */
 	public inline function getFloat(i : Int):Float {
@@ -317,7 +328,7 @@ class Binary {
 
 	/* convert [this] to a haxe.io.Bytes object */
 	public function toBytes():haxe.io.Bytes {
-		return haxe.io.Bytes.ofData(untyped b);
+		return haxe.io.Bytes.alloc( 0 );
 	}
 
 	/* convert [this] to a hexidecimal String */
@@ -366,6 +377,17 @@ class Binary {
 	/* reassign the underlying data for [this] data */
 	private function setData(data : BinaryData):Void {
 		b = data;
+	}
+
+	/* throw a BinaryError */
+	private inline function err(e : BinaryError):Void {
+		throw e;
+	}
+	private inline function outOfBounds():Void {
+		err( OutOfBounds );
+	}
+	private inline function overflow():Void {
+		err( Overflow );
 	}
 
 	/* do the stuff */
