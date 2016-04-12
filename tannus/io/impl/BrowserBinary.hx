@@ -88,6 +88,11 @@ class BrowserBinary extends Binary {
 		_length = array.length;
 	}
 
+	/* convert [this] to haxe.io.Bytes */
+	override public function toBytes():haxe.io.Bytes {
+		return haxe.io.Bytes.ofData(untyped getData());
+	}
+
 	/* convert [this] to a node.js Buffer */
 	public function toBuffer():tannus.node.Buffer {
 		return (new tannus.node.Buffer(untyped array));
