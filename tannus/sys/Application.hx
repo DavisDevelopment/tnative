@@ -71,7 +71,7 @@ class Application {
 		python.Syntax.importModule( 'os' );
 		python.Syntax.pythonCode( 'os.system' )( command );
 		#else
-		return '';
+		throw 'Error: not supported on current platform';
 		#end
 	}
 
