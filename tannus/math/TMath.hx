@@ -324,6 +324,7 @@ class TMath {
 	  * Convert a Double to a 64bit integer
 	  */
 	@:access( haxe.Int64 )
+	/*
 	public static function doubleToI64(v : Float):Int64 {
 		var i64:Int64 = Int64.ofInt( 0 );
 		if( v == 0 ) {
@@ -341,6 +342,7 @@ class TMath {
 		}
 		return i64;
 	}
+	*/
 
 	/**
 	  * Get the largest element in the given Array
