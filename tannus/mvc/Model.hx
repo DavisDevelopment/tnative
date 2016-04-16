@@ -9,6 +9,7 @@ import tannus.ds.Destructible;
 import tannus.ds.Memory;
 import tannus.ds.Object;
 import tannus.io.Ptr;
+import tannus.io.Signal;
 import tannus.io.EventDispatcher;
 import tannus.io.VoidSignal;
 
@@ -22,9 +23,11 @@ class Model extends EventDispatcher implements Asset {
 	public function new():Void {
 		super();
 
+		change = new Signal();
 		assets = new Array();
 		readyReqs = new Requirements();
 		_ready = new VoidSignal();
+		_a = new Map();
 
 		_bindMethodsToEvents();
 	}
@@ -101,8 +104,10 @@ class Model extends EventDispatcher implements Asset {
 	  * persist [this] Model's state
 	  */
 	public function sync(done : Void->Void):Void {
-		storage.push( done );
+		done();
 	}
+
+
 	public function save():Void {
 		sync(function() null);
 	}
@@ -111,7 +116,7 @@ class Model extends EventDispatcher implements Asset {
 	  * Get the value of an attribute of [this] Model
 	  */
 	public function getAttribute<T>(key : String):Null<T> {
-		return (storage.get(map_key( key )));
+		return untyped _a.get( key );//(storage.get(map_key( key )));
 	}
 	public inline function get<T>(k : String):Null<T> return getAttribute( k );
 
@@ -119,7 +124,10 @@ class Model extends EventDispatcher implements Asset {
 	  * Set the value of an attribute of [this] Model
 	  */
 	public function setAttribute<T>(key:String, value:T):T {
-		return storage.set(map_key(key), value);
+		var d = {name:key, value:new Delta(value, get(key))};
+		var curr = _a.set(key, value);//storage.set(map_key(key), value);
+		change.call( d );
+		return curr;
 	}
 	public inline function set<T>(key:String, value:T):T return setAttribute(key, value);
 
@@ -135,7 +143,7 @@ class Model extends EventDispatcher implements Asset {
 	  * Check whether [this] Model has an attribute with the given name
 	  */
 	public function hasAttribute(name : String):Bool {
-		return storage.exists(map_key( name ));
+		return untyped _a.exists( name );//storage.exists(map_key( name ));
 	}
 	public inline function exists(key : String):Bool return hasAttribute(key);
 
@@ -143,9 +151,7 @@ class Model extends EventDispatcher implements Asset {
 	  * Delete the given attribute of [this] Model
 	  */
 	public function removeAttribute(name : String):Bool {
-		var had:Bool = hasAttribute( name );
-		storage.remove(map_key( name ));
-		return had;
+		return _a.remove( name );
 	}
 	public inline function remove(key : String):Bool return removeAttribute( key );
 
@@ -153,38 +159,9 @@ class Model extends EventDispatcher implements Asset {
 	  * Get an Array of the names of all attributes
 	  */
 	public inline function allAttributes():Array<String> {
-		return storage.keys();
+		return [for (k in _a.keys()) k];
 	}
 	public inline function keys():Array<String> return allAttributes();
-
-	/**
-	  * Listen for changes to [this]'s attributes
-	  */
-	public function watch(cb : Commit -> Void):Void {
-		storage.watch( cb );
-	}
-
-	/**
-	  * Listen for activity on a particular field
-	  */
-	public function watchKey(key:String, cb:Void -> Void):Void {
-		watch(function(com : Commit):Void {
-			switch ( com ) {
-				case Create(k, _), Delete(k), Change(k, _, _) if (k == key):
-					cb();
-
-				default:
-					null;
-			}
-		});
-	}
-
-	/**
-	  * Modify storage-keys
-	  */
-	private function map_key(key : String):String {
-		return key;
-	}
 
 	/**
 	  * Perform metadata-based event-binding
@@ -218,17 +195,19 @@ class Model extends EventDispatcher implements Asset {
 	/**
 	  * Storage object in use by [this] Model currently
 	  */
+	/*
 	public var storage(default, set):Storage;
 	private function set_storage(v : Storage):Storage {
 		storage = v;
 
-		/* define the 'storage' requirement's Task as the intialization of [storage] */
+		// define the 'storage' requirement's Task as the intialization of [storage]
 		readyReqs.add('storage', function(met) {
 			v.init( met );
 		});
 
 		return storage;
 	}
+	*/
 
 /* === Instance Fields === */
 
@@ -237,7 +216,18 @@ class Model extends EventDispatcher implements Asset {
 
 	/* signal fired when [storage] becomes usable */
 	public var readyReqs : Requirements;
+	
+	/* a Signal fired when changes are made to [this] Model */
+	public var change : Signal<ModelChange<Dynamic>>;
 
 	/* signal fired when [this] Model becomes 'ready' */
 	private var _ready : VoidSignal;
+
+	/* a Map to store attribute values in */
+	private var _a : Map<String, Dynamic>;
 }
+
+typedef ModelChange<T> = {
+	var name : String;
+	var value : Delta<T>;
+};
