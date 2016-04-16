@@ -10,9 +10,15 @@ import tannus.geom.Rectangle;
 import tannus.html.ElStyles;
 import tannus.html.Elementable;
 
-import js.JQuery;
+import haxe.Constraints.Function;
 
+import js.JQuery;
+import Reflect.*;
+
+// using Reflect;
 using Lambda;
+using tannus.ds.ArrayTools;
+
 @:forward
 abstract Element (JQuery) from JQuery to JQuery {
 	/* Constructor Function */
@@ -214,6 +220,18 @@ abstract Element (JQuery) from JQuery to JQuery {
 	public inline function set(key:String, value:String):String {
 		this.attr(key, value);
 		return value;
+	}
+
+	/* invoke a plugin method on [this] Element */
+	public function plugin<T>(name:String, ?arguments:Array<Dynamic>):T {
+		if (arguments == null) arguments = new Array();
+		return callMethod(this, getProperty(this, name), arguments);
+	}
+
+	/* get a Function for the requested method, already bound to [this] */
+	public function method<T:Function>(name : String):T {
+		var _f:Dynamic = makeVarArgs(callMethod.bind(this, getProperty(this, name), _));
+		return untyped _f;
 	}
 
 	/**
