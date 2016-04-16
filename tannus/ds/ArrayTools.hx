@@ -413,6 +413,33 @@ class ArrayTools {
 	}
 
 	/**
+	  * filter and map simultaneously
+	  */
+	public static function mapfilter<A, B>(list:Array<A>, test:A->Bool, map:A->B):Array<B> {
+		var results:Array<B> = new Array();
+		for (x in list) {
+			if (test( x )) {
+				results.push(map( x ));
+			}
+		}
+		return results;
+	}
+
+	/**
+	  * macro-licious mapfilter
+	  */
+	public static macro function macmapfilter<A, B>(list:ExprOf<Array<A>>, test:Expr, map:Expr):ExprOf<Array<B>> {
+		test = test.replace(macro _, macro item);
+		map = map.replace(macro _, macro item);
+		if (!test.hasReturn()) test = macro return $test;
+		if (!map.hasReturn()) map = macro return $map;
+		test = macro (function(item) $test);
+		map = macro (function(item) $map);
+
+		return macro tannus.ds.ArrayTools.mapfilter($list, $test, $map);
+	}
+
+	/**
 	  * convert a pair of Arrays into an Array of pairs
 	  */
 	public static function zip<A, B>(left:Array<A>, right:Array<B>):Array<Tup2<A, B>> {
