@@ -73,6 +73,29 @@ class MacroTools {
 		return e.map(replacer.bind(_, whats, with));
 	}
 
+	
+	public static function has(e:Expr, what:Expr):Bool {
+		if (e.expr.equals( what.expr )) {
+			return true;
+		}
+		else {
+			var ret:Bool = false;
+			function finder(ee : Expr):Void {
+				if (ee.expr.equals( what.expr )) {
+					throw true;
+				}
+				else ee.iter( finder );
+			}
+			try {
+				e.iter( finder );
+				return ret;
+			}
+			catch (err : Bool) {
+				return err; 
+			}
+		}
+	}
+
 	/**
 	  * Check whether the given Expression contains a return
 	  */
@@ -177,7 +200,11 @@ class MacroTools {
 	  * get the full name of the given class-type
 	  */
 	public static function fullName(ct : ClassType):String {
-		return ct.pack.concat([ct.name]).join('.');
+		var a = ct.pack;
+		if (ct.module != '' && ct.name != ct.module)
+			a.push( ct.module );
+		a.push( ct.name );
+		return a.join('.');
 	}
 
 	#end
