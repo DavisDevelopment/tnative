@@ -113,6 +113,24 @@ class Model extends EventDispatcher implements Asset {
 	}
 
 	/**
+	  * Watch for changes
+	  */
+	public inline function watch<T>(f : ModelChange<T> -> Void):Void {
+		change.on( f );
+	}
+
+	/**
+	  * Watch a given key for changes
+	  */
+	public function watchKey(key:String, f:Void->Void):Void {
+		change.on(function(c) {
+			if (c.name == key) {
+				f();
+			}
+		});
+	}
+
+	/**
 	  * Get the value of an attribute of [this] Model
 	  */
 	public function getAttribute<T>(key : String):Null<T> {
@@ -125,18 +143,26 @@ class Model extends EventDispatcher implements Asset {
 	  */
 	public function setAttribute<T>(key:String, value:T):T {
 		var d = {name:key, value:new Delta(value, get(key))};
-		var curr = _a.set(key, value);//storage.set(map_key(key), value);
+		_a.set(key, value);//storage.set(map_key(key), value);
+		var curr = _a.get( key );
 		change.call( d );
-		return curr;
+		return untyped curr;
 	}
 	public inline function set<T>(key:String, value:T):T return setAttribute(key, value);
 
 	/**
 	  * Get a Pointer to an attribute of [this] Model
 	  */
-	public function attribute<T>(key : String):Ptr<T> {
+	public function reference<T>(key : String):Ptr<T> {
 		var ref:Ptr<Dynamic> = new Ptr(getAttribute.bind(key), setAttribute.bind(key, _));
 		return (untyped ref);
+	}
+
+	/**
+	  * Get an Attribute object for an attribute of [this] Model
+	  */
+	public inline function attribute<T>(key : String):Attribute<T> {
+		return untyped new Attribute(this, key);
 	}
 
 	/**
@@ -158,7 +184,7 @@ class Model extends EventDispatcher implements Asset {
 	/**
 	  * Get an Array of the names of all attributes
 	  */
-	public inline function allAttributes():Array<String> {
+	public function allAttributes():Array<String> {
 		return [for (k in _a.keys()) k];
 	}
 	public inline function keys():Array<String> return allAttributes();
