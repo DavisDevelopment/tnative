@@ -454,7 +454,7 @@ class Promise<T> {
 			nocall = Context.makeExpr(false, Context.currentPos());
 		}
 
-		return macro new Promise(function(accept, reject) {
+		return macro new tannus.ds.Promise(function(accept, reject) {
 			$action;
 		}, $nocall);
 	}
