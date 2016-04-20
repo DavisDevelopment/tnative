@@ -65,8 +65,15 @@ abstract Rectangle (CRectangle) from CRectangle to CRectangle {
 	  * Create a Rectangle from an Array of Numbers
 	  */
 	@:from
-	public static inline function fromArray<T : Float> (a : Array<T>):Rectangle {
-		return new Rectangle(a[0], a[1], a[2], a[3]);
+	public static function fromArray<T : Float> (a : Array<T>):Rectangle {
+		switch ( a ) {
+			case [w, h]:
+				return new Rectangle(0, 0, w, h);
+			case [x, y, w, h]:
+				return new Rectangle(x, y, w, h);
+			default:
+				return new Rectangle(a[0], a[1], a[2], a[3]);
+		}
 	}
 }
 
