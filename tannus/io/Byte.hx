@@ -4,6 +4,7 @@ import haxe.macro.Expr;
 import haxe.macro.Context;
 
 using tannus.ds.StringUtils;
+using tannus.macro.MacroTools;
 
 /**
   * Abstract class which allows an Integer to behave as both an integer, and a single-character String, simultaneously
@@ -128,6 +129,17 @@ abstract Byte (Int) from Int to Int {
 	@:op(A == B)
 	public inline function equalss(other : String):Bool {
 		return (this == other.charCodeAt(0));
+	}
+
+	public macro function equalsChar(self:ExprOf<Byte>, c:ExprOf<String>):ExprOf<Bool> {
+		var i : ExprOf<Int>;
+		if (c.isConstant()) {
+			i = macro $c.code;
+		}
+		else {
+			i = macro $c.charCodeAt( 0 );
+		}
+		return macro ($self == $i);
 	}
 
 	/**
