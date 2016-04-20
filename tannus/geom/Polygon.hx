@@ -48,7 +48,7 @@ class Polygon implements Shape {
 	/**
 	  * Obtain [this] Shape's vertices
 	  */
-	public function getVertices():Vertices {
+	public function getVertices(?precision:Int):Vertices {
 		return vertices;
 	}
 
