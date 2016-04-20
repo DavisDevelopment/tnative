@@ -5,10 +5,13 @@ import tannus.io.Getter;
 import tannus.io.Setter;
 
 import Reflect in R;
+import haxe.macro.Expr;
+import haxe.Constraints.Function;
 
 using Reflect;
 using Lambda;
 using tannus.ds.ArrayTools;
+using tannus.macro.MacroTools;
 
 @:forward
 abstract Obj (CObj) from CObj {
@@ -38,6 +41,14 @@ abstract Obj (CObj) from CObj {
 	@:arrayAccess
 	public inline function set<T>(key:String, val:T):T
 		return this.set(key, val);
+
+	/**
+	  * Define a Property of [this]
+	  */
+	public macro function define<T>(self:ExprOf<Obj>, name:ExprOf<String>, value:ExprOf<T>):Expr {
+		var ref:Expr = value.pointer();
+		return macro $self.defineProperty($name, $ref);
+	}
 
 /* === Class Methods === */
 
@@ -69,14 +80,14 @@ class CObj {
 	/**
 	  * Check for the given attribute
 	  */
-	public function exists(key : String):Bool {
+	public inline function exists(key : String):Bool {
 		return o.hasField(key);
 	}
 
 	/**
 	  * Get the value of the given attribute
 	  */
-	public function get<T>(key : String):T {
+	public inline function get<T>(key : String):T {
 		return (untyped o.getProperty(key));
 	}
 
@@ -86,6 +97,20 @@ class CObj {
 	public function set<T>(key:String, val:T):T {
 		o.setProperty(key, val);
 		return get(key);
+	}
+
+	/**
+	  * Get a method
+	  */
+	public inline function method<T:Function>(name : String):T {
+		return untyped o.callMethod.bind(get( name ), _).makeVarArgs();
+	}
+
+	/**
+	  * Call a method
+	  */
+	public inline function call<T>(name:String, args:Array<Dynamic>):T {
+		return o.callMethod(get(name), args);
 	}
 
 	/**
@@ -150,20 +175,24 @@ class CObj {
 		}
 	}
 
-#if js
-
 	/**
 	  * add a JavaScript 'getter' method to [o]
 	  */
 	public inline function defineGetter<T>(key:String, getter:Getter<T>):Void {
-		get( '__defineGetter__' )(key, getter);
+		#if js
+		call('__defineGetter__', untyped [key, getter]);
+		#else
+		set(key, getter.get());
+		#end
 	}
 
 	/**
 	  * add a JavaScript 'setter' method to [o]
 	  */
 	public inline function defineSetter<T>(key:String, setter:Setter<T>):Void {
-		get( '__defineSetter__' )(key, setter);
+		#if js
+		call('__defineSetter__', untyped [key, setter]);
+		#end
 	}
 
 	/**
@@ -173,8 +202,6 @@ class CObj {
 		defineGetter(name, pointer.getter);
 		defineSetter(name, pointer.setter);
 	}
-
-#end
 
 /* === Instance Field === */
 
