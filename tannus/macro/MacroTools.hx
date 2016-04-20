@@ -35,6 +35,18 @@ class MacroTools {
 	#if macro
 
 	/**
+	  * Check whether [e] is a constant or not
+	  */
+	public static function isConstant(e : Expr):Bool {
+		switch ( e.expr ) {
+			case EConst(_):
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	/**
 	  * Replace all references to '_' with [repl]
 	  */
 	public static function mapUnderscoreTo(e:Expr, repl:String):Expr {
