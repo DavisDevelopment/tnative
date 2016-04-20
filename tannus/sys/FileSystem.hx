@@ -107,8 +107,7 @@ class FileSystem {
 	  */
 	public static inline function read(path:String, ?length:Int):ByteArray {
 		#if python
-			var p:String = path;
-			var f:Dynamic = python.Syntax.pythonCode('open(p, "rb")');
+			var f:Dynamic = (python.Syntax.pythonCode('open'))(path, 'rb');
 			var _data:python.Bytearray = new python.Bytearray(length!=null?f.read():f.read(length));
 			f.close();
 
