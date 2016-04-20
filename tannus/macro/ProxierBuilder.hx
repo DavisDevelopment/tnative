@@ -57,35 +57,26 @@ class ProxierBuilder {
 						/* most basic proxy -- forward */
 						case [ getExpr ]:
 							var get:Expr = getExpr;
-							var gete_type = typeof( get ).toComplexType();
-							/*
-							switch ( gete_type ) {
-								case TFunction(args, ret):
-									if (args.length == 0 && ret.equals( gete_type )) {
-
-									}
+							/* if the proxy is to a constant, only supply a getter */
+							if (get.isConstant()) {
+								f.kind = FProp('get', 'null', type, null);
+								generated.push( f );
+								generated.push(getterField(f.name, get, type));
 							}
-							*/
-							f.kind = FProp('get', 'null', type, null);
-							generated.push( f );
-							var getterField:Field = {
-								'pos' : field.pos,
-								'name': ('get_' + field.name),
-								'meta': null,
-								'kind': FFun(getterFunction(get, type)),
-								'doc' : null,
-								'access': [APrivate, AInline]
-							};
-							generated.push( getterField );
-							var setterField:Field = {
-								'pos' : field.pos,
-								'name': ('set_' + field.name),
-								'meta': null,
-								'kind': FFun(setterFunction(get, type)),
-								'doc': null,
-								'access': [APrivate, AInline]
-							};
-							generated.push( setterField );
+							else {
+								f.kind = FProp('get', 'set', type, null);
+								generated.push( f );
+								generated.push(getterField(f.name, get, type));
+								var setterField:Field = {
+									'pos' : field.pos,
+									'name': ('set_' + field.name),
+									'meta': null,
+									'kind': FFun(setterFunction(get, type)),
+									'doc': null,
+									'access': [APrivate, AInline]
+								};
+								generated.push( setterField );
+							}
 
 						case [getExpr, setExpr]:
 							var gete_type = typeof( getExpr ).toComplexType();
@@ -120,6 +111,20 @@ class ProxierBuilder {
 			}
 		}
 		return generated;
+	}
+
+	/**
+	  * Create and return a get_[name] Field
+	  */
+	private static function getterField(name:String, get:Expr, type:Null<ComplexType>):Field {
+		return {
+			'pos' : Context.currentPos(),
+			'name': ('get_' + name),
+			'meta': null,
+			'kind': FFun(getterFunction(get, type)),
+			'doc' : null,
+			'access': [APrivate, AInline]
+		};
 	}
 
 	/**
