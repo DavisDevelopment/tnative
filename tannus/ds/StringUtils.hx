@@ -57,6 +57,32 @@ class StringUtils {
 	}
 
 	/**
+	  * Count the number of times that the given pattern is matched in [str]
+	  */
+	public static function count(str:String, pattern:EitherType<String, EReg>):Int {
+		switch ( pattern.type ) {
+			case Left( sub ):
+				var pos:Int = 0;
+				var n:Int = 0;
+				var step:Int = sub.length;
+
+				while ( true  ) {
+					pos = str.indexOf(sub, pos);
+					if (pos >= 0) {
+						++n;
+						pos += step;
+
+					} else break;
+				}
+				return n;
+
+			case Right( pat ):
+				var e:RegEx = pat;
+				return e.matches( str ).length;
+		}
+	}
+
+	/**
 	  * Strip out all pieces of [str] which match the pattern [pat]
 	  */
 	public static function strip(str:String, pat:EitherType<String, EReg>):String {
