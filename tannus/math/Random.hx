@@ -4,11 +4,13 @@ import tannus.math.TMath;
 import tannus.math.TMath.*;
 import tannus.math.Ratio;
 import tannus.geom.*;
+import tannus.utils.Error;
 
 import Math.*;
 
 using Lambda;
 using tannus.ds.ArrayTools;
+using tannus.math.TMath;
 
 @:expose('Random')
 class Random {
@@ -46,6 +48,37 @@ class Random {
 	 */
 	public function randint(min:Int, max:Int):Int {
 		return Math.floor(nextFloat() * (max - min + 1) + min);
+	}
+
+	/**
+	  * get a random value from the given Map
+	  */
+	public function chance<T>(chances:Array<Int>, choices:Array<T>, shuffleAll:Bool=true):T {
+		if (chances.sum() != 100) {
+			throw new Error('RandomError: The [chances] parameter for tannus.math.Random::chance must add up to 100');
+		}
+		else if (chances.length != choices.length) {
+			throw new Error('RandomError: The [chances] and [choices] parameters for tannus.math.Random::chance must be of the same length');
+		}
+		else {
+			var all:Array<T> = new Array();
+
+			/* build the [all] array */
+			for (index in 0...chances.length) {
+				var count:Int = chances[ index ];
+				var value:T = choices[ index ];
+				
+				/* add [value] to [all] [count] times */
+				for (i in 0...count) all.push( value );
+			}
+
+			if ( shuffleAll ) {
+				// shuffle [all]
+				all = shuffle( all );
+			}
+
+			return choice( all );
+		}
 	}
 
 	/**
