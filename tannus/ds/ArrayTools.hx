@@ -442,12 +442,60 @@ class ArrayTools {
 	/**
 	  * convert a pair of Arrays into an Array of pairs
 	  */
-	public static function zip<A, B>(left:Array<A>, right:Array<B>):Array<Tup2<A, B>> {
-		var pairs:Array<Tup2<A, B>> = new Array();
+	public static function zip<A, B>(left:Array<A>, right:Array<B>):Array<Pair<A, B>> {
+		var pairs:Array<Pair<A, B>> = new Array();
 		for (i in 0...left.length) {
-			pairs.push(new Tup2(left[i], right[i]));
+			pairs.push(new Pair(left[i], right[i]));
 		}
 		return pairs;
+	}
+
+	/**
+	  * macro-based zip-map
+	  */
+	public static function zipmap<A, B, C>(left:Array<A>, right:Array<B>, predicate:A->B->C):Array<C> {
+		var pairs = zip(left, right);
+		return [for (p in pairs) predicate(p.left, p.right)];
+	}
+
+	/**
+	  * macro-based zip-map
+	  */
+	public static macro function maczipmap<A, B, C>(left:ExprOf<Array<A>>, right:ExprOf<Array<B>>, args:Array<Expr>):ExprOf<Array<C>> {
+		var lExpressions:Array<Expr> = [macro x];
+		var rExpressions:Array<Expr> = [macro y];
+		var f:Expr = args[0];
+
+		switch ( args ) {
+			case [leftExpr, rightExpr, action]:
+				lExpressions.push( leftExpr );
+				rExpressions.push( rightExpr );
+				f = action;
+
+			case [action]:
+				f = action;
+
+			default:
+				null;
+		}
+
+		// map all given [left] and [right] aliases to just 'left' and 'right' respectively
+		f = f.replaceMultiple(lExpressions, macro left).replaceMultiple(rExpressions, macro right);
+		
+		/* if [f] does not contain a 'return' statement */
+		if (!f.hasReturn()) {
+			/* automagically return the last expression (usually the only one) */
+			var body:Array<Expr> = f.toArray();
+			var rve:Expr = body.pop();
+			body.push(macro return $rve);
+			f = body.fromArray();
+		}
+
+		/* wrap [f] in a function definition, making [f] now the body of said function */
+		f = (macro function(left, right) $f);
+		//trace(f.toString());
+
+		return macro tannus.ds.ArrayTools.zipmap($left, $right, $f);
 	}
 
 	/**
@@ -455,6 +503,36 @@ class ArrayTools {
 	  */
 	public static inline function gridify<T>(arr : Array<Array<T>>):Grid<T> {
 		return tannus.ds.Grid.fromArray2( arr );
+	}
+
+	/**
+	  * (if necessary) enlarge [list] to [len] by prepending [value]
+	  * to [list] until it's of the desired length
+	  */
+	public static function lpad<T>(list:Array<T>, len:Int, value:T):Array<T> {
+		if (list.length >= len) {
+			return list;
+		}
+		else {
+			var res = list.copy();
+			while (res.length < len) res.unshift( value );
+			return res;
+		}
+	}
+
+	/**
+	  * (if necessary) enlarge [list] to [len] by appending [value]
+	  * to [list] until it's of the desired length
+	  */
+	public static function rpad<T>(list:Array<T>, len:Int, value:T):Array<T> {
+		if (list.length >= len) {
+			return list;
+		}
+		else {
+			var res = list.copy();
+			while (res.length < len) res.push( value );
+			return res;
+		}
 	}
 
 	#if macro
