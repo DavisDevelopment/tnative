@@ -2,7 +2,7 @@ package tannus.mvc;
 
 import tannus.io.Signal;
 
-class View<T> implements Asset {
+class View<T, Modl:Model> implements Asset {
 	/* Constructor Function */
 	public function new():Void {
 		_target = null;
@@ -50,7 +50,16 @@ class View<T> implements Asset {
 		delete();
 	}
 
+	public function destroy():Void delete();
+
+/* === Computed Instance Fields === */
+
+	/* view target */
+	public var target(get, never):Null<T>;
+	private inline function get_target():Null<T> return _target;
+
 /* === Instance Fields === */
 
 	private var _target : Null<T>;
+	private var model : Modl;
 }
