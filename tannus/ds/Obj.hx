@@ -6,12 +6,15 @@ import tannus.io.Setter;
 
 import Reflect in R;
 import haxe.macro.Expr;
+import haxe.macro.Context;
 import haxe.Constraints.Function;
 
 using Reflect;
 using Lambda;
 using tannus.ds.ArrayTools;
 using tannus.macro.MacroTools;
+using haxe.macro.ExprTools;
+using haxe.macro.TypeTools;
 
 @:forward
 abstract Obj (CObj) from CObj {
@@ -45,9 +48,85 @@ abstract Obj (CObj) from CObj {
 	/**
 	  * Define a Property of [this]
 	  */
-	public macro function define<T>(self:ExprOf<Obj>, name:ExprOf<String>, value:ExprOf<T>):Expr {
-		var ref:Expr = value.pointer();
-		return macro $self.defineProperty($name, $ref);
+	public macro function define<T>(self:ExprOf<Obj>, args:Array<Expr>):Expr {
+		var n:Expr = args.shift();
+		
+		switch ( n.expr ) {
+			case EConst(CString( name )):
+				var ref:Expr = args.shift().pointer();
+				return macro $self.defineProperty($v{name}, $ref);
+
+			case EConst(CIdent( name )):
+				var ref:Expr = n.pointer();
+				return macro $self.defineProperty($v{name}, $ref);
+
+			default:
+				var sargs:String = args.map(function(e) return e.toString()).join(', ');
+				Context.fatalError('Invalid arguments to Obj::define('+sargs+')', Context.currentPos());
+				return macro null;
+		}
+	}
+
+	public macro function property<T>(self:ExprOf<Obj>, args:Array<Expr>):Expr {
+		var n:Expr = args.shift();
+		
+		switch ( n.expr ) {
+			case EConst(CString( name )):
+				var ref:Expr = args.shift().pointer();
+				return macro $self.defineProperty($v{name}, $ref);
+
+			case EConst(CIdent( name )):
+				var ref:Expr = n.pointer();
+				trace(ref.test());
+				return macro $self.defineProperty($v{name}, $ref);
+
+			default:
+				var sargs:String = args.map(function(e) return e.toString()).join(', ');
+				Context.fatalError('Invalid arguments to Obj::define('+sargs+')', Context.currentPos());
+				return macro null;
+		}
+	}
+
+	public macro function getter<T>(self:ExprOf<Obj>, args:Array<Expr>):Expr {
+		var n:Expr = args.shift();
+		
+		switch ( n.expr ) {
+			case EConst(CString( name )):
+				var ref:Expr = args.shift();
+				ref = macro tannus.io.Getter.create( $ref );
+				return macro $self.defineGetter($v{name}, $ref);
+
+			case EConst(CIdent( name )):
+				var ref:Expr = n;
+				ref = macro tannus.io.Getter.create( $ref );
+				return macro $self.defineGetter($v{name}, $ref);
+
+			default:
+				var sargs:String = args.map(function(e) return e.toString()).join(', ');
+				Context.fatalError('Invalid arguments to Obj::define('+sargs+')', Context.currentPos());
+				return macro null;
+		}
+	}
+
+	public macro function setter<T>(self:ExprOf<Obj>, args:Array<Expr>):Expr {
+		var n:Expr = args.shift();
+		
+		switch ( n.expr ) {
+			case EConst(CString( name )):
+				var ref:Expr = args.shift();
+				ref = macro tannus.io.Setter.create( $ref );
+				return macro $self.defineSetter($v{name}, $ref);
+
+			case EConst(CIdent( name )):
+				var ref:Expr = n;
+				ref = macro tannus.io.Setter.create( $ref );
+				return macro $self.defineSetter($v{name}, $ref);
+
+			default:
+				var sargs:String = args.map(function(e) return e.toString()).join(', ');
+				Context.fatalError('Invalid arguments to Obj::define('+sargs+')', Context.currentPos());
+				return macro null;
+		}
 	}
 
 /* === Class Methods === */
