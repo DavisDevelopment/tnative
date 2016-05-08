@@ -35,6 +35,20 @@ class MacroTools {
 	#if macro
 
 	/**
+	  * Check the given Expr for errors
+	  */
+	public static function test(e : Expr):Null<Dynamic> {
+		var s = e.toString();
+		try {
+			var pe = Context.parse(s, e.pos);
+			return null;
+		}
+		catch (error : Dynamic) {
+			return error;
+		}
+	}
+
+	/**
 	  * Check whether [e] is a constant or not
 	  */
 	public static function isConstant(e : Expr):Bool {
@@ -136,6 +150,16 @@ class MacroTools {
 		return (macro tannus.io.Ptr.create( $e ));
 	}
 
+	/*
+	public static function setter<T>(e : ExprOf<T>):ExprOf<tannus.io.Setter<T>> {
+		return (macro tannus.io.Setter.create( $e ));
+	}
+
+	public static function getter<T>(e : ExprOf<T>):ExprOf<tannus.io.Getter<T>> {
+		return (macro tannus.io.Getter.create( $e ));
+	}
+	*/
+
 	/**
 	  * Generate the (approximate) code for the given expression
 	  */
@@ -217,6 +241,26 @@ class MacroTools {
 			a.push( ct.module );
 		a.push( ct.name );
 		return a.join('.');
+	}
+
+	/**
+	  * convert the given Expr to an Array<Expr> 
+	  */
+	public static function toArray(e : Expr):Array<Expr> {
+		switch ( e.expr ) {
+			case EBlock( list ):
+				return list;
+
+			default:
+				return [e];
+		}
+	}
+
+	/**
+	  * Create a Block expression from an Array of expressions
+	  */
+	public static function fromArray(list : Array<Expr>):Expr {
+		return macro $b{ list };
 	}
 
 	#end
