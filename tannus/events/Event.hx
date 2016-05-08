@@ -16,6 +16,7 @@ class Event {
 		_bubbles = bubbls;
 		_defaultPrevented = false;
 		_cancelled = false;
+		_propogationStopped = false;
 
 		onCancelled = new VoidSignal();
 		onDefaultPrevented = new VoidSignal();
@@ -60,6 +61,7 @@ class Event {
 	  * Stop the propogation of [this] Event
 	  */
 	public function stopPropogation():Void {
+		_propogationStopped = true;
 		onPropogationStopped.fire();
 	}
 
@@ -88,6 +90,9 @@ class Event {
 	public var defaultPrevented(get, never):Bool;
 	private inline function get_defaultPrevented() return (_defaultPrevented);
 
+	public var propogationStopped(get, never):Bool;
+	private inline function get_propogationStopped():Bool return _propogationStopped;
+
 /* === Instance Fields === */
 
 	//- The type of Event [this] is
@@ -104,6 +109,9 @@ class Event {
 
 	// whether [this] Event has been cancelled
 	private var _cancelled : Bool;
+
+	// whether the propogation of [this] Event has been stopped
+	private var _propogationStopped : Bool;
 
 	//- Signal which fires when [this] Event's default action is prevented
 	private var onDefaultPrevented : VoidSignal;
