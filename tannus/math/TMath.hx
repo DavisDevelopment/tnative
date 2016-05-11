@@ -393,4 +393,35 @@ class TMath {
 		var f:ExprOf<T -> Float> = (macro function(item) $ext);
 		return macro tannus.math.TMath.sumf($list, $f);
 	}
+
+	/**
+	  * get the item in [list] that is most similar to [value] when measured by [f]
+	  */
+	public static function snap<T:Float>(value:T, min:T, step:T, ?max:T):T {
+		if (value < min) {
+			return min;
+		}
+		else if (max != null && value > max) {
+			return max;
+		}
+		else {
+			var v:T = min;
+			while ( true ) {
+				if (value <= v) {
+					var prev = (v - step);
+					if (value >= prev) {
+						/* if [value] is closer to the current value than the next one */
+						if ((v - value) < (value - prev)) {
+							return v;
+						}
+						else {
+							return prev;
+						}
+					}
+				}
+
+				v += step;
+			}
+		}
+	}
 }
