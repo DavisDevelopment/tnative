@@ -32,6 +32,13 @@ class MacroTools {
 		return macro $ref;
 	}
 
+	/**
+	  * Create and `throw` and Error from the given String expression
+	  */
+	public static macro function report(message : ExprOf<String>):Expr {
+		return macro throw new tannus.utils.Error( $message );
+	}
+
 	#if macro
 
 	/**
