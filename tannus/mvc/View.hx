@@ -55,8 +55,13 @@ class View<T, Modl:Model> implements Asset {
 /* === Computed Instance Fields === */
 
 	/* view target */
-	public var target(get, never):Null<T>;
-	private inline function get_target():Null<T> return _target;
+	public var target(get, never):T;
+	private function get_target():T {
+		if (_target == null) {
+			render();
+		}
+		return _target;
+	}
 
 /* === Instance Fields === */
 

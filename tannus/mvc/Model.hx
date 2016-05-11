@@ -23,6 +23,7 @@ class Model extends EventDispatcher implements Asset {
 	public function new():Void {
 		super();
 
+		am = new ModelCollection( this );
 		change = new Signal();
 		assets = new Array();
 		readyReqs = new Requirements();
@@ -30,6 +31,14 @@ class Model extends EventDispatcher implements Asset {
 		_a = new Map();
 
 		_bindMethodsToEvents();
+
+		var saving : Bool = false;
+		change.on(function( c ) {
+			if (autoSave && !saving) {
+				saving = true;
+				sync(function() saving = false);
+			}
+		});
 	}
 
 /* === Instance Methods === */
@@ -115,8 +124,14 @@ class Model extends EventDispatcher implements Asset {
 	/**
 	  * Watch for changes
 	  */
-	public inline function watch<T>(f : ModelChange<T> -> Void):Void {
+	public function watch<T>(f : ModelChange<T> -> Void):Void {
 		change.on( f );
+	}
+	public function unwatch<T>(?f : ModelChange<T> -> Void):Void {
+		if (f == null) change.clear();
+		else {
+			change.off( f );
+		}
 	}
 
 	/**
@@ -161,8 +176,28 @@ class Model extends EventDispatcher implements Asset {
 	/**
 	  * Get an Attribute object for an attribute of [this] Model
 	  */
-	public inline function attribute<T>(key : String):Attribute<T> {
-		return untyped new Attribute(this, key);
+	public function attribute<T>(key:String, ?dv:Void->T):Attribute<T> {
+		var a:Attribute<T> = (untyped new Attribute(this, key));
+		if (dv != null)
+			a.defaultValue = dv;
+		return bindAttribute( a );
+	}
+
+	public function listAttribute<T>(key:String, ?dv:Void -> Array<T>):ListAttribute<T> {
+		var a:ListAttribute<T> = (untyped new ListAttribute(this, key));
+		if (dv != null)
+			untyped a.defaultValue = dv;
+		return bindAttribute( a );
+	}
+
+	/**
+	  * Bind the given Attribute to [this] Model
+	  */
+	public function bindAttribute<T:Attribute<Dynamic>>(a : T):T {
+		if (a.model != this)
+			a.rebind( this );
+		am.addAttribute( a );
+		return a;
 	}
 
 	/**
@@ -237,6 +272,13 @@ class Model extends EventDispatcher implements Asset {
 
 /* === Instance Fields === */
 
+	/* whether to sync [this] Model automagically */
+	public var autoSave : Bool = false;
+
+	/* the Attribute manager for [this] Model */
+	@:allow( tannus.mvc.Attribute )
+	private var am : ModelCollection;
+
 	/* objects 'attached' to [this] Model, to be deleted when [this] is */
 	private var assets : Array<Asset>;
 
@@ -251,6 +293,7 @@ class Model extends EventDispatcher implements Asset {
 
 	/* a Map to store attribute values in */
 	private var _a : Map<String, Dynamic>;
+//	private var _watchers : Null<Array<ModelChange<Dynamic> -> Void>> = null;
 }
 
 typedef ModelChange<T> = {
