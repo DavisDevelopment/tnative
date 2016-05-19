@@ -90,6 +90,13 @@ class ByteStack extends Stack<Byte> {
 		return b.copy();
 	}
 
+	/**
+	  * Get the portion of the ByteArray which has not yet been read
+	  */
+	public function remaining():Int {
+		return (b.length - i);
+	}
+
 /* === Instance Fields === */
 
 	private var b : ByteArray;
