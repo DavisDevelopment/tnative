@@ -4,35 +4,23 @@ import tannus.io.Blob;
 import tannus.io.ByteArray;
 import tannus.io.Signal;
 import tannus.ds.Object;
+import tannus.sys.Path;
 import haxe.Serializer;
 import haxe.Unserializer;
 import tannus.concurrent.IBoss;
 
-#if !macro
 
-	import js.html.Worker;
-
-#end
-	import haxe.macro.Context;
-	import haxe.macro.Expr;
-	using haxe.macro.ExprTools;
-	
-#if macro
-	typedef Worker = Dynamic;
-#end
+import js.html.Worker;
+import js.Browser.document in doc;
 
 class Boss implements IBoss {
 	/* Constructor Function */
-	public function new(scriptBlob : Blob):Void {
+	public function new(script : Blob):Void {
 		#if !macro
-		worker = new Worker(scriptBlob.toObjectURL());
+		worker = new Worker(script.toObjectURL());
 		#end
 		_message = new Signal();
-		worker.onmessage = function(e) {
-			var enc:String = Std.string(e.data);
-			var data:Object = cast Unserializer.run( enc );
-			_message.call( data );
-		};
+		__bind();
 	}
 
 /* === Instance Methods === */
@@ -54,18 +42,18 @@ class Boss implements IBoss {
 		_message.on( cb );
 	}
 
+	/**
+	  * Bind events and shit to the worker
+	  */
+	private function __bind():Void {
+		worker.addEventListener('message', function(event) {
+			var data:Object = cast Unserializer.run(Std.string(event.data));
+			_message.call( data );
+		});
+	}
+
 /* === Instance Fields === */
 
 	private var _message:Signal<Object>;
 	private var worker:Worker;
-
-/* === Statis Methods === */
-
-	/**
-	  * Create a new Boss with macro-licious simplicity
-	  */
-	public static macro function create(build_file : String):ExprOf<tannus.concurrent.js.Boss> {
-		var ebf = Context.makeExpr(build_file, Context.currentPos());
-		return macro (new pman.Boss(tannus.concurrent.Workers.buildBlob($ebf)));
-	}
 }

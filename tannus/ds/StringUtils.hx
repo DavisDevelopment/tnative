@@ -4,11 +4,17 @@ import tannus.ds.EitherType;
 import tannus.io.RegEx;
 import tannus.io.Byte;
 
+import haxe.macro.Expr;
+import haxe.macro.Context;
+
 using StringTools;
+using haxe.macro.ExprTools;
+using tannus.macro.MacroTools;
 
 /**
   * Class with additional tools for manipulating Strings
   */
+@:expose( 'StringTools' )
 class StringUtils {
 	/**
 	  * Get the Byte at index [i] in String [s]
@@ -19,6 +25,60 @@ class StringUtils {
 		}
 		else {
 			throw 'IndexOutOfBoundError: $i is not within range(0, ${s.length - 1})';
+		}
+	}
+
+	/**
+	  * Perform byte-by-byte mapping of the given String
+	  */
+	public static function byteMap(s:String, f:Byte -> Byte):String {
+		var res:String = '';
+		for (i in 0...s.length) {
+			res += f(byteAt(s, i));
+		}
+		return res;
+	}
+
+	/**
+	  * macro-licious byteMap
+	  */
+	public static macro function macbyteMap(s:ExprOf<String>, f:Expr):ExprOf<String> {
+		switch ( f.expr ) {
+			case EConst(CIdent( '_' )):
+				f = (macro char);
+			default:
+				f = f.mapUnderscoreToExpr(macro char);
+		}
+		if (!f.hasReturn()) {
+			f = (macro return $f);
+		}
+		f = (macro function(char) $f);
+		return macro tannus.ds.StringUtils.byteMap($s, $f);
+	}
+
+	/**
+	  * Count the number of times that the given pattern is matched in [str]
+	  */
+	public static function count(str:String, pattern:EitherType<String, EReg>):Int {
+		switch ( pattern.type ) {
+			case Left( sub ):
+				var pos:Int = 0;
+				var n:Int = 0;
+				var step:Int = sub.length;
+
+				while ( true  ) {
+					pos = str.indexOf(sub, pos);
+					if (pos >= 0) {
+						++n;
+						pos += step;
+
+					} else break;
+				}
+				return n;
+
+			case Right( pat ):
+				var e:RegEx = pat;
+				return e.matches( str ).length;
 		}
 	}
 
@@ -67,15 +127,47 @@ class StringUtils {
 	/**
 	  * Capitalize some String
 	  */
-	public static function capitalize(s : String):String {
-		return (s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase());
+	public static function capitalize(s:String, fancy:Bool=false):String {
+		if ( !fancy ) {
+			return (s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase());
+		}
+		else {
+			var res:String = '';
+			// whether the last Byte was an alphanumeric character
+			var lwan:Bool = false;
+			for (i in 0...s.length) {
+				var c = byteAt(s, i);
+				if (c.isAlphaNumeric()) {
+					if (c.isLetter()) {
+						var l = c.aschar;
+						res += (lwan ? l.toLowerCase() : l.toUpperCase());
+					}
+					else {
+						res += c;
+					}
+					lwan = true;
+				}
+				else {
+					res += c;
+					lwan = false;
+				}
+			}
+			return res;
+		}
 	}
 
 	/**
 	  * Whether sub-string [sub] can be found in [str]
 	  */
 	public static function has(str:String, sub:String):Bool {
-		return (str.indexOf(sub) != -1);
+		var i:Int;
+		try {
+			i = str.indexOf( sub );
+		}
+		catch (err : Dynamic) {
+			i = -1;
+		}
+		return (i != -1);
 	}
 
 	/**
@@ -89,7 +181,7 @@ class StringUtils {
 	  * Get all text of [s] that occurs BEFORE [del], or all of [s] if [del] is absent
 	  */
 	public static function before(s:String, del:String):String {
-		if (has(s, del)) {
+		if (del != '' && has(s, del)) {
 			return s.substring(0, s.indexOf(del));
 		}
 		else return s;
@@ -100,7 +192,7 @@ class StringUtils {
 	  * or all of [s] if [del] is absent
 	  */
 	public static function beforeLast(s:String, del:String):String {
-		if (has(s, del)) {
+		if (del != '' && has(s, del)) {
 			return (s.substring(0, s.lastIndexOf(del)));
 		}
 		else {
@@ -112,17 +204,20 @@ class StringUtils {
 	  * Get all text of [s] that occurs AFTER [del], or all of [s] if [del] is absent
 	  */
 	public static function after(s:String, del:String):String {
-		if (has(s, del))
-			return s.substring(s.indexOf(del)+1);
-		else return s;
+		if (del != '' && has(s, del)) {
+			return s.substring(s.indexOf( del ) + del.length);
+		}
+		else {
+			return s;
+		}
 	}
 	
 	/**
 	  * get all text of [s] that occurs AFTER the last instance of [del]
 	  */
 	public static function afterLast(s:String, del:String):String {
-		if (has(s, del)) {
-			return (s.substring(s.lastIndexOf(del) + 1));
+		if (del != '' && has(s, del)) {
+			return (s.substring(s.lastIndexOf(del) + del.length));
 		}
 		else {
 			return '';
@@ -157,5 +252,17 @@ class StringUtils {
 			}
 			return res;
 		}
+	}
+
+	/**
+	  * determine whether [this] String is made up entirely of numeric characters
+	  */
+	public static function isNumeric(s : String):Bool {
+		for (i in 0...s.length) {
+			if (!byteAt(s, i).isNumeric()) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

@@ -3,9 +3,12 @@ package tannus.chrome;
 import tannus.html.fs.WebFileEntry;
 import tannus.html.fs.WebFSEntry;
 import tannus.html.fs.WebDirectoryEntry in Dir;
+import tannus.html.fs.FilePromise;
 import tannus.sys.Path;
+import tannus.internal.TypeTools.typename;
 
 import tannus.ds.Promise;
+import tannus.ds.promises.*;
 
 import Std.is;
 
@@ -30,14 +33,16 @@ class FileSystem {
 	public static function chooseEntry(options:ChooseEntryOptions, cb:Array<WebFSEntry>->Void):Void {
 		lib.chooseEntry(options, function(entry:WebFSEntry) {
 			var all:Array<WebFSEntry> = new Array();
+			var tn:String = typename( entry );
 			if (entry != null) {
-				if (Std.is(entry, Array))
+				if (tn == 'Array') {
 					all = all.concat(untyped entry);
-				else
+				}
+				else {
 					all.push(entry);
+				}
 			}
-			var _all:Array<Array<WebFSEntry>> = untyped all;
-			all = tannus.ds.ArrayTools.flatten(_all);
+			trace( all );
 			cb( all );
 		});
 	}
@@ -64,6 +69,17 @@ class FileSystem {
 	}
 
 	/**
+	  * Check whether a given entry is restorable
+	  */
+	public static function canRestore(id : String):BoolPromise {
+		return Promise.create({
+			isRestorable(id, function(status : Bool) {
+				return status;
+			});
+		}).bool();
+	}
+
+	/**
 	  * Get a Directory from the User
 	  */
 	public static function chooseDirectory():Promise<Dir> {
@@ -74,6 +90,50 @@ class FileSystem {
 					throw 'Not a Directory!';
 				else
 					return new Dir(cast e);
+			});
+		});
+	}
+
+	/**
+	  * Get a File from the user
+	  */
+	public static function chooseFile(writable:Bool=false, mustExist:Bool=true):FilePromise {
+		return new FilePromise(function(provide) {
+			var options:ChooseEntryOptions = {};
+			switch ([writable, mustExist]) {
+				case [true, true]:
+					options.type = OpenWritable;
+
+				case [_, false]:
+					options.type = SaveFile;
+
+				default:
+					options.type = OpenFile;
+			}
+
+			chooseEntry(options, function(entries) {
+				provide(cast entries[0]);
+			});
+		});
+	}
+
+	/**
+	  * Get a File object to save to
+	  */
+	public static function saveAs(?name : String):Promise<WebFileEntry> {
+		return Promise.create({
+			var options:ChooseEntryOptions = {
+				'type' : SaveFile,
+		       		'suggestedName' : name
+			};
+
+			chooseEntry(options, function(entries) {
+				if (entries.length > 0) {
+					return (cast entries[0]);
+				}
+				else {
+					throw 'No File Selected';
+				}
 			});
 		});
 	}

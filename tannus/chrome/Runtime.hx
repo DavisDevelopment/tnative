@@ -6,6 +6,7 @@ import tannus.ds.ActionStack;
 import tannus.io.Ptr;
 import tannus.io.Signal;
 import tannus.io.ByteArray;
+import tannus.html.Win;
 
 import haxe.Serializer;
 import haxe.Unserializer;
@@ -49,6 +50,33 @@ class Runtime {
 			});
 		});
 	}
+
+	/**
+	  * get a reference to the 'window' Object for the background page
+	  */
+	public static function getBackgroundPage(cb : Win -> Void):Void {
+		if (_bg == null) {
+			lib.getBackgroundPage(function( w ) {
+				cb(_bg = w);
+			});
+		}
+		else {
+			cb( _bg );
+		}
+	}
+
+	/**
+	  * check whether we're currently running in the background page
+	  */
+	public static function isBackgroundPage(w:Win, cb:Bool->Void):Void {
+		getBackgroundPage(function( bg ) {
+			cb(w == bg);
+		});
+	}
+
+	public static inline function inBackgroundPage(cb : Bool -> Void):Void {
+		isBackgroundPage(Win.current, cb);
+	}
 	
 	/**
 	  * The ID of the current application/extension
@@ -60,17 +88,19 @@ class Runtime {
 	  */
 	public static var lib(get, never):Dynamic;
 	private static inline function get_lib():Dynamic return untyped __js__('chrome.runtime');
+	
+	private static var _bg : Null<Win>;
 }
 
-private typedef Message = {
+typedef Message = {
 	var data : Object;
 	var sender : MessageSender;
 	var respond : Object -> Void;
 };
 
-private typedef MessageSender = {
+typedef MessageSender = {
 	@:optional
-	var tab : Maybe<Tab>;
+	var tab : Tab;
 	@:optional
 	var id : Maybe<String>;
 	@:optional

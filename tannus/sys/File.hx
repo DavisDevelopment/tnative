@@ -11,7 +11,6 @@ import tannus.sys.internal.FileContent;
 import tannus.io.Byte;
 import tannus.io.ByteArray;
 import tannus.io.Ptr;
-import tannus.io.OutputStream;
 
 @:forward
 abstract File (CFile) {
@@ -19,36 +18,6 @@ abstract File (CFile) {
 	public inline function new(p : Path):Void {
 		this = new CFile(p);
 	}
-
-/* === Instance Fields === */
-
-/* === Instance Methods === */
-
-	/**
-	  * Lines of content from [this] File
-	  */
-	public function lines(?nlines:Array<String>):Array<String> {
-		if (nlines == null)
-			return (this.read().toString().split('\n'));
-		else {
-			this.write(nlines.join('\n'));
-			return nlines;
-		}
-	}
-
-/* === Casting Methods === */
-
-	#if node
-		/**
-		  * To node.WritableStream
-		  */
-		@:to
-		public inline function toWritableStream():tannus.node.WritableStream {
-			return tannus.sys.node.NodeFSModule.createWriteStream(this.path);
-		}
-
-	#end
-
 /* === Class Methods === */
 
 	/**
@@ -93,29 +62,29 @@ class CFile {
 	  * Reads the content of [this] File
 	  */
 	public inline function read():ByteArray {
-		return FileSystem.read(path);
+		return FileSystem.read(path.toString());
 	}
 
 	/**
 	  * Writes new content to [this] File
 	  */
 	public inline function write(data : ByteArray):Void {
-		FileSystem.write(path, data);
+		FileSystem.write(path.toString(), data);
 	}
 
 	/**
 	  * Appends [data] to [this] File
 	  */
 	public inline function append(data : ByteArray):Void {
-		FileSystem.append(path, data);
+		FileSystem.append(path.toString(), data);
 	}
 
 	/**
-	  * Get an OutputStream to [this] File
+	  * Write a String to [this] File
 	  */
-	//public function output():OutputStream {
-		//return FileSystem.ostream( path );
-	//}
+	public inline function writeString(s : String):Void {
+		FileSystem.write(path.toString(), ByteArray.ofString( s ));
+	}
 
 	/**
 	  * Renames [this] File
@@ -128,7 +97,38 @@ class CFile {
 	  * Deletes [this] File
 	  */
 	public inline function delete():Void {
-		FileSystem.deleteFile(path);
+		FileSystem.deleteFile(path.toString());
+	}
+
+/* === Fancy Instance Methods === */
+
+	/**
+	  * Get or set the lines of [this] File
+	  */
+	public function lines(?list : Array<String>):Array<String> {
+		/* read the lines */
+		if (list == null) {
+			var res:Array<String> = new Array();
+			var buf:String = '';
+			var data = read();
+			for (byte in data) {
+				if (byte.isLineBreaking()) {
+					res.push( buf );
+					buf = '';
+				}
+				else {
+					buf += byte.aschar;
+				}
+			}
+			if (buf.length != 0) {
+				res.push( buf );
+			}
+			return res;
+		}
+		else {
+			write(ByteArray.ofString(list.join('\n')));
+			return list;
+		}
 	}
 
 /* === Computed Instance Fields === */
@@ -202,6 +202,12 @@ class CFile {
 		#else
 			return sys.io.File.read(_path, true);
 		#end
+	}
+
+	/* the stats for [this] File */
+	public var stats(get, never):FileStat;
+	private inline function get_stats():FileStat {
+		return FileSystem.stat( _path );
 	}
 
 /* === Instance Fields === */

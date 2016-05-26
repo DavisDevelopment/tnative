@@ -10,9 +10,16 @@ import tannus.geom.Rectangle;
 import tannus.html.ElStyles;
 import tannus.html.Elementable;
 
-import js.JQuery;
+import haxe.Constraints.Function;
 
+import js.JQuery;
+import Reflect.*;
+
+// using Reflect;
 using Lambda;
+using tannus.ds.ArrayTools;
+using tannus.html.JSTools;
+
 @:forward
 abstract Element (JQuery) from JQuery to JQuery {
 	/* Constructor Function */
@@ -73,6 +80,12 @@ abstract Element (JQuery) from JQuery to JQuery {
 	  */
 	public var attributes(get, never):ElAttributes;
 	private function get_attributes() return new ElAttributes(cast Getter.create(this));
+
+	/* map-like access to the data of [this] Element */
+	public var edata(get, never):ElData;
+	private function get_edata():ElData {
+		return new ElData(cast Getter.create( this ));
+	}
 
 	/**
 	  * Array of classes associated with [this] Element
@@ -208,6 +221,31 @@ abstract Element (JQuery) from JQuery to JQuery {
 	public inline function set(key:String, value:String):String {
 		this.attr(key, value);
 		return value;
+	}
+
+	/* invoke a plugin method on [this] Element */
+	public function plugin<T>(name:String, ?arguments:Array<Dynamic>):T {
+		if (arguments == null) arguments = new Array();
+		return callMethod(this, getProperty(this, name), arguments);
+	}
+
+	/* get a Function for the requested method, already bound to [this] */
+	public function method<T:Function>(name : String):T {
+		var _f:Dynamic = makeVarArgs(callMethod.bind(this, getProperty(this, name), _));
+		return untyped _f;
+	}
+
+	/**
+	  * Get the index of the given Element in [this]
+	  */
+	public function index(child:Element, ?value:Int):Int {
+		if (value == null) {
+			return (at( 0 ).children.arrayify()).indexOf(child.at( 0 ));
+		}
+		else {
+			child.insertBefore(at( 0 ).children.arrayify()[ value ]);
+			return index( child );
+		}
 	}
 
 	/**

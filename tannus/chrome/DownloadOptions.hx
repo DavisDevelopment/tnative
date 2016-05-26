@@ -33,7 +33,7 @@ abstract DownloadOptions (Object) from Dynamic {
 
 	/* SaveAs */
 	public var saveAs(get, set):Bool;
-	private inline function get_saveAs() return (this['saveAs'] || true);
+	private inline function get_saveAs() return (this['saveAs'].or( true ));
 	private inline function set_saveAs(n:Bool) return (this['saveAs'] = n);
 }
 

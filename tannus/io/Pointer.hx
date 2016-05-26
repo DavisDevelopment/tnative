@@ -136,7 +136,7 @@ abstract Pointer<T> (Ref<T>) from Ref<T> {
 	  */
 	@:op(A += B)
 	public inline function attach_str(str : Setter<T>):Void {
-		var s = setter;
+		var s:Setter<T> = setter;
 		this.setter = s.attach( str );
 	}
 
@@ -195,11 +195,39 @@ abstract Pointer<T> (Ref<T>) from Ref<T> {
 	@:to
 	public inline function toString() return this.toString();
 
+/* === Type-Specific Methods === */
+
 	/**
 	  * Return the iterator for Pointers which reference Iterable data
 	  */
 	public static function iterator<T>(self : Pointer<Iterable<T>>):Iterator<T> {
 		return (self.v.iterator());
+	}
+
+	@:op( --A )
+	public static function pre_decrement<T:Float>(a : Ptr<T>):T {
+		a.set(a.get() - 1);
+		return a.get();
+	}
+	
+	@:op( ++A )
+	public static function pre_increment<T:Float>(a : Ptr<T>):T {
+		a.set(a.get() + 1);
+		return a.get();
+	}
+	
+	@:op( A-- )
+	public static function post_decrement<T:Float>(a : Ptr<T>):T {
+		var r = a.get();
+		a.set(r - 1);
+		return r;
+	}
+	
+	@:op( A++ )
+	public static function post_increment<T:Float>(a : Ptr<T>):T {
+		var r = a.get();
+		a.set(r + 1);
+		return r;
 	}
 
 /* === Class Methods === */

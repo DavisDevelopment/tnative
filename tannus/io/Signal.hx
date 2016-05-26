@@ -72,27 +72,17 @@ class Signal<T> {
 	  * Remove a listener
 	  */
 	public function ignore(func : T->Void):Void {
-		var toIgnore:Array<Handler<T>> = [];
-
-		for (h in handlers) {
+		handlers = handlers.filter(function(h : Handler<T>):Bool {
 			switch (h) {
 				/* Standard Handler */
 				case Normal( f ), Once(f, _), Tested(f, _), Counted(f, _, _), Every(f, _, _):
-					/* if [f] and [func] are the same function */
-					if (Reflect.compareMethods(f, func)) {
-						//- flag it for removal
-						toIgnore.push(h);
-					}
+					return !Reflect.compareMethods(f, func);
 
 				/* Anything Else */
 				default:
-					//- Do Nothing
-					null;
+					return true;
 			}
-		}
-
-		for (h in toIgnore)
-			handlers.remove( h );
+		});
 	}
 
 	/**
@@ -152,6 +142,7 @@ class Signal<T> {
 	  * Call all listeners
 	  */
 	public function broadcast(data : T):Void {
+		/* invoke the relevant handlers */
 		for (h in handlers) {
 			callHandler(h, data);
 		}

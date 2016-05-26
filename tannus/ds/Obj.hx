@@ -1,10 +1,20 @@
 package tannus.ds;
 
 import tannus.io.Ptr;
+import tannus.io.Getter;
+import tannus.io.Setter;
 
 import Reflect in R;
+import haxe.macro.Expr;
+import haxe.macro.Context;
+import haxe.Constraints.Function;
 
 using Reflect;
+using Lambda;
+using tannus.ds.ArrayTools;
+using tannus.macro.MacroTools;
+using haxe.macro.ExprTools;
+using haxe.macro.TypeTools;
 
 @:forward
 abstract Obj (CObj) from CObj {
@@ -34,6 +44,90 @@ abstract Obj (CObj) from CObj {
 	@:arrayAccess
 	public inline function set<T>(key:String, val:T):T
 		return this.set(key, val);
+
+	/**
+	  * Define a Property of [this]
+	  */
+	public macro function define<T>(self:ExprOf<Obj>, args:Array<Expr>):Expr {
+		var n:Expr = args.shift();
+		
+		switch ( n.expr ) {
+			case EConst(CString( name )):
+				var ref:Expr = args.shift().pointer();
+				return macro $self.defineProperty($v{name}, $ref);
+
+			case EConst(CIdent( name )):
+				var ref:Expr = n.pointer();
+				return macro $self.defineProperty($v{name}, $ref);
+
+			default:
+				var sargs:String = args.map(function(e) return e.toString()).join(', ');
+				Context.fatalError('Invalid arguments to Obj::define('+sargs+')', Context.currentPos());
+				return macro null;
+		}
+	}
+
+	public macro function property<T>(self:ExprOf<Obj>, args:Array<Expr>):Expr {
+		var n:Expr = args.shift();
+		
+		switch ( n.expr ) {
+			case EConst(CString( name )):
+				var ref:Expr = args.shift().pointer();
+				return macro $self.defineProperty($v{name}, $ref);
+
+			case EConst(CIdent( name )):
+				var ref:Expr = n.pointer();
+				trace(ref.test());
+				return macro $self.defineProperty($v{name}, $ref);
+
+			default:
+				var sargs:String = args.map(function(e) return e.toString()).join(', ');
+				Context.fatalError('Invalid arguments to Obj::define('+sargs+')', Context.currentPos());
+				return macro null;
+		}
+	}
+
+	public macro function getter<T>(self:ExprOf<Obj>, args:Array<Expr>):Expr {
+		var n:Expr = args.shift();
+		
+		switch ( n.expr ) {
+			case EConst(CString( name )):
+				var ref:Expr = args.shift();
+				ref = macro tannus.io.Getter.create( $ref );
+				return macro $self.defineGetter($v{name}, $ref);
+
+			case EConst(CIdent( name )):
+				var ref:Expr = n;
+				ref = macro tannus.io.Getter.create( $ref );
+				return macro $self.defineGetter($v{name}, $ref);
+
+			default:
+				var sargs:String = args.map(function(e) return e.toString()).join(', ');
+				Context.fatalError('Invalid arguments to Obj::define('+sargs+')', Context.currentPos());
+				return macro null;
+		}
+	}
+
+	public macro function setter<T>(self:ExprOf<Obj>, args:Array<Expr>):Expr {
+		var n:Expr = args.shift();
+		
+		switch ( n.expr ) {
+			case EConst(CString( name )):
+				var ref:Expr = args.shift();
+				ref = macro tannus.io.Setter.create( $ref );
+				return macro $self.defineSetter($v{name}, $ref);
+
+			case EConst(CIdent( name )):
+				var ref:Expr = n;
+				ref = macro tannus.io.Setter.create( $ref );
+				return macro $self.defineSetter($v{name}, $ref);
+
+			default:
+				var sargs:String = args.map(function(e) return e.toString()).join(', ');
+				Context.fatalError('Invalid arguments to Obj::define('+sargs+')', Context.currentPos());
+				return macro null;
+		}
+	}
 
 /* === Class Methods === */
 
@@ -65,14 +159,14 @@ class CObj {
 	/**
 	  * Check for the given attribute
 	  */
-	public function exists(key : String):Bool {
+	public inline function exists(key : String):Bool {
 		return o.hasField(key);
 	}
 
 	/**
 	  * Get the value of the given attribute
 	  */
-	public function get<T>(key : String):T {
+	public inline function get<T>(key : String):T {
 		return (untyped o.getProperty(key));
 	}
 
@@ -82,6 +176,20 @@ class CObj {
 	public function set<T>(key:String, val:T):T {
 		o.setProperty(key, val);
 		return get(key);
+	}
+
+	/**
+	  * Get a method
+	  */
+	public inline function method<T:Function>(name : String):T {
+		return untyped o.callMethod.bind(get( name ), _).makeVarArgs();
+	}
+
+	/**
+	  * Call a method
+	  */
+	public inline function call<T>(name:String, args:Array<Dynamic>):T {
+		return o.callMethod(get(name), args);
 	}
 
 	/**
@@ -106,6 +214,29 @@ class CObj {
 	}
 
 	/**
+	  * create and return an object with a subset of the properties/values attached to [this] one
+	  */
+	public function pluck(keys : Array<String>):Obj {
+		var o:Dynamic = {};
+		var copy:Obj = Obj.fromDynamic( o );
+		for (k in this.keys())
+			if (keys.has( k ))
+				copy.set(k, get( k ));
+		return copy;
+	}
+
+	/**
+	  * create a new anonymous object with the same properties/property-values as [this]
+	  */
+	public function rawclone():Obj {
+		var o:Dynamic = {};
+		var copy:Obj = Obj.fromDynamic( o );
+		for (k in keys())
+			copy.set(k, get(k));
+		return copy;
+	}
+
+	/**
 	  * Copy [this] Obj
 	  */
 	public function clone():Obj {
@@ -121,6 +252,34 @@ class CObj {
 		else {
 			return R.copy(o);
 		}
+	}
+
+	/**
+	  * add a JavaScript 'getter' method to [o]
+	  */
+	public inline function defineGetter<T>(key:String, getter:Getter<T>):Void {
+		#if js
+		call('__defineGetter__', untyped [key, getter]);
+		#else
+		set(key, getter.get());
+		#end
+	}
+
+	/**
+	  * add a JavaScript 'setter' method to [o]
+	  */
+	public inline function defineSetter<T>(key:String, setter:Setter<T>):Void {
+		#if js
+		call('__defineSetter__', untyped [key, setter]);
+		#end
+	}
+
+	/**
+	  * add a pointer as a property to [o]
+	  */
+	public inline function defineProperty<T>(name:String, pointer:Ptr<T>):Void {
+		defineGetter(name, pointer.getter);
+		defineSetter(name, pointer.setter);
 	}
 
 /* === Instance Field === */

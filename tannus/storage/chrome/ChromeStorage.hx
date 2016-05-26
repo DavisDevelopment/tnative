@@ -8,6 +8,9 @@ import tannus.ds.Object;
 import tannus.ds.Delta;
 import tannus.io.Signal;
 
+import haxe.Serializer;
+import haxe.Unserializer;
+
 using Lambda;
 using tannus.ds.MapTools;
 
@@ -26,8 +29,8 @@ class ChromeStorage extends Storage {
 	  */
 	override private function _fetch(cb : Data->Void):Void {
 		area.get(null, function(data : Object) {
-			trace('ChromeStorage data loaded');
-			cb( data );
+			var d = decode( data );
+			cb( d );
 		});
 	}
 
@@ -35,9 +38,8 @@ class ChromeStorage extends Storage {
 	  * Persist the data to [area]
 	  */
 	override private function _push(map_data:Data, cb:Err->Void):Void {
-		var data:Object = map_data.toObject();
+		var data:Object = encode( map_data ).toObject();
 		area.set(data, function() {
-			trace('ChromeStorage data saved');
 			cb( null );
 		});
 	}
@@ -84,6 +86,28 @@ class ChromeStorage extends Storage {
 			}
 		});
 		return signal;
+	}
+
+	/**
+	  * encode an Object
+	  */
+	private function encode(data : Data):Data {
+		var e:Data = new Data();
+		for (key in data.keys()) {
+			e[key] = Serializer.run(data[key]);
+		}
+		return e;
+	}
+
+	/**
+	  * decode an Object
+	  */
+	private function decode(data : Data):Data {
+		var d = new Data();
+		for (key in data.keys()) {
+			d[key] = Unserializer.run( data[key] );
+		}
+		return d;
 	}
 
 /* === Instance Fields === */

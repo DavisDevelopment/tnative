@@ -31,4 +31,7 @@ enum Value {
 
 	/* Tuple */
 	VTuple(vals : Array<Value>);
+
+	/* Comma */
+	VComma;
 }

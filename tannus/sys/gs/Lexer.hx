@@ -2,6 +2,7 @@ package tannus.sys.gs;
 
 import tannus.io.Byte;
 import tannus.io.ByteArray;
+import tannus.io.ByteStack;
 import tannus.io.Asserts.assert;
 
 import tannus.sys.gs.Token;
@@ -26,7 +27,7 @@ class Lexer {
 	  */
 	public function lex(s : String):Array<Token> {
 		reset();
-		buffer = s;
+		buffer = new ByteStack(ByteArray.ofString( s ));
 
 		while (true) {
 			var t:Null<Token> = lexNext();
@@ -43,18 +44,18 @@ class Lexer {
 	  * Tokenize and return one Token
 	  */
 	private function lexNext():Null<Token> {
-		var c:Byte = next();
-
-		/* == End of Input == */
-		if (eoi) {
+		/* exit immediately if we've reached the end of our input */
+		if ( eoi ) {
 			return null;
 		}
 
+		// the next available Byte
+		var c:Byte = next();
+
 		/* == Star and DoubleStar */
-		else if (c == '*'.code) {
+		if (c == '*'.code) {
 			advance();
-			trace('asterisk');
-			if (next() == '*'.code) {
+			if (!eoi && next() == '*'.code) {
 				advance();
 				return DoubleStar;
 			}
@@ -105,7 +106,12 @@ class Lexer {
 
 		/* == Parameter Declaration == */
 		else if (c == '<'.code) {
-			var param = ilex(between('<', '>', false));
+			advance();
+			var code:String = '';
+			while (!eoi && next() != '>'.code)
+				code += advance();
+			advance();
+			var param = ilex( code );
 			var name:String = '';
 			var check:Token = Star;
 			var bits = [param.shift(), param.shift(), param.shift()];
@@ -143,8 +149,8 @@ class Lexer {
 	  */
 	private function ilex(s : String):Tree {
 		var current = save();
-		reset();
-		var res = lex(s);
+		tree = new Array();
+		var res = lex( s );
 		restore( current );
 		return res;
 	}
@@ -179,22 +185,22 @@ class Lexer {
 	  * Restore [this] Lexer to it's default state
 	  */
 	private inline function reset():Void {
-		buffer = new ByteArray();
+		buffer = new ByteStack(new ByteArray());
 		tree = new Array();
 	}
 
 	/**
 	  * Get the 'next' Byte in the Buffer
 	  */
-	private inline function next(d:Int=1):Byte {
-		return buffer[d - 1];
+	private inline function next():Byte {
+		return buffer.peek();
 	}
 
 	/**
 	  * Advance in the buffer by one Byte
 	  */
 	private function advance():Byte {
-		return buffer.shift();
+		return buffer.pop();
 	}
 
 	/**
@@ -209,7 +215,7 @@ class Lexer {
 	  */
 	private function save():State {
 		return {
-			'buffer': buffer,
+			'buffer': cast buffer.copy(),
 			'tree': tree
 		};
 	}
@@ -228,16 +234,16 @@ class Lexer {
 	  * Whether the buffer is empty
 	  */
 	private var eoi(get, never):Bool;
-	private inline function get_eoi() return (buffer.length <= 0);
+	private inline function get_eoi() return buffer.empty;
 
 /* === Instance Fields === */
 
-	private var buffer : ByteArray;
+	private var buffer : ByteStack;
 	private var tree : Array<Token>;
 	private var reserved : Array<Byte>;
 }
 
 private typedef State = {
-	buffer:ByteArray,
+	buffer:ByteStack,
 	tree:Array<Token>
 };

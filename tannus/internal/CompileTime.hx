@@ -19,6 +19,8 @@ import haxe.Json;
 using StringTools;
 using Lambda;
 using haxe.macro.ExprTools;
+using tannus.macro.MacroTools;
+using tannus.ds.StringUtils;
 
 /**
   * Class of utility macro methods
@@ -79,6 +81,16 @@ class CompileTime {
 		return macro tannus.io.ByteArray.fromBase64($enc);
 	}
 
+	/**
+	  * Inline an entire File as Binary data
+	  */
+	public static macro function readFileAsString(path : String):ExprOf<String> {
+		var data:ByteArray = loadFile( path );
+		var enc:ExprOf<String> = toExpr(data.toString());
+
+		return macro $enc;
+	}
+
 	public static macro function readLines(path : String):ExprOf<Array<String>> {
 		var data:String = loadFile(path);
 		var lines:ExprOf<Array<String>> = toExpr(data.split('\n'));
@@ -124,6 +136,15 @@ class CompileTime {
 		var data:Dynamic = haxe.Json.parse( sdata );
 
 		return toExpr( data );
+	}
+
+	/**
+	  * Inline a data-uri
+	  */
+	public static macro function readDataURI(path:String, type:String):ExprOf<String> {
+		var sdata = loadFile( path );
+		var uri = ('data:$type;base64,' + sdata.base64Encode());
+		return toExpr( uri );
 	}
 
 	/**
@@ -208,7 +229,85 @@ class CompileTime {
 		return macro new tannus.io.Blob($ename, $etype, $ebytes);
 	}
 
+	/**
+	  * get an Array of all classes which extend the given one
+	  */
+	public static macro function subClasses(cl : Expr):Expr {
+		var ct = getClassType( cl );
+		var sh = build_sub_holder( ct );
+		var handler = checkForChildren.bind(ct, sh, _);
+		Context.onGenerate( handler );
+		return macro ($i{sh.name}.get());
+	}
+
 #if macro
+
+	/**
+	  * get a ClassType from an expression
+	  */
+	public static function getClassType(e : Expr):ClassType {
+		var t = Context.getType(e.toString());
+		switch ( t ) {
+			case Type.TInst(_.get() => ct, _):
+				return ct;
+
+			default:
+				throw 'FuckError: Cannot get ClassType from ${e.toString()}!';
+		}
+	}
+
+	private static function build_sub_holder(ct : ClassType):ClassType {
+		var holder_name:String = ct.fullName().split('.').concat(['SubList']).map(function(s) return s.capitalize()).join('_');
+		try {
+			var sub = Context.getType(holder_name);
+			return getClassType(macro $i{holder_name});
+		}
+		catch (err : Dynamic) {
+			var holderDef = macro class $holder_name {
+				public static function get():Array<Dynamic> {
+					var m = haxe.rtti.Meta.getType( $i{holder_name} );
+					var names:Array<String> = cast m.data;
+					return names.map(function(name) return Type.resolveClass(name));
+				}
+			};
+			Context.defineType( holderDef );
+			return build_sub_holder( ct );
+		}
+	}
+
+	/**
+	  * do the shit
+	  */
+	public static function checkForChildren(base:ClassType, holder:ClassType, all:Array<Type>):Void {
+		var children:Array<ClassType> = new Array();
+		for (t in all) {
+			switch ( t ) {
+				case Type.TInst(_.get() => ctype, _):
+					if (ctype.subClassOf(base)) {
+						children.push( ctype );
+					}
+
+				default:
+					null;
+			}
+		}
+
+		var metaList:Array<Expr>;
+		if (holder.meta.has('data')) {
+			metaList = holder.meta.get().filter(function(e) return e.name == 'data')[0].params; 
+			holder.meta.remove('data');
+		}
+		else {
+			metaList = new Array();
+		}
+
+		for (ct in children) {
+			var name:String = ct.fullName();
+			metaList.push(macro $v{name});
+		}
+
+		holder.meta.add('data', metaList, Context.currentPos());
+	}
 	
 	/**
 	  * Convert [v] to an Expr

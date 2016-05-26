@@ -38,11 +38,12 @@ class Messager {
 	  * Connect to the peer
 	  */
 	public function connect(cb : Bool->Void):Void {
-		on('meta:connected', function(msg) {
+		once('meta:connected', function(msg) {
 			var status:Bool = (cast msg.data['status']);
 
 			cb( status );
 		});
+
 		send('meta:connect', getConnectionData());
 	}
 

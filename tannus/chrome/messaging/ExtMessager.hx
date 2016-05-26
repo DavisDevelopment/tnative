@@ -1,6 +1,5 @@
 package tannus.chrome.messaging;
 
-import tannus.messaging.*;
 import tannus.ds.Object;
 import tannus.ds.Memory;
 import tannus.ds.Maybe;
@@ -9,6 +8,8 @@ import tannus.io.Signal;
 import tannus.chrome.Runtime;
 import tannus.chrome.Tabs;
 import tannus.chrome.Tab;
+import tannus.messaging.*;
+import tannus.messaging.Message;
 import Std.*;
 
 import tannus.chrome.messaging.BGServer in Server;
@@ -36,46 +37,64 @@ class ExtMessager extends Messager {
 			  * When chrome.runtime fires the 'onMessage' Event
 			  */
 			Runtime.onMessage(function( msg ) {
+				/* get the Address of the Sender */
+				var senderAddress:Address = Address.fromChromeMessage( msg );
+
 				/* check that [msg] is a valid SafeMessage Object */
-				if (SafeMessage.isSafeMessage(msg.data)) {
+				if (SafeMessage.isSafeMessage( msg.data )) {
 					/* if we're not connected to anything yet */
-					if (tab == null) {
+					if (peerAddress == null) {
 						//- if [this] Messager is in a Pool
-						if (inPool) {
+						if ( inPool ) {
 							//- ignore input from Tabs we're already connected to
-							var existing = pool.getMessagerByTab(msg.sender.tab.value.id);
-							if (existing != null)
+							//var existing = pool.getMessagerByTab( msg.sender.tab.id );
+							var existing = pool.getMessagerByAddress( senderAddress );
+							if (existing != null) {
+								trace( existing );
 								return ;
+							}
 						}
+
 						//- set the [tab] field to that of [msg.sender]
-						tab = msg.sender.tab.value;
+						// tab = msg.sender.tab;
+						peerAddress = senderAddress;
 
 						//- dispatch the 'connected' Event
-						_connected.call(null);
+						_connected.call( null );
 					}
 
 					/* if we're already connected to something */
 					else {
 						/* if the Message came from any other Messager than [peer] */
-						if (msg.sender.tab.value.id != tab.value.id)
+						if (!senderAddress.equals( peerAddress )) {
+							trace('${senderAddress} != ${peerAddress}');
+						}
+						/*
+						if (msg.sender.tab.value.id != tab.value.id) {
 							return ;
+						}
+						*/
 					}
 
 					/* decode the Message object */
 					var safe:SafeMessage = (cast msg.data);
 					var messg:Message = Message.fromSafe(this, safe);
-					trace( messg );
+
+					/* pull additional address info from the Message itself */
+					senderAddress.getMessageInfo( messg );
 
 					/* and plop it right into our sexy-ass Message-handling system */
 					receiveFromPeer( messg );
 				} 
+
+				trace( senderAddress );
 			});
 
 			/* the first time the 'connected' Event is dispatched */
 			_connected.once(function(x) {
 				/* send the peer metadata */
 				send('meta:source', {
-					'tab': tab.value.id
+					'address' : peerAddress
 				});
 			});
 		}
@@ -84,20 +103,26 @@ class ExtMessager extends Messager {
 		else {
 			/* listen for data from the chrome.runtime.onMessage Event */
 			Runtime.onMessage(function( msg ) {
+				/* get the Address of the sender */
+				var senderAddress:Address = Address.fromChromeMessage( msg );
+
 				/* if [msg] is a valid Message */
-				if (SafeMessage.isSafeMessage(msg.data)) {
+				if (SafeMessage.isSafeMessage( msg.data )) {
 					/* decode it into a Message object */
 					var messg:Message = Message.fromSafe(this, cast msg.data);
+
+					/* get info from the Message object as well */
+					senderAddress.getMessageInfo( messg );
+
+					/* whether the Message is from our peer Socket or not */
+					var fromPeer:Bool = peerAddress.equals( senderAddress );
+					trace('message from peer: $fromPeer');
 
 					/* send it to be handled */
 					receiveFromPeer( messg );
 				}
-			});
 
-			on('meta:source', function( msg ) {
-				var tabid:Int = cast msg.data['tab'];
-
-				trace('I am in Tab $tabid');
+				trace( senderAddress );
 			});
 		}
 
@@ -115,13 +140,18 @@ class ExtMessager extends Messager {
 		var safe = msg.safe();
 
 		/* Background Page */
-		if (is_server) {
-			tab.value.sendMessage( safe );
+		if ( is_server ) {
+			if (peerAddress.app == Runtime.id) {
+				peerAddress.tab.sendMessage( safe );
+			}
+			else {
+				Runtime.sendMessage(peerAddress.app, safe);
+			}
 		}
 
 		/* Content Script */
 		else {
-			Runtime.sendMessage(Runtime.id, safe);
+			Runtime.sendMessage(peerAddress.app, safe);
 		}
 	}
 
@@ -158,14 +188,38 @@ class ExtMessager extends Messager {
 	}
 
 	/**
+	  * Connect to external Socket
+	  */
+	public function connectToExternal(appid:String, cb:Bool->Void):Void {
+		peerAddress = new Address({
+			'app': appid,
+			'tab': null
+		});
+		connect( cb );
+	}
+
+	/**
+	  * Connect to the Background Page of [this] Application
+	  */
+	public function connectToBackground(cb : Bool->Void):Void {
+		peerAddress = new Address({
+			'app': Runtime.id,
+			'tab': null
+		});
+		connect( cb );
+	}
+
+	/**
 	  * Connect to the peer
 	  */
 	override public function connect(cb : Bool->Void):Void {
-		if (is_server) {
-			if (tab.exists) 
+		if ( is_server ) {
+			if (peerAddress != null) {
 				cb( true );
-			else
+			}
+			else {
 				_connected.on(function(x) cb(true));
+			}
 		}
 		else {
 			super.connect( cb );
@@ -193,6 +247,9 @@ class ExtMessager extends Messager {
 
 	/* (server) The Tab [this] Messager is connected to */
 	public var tab : Maybe<Tab>;
+
+	/* the Address of Socket that [this] is connected to */
+	public var peerAddress : Null<Address>;
 
 	/*erver) The MessagePool [this] is attached to */
 	public var pool : Null<Server>;

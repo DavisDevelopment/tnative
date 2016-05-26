@@ -8,6 +8,7 @@ import tannus.internal.BuildComponent;
 class Writer extends tannus.format.Writer {
 	public function new():Void {
 		super();
+		data = new ByteArray();
 	}
 
 	public function generate(bf : BuildFile):ByteArray {
@@ -15,33 +16,37 @@ class Writer extends tannus.format.Writer {
 			genComponent( c );
 		}
 
-		return this.buffer;
+		return data;
 	}
 
 	public function genComponent(c : BuildComponent):Void {
 		switch (c) {
 			case Comp.BCMain( cref ):
-				line('-main $cref');
+				data.appendString('-main $cref\n');
 
 			case Comp.BCClassPath( dir ):
-				line('-cp $dir');
+				data.appendString('-cp $dir\n');
 
 			case Comp.BCDef( name ):
-				line('-D $name');
+				data.appendString('-D $name\n');
 
 			case Comp.BCMacro( code ):
-				line('--macro $code');
+				data.appendString('--macro $code\n');
 
 			case Comp.BCDebug:
-				line('-debug');
+				data.appendString('-debug\n');
 
 			case Comp.BCTarget(t, d):
-				line('-$t $d');
+				data.appendString('-$t $d\n');
 
 			default:
 				throw 'HXMLError: $c not yet implemented!';
 		}
 	}
+
+/* === Instance Fields === */
+
+	private var data : ByteArray;
 }
 
 private typedef Comp = BuildComponent;

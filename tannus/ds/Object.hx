@@ -37,6 +37,13 @@ abstract Object (Dynamic) from Dynamic to Dynamic {
 	}
 
 	/**
+	  * Raw Field Access
+	  */
+	public inline function rawget<T>(key : String):Null<T> {
+		return untyped Reflect.getProperty(this, key);
+	}
+
+	/**
 	  * Field Assignment
 	  */
 	@:arrayAccess
@@ -164,7 +171,7 @@ abstract Object (Dynamic) from Dynamic to Dynamic {
 	  * Test [this] Object with an OReg
 	  */
 	public inline function is(oreg : String):Bool {
-		var sel:Selector<Dynamic> = oreg;
+		var sel:Selector = oreg;
 		return sel.test( this );
 	}
 
@@ -190,6 +197,7 @@ abstract Object (Dynamic) from Dynamic to Dynamic {
 	}
 
 	/* To Dict<String, Dynamic> */
+	/*
 	@:to
 	public function toTannusDict():Dict<String, Dynamic> {
 		var d:Dict<String, Dynamic> = new Dict();
@@ -197,6 +205,7 @@ abstract Object (Dynamic) from Dynamic to Dynamic {
 			d.set(p.name, p.value);
 		return d;
 	}
+	*/
 
 	#if python
 		/* To Dict<String, Dynamic> */

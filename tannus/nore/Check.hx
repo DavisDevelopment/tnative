@@ -1,49 +1,21 @@
 package tannus.nore;
 
-import tannus.nore.Value;
-
 enum Check {
-	//- "Check" that will match anything
-	NoCheck;
+	TypeCheck(t : String);
+	LooseTypeCheck(t : String);
+	ShortTypeCheck(t : String);
+	NestedCheck(op:String, value:Value);
 
-	//- Check for verifying that an Entity has a particular ID
-	IDCheck(id : Value);
+	FieldExistsCheck(name : String);
+	FieldValueCheck(op:String, name:String, value:Value);
+	FieldValueBlockCheck(name:String, checks:Array<Check>);
+	FieldValueTypeCheck(name:String, type:String, loose:Bool);
 
-	//- Verify that an Entity is of a given type
-	TypeCheck(typename : String);
+	HelperCheck(name:String, args:Array<Value>);
 
-	//- Verify that an Entity is either of the given type, or is of a type that is descended from the given type
-	LooseTypeCheck(typename : String);
+	GroupCheck(checks : Array<Check>);
 
-	//- Check for the existence of [field]
-	FieldExistsCheck(field : String);
-
-	//- Check that the result of [op] applied to [field] and [value] is [true]
-	FieldValueCheck(field:String, op:String, value:Value);
-
-	//- Check that [field] validates with [sub]
-	FieldSubChecks(field:String, sub:Array<Check>);
-
-	//- Check a list of Checks
-	GroupCheck(subchecks : Array<Check>);
-
-	//- Check that the helper function [helper] validates
-	HelperCheck(helper:String, ?args:Array<Value>);
-
-	//- Check that represents a List of possible values
-	//- NOTE: This Check is one that will never reach compilation, as it is only used in conjunction with other Checks
-	TupleCheck(tup : Array<Value>);
-
-	//- Check that [check] fails
-	InverseCheck(check : Check);
-
-	//- Check ther EITHER [left] or [right] succeeds
 	EitherCheck(left:Check, right:Check);
-
-	/**
-	  * Ternary Check
-	  *---------------
-	  * If [condition] validates, attempt to validate [ifTrue], otherwise attempt to validate [ifFalse]
-	  */
-	TernaryCheck(condition:Check, ifTrue:Check, ifFalse:Check);
+	InvertedCheck(check : Check);
+	TernaryCheck(condition:Check, itrue:Check, ?ifalse:Check);
 }

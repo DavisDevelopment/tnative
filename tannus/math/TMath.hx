@@ -2,7 +2,17 @@ package tannus.math;
 
 import tannus.ds.Maybe;
 import tannus.ds.FloatRange;
+import haxe.Int64;
 
+import Math.*;
+
+import haxe.macro.Expr;
+import haxe.macro.Context;
+
+using haxe.macro.ExprTools;
+using tannus.macro.MacroTools;
+
+@:expose('TMath')
 class TMath {
 	public static inline var E = 2.718281828459045;
 	public static inline var LN2 = 0.6931471805599453;
@@ -42,9 +52,8 @@ class TMath {
 	}
 
 	/** Determines and Returns the angle between two points */
-	#if !js @:generic #end
-	inline public static function angleBetween<T : Float> (x1:T, y1:T, x2:T, y2:T):Float {
-		return (toDegrees(Math.atan2(y2 - y1, x2 - x1)));	
+	public static inline function angleBetween(x1:Float, y1:Float, x2:Float, y2:Float):Float {
+		return (toDegrees(Math.atan2(y2 - y1, x2 - x1)));
 	}
 
 	#if !js @:generic #end
@@ -113,6 +122,13 @@ class TMath {
 		return a + x * (b - a);
 	}
 
+	/**
+	  * Check whether [n] is "almost" equal to [v]
+	  */
+	public static inline function almostEquals<T:Float>(n:T, v:T, threshold:T):Bool {
+		return (abs(n - v) <= threshold);
+	}
+
 	/** Cast from Float to Int */
 	public static inline function i(f : Float):Int {
 		return (Std.int(f));
@@ -133,7 +149,7 @@ class TMath {
 	}
 
 	#if !js @:generic #end
-	public static inline function largest <T> (items:Iterable<T>, predicate:T -> Float):Float {
+	public static function largest<T>(items:Iterable<T>, predicate:T -> Float):Float {
 		var highest:Float = 0;
 		for (item in items) {
 			highest = max(highest, predicate(item));
@@ -142,12 +158,44 @@ class TMath {
 	}
 
 	#if !js @:generic #end
-	public static inline function smallest <T> (items:Iterable<T>, predicate:T -> Float):Float {
+	public static function smallest<T>(items:Iterable<T>, predicate:T -> Float):Float {
 		var lowest:Float = 0;
 		for (item in items) {
 			lowest = min(lowest, predicate(item));
 		}
 		return lowest;
+	}
+
+	/**
+	  * using [predicate] to 'score' each value in [items], return the value which scored the highest
+	  */
+	public static function largestItem<T>(items:Iterable<T>, predicate:T->Float):Null<T> {
+		var asarr = Lambda.array(items);
+		if (asarr.length == 0)
+			return null;
+		else if (asarr.length == 1)
+			return asarr[0];
+		else if (asarr.length == 2) {
+			var px = predicate(asarr[0]);
+			var py = predicate(asarr[1]);
+			if (px >= py)
+				return asarr[0];
+			else 
+				return asarr[1];
+		}
+		else {
+			var best:Null<{item:T, score:Float}> = null;
+			for (item in items) {
+				var score = predicate( item );
+				if (best == null || score > best.score) {
+					best = {
+						'item' : item,
+						'score': score
+					};
+				}
+			}
+			return best.item;
+		}
 	}
 
 	#if !js @:generic #end
@@ -171,11 +219,12 @@ class TMath {
 	}
 
 	@:generic
-	public static inline function clamp<T:Float> (value :T, min :T, max :T) :T
-	{
-		return if (value < min) min
+	public static inline function clamp<T:Float>(value:T, min:T, max:T):T {
+		return (
+			if (value < min) min
 			else if (value > max) max
-				else value;
+			else value
+		);
 	}
 
 	public static function sign (value : Float):Int {
@@ -201,6 +250,17 @@ class TMath {
 	}
 
 	/**
+	  * Obtain the sum of all items in [list]
+	  */
+	public static function sumf<T>(set:Iterable<T>, extractor:T->Float):Float {
+		var res:Null<Float> = null;
+		for (item in set) {
+			res = (res != null ? (res + extractor( item )) : extractor( item ));
+		}
+		return res;
+	}
+
+	/**
 	 * Obtain the unbiased sample variance in a dataset
 	 */
 	public static function sampleVariance(data : Array<Float>):Float {
@@ -218,5 +278,150 @@ class TMath {
 	  */
 	public static function standardDeviation(data : Array<Float>):Float {
 		return Math.sqrt(sampleVariance( data ));
+	}
+
+	/**
+	  * Convert 32bit integer to a floating-point value
+	  */
+	public static function i32ToFloat(i : Int):Float {
+		var sign = (1 - ((i >>> 31) << 1));
+		var exp = ((i >>> 23) & 0xFF);
+		var sig = (i & 0x7FFFFF);
+		if( sig == 0 && exp == 0 )
+			return 0.0;
+		return (sign * (1 + Math.pow(2, -23)*sig) * Math.pow(2, (exp - 127)));
+	}
+
+	/**
+	  * Convert a floating-point value to a 32bit integer
+	  */
+	public static function floatToI32(f : Float):Int {
+		if(f == 0)
+			return 0;
+		var af = (f < 0 ? -f : f);
+		var exp = floor(log( af ) / LN2);
+		if (exp < -127)
+			exp = -127 
+		else if( exp > 128 ) 
+			exp = 128;
+		var sig = (round((af / pow(2, exp) - 1) * 0x800000) & 0x7FFFFF);
+		return ((f < 0 ? 0x80000000 : 0) | ((exp + 127) << 23) | sig);
+	}
+
+	/**
+	  * Convert a 64bit integer to a Double
+	  */
+	public static function i64ToDouble(low:Int, high:Int):Float {
+		var sign = 1 - ((high >>> 31) << 1);
+		var exp = ((high >> 20) & 0x7FF) - 1023;
+		var sig = (high&0xFFFFF) * 4294967296. + (low>>>31) * 2147483648. + (low&0x7FFFFFFF);
+		if( sig == 0 && exp == -1023 )
+			return 0.0;
+		return sign*(1.0 + pow(2, -52)*sig) * pow(2, exp);
+	}
+
+	/**
+	  * Convert a Double to a 64bit integer
+	  */
+	@:access( haxe.Int64 )
+	/*
+	public static function doubleToI64(v : Float):Int64 {
+		var i64:Int64 = Int64.ofInt( 0 );
+		if( v == 0 ) {
+			i64.set_low(0);
+			i64.set_high(0);
+		}
+		else {
+			var av = (v < 0 ? -v : v);
+			var exp = floor(log( av ) / LN2);
+			var sig = fround(((av / pow(2, exp)) - 1) * 4503599627370496.);
+			var sig_l = Std.int( sig );
+			var sig_h = Std.int(sig / 4294967296.0);
+			i64.set_low( sig_l );
+			i64.set_high((v < 0 ? 0x80000000 : 0) | ((exp + 1023) << 20) | sig_h);
+		}
+		return i64;
+	}
+	*/
+
+	/**
+	  * Get the largest element in the given Array
+	  */
+	public static macro function macmax<T>(list:ExprOf<Array<T>>, test:Expr):ExprOf<T> {
+		var testf = test.mapUnderscoreTo( 'val' );
+		testf = (macro function(val) return $testf);
+		return macro tannus.ds.ArrayTools.max($list, $testf);
+	}
+
+	/**
+	  * Get the largest element in the given Array
+	  */
+	public static macro function macmaxe<T>(list:ExprOf<Array<T>>, test:Expr):ExprOf<Float> {
+		var testf = test.mapUnderscoreToExpr(macro val);
+		testf = (macro function(val) return $testf);
+		var res = macro tannus.ds.ArrayTools.max($list, $testf);
+		var eres = test.mapUnderscoreToExpr( res );
+		return macro $eres;
+	}
+
+	/**
+	  * get the smallest element in the given Array
+	  */
+	public static macro function macmin<T>(list:ExprOf<Array<T>>, test:Expr):ExprOf<T> {
+		test = test.mapUnderscoreTo( 'v' );
+		test = (macro function(v) return $test);
+		return macro tannus.ds.ArrayTools.min($list, $test);
+	}
+	
+	/**
+	  * get the smallest element in the given Array
+	  */
+	public static macro function macmine<T>(list:ExprOf<Array<T>>, test:Expr):ExprOf<Float> {
+		var testf = test.mapUnderscoreTo( 'v' );
+		testf = (macro function(v) return $test);
+		return test.mapUnderscoreToExpr(macro tannus.ds.ArrayTools.min($list, $testf));
+	}
+
+	/**
+	 * macro-licious 'sum'
+	 */
+	public static macro function macsum<T>(list:ExprOf<Iterable<T>>, ext:Expr):ExprOf<Float> {
+		ext = ext.mapUnderscoreToExpr(macro item);
+		if (!ext.hasReturn()) {
+			ext = macro return $ext;
+		}
+		var f:ExprOf<T -> Float> = (macro function(item) $ext);
+		return macro tannus.math.TMath.sumf($list, $f);
+	}
+
+	/**
+	  * get the item in [list] that is most similar to [value] when measured by [f]
+	  */
+	public static function snap<T:Float>(value:T, min:T, step:T, ?max:T):T {
+		if (value < min) {
+			return min;
+		}
+		else if (max != null && value > max) {
+			return max;
+		}
+		else {
+			var v:T = min;
+			while ( true ) {
+				if (value <= v) {
+					var prev = (v - step);
+					if (value >= prev) {
+						/* if [value] is closer to the current value than the next one */
+						if ((v - value) < (value - prev)) {
+							return v;
+						}
+						else {
+							return prev;
+						}
+					}
+				}
+
+				v += step;
+			}
+		}
 	}
 }

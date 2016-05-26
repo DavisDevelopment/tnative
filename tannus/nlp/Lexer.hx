@@ -2,6 +2,7 @@ package tannus.nlp;
 
 import tannus.io.Byte;
 import tannus.io.ByteArray;
+import tannus.io.ByteStack;
 
 import tannus.ds.Stack;
 
@@ -19,7 +20,7 @@ class Lexer {
 	  * Tokenize the given String
 	  */
 	public function tokenize(s : String):Array<Word> {
-		buffer = new Stack(ByteArray.fromString(s).toArray());
+		buffer = new ByteStack(ByteArray.ofString( s ));
 		words = new Array();
 
 		while (!buffer.empty) {
@@ -44,6 +45,18 @@ class Lexer {
 			advance();
 			return nextWord();
 		}
+
+		/*
+		else if (c == '('.code) {
+			advance();
+			var lvl = 1;
+			while (!buffer.empty && lvl > 0) {
+				c = next();
+				if (c == '('.code)
+					lvl++
+			}
+		}
+		*/
 
 		else if (buffer.empty) {
 			return null;
@@ -87,7 +100,7 @@ class Lexer {
 
 /* === Instance Fields === */
 
-	private var buffer : Stack<Byte>;
+	private var buffer : ByteStack;
 	private var words : Array<Word>;
 
 /* ==== Static Fields === */

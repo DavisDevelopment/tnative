@@ -1,13 +1,14 @@
 package tannus.xml;
 
 import tannus.ds.Object;
+import tannus.ds.Obj;
 
 class Elem {
 	/* Constructor Function */
 	public function new(type:String, ?parent:Elem):Void {
 		tag = type;
 		text = '';
-		attr = {};
+		attributes = {};
 		children = new Array();
 
 		if (parent != null) {
@@ -20,7 +21,7 @@ class Elem {
 	/* Append an Elem to [this] */
 	public function addChild(child : Elem):Void {
 		children.push( child );
-		child.parent = child;
+		child.parent = this;
 	}
 
 	/* Remove an Elem from [this] */
@@ -40,30 +41,170 @@ class Elem {
 
 	/* Obtain the index of [child] in [this] */
 	public function indexOfChild(child : Elem):Int {
-		return children.indexOf(child);
+		for (i in 0...children.length)
+			if (children[i] == child)
+				return i;
+		return -1;
+
 	}
 
-	/* Get the value of an attribute of [this] Elem */
+	/**
+	  * get the index of [this] element
+	  */
+	public function index():Int {
+		if (parent != null)
+			return parent.indexOfChild( this );
+		else
+			return -1;
+	}
+
+	/**
+	  * replace [this] Element with the given one
+	  */
+	public function replaceWith(other : Elem):Void {
+		if (parent != null) {
+			parent.replaceChild(this, other);
+		}
+	}
+
+	/**
+	  * add the given element as a child of [this] one
+	  */
+	public function append(child : Elem):Void {
+		addChild( child );
+	}
+
+	/**
+	  * add the given element as a child of [this] one, before all the other children
+	  */
+	public function prepend(child : Elem):Void {
+		addChild( child );
+		children.remove( child );
+		children.insert(0, child);
+	}
+
+	/**
+	  * insert the [what] before [before]
+	  */
+	public function insertBefore(what:Elem, before:Elem):Void {
+		addChild( what );
+		children.remove( what );
+		children.insert(indexOfChild(before), what);
+	}
+
+	/**
+	  * insert [what] after [after]
+	  */
+	public function insertAfter(what:Elem, after:Elem):Void {
+		addChild( what );
+		children.remove( what );
+		children.insert(indexOfChild(after) + 1, what);
+	}
+
+	/**
+	  * insert what after [this]
+	  */
+	public function after(what : Elem):Void {
+		if (parent != null) {
+			parent.insertAfter(what, this);
+		}
+	}
+
+	/**
+	  * insert what before [this]
+	  */
+	public function before(what : Elem):Void {
+		if (parent != null) {
+			parent.insertBefore(what, this);
+		}
+	}
+
+	/**
+	  * Check whether [child] is a child of [this]
+	  */
+	public function hasChild(child : Elem):Bool {
+		for (e in children) {
+			if (e == child) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	  * Check whether [child] is a descendent of [this]
+	  */
+	public function hasDescendendant(child : Elem):Bool {
+		for (e in descend()) {
+			if (e == child) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	  * check whether [this] is a child of [par]
+	  */
+	public function childOf(par : Elem):Bool {
+		return par.hasChild( this );
+	}
+
+	/**
+	  * check whether [this] is a descendant of [par]
+	  */
+	public function descendantOf(par : Elem):Bool {
+		return return par.hasDescendendant( this );
+	}
+
+	/* Get the value of an attributesibute of [this] Elem */
 	public function get(key : String):Null<String> {
-		return attr[key];
+		return attributes[key];
 	}
 
-	/* Set the value of an attribute */
-	public function set(key:String, val:String):Void {
-		attr.set(key, val);
+	/* Set the value of an attributesibute */
+	public function set(key:String, val:String):String {
+		attributes.set(key, val);
+		return get( key );
 	}
 
-	/* Check whether [this] has an attribute */
+	/* Check whether [this] has an attributesibute */
 	public function exists(key : String):Bool {
-		return attr.exists(key);
+		return attributes.exists(key);
+	}
+
+	/**
+	  * batch-set attributes on [this] Elem
+	  */
+	public function attr(_batch : Dynamic):Elem {
+		var batch:Obj = Obj.fromDynamic( _batch );
+		for (key in batch.keys()) {
+			set(key, Std.string(batch[key]));
+		}
+		return this;
 	}
 
 	/* Apply [f] recursively to all children of [this] */
 	public function walk(f : Elem->Void):Void {
-		if (parent != null)
-			f(this);
-		for (kid in children)
-			f(kid);
+		if (parent != null) {
+			f( this );
+		}
+
+		for (kid in children) {
+			f( kid );
+		}
+	}
+
+	/**
+	  * Get all descendants of [this] Elem
+	  */
+	public function descend():Array<Elem> {
+		var all:Array<Elem> = new Array();
+		for (c in children) {
+			all.push( c );
+			all = all.concat(c.descend());
+		}
+		return all;
 	}
 
 	/* Find all Elems for whom [test] returns true */
@@ -91,10 +232,10 @@ class Elem {
 		return query(function(e) return (e.tag.toLowerCase() == name.toLowerCase()));
 	}
 
-	/* Find all Elems whose [key] attribute equals [val] */
+	/* Find all Elems whose [key] attributesibute equals [val] */
 	public function findByAttribute(key:String, val:String):Array<Elem> {
 		return query(function(e) {
-			return (e.attr[key] == val);
+			return (e.attributes[key] == val);
 		});
 	}
 
@@ -105,7 +246,7 @@ class Elem {
 			xm.addChild(Xml.createPCData(text));
 		}
 
-		for (k in attr.keys) {
+		for (k in attributes.keys) {
 			xm.set(k, get(k));
 		}
 
@@ -119,8 +260,15 @@ class Elem {
 	/**
 	  * Output [this] DOM as an XML String
 	  */
-	public function print(?pretty:Bool=false):String {
-		return haxe.xml.Printer.print(toXml(), pretty);
+	public function print(pretty:Bool = false):String {
+		return tannus.xml.Printer.print(this, pretty);
+	}
+
+	/**
+	  * method called just before [this] Node is stringified
+	  */
+	private function _pre_print():Void {
+		null;
 	}
 
 /* === Static Fields === */
@@ -159,7 +307,7 @@ class Elem {
 	public var text:String;
 
 	//- Attributes associated with [this] Elem
-	public var attr:Object;
+	public var attributes:Object;
 
 	//- Array of Elems which are children to [this]
 	public var children:Array<Elem>;

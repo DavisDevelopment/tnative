@@ -9,7 +9,7 @@ using Lambda;
 class Polygon implements Shape {
 	/* Constructor Function */
 	public function new():Void {
-		vertices = new Vertices();
+		points = new Array();
 	}
 
 /* === Instance Methods === */
@@ -17,8 +17,9 @@ class Polygon implements Shape {
 	/**
 	  * Add a Point to [this] Polygon
 	  */
-	public function addPoint(pt : Point):Void {
-		vertices.add( pt );
+	public function addPoint(pt : Point):Point {
+		points.push( pt );
+		return pt;
 	}
 
 	/**
@@ -33,7 +34,7 @@ class Polygon implements Shape {
 	  */
 	public function clone():Polygon {
 		var c = new Polygon();
-		c.vertices = vertices.clone();
+		c.points = [for (p in points) p.clone()];
 		return c;
 	}
 
@@ -41,18 +42,23 @@ class Polygon implements Shape {
 	  * Get the lines which make up [this] Polygon
 	  */
 	public function getLines(?close:Bool = false):Array<Line> {
-		return vertices.calculateLines(close);
+		return vertices.calculateLines( close );
 	}
 
 	/**
 	  * Obtain [this] Shape's vertices
 	  */
-	public function getVertices():Vertices {
+	public function getVertices(?precision:Int):Vertices {
 		return vertices;
 	}
+
+/* === Computed Instance Fields === */
+
+	public var vertices(get, never):Vertices;
+	private inline function get_vertices():Vertices return new Vertices( points );
 
 /* === Instance Fields === */
 
 	/* The Points associated with [this] Polygon */
-	public var vertices:Vertices;
+	public var points : Array<Point>;
 }

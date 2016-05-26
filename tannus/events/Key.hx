@@ -70,25 +70,31 @@ abstract Key (Int) from Int to Int {
     var LetterX = 88;
     var LetterY = 89;
     var LetterZ = 90;
+    var F1 = 112;
+    var F2 = 113;
+    var F3 = 114;
+    var F4 = 115;
+    var F5 = 116;
+    var F6 = 117;
+    var F7 = 118;
+    var F8 = 119;
+    var F9 = 120;
+    var F10 = 121;
+    var F11 = 122;
+    var F12 = 123;
+    var Number0 = 48;
+    var Number1 = 49;
+    var Number2 = 50;
+    var Number3 = 51;
+    var Number4 = 52;
+    var Number5 = 53;
+    var Number6 = 54;
+    var Number7 = 55;
+    var Number8 = 56;
+    var Number9 = 57;
 
 /* === Fields === */
 
     public var name(get, never):String;
-    private inline function get_name() return nameof(this);
-
-/* === Methods === */
-
-    //- Data from which key-names are pulled
-    private static var raw:Object = {{};/*haxe.Json.parse(Ct.readFile('assets/keycodes.json'));*/};
-    
-    /**
-      * Obtain the 'name' of a Key as a String
-      */
-    public static function nameof(key : Key):Null<String> {
-	for (pair in raw.pairs()) {
-		if (pair.value == key)
-			return pair.name;
-	}
-	return null;
-    }
+    private inline function get_name() return KeyTools.getName( this );
 }

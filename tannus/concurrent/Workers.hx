@@ -8,8 +8,11 @@ import tannus.sys.File;
 import tannus.sys.Directory;
 import tannus.sys.FileSystem in Fs;
 import tannus.sys.Path;
+import tannus.sys.Mimes;
 import tannus.io.Blob;
 import tannus.internal.BuildFile;
+import tannus.internal.BuildData;
+import tannus.format.hxml.*;
 
 import haxe.macro.Context;
 import haxe.macro.Compiler;
@@ -27,29 +30,33 @@ class Workers {
 	  * 'Hire' a Worker
 	  */
 	public static macro function hire(bf : String):ExprOf<tannus.concurrent.js.Boss> {
-		var ebf = toExpr( bf );
+		var ebf = buildWorker( bf );
 
-		return macro (tannus.concurrent.js.Boss.create($ebf));
+		return macro (new tannus.concurrent.js.Boss( $ebf ));
 	}
 
 	/**
 	  * Build a Worker
 	  */
-	public static macro function buildBlob(buildFile:String):ExprOf<tannus.io.Blob> {
-		var f:File = new File(buildFile);
-		var bytes = f.read();
-		var reader = new tannus.format.hxml.Reader();
-		var buildf = reader.read( bytes );
-		var bd = buildf.getData()[0];
+	public static #if !macro macro #end function buildWorker(buildFile : String):ExprOf<Blob> {
+		var buildf:BuildFile = loadBuildFile( buildFile );
+		buildf.def( 'worker' );
+		var bd:BuildData = buildf.getData()[0];
+		
+		var mainBuildPath:Path = getMainBuildPath();
+		
 		var mainClass:String = '';
 
 		var _cwd:Path = Sys.getCwd();
-		_cwd = _cwd.normalize();
-		var _tdir:Path = tannus.TSys.tempDir();
-		_tdir = _tdir.normalize();
+		var _tdir:Path = mainBuildPath.directory;
+
+		/* resolve the target-path for this build */
+		bd.buildPath = (mainBuildPath.directory + bd.buildPath.name);
+		if ( !bd.buildPath.absolute ) {
+			bd.buildPath = _cwd.resolve( bd.buildPath ).absolutize();
+		}
 		
 		//- alter the paths in the build-file to continue pointing to their intended location
-		bd.buildPath = (_tdir + bd.buildPath.name).normalize();
 		bd.classPaths = bd.classPaths.map(function(cp) {
 			return (cp.absolute ? cp : (_cwd + cp)).normalize();
 		});
@@ -64,40 +71,51 @@ class Workers {
 
 		//- create a Path for the HXML File
 		var bfp:Path = (_tdir + 'build.hxml');
+		// create the build-file object
+		var rbf:BuildFile = BuildFile.fromData( bd );
+
 		//- Write the HXML Code into the HXML File
-		var hxf:File = new File(bfp);
-		hxf.write(BuildFile.fromData( bd ).toHxml());
+		Fs.write(bfp, rbf.toHxml());
 
 		//- Move to the temp-dir
 		Sys.setCwd( bfp.directory );
 
 		//- Tell Haxe to compile that HXML File
-		Sys.command('haxe', [bfp]);
+		Sys.command('haxe', [bfp.name]);
 
-		//- Find the built File
-		var rfile:File = new File(bd.buildPath.normalize());
-		var ebytes:ExprOf<ByteArray>;
-		
-		if (rfile.exists) {
-			var content = rfile.read();
-			rfile.delete();
-			hxf.delete();
-			mcFile.delete();
-			var encoded:String = content.toBase64();
-			var exprEncoded = Context.makeExpr(encoded, Context.currentPos());
-			Sys.setCwd(_cwd);
-			ebytes = (macro tannus.io.ByteArray.fromBase64($exprEncoded));
+		var cfile:File = new File(bd.buildPath);
+
+		/* if we've built our file successfully */
+		if (Fs.exists( bd.buildPath )) {
+			var data:String = sys.io.File.getContent( bd.buildPath );
+			//sys.io.File.saveContent(bd.buildPath, preamble(data));
+			var blob = blobExpr(bd.buildPath.name, preamble(data));
+
+			// delete the hxml file
+			Fs.deleteFile( bfp.name );
+			// delete the main class file
+			Fs.deleteFile( mcFile.path.name );
+
+			// return to our original working directory
+			Sys.setCwd( _cwd );
+
+			return blob;
 		} 
-		else {
-			Sys.setCwd(_cwd);
-			Context.error('Compilation of $bfp failed!', Context.currentPos());
-			ebytes = (macro tannus.io.ByteArray.fromString(''));
-		}
-
-		var ename = Context.makeExpr(bd.buildPath.name, Context.currentPos());
-		var etype = Context.makeExpr(tannus.sys.Mimes.getMimeType(bd.buildPath.extension), Context.currentPos());
 		
-		return macro new tannus.io.Blob($ename, $etype, $ebytes);
+		/* if the file was not created, for some reason */
+		else {
+			// delete the hxml file
+			Fs.deleteFile( bfp.name );
+			// delete the main class file
+			Fs.deleteFile( mcFile.path.name );
+
+			// return to our original working directory
+			Sys.setCwd( _cwd );
+
+			// alert the user that the build failed
+			Context.error('Compilation of $bfp failed!', Context.currentPos());
+			return macro throw 'WorkerError: Worker compilation failed and shit';
+		}
 	}
 
 #if macro
@@ -119,6 +137,50 @@ class Workers {
 		} catch (err : String) {
 			return haxe.macro.Context.error(err, Context.currentPos());
 		}
+	}
+
+	/**
+	  * Alter the script's contents to allow it to execute
+	  */
+	private static function preamble(code : String):String {
+		var result:String = '';
+		result += 'var exports = {};\n';
+		result += code;
+		return result;
+	}
+
+	/**
+	  * Get the target build-path
+	  */
+	public static function getMainBuildPath():Path {
+		var buildFilePath:Path = Path.sum(Sys.getCwd(), 'build.hxml');
+		var buildFile:BuildFile = loadBuildFile( buildFilePath );
+		var buildData:BuildData = buildFile.getData()[0];
+		var result = buildData.buildPath;
+		if (result == null)
+			throw 'WorkerError: Cannot infer current build-path!';
+		return result;
+	}
+
+	/**
+	  * Load a build-file
+	  */
+	public static function loadBuildFile(path : Path):BuildFile {
+		var reader = new Reader();
+		return reader.read(loadFile( path ));
+	}
+
+	/**
+	  * Build an ExprOf<Blob>
+	  */
+	public static function blobExpr(name:String, data:ByteArray, ?type:String):ExprOf<Blob> {
+		if (type == null) {
+			type = Mimes.getMimeType(new Path(name).extension);
+		}
+
+		var encoded:String = data.base64Encode();
+		var decoded:ExprOf<ByteArray> = macro tannus.io.ByteArray.fromBase64( $v{encoded} );
+		return macro new tannus.io.Blob($v{name}, $v{type}, $decoded);
 	}
 	
 	/**

@@ -11,7 +11,118 @@ using tannus.macro.MacroTools;
 
 using Lambda;
 
+@:expose( 'ArrayTools' )
 class ArrayTools {
+	/**
+	  * Determine whether all items in the given Array are equal
+	  */
+	public static function equal<T>(a : Array<T>):Bool {
+		for (i in 0...a.length) {
+			for (j in i...a.length) {
+				if (a[i] != a[j]) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	/**
+	  * macro-licious array equality
+	  */
+	public static macro function macequal<T>(a:ExprOf<Array<T>>, extractor:Expr):ExprOf<Bool> {
+		var f:Expr = extractor.mapUnderscoreTo( 'item' );
+		var rets = f.hasReturn();
+		if ( rets ) 
+			f = (macro function(item) $f);
+		else
+			f = (macro function(item) return $f);
+		return (macro (function(list) {
+			var f = $f;
+			for (i in 0...list.length) {
+				for (j in i...list.length) {
+					if (f(list[i]) != f(list[j])) {
+						return false;
+					}
+				}
+			}
+			return true;
+		})( $a ));
+	}
+
+	/**
+	  * compare two Arrays
+	  */
+	public static function compare<T>(left:Array<T>, right:Array<T>, ?predicate:T -> T -> Bool):Bool {
+		/* if the two arrays are not of the same size */
+		if (left.length != right.length) {
+			/* they cannot be equal */
+			return false;
+		}
+		/* if the two arrays are the same size */
+		else {
+			/* if [predicate] was not provided */
+			if (predicate == null) {
+				/* use the default */
+				predicate = (function(x, y) return (x == y));
+			}
+
+			/* for every index in the two arrays */
+			for (i in 0...left.length) {
+				/* get item in [left] at the current index */
+				var l = left[ i ];
+				/* get the item in [right] at the current index */
+				var r = right[ i ];
+				/* if [predicate] returns false */
+				if (!predicate(l, r)) {
+					/* then the two arrays are not equal */
+					return false;
+				}
+			}
+
+			/* 
+			   If the function makes it this far, then either the arrays were both empty, 
+			   or [predicate] returned 'true' for all values. In either case, the two arrays
+			   can be said to be equivalent
+			 */
+			return true;
+		}
+	}
+
+	/**
+	  * macro-licious 'compare'
+	  */
+	public static macro function maccompare<T>(left:ExprOf<Array<T>>, right:ExprOf<Array<T>>, args:Array<Expr>):ExprOf<Bool> {
+		var predicate:Null<Expr> = args[0];
+		if (predicate == null) {
+			predicate = (macro null);
+		}
+		else {
+			var le:Array<Expr> = [macro x];
+			var re:Array<Expr> = [macro y];
+			
+			/* if a fourth and fifth argument are provided, use them as the expressions for [x] and [y] */
+			if (args[1] != null && args[2] != null) {
+				le.push(args[1]);
+				re.push(args[2]);
+			}
+
+			/* map all instances of [le] and [re] to 'left' and 'right' respectively */
+			predicate = predicate.replaceMultiple(le, macro left);
+			predicate = predicate.replaceMultiple(re, macro right);
+
+			/* add a 'return' expression to [predicate], if one is not already present */
+			if (!predicate.hasReturn()) {
+				predicate = (macro return $predicate);
+			}
+
+			/* wrap [predicate] in a function definition */
+			predicate = (macro function(left, right) $predicate);
+		}
+
+		return macro tannus.ds.ArrayTools.compare($left, $right, $predicate);
+	}
+
 	/**
 	  * Obtain an Array of Pointers from an Array of values
 	  */
@@ -28,9 +139,11 @@ class ArrayTools {
 	public static function without<T>(list:Array<T>, blacklist:Array<T>):Array<T> {
 		var c = list.copy();
 		for (v in blacklist) {
-			while (true)
-				if (!c.remove(v))
+			while ( true ) {
+				if (!c.remove( v )) {
 					break;
+				}
+			}
 		}
 		return c;
 	}
@@ -38,26 +151,58 @@ class ArrayTools {
 	/**
 	  * Obtain the first item in [list] Array which matches the given pattern
 	  */
-	public static macro function firstMatch<T>(list:ExprOf<Array<T>>, itemName, itemTest) {
-		return macro (function() {
-			var result:Dynamic = null;
-			for ($itemName in $list) {
-				var passed:Bool = ($itemTest);
-				if (passed) {
-					result = $itemName;
-					break;
-				}
+	public static function firstMatch<T>(list:Array<T>, test:T->Bool):Null<T> {
+		for (item in list) {
+			if (test( item )) {
+				return item;
 			}
-			return (cast result);
-		}());
+		}
+		return null;
+	}
+
+	/**
+	  * Obtain the index of the first item in [list] Array which matches the given pattern
+	  */
+	public static function firstMatchIndex<T>(list:Array<T>, test:T->Bool):Int {
+		for (index in 0...list.length) {
+			if (test(list[index])) {
+				return index;
+			}
+		}
+		return -1;
+	}
+
+	/**
+	  * macro-licious firstMatch
+	  */
+	public static macro function macfirstMatch<T>(list:ExprOf<Array<T>>, test:Expr):ExprOf<Null<T>> {
+		test = test.mapUnderscoreTo( 'item' );
+		if (!test.hasReturn()) {
+			test = macro return $test;
+		}
+		test = macro (function(item) $test);
+		return macro tannus.ds.ArrayTools.firstMatch($list, $test);
+	}
+
+	/**
+	  * macro-licious firstMatchIndex
+	  */
+	public static macro function macfirstMatchIndex<T>(list:ExprOf<Array<T>>, test:Expr):ExprOf<Int> {
+		test = test.mapUnderscoreTo( 'item' );
+		if (!test.hasReturn()) {
+			test = macro return $test;
+		}
+		test = macro (function(item) $test);
+		return macro tannus.ds.ArrayTools.firstMatchIndex($list, $test);
 	}
 
 	/**
 	  * Perform [action] on every item in the list
 	  */
-	public static macro function each<T>(list:ExprOf<Iterable<T>>, name, action) {
+	public static macro function each<T>(list:ExprOf<Iterable<T>>, action:Expr):Expr {
+		action = action.mapUnderscoreTo( 'item' );
 		return macro {
-			for ($name in $list) {
+			for (item in $list) {
 				$action;
 			}
 		};
@@ -100,6 +245,13 @@ class ArrayTools {
 	}
 
 	/**
+	  * obtain the intersection of two Arrays
+	  */
+	public static inline function intersection<T>(one:Array<T>, two:Array<T>):Array<T> {
+		return ((one.length < two.length) ? macfilter(one, !two.has( _ )) : macfilter(two, !one.has( _ )));
+	}
+
+	/**
 	  * Flatten [set]
 	  */
 	public static function flatten<T>(set : Array<Array<T>>):Array<T> {
@@ -113,10 +265,11 @@ class ArrayTools {
 	  * Macro-Licious Array.map
 	  */
 	public static macro function macmap<T, O>(set:ExprOf<Array<T>>, extractor:ExprOf<O>):ExprOf<Array<O>> {
-		extractor = extractor.map(mapper.bind('item', _));
-
+		extractor = extractor.mapUnderscoreTo( 'item' );
+		var hasret:Bool = extractor.hasReturn();
+		var body:Expr = (hasret ? extractor : (macro return $extractor));
 		return macro $set.map(function( item ) {
-			return $extractor;
+			$body;
 		});
 	}
 
@@ -170,7 +323,7 @@ class ArrayTools {
 	/**
 	  * Get the item in the given list which scored the lowest, based on the given predicate
 	  */
-	public static function min<T>(list:Iterable<T>, predicate:T -> Float):T {
+	public static function min<T>(list:Iterable<T>, predicate:T -> Float):Null<T> {
 		var m:Null<Tup2<T, Float>> = null;
 		for (x in list) {
 			var score:Float = predicate( x );
@@ -179,7 +332,8 @@ class ArrayTools {
 			}
 		}
 		if (m == null) {
-			throw 'Error: Iterable must not be empty!';
+			//throw 'Error: Iterable must not be empty!';
+			return null;
 		}
 		return m._0;
 	}
@@ -187,7 +341,7 @@ class ArrayTools {
 	/**
 	  * Get the item in the given list which scored the highest, based on the given predicate
 	  */
-	public static function max<T>(list:Iterable<T>, predicate:T -> Float):T {
+	public static function max<T>(list:Iterable<T>, predicate:T -> Float):Null<T> {
 		var m:Null<Tup2<T, Float>> = null;
 		for (x in list) {
 			var score:Float = predicate( x );
@@ -196,7 +350,8 @@ class ArrayTools {
 			}
 		}
 		if (m == null) {
-			throw 'Error: Iterable must not be empty!';
+			//throw 'Error: Iterable must not be empty!';
+			return null;
 		}
 		return m._0;
 	}
@@ -229,6 +384,157 @@ class ArrayTools {
 		};
 	}
 
+	/**
+	  * Perform a split-filter operation on the given Array, which splits an Array in to Arrays,
+	  * one filled with those items that 'passed' the test, and the other
+	  * filled with those who 'failed'
+	  */
+	public static function splitfilter<T>(list:Array<T>, pred:T->Bool):SplitFilterResult<T> {
+		var res = {
+			'pass': new Array(),
+			'fail': new Array()
+		};
+		for (item in list) {
+			(pred(item) ? res.pass : res.fail).push( item );
+		}
+		return res;
+	}
+
+	/**
+	  * macro-licious split-filter
+	  */
+	public static macro function macsplitfilter<T>(list:ExprOf<Array<T>>, test:Expr):ExprOf<SplitFilterResult<T>> {
+		test = test.mapUnderscoreTo( 'item' );
+		if (!test.hasReturn()) {
+			test = macro return $test;
+		}
+		test = macro (function(item) $test);
+		return macro tannus.ds.ArrayTools.splitfilter($list, $test);
+	}
+
+	/**
+	  * filter and map simultaneously
+	  */
+	public static function mapfilter<A, B>(list:Array<A>, test:A->Bool, map:A->B):Array<B> {
+		var results:Array<B> = new Array();
+		for (x in list) {
+			if (test( x )) {
+				results.push(map( x ));
+			}
+		}
+		return results;
+	}
+
+	/**
+	  * macro-licious mapfilter
+	  */
+	public static macro function macmapfilter<A, B>(list:ExprOf<Array<A>>, test:Expr, map:Expr):ExprOf<Array<B>> {
+		test = test.replace(macro _, macro item);
+		map = map.replace(macro _, macro item);
+		if (!test.hasReturn()) test = macro return $test;
+		if (!map.hasReturn()) map = macro return $map;
+		test = macro (function(item) $test);
+		map = macro (function(item) $map);
+
+		return macro tannus.ds.ArrayTools.mapfilter($list, $test, $map);
+	}
+
+	/**
+	  * convert a pair of Arrays into an Array of pairs
+	  */
+	public static function zip<A, B>(left:Array<A>, right:Array<B>):Array<Pair<A, B>> {
+		var pairs:Array<Pair<A, B>> = new Array();
+		for (i in 0...left.length) {
+			pairs.push(new Pair(left[i], right[i]));
+		}
+		return pairs;
+	}
+
+	/**
+	  * macro-based zip-map
+	  */
+	public static function zipmap<A, B, C>(left:Array<A>, right:Array<B>, predicate:A->B->C):Array<C> {
+		var pairs = zip(left, right);
+		return [for (p in pairs) predicate(p.left, p.right)];
+	}
+
+	/**
+	  * macro-based zip-map
+	  */
+	public static macro function maczipmap<A, B, C>(left:ExprOf<Array<A>>, right:ExprOf<Array<B>>, args:Array<Expr>):ExprOf<Array<C>> {
+		var lExpressions:Array<Expr> = [macro x];
+		var rExpressions:Array<Expr> = [macro y];
+		var f:Expr = args[0];
+
+		switch ( args ) {
+			case [leftExpr, rightExpr, action]:
+				lExpressions.push( leftExpr );
+				rExpressions.push( rightExpr );
+				f = action;
+
+			case [action]:
+				f = action;
+
+			default:
+				null;
+		}
+
+		// map all given [left] and [right] aliases to just 'left' and 'right' respectively
+		f = f.replaceMultiple(lExpressions, macro left).replaceMultiple(rExpressions, macro right);
+		
+		/* if [f] does not contain a 'return' statement */
+		if (!f.hasReturn()) {
+			/* automagically return the last expression (usually the only one) */
+			var body:Array<Expr> = f.toArray();
+			var rve:Expr = body.pop();
+			body.push(macro return $rve);
+			f = body.fromArray();
+		}
+
+		/* wrap [f] in a function definition, making [f] now the body of said function */
+		f = (macro function(left, right) $f);
+		//trace(f.toString());
+
+		return macro tannus.ds.ArrayTools.zipmap($left, $right, $f);
+	}
+
+	/**
+	  * build a Grid<T> from an Array<Array<T>>
+	  */
+	public static inline function gridify<T>(arr : Array<Array<T>>):Grid<T> {
+		return tannus.ds.Grid.fromArray2( arr );
+	}
+
+	/**
+	  * (if necessary) enlarge [list] to [len] by prepending [value]
+	  * to [list] until it's of the desired length
+	  */
+	public static function lpad<T>(list:Array<T>, len:Int, value:T):Array<T> {
+		if (list.length >= len) {
+			return list;
+		}
+		else {
+			var res = list.copy();
+			while (res.length < len) res.unshift( value );
+			return res;
+		}
+	}
+
+	/**
+	  * (if necessary) enlarge [list] to [len] by appending [value]
+	  * to [list] until it's of the desired length
+	  */
+	public static function rpad<T>(list:Array<T>, len:Int, value:T):Array<T> {
+		if (list.length >= len) {
+			return list;
+		}
+		else {
+			var res = list.copy();
+			while (res.length < len) res.push( value );
+			return res;
+		}
+	}
+
 	#if macro
 
 	/**
@@ -255,3 +561,5 @@ class ArrayTools {
 
 	#end
 }
+
+typedef SplitFilterResult<T> = {pass:Array<T>, fail:Array<T>};

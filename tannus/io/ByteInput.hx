@@ -54,6 +54,6 @@ class ByteInput extends Input {
 	  * Creates a ByteInput instance from a String
 	  */
 	public static inline function fromString(s : String):ByteInput {
-		return new ByteInput(ByteArray.fromString(s));
+		return new ByteInput(ByteArray.ofString( s ));
 	}
 }

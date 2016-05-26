@@ -64,9 +64,39 @@ class MouseEvent extends Event {
 		var pos:Point = new Point(event.pageX, event.pageY);
 		var result = new MouseEvent(event.type, pos, event.which, mods);
 		
-		result.onDefaultPrevented.once(function(x) event.preventDefault());
-		result.onPropogationStopped.once(function(x) event.stopPropagation());
+		result.onDefaultPrevented.once( event.preventDefault );
+		result.onPropogationStopped.once( event.stopPropagation );
 
 		return result;
+	}
+
+	/**
+	  * Create a Tannus MouseEvent from a native JavaScript MouseEvent
+	  */
+	public static function fromJsEvent(event : js.html.MouseEvent):MouseEvent {
+		var mods:Array<EventMod> = new Array();
+		if (event.shiftKey)
+			mods.push( Shift );
+		if (event.altKey)
+			mods.push( Alt );
+		if (event.ctrlKey)
+			mods.push( Control );
+		if (event.metaKey)
+			mods.push( Meta );
+		var pos = new Point(event.pageX, event.pageY);
+		
+		var e = new MouseEvent(event.type, pos, event.which, mods);
+		e.onCancelled.once(event.preventDefault);
+		e.onDefaultPrevented.once(event.preventDefault);
+		e.onPropogationStopped.once(event.stopPropagation);
+		function copyEvent(copy : Event):Void {
+			copy.onCancelled.once(event.preventDefault);
+			copy.onDefaultPrevented.once(event.preventDefault);
+			copy.onPropogationStopped.once(event.stopPropagation);
+			copy._onCopy.on( copyEvent );
+		}
+		e._onCopy.on( copyEvent );
+
+		return e;
 	}
 }

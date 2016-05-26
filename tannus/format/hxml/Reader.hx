@@ -52,6 +52,9 @@ class Reader {
 				case '--next':
 					bf.next();
 
+				case '--each':
+					bf.each();
+
 				case (_.toLowerCase().substring(1) => target) if (target != '' && all_targets.has(target)):
 					bf.target(target, rest.trim());
 

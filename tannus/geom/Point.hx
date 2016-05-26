@@ -7,6 +7,7 @@ import tannus.geom.Angle;
 import tannus.ds.Maybe;
 import tannus.ds.EitherType;
 import tannus.io.Ptr;
+import tannus.io.Getter;
 
 import haxe.macro.Expr;
 
@@ -21,7 +22,7 @@ using tannus.math.TMath;
 using tannus.macro.MacroTools;
 
 @:forward
-abstract Point (TPoint) {
+abstract Point (TPoint) from TPoint to TPoint {
 	/* Constructor Function */
 	public inline function new(?x:Float=0, ?y:Float=0, ?z:Float=0):Void {
 		this = new TPoint(x, y, z);
@@ -184,7 +185,7 @@ abstract Point (TPoint) {
 	}
 
 	@:op(A == B)
-	public inline function equals(p : Point):Bool return this.equals(p);
+	public inline function equals(p : Point):Bool return this.equals( p );
 
 	@:op(A != B)
 	public inline function nequals(p : Point):Bool return this.nequals(p);
@@ -199,7 +200,7 @@ abstract Point (TPoint) {
 	/**
 	  * Devectorize [this] Point, based on a given Rectangle
 	  */
-	public inline function devectorize(r : Rectangle):Point {
+	public function devectorize(r : Rectangle):Point {
 		var px:Percent = new Percent(x), py:Percent = new Percent(y);
 		return new Point(px.of(r.w), py.of(r.h));
 	}
@@ -323,6 +324,16 @@ abstract Point (TPoint) {
 	}
 
 	/**
+	  * Create a linked Point, from a Ptr<Point>
+	  */
+	public static function createLinkedFromPointRef(p : Getter<Point>):Point {
+		var x:Ptr<Float> = Ptr.create( p.v.x );
+		var y:Ptr<Float> = Ptr.create( p.v.y );
+		var z:Ptr<Float> = Ptr.create( p.v.z );
+		return createLinked(x, y, z);
+	}
+
+	/**
 	  * Create a linked Point, implicitly
 	  */
 	public static macro function linked(x:ExprOf<Float>, others:Array<ExprOf<Float>>):ExprOf<Point> {
@@ -330,10 +341,18 @@ abstract Point (TPoint) {
 		var result:ExprOf<Point> = (macro tannus.geom.Point.createLinked( $a{args} ));
 		return result;
 	}
+
+	/**
+	  * Create a linked Point from a pointer
+	  */
+	public static macro function linkedFromPointer(point : ExprOf<Point>):ExprOf<Point> {
+		var ref:ExprOf<Ptr<Point>> = (macro tannus.io.Getter.create( $point ));
+		return macro tannus.geom.Point.createLinkedFromPointRef( $ref );
+	}
 }
 
 /* Base Point Class */
-class TPoint {
+class TPoint implements tannus.ds.Comparable<TPoint> {
 	/* Constructor Function */
 	public function new(x:Float, y:Float, z:Float):Void {
 		_x = x;
@@ -497,6 +516,23 @@ class TPoint {
 			TMath.lerp(y, other.y, weight),
 			TMath.lerp(z, other.z, weight)
 		);
+	}
+
+	/**
+	  * create and return a Point whose data is the result of mutating [this]'s data by [f]
+	  */
+	public function mutate(f : Float -> Float):Point {
+		return new Point(f(x), f(y), f(z));
+	}
+
+	/**
+	  * mutate [this] in-place
+	  */
+	public function imutate(f : Float->Float):Point {
+		x = f( x );
+		y = f( y );
+		z = f( z );
+		return cast this;
 	}
 
 	/**

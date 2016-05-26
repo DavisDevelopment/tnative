@@ -1,3 +1,3 @@
 package tannus.io;
 
-interface StreamAccessor {}
+interface IOAccessor {}

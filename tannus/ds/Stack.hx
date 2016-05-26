@@ -46,6 +46,13 @@ class Stack<T> {
 	public function bottom():T {
 		return data.pop();
 	}
+
+	/**
+	  * remove the given value from [this] Stack
+	  */
+	public function remove(v : T):Bool {
+		return data.remove( v );
+	}
 	
 	/**
 	  * get/set the 'next' item in [this] Stack

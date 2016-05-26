@@ -6,6 +6,7 @@ import tannus.html.fs.WebFileSystem;
 import tannus.html.fs.WebFileWriter;
 
 import tannus.ds.Promise;
+import tannus.ds.Object;
 import tannus.ds.promises.*;
 import tannus.io.ByteArray;
 
@@ -30,8 +31,24 @@ abstract WebFileEntry (FileEntry) from FileEntry {
 	/**
 	  * Do Stuff
 	  */
-	public function file():Promise<tannus.html.fs.WebFile> {
-		return cast new Promise(this.file.bind(_, _));
+	public inline function file():FilePromise {
+		return new FilePromise(function(give) give( this ));
+	}
+
+	/**
+	  * get the associated WebFile object
+	  */
+	public function getFile(cb : WebFile->Void):Void {
+		var self = o;
+		if (self.exists('_file')) {
+			cb(untyped self['_file']);
+		}
+		else {
+			this.file(function( f ) {
+				self['_file'] = f;
+				cb(cast f);
+			}, function(err) throw err);
+		}
 	}
 
 	/**
@@ -55,18 +72,16 @@ abstract WebFileEntry (FileEntry) from FileEntry {
 	  */
 	public function read():Promise<ByteArray> {
 		return Promise.create({
-			this.file(function(file) {
+			getFile(function( file ) {
 				var reader = new FileReader();
 				reader.onerror = function(error) {
 					throw error;
 				};
 				reader.onload = function(event) {
-					var data:ByteArray = ByteArray.fromArrayBuffer(cast event.target.result);
+					var data:ByteArray = ByteArray.ofData(cast event.target.result);
 					return data;
 				};
 				reader.readAsArrayBuffer(cast file);
-			}, function(error) {
-				throw error;
 			});
 		});
 	}
@@ -76,9 +91,68 @@ abstract WebFileEntry (FileEntry) from FileEntry {
 	  */
 	public function writer():Promise<WebFileWriter> {
 		return Promise.create({
-			this.createWriter((function(writer) return writer), (function(err) throw err));
+			createWriter((function(writer) return writer), (function(err) throw err));
 		});
 	}
+
+	/**
+	  * Obtain a writer
+	  */
+	public function createWriter(onsuccess:WebFileWriter->Void, ?onerror:Dynamic->Void):Void {
+		this.createWriter(function(fw : FileWriter) onsuccess( fw ), onerror);
+	}
+
+	/**
+	  * Move [this] Entry
+	  */
+	@:access( tannus.html.fs.WebDirectoryEntry )
+	public function moveTo(parent:WebDirectoryEntry, ?name:String):Promise<WebFileEntry> {
+		return Promise.create(@promise this.moveTo(parent, name));
+	}
+
+	/**
+	  * Copy [this] Entry
+	  */
+	public function copyTo(parent:WebDirectoryEntry, ?name:String):Promise<WebFileEntry> {
+		return Promise.create(@promise this.copyTo(parent, name));
+	}
+
+	/**
+	  * Rename [this] Entry
+	  */
+	public function rename(newname : String):Promise<WebFileEntry> {
+		return Promise.create({
+			var pp = getDirectory();
+			pp.then(function( parent ) {
+				@forward moveTo(this, parent, newname);
+			});
+			pp.unless(function( error ) {
+				throw error;
+			});
+		});
+	}
+
+	/**
+	  * delete [this] file
+	  */
+	public inline function remove(?cb : Void->Void):Void {
+		this.remove( cb );
+	}
+
+	/**
+	  * get the directory that [this] file is in
+	  */
+	public inline function getDirectory():Promise<WebDirectoryEntry> {
+		return Promise.create({
+			this.getParent(function(parent) {
+				if ( parent.isDirectory )
+					return cast parent;
+			}, (function(err) throw err));
+		});
+	}
+
+	private var o(get, never):Object;
+	private inline function get_o():Object return new Object(this);
 }
 
 typedef FileEntry = {
@@ -88,6 +162,6 @@ typedef FileEntry = {
 	function file(onSuccess:File->Void, ?onFailure:Dynamic->Void):Void;
 
 	/* Get a Writer for [this] File */
-	function createWriter(onSuccess:WebFileWriter->Void, ?onFailure:Dynamic->Void):Void;
+	function createWriter(onSuccess:FileWriter->Void, ?onFailure:Dynamic->Void):Void;
 }
 

@@ -26,24 +26,34 @@ class QueryString {
 			var t:String = tn( val );
 			switch ( t ) {
 				case 'Number', 'String', 'Boolean':
-					pairs.push(key+'='+string(val).urlEncode());
+					pairs.push(key + '=' + enc( val ));
 
 				case 'Array':
 					var arr:Array<Dynamic> = cast val;
-					arr.each(x, assert(['Number', 'String', 'Boolean'].has(tn(x)), 'TypeError: Cannot urlify non-primitive values!'));
+					arr.each(assert(['Number', 'String', 'Boolean'].has(tn(_)), 'TypeError: Cannot urlify non-primitive values!'));
 					for (x in arr) {
-						pairs.push('$key[]='+string(x).urlEncode());
+						pairs.push('$key[]=' + enc( x ));
 					}
 
 				default:
 					var o:Object = new Object(val);
 					for (ok in o.keys) {
-						pairs.push('$key[$ok]='+string(o[ok]).urlEncode());
+						pairs.push('$key[$ok]=' + enc(o[ok]));
 					}
 			}
 		}
 		var qs:String = pairs.join('&');
 		return qs;
+	}
+
+	/**
+	  * string-encode a value
+	  */
+	private static function enc(value : Dynamic):String {
+		var s = string( value ).urlEncode();
+		s = s.replace('%2B', '+');
+		s = s.replace('%0D', '');
+		return s;
 	}
 
 	/**

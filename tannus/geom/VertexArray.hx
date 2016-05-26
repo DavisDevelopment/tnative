@@ -6,6 +6,8 @@ import tannus.ds.Pair;
 
 import tannus.geom.*;
 import tannus.geom.Point;
+import Math.*;
+import tannus.math.TMath.*;
 
 using Lambda;
 using tannus.ds.ArrayTools;
@@ -14,7 +16,8 @@ using tannus.math.TMath;
 class VertexArray {
 	/* Constructor Function */
 	public function new(?v : Array<Point>):Void {
-		data = (v != null ? [for (p in v) toImmutable(p)] : new Array());
+		//data = (v != null ? [for (p in v) toImmutable(p)] : new Array());
+		data = (v != null ? v.copy() : new Array());
 		_lines = new Pair(null, null);
 		_rect = null;
 	}
@@ -40,7 +43,8 @@ class VertexArray {
 	  * Set the Point at index [i]
 	  */
 	public function set(i:Int, p:Point):Point {
-		data[i] = toImmutable( p );
+		//data[i] = toImmutable( p );
+		data[i] = p.clone();
 		resetCache();
 
 		return get( i );
@@ -81,7 +85,8 @@ class VertexArray {
 	  */
 	public function push(p : Point):Int {
 		resetCache();
-		return data.push(toImmutable( p ));
+		//return data.push(toImmutable( p ));
+		return data.push(p.clone());
 	}
 
 	/**
@@ -97,7 +102,8 @@ class VertexArray {
 	  */
 	public function unshift(p : Point):Int {
 		resetCache();
-		data.unshift(toImmutable( p ));
+		//data.unshift(toImmutable( p ));
+		data.unshift(p.clone());
 		return length;
 	}
 
@@ -107,6 +113,22 @@ class VertexArray {
 	public function shift():Null<Point> {
 		resetCache();
 		return data.shift();
+	}
+
+	/**
+	  * Create and return the concatenation of [other] and [this]
+	  */
+	public inline function concat(other : Vertices):Vertices {
+		return new Vertices(data.concat(other.data));
+	}
+
+	/**
+	  * Append [other] to [this]
+	  */
+	public function append(other : Vertices):Vertices {
+		resetCache();
+		data = data.concat( other.data );
+		return data;
 	}
 
 	/**
@@ -164,7 +186,7 @@ class VertexArray {
 	/**
 	  * Get a Stack of Points
 	  */
-	private function pointStack():Stack<Point> {
+	public function pointStack():Stack<Point> {
 		var rdat = data.copy();
 		rdat.reverse();
 		return new Stack<Point>( rdat );
@@ -174,26 +196,18 @@ class VertexArray {
 	  * Simplify [this] VertexArray
 	  */
 	public function simplify(threshold:Int = 2):Void {
-		var s = pointStack();
+		var lines = calculateLines();
 		var ndata:Array<Point> = new Array();
-		var pass = ndata.push.bind(_);
-
-		while (!s.empty) {
-			var x = s.pop();
-			var y = s.peek();
-
-			if (Math.round(x.distanceFrom(y)) < threshold) {
-				s.add( y );
+		for (line in lines) {
+			if (round(line.length) <= threshold) {
+				ndata.push(line.along( 0.5 ));
 			}
 			else {
-				pass( x );
+				ndata.push( line.start );
+				ndata.push( line.end );
 			}
 		}
-
-		if (data.length != ndata.length) {
-			data = ndata;
-			resetCache();
-		}
+		data = ndata;
 	}
 
 	/**
@@ -202,10 +216,10 @@ class VertexArray {
 	public function each(f:Point -> Void):Void {
 		var points = pointStack();
 		while (!points.empty) {
-			var ip = points.peek();
-			var p = toMutable(points.pop());
+			var p = points.pop();
+			//var p = toMutable(points.pop());
 			f( p );
-			cast(ip, ImmutablePoint).write( p );
+			//cast(ip, ImmutablePoint).write( p );
 		}
 		resetCache();
 	}
@@ -214,7 +228,9 @@ class VertexArray {
 	  * Apply the given Matrix to [this] VertexArray
 	  */
 	public function apply(m : Matrix):Void {
-		each( m.transformPoint );
+		data = data.map(function(p : Point) {
+			return m.transformPoint( p );
+		});
 	}
 
 	/**
@@ -261,7 +277,13 @@ class VertexArray {
 /* === Instance Fields === */
 
 	/* the list of Point objects */
-	private var data : Array<Point>;
+	private var data(default, set): Array<Point>;
+	private function set_data(plist : Array<Point>):Array<Point> {
+		if (plist != data) {
+			resetCache();
+		}
+		return (data = plist);
+	}
 
 	/* the cached list of Lines */
 	private var _lines : Pair<Null<Array<Line>>, Null<Array<Line>>>;

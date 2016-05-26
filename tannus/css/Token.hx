@@ -1,26 +1,12 @@
 package tannus.css;
 
+import tannus.css.Value;
+
 enum Token {
-/* === Tokens === */
-
-	/* Identifier */
-	TIdent(s : String);
-
-	/* Variable Reference */
-	TRef(s : String);
-
-	/* Block */
-	TBlock(tree : Array<Token>);
-
-	/* Group */
-	TParen(tree : Array<Token>);
-
-	/* Semicolon */
-	TSemi;
-
-	/* Colon */
-	TColon;
-
-	/* Comma */
-	TComma;
+	TRule(selector:String, props:Array<Token>);
+	TProp(name:String, value:Val);
+	TMixin(name : String);
+	TVar(name:String, value:Val);
 }
+
+typedef Val = Array<Value>;

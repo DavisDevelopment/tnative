@@ -15,22 +15,22 @@ using tannus.ds.StringUtils;
 
 @:forward
 abstract GlobStar (CGlobStar) from CGlobStar {
-	public inline function new(s : String):Void {
-		this = new CGlobStar(s);
+	public inline function new(s : String, flags:String=''):Void {
+		this = new CGlobStar(s, flags);
 	}
 
 	@:from
 	public static inline function fromString(s : String):GlobStar {
-		return new GlobStar(s);
+		return new GlobStar( s );
 	}
 }
 
 @:expose('globstar')
 class CGlobStar {
 	/* Constructor Function */
-	public function new(pat : String):Void {
+	public function new(pat:String, flags:String):Void {
 		spat = pat;
-		var data = Printer.compile(pat);
+		var data = Printer.compile(pat, flags);
 		pattern = data.regex;
 		pind = data.params;
 	}
@@ -41,6 +41,7 @@ class CGlobStar {
 	  * Test a Path against [this] GlobStar
 	  */
 	public function test(path : String):Bool {
+		return pattern.match(path);
 		var data = pattern.search( path );
 		if (data.length == 0)
 			return false;
@@ -53,7 +54,7 @@ class CGlobStar {
 	  * Get match-data
 	  */
 	public function match(s : String):Null<Object> {
-		var dat = pattern.search( s );
+		var dat = pattern.matches( s );
 		if (dat.length == 0)
 			return null;
 		else {
@@ -61,7 +62,6 @@ class CGlobStar {
 			var res:Object = {};
 			for (k in pind.keys()) {
 				var i = pind[k];
-				trace(i);
 				res[k] = m[i+1];
 			}
 			return res;

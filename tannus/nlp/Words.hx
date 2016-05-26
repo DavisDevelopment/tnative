@@ -112,7 +112,12 @@ class Words {
 	  * Create a wordbag from a String
 	  */
 	public static function create(s : String):Words {
-		return new Words(Lexer.tokenizeString(s));
+		if (s.length == 0) {
+			return new Words([]);
+		}
+		else {
+			return new Words(Lexer.tokenizeString(s));
+		}
 	}
 
 	/* create an empty word-set */

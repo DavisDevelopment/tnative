@@ -39,10 +39,18 @@ class BGServer extends MessagerPool {
 	  * Determine whether a Messager already exists which is connected to a given Tab
 	  */
 	public function getMessagerByTab(tabid : Int):Null<ExtMessager> {
-		var mes = sockets.firstMatch(item, (
-			cast(item, ExtMessager).tab.value != null &&
-			cast(item, ExtMessager).tab.value.id == tabid)
+		var mes = cast sockets.macfirstMatch(
+			cast(_, ExtMessager).tab.value != null &&
+			cast(_, ExtMessager).tab.value.id == tabid
 		);
 		return mes;
+	}
+
+	/**
+	  * Get the Messager (if any) with the given Address
+	  */
+	public function getMessagerByAddress(a : Address):Null<ExtMessager> {
+		var esockets:Array<ExtMessager> = cast sockets;
+		return esockets.macfirstMatch(_.peerAddress != null && _.peerAddress.equals( a ));
 	}
 }

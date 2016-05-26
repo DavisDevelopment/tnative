@@ -21,7 +21,7 @@ class Mimes {
 	/**
 	  * Get a MIME Type, from an extension-name
 	  */
-	public static function getMimeType(ext : String):Null<String> {
+	public static function getMimeType(ext : String):Null<Mime> {
 		minit();
 		if (ext.startsWith('.'))
 			ext = ext.substring( 1 );
@@ -36,7 +36,7 @@ class Mimes {
 	/**
 	  * Get an extension-name from a MIME type
 	  */
-	public static function getExtensionList(mime : String):Array<String> {
+	public static function getExtensionList(mime : Mime):Array<String> {
 		minit();
 		if (types.exists( mime )) {
 			return types.get( mime );
@@ -66,13 +66,25 @@ class Mimes {
 		initted = true;
 	}
 
+	/**
+	  * Get the [types] Map
+	  */
+	public static function getTypeToExtensionsMap():Map<Mime, Array<String>> {
+		minit();
+		var m = new Map();
+		for (mime in types.keys()) {
+			m.set(mime, types[mime].copy());
+		}
+		return m;
+	}
+
 /* === Class Fields === */
 
 	/* Mime Data Registry, used internally by [this] Class */
-	private static var types:Map<String, Array<String>>;
+	private static var types:Map<Mime, Array<String>>;
 
 	/* Extension Registry */
-	private static var extensions:Map<String, String>;
+	private static var extensions:Map<String, Mime>;
 
 	/* Whether [this] Class has been initialized */
 	private static var initted:Bool = false;

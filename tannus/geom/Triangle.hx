@@ -6,6 +6,8 @@ import tannus.geom.Line;
 import tannus.geom.Shape;
 import tannus.geom.Vertices;
 
+import Math.*;
+
 /**
   * Class to represent a Triangle
   */
@@ -24,6 +26,40 @@ class Triangle implements Shape {
 	  */
 	public inline function clone():Triangle {
 		return new Triangle(one.clone(), two.clone(), three.clone());
+	}
+
+	/**
+	  * Split [this] Triangle into two triangles
+	  */
+	public function bisect():Array<Triangle> {
+		var mp = (new Line(one, three).mid);
+		var l = new Triangle(one, two, mp);
+		var r = new Triangle(mp, two, three);
+		return [l, r];
+	}
+
+	/**
+	  * check whether the given Point is in [this] Triangle
+	  */
+	public function containsPoint(p : Point):Bool {
+		var a = three.minusPoint( one );
+		var b = two.minusPoint( one );
+		var c = p.minusPoint( one );
+		
+		var dot_aa = dot(a, a);
+		var dot_ab = dot(a, b);
+		var dot_ac = dot(a, c);
+		var dot_bb = dot(b, b);
+		var dot_bc = dot(b, c);
+
+		var invDenom:Float = (1 / (dot_aa * dot_bb - dot_ab * dot_ab));
+		var u = (dot_bb * dot_ac - dot_ab * dot_bc) * invDenom;
+		var v = (dot_aa * dot_bc - dot_ab * dot_ac) * invDenom;
+		return ((u >= 0) && (v >= 0) && (u + v < 1));
+	}
+
+	private inline function dot(x:Point, y:Point):Float {
+		return ((x.x * y.x) + (x.y * y.y));
 	}
 
 	/**
@@ -54,7 +90,7 @@ class Triangle implements Shape {
 	/**
 	  * Get the vertex-list for [this] Triangle
 	  */
-	public function getVertices():Vertices {
+	public function getVertices(?precision : Int):Vertices {
 		return lines;
 	}
 
@@ -89,5 +125,17 @@ class Triangle implements Shape {
 		la.push(new Line(three, one));
 
 		return la;
+	}
+
+	/**
+	  * The three Points that make up [this] Triangle, as an Array
+	  */
+	public var points(get, set):Array<Point>;
+	private inline function get_points():Array<Point> return [one, two, three];
+	private function set_points(v : Array<Point>):Array<Point> {
+		one = v[0];
+		two = v[1];
+		three = v[2];
+		return points;
 	}
 }

@@ -1,6 +1,5 @@
 package tannus.http;
 
-import tannus.io.ByteArray;
 import tannus.http.*;
 import tannus.http.BaseRequest in Base;
 

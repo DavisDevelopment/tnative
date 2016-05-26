@@ -50,7 +50,8 @@ class Playlist {
 	  */
 	private function updateIndices():Void {
 		for (t in tracks) {
-			var i:Int = t.index = tracks.indexOf( t );
+			var i:Int = tracks.indexOf( t );
+			t.index = i;
 		}
 	}
 
@@ -67,7 +68,7 @@ class Playlist {
 	/**
 	  * Get Track by Index
 	  */
-	public function getTrackByIndex(i : Int):Maybe<Track> {
+	public function getTrackByIndex(i : Int):Null<Track> {
 		return (tracks[ i ]);
 		/*
 		for (t in tracks) 
@@ -79,7 +80,7 @@ class Playlist {
 	/**
 	  * Get Track by Location
 	  */
-	public function getTrackByLocation(loc : String):Maybe<Track> {
+	public function getTrackByLocation(loc : String):Null<Track> {
 		for (t in tracks)
 			if (t.location == loc) return t;
 		return null;
@@ -88,7 +89,7 @@ class Playlist {
 	/**
 	  * Get Track by Name
 	  */
-	public function getTrackByName(name : String):Maybe<Track> {
+	public function getTrackByName(name : String):Null<Track> {
 		for (t in tracks)
 			if (t.title == name) 
 				return t;
@@ -98,7 +99,7 @@ class Playlist {
 	/**
 	  * Get Track by 'id'
 	  */
-	public function getTrackById(id : String):Maybe<Track> {
+	public function getTrackById(id : String):Null<Track> {
 		for (t in tracks) {
 			if (t.id == id) {
 				return t;

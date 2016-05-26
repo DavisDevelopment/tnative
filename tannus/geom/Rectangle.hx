@@ -1,5 +1,7 @@
 package tannus.geom;
 
+import tannus.io.Ptr;
+
 import tannus.geom.Point;
 import tannus.geom.Area;
 import tannus.geom.Shape;
@@ -7,6 +9,12 @@ import tannus.geom.Vertices;
 
 import tannus.math.Percent;
 import tannus.ds.EitherType in Either;
+
+import Math.*;
+import tannus.math.TMath.*;
+
+using Lambda;
+using tannus.ds.ArrayTools;
 
 @:forward
 abstract Rectangle (CRectangle) from CRectangle to CRectangle {
@@ -57,8 +65,15 @@ abstract Rectangle (CRectangle) from CRectangle to CRectangle {
 	  * Create a Rectangle from an Array of Numbers
 	  */
 	@:from
-	public static inline function fromArray<T : Float> (a : Array<T>):Rectangle {
-		return new Rectangle(a[0], a[1], a[2], a[3]);
+	public static function fromArray<T : Float> (a : Array<T>):Rectangle {
+		switch ( a ) {
+			case [w, h]:
+				return new Rectangle(0, 0, w, h);
+			case [x, y, w, h]:
+				return new Rectangle(x, y, w, h);
+			default:
+				return new Rectangle(a[0], a[1], a[2], a[3]);
+		}
 	}
 }
 
@@ -144,14 +159,166 @@ class CRectangle implements Shape {
 	  * Whether [rect] is 'inside' [this] Rectangle
 	  */
 	public function containsRect(o : Rectangle):Bool {
-		//- For every corner of [o]
-		for (p in o.corners) {
-			//- Check whether [this] contains that corner
-			if (containsPoint(p)) {
-				return true;
+		if (containsPoint(o.center)) {
+			return true;
+		}
+		else {
+			for (p in o.corners) {
+				if (containsPoint( p )) {
+					return true;
+				}
+			}
+			return false;
+		}
+	}
+
+	/**
+	  * Enlarge [this] Rectangle by the given amount
+	  */
+	public function enlarge(dw:Float, dh:Float):Void {
+		w += dw;
+		h += dh;
+		x -= (dw / 2);
+		y -= (dh / 2);
+	}
+
+	/**
+	  * Move [this] Rectangle by the given amount
+	  */
+	public function move(dx:Float, dy:Float):Void {
+		x += dx;
+		y += dy;
+	}
+
+	/**
+	  * Scale [this] Rectangle such that the relationship between [w] and [h] remain the same
+	  */
+	public function scale(?sw:Float, ?sh:Float):Void {
+		if (sw != null) {
+			var ratio:Float = (sw / width);
+			width = sw;
+			height = (ratio * height);
+		}
+		else if (sh != null) {
+			var ratio:Float = (sh / height);
+			width = (ratio * width);
+			height = sh;
+		}
+		else {
+			return ;
+		}
+	}
+
+	/**
+	  * create and return a scaled copy of [this]
+	  */
+	public function scaled(?sw:Float, ?sh:Float):Rectangle {
+		var s:Rectangle = clone();
+		s.scale(sw, sh);
+		return s;
+	}
+
+	/**
+	  * Scale [this] Rectangle to be [amount]% of its current size
+	  */
+	public function percentScale(amount : Percent):Void {
+		w = amount.of( w );
+		h = amount.of( h );
+	}
+
+	/**
+	  * Create and return a scaled version of [this] Rectangle
+	  */
+	public inline function percentScaled(amount : Percent):Rectangle {
+		return new Rectangle(x, y, amount.of( w ), amount.of( h ));
+	}
+
+	/**
+	  * get the rotated dimensions of [this] Rectangle
+	  */
+	public function rotated(angle : Angle):Rectangle {
+		var rads = angle.radians;
+
+		/* calculate new width */
+		var nw:Float = (abs(width * sin( rads ) + abs(height * cos( rads ))));
+
+		/* calculate new height */
+		var nh:Float = (abs(width * cos( rads ) + abs(height * sin( rads ))));
+
+		return new Rectangle(x, y, nw, nh);
+	}
+
+	/**
+	  * Split [this] Rectangle into [count] pieces, either vertically or horizontally
+	  */
+	public function split(count:Int, vertical:Bool=true):Array<Rectangle> {
+		var all:Array<Rectangle> = new Array();
+		if ( vertical ) {
+			var ph:Float = (h / count);
+			for (i in 0...count) {
+				all.push(new Rectangle(x, (y + (i * ph)), w, ph));
 			}
 		}
-		return false;
+		else {
+			var pw:Float = (w / count);
+			for (i in 0...count) {
+				all.push(new Rectangle((x + (i * pw)), y, pw, h));
+			}
+		}
+		return all;
+	}
+
+	/**
+	  * Split [this] Rectangle into [count]^2 pieces, stored in a two-dimensional Array
+	  */
+	public function split2(count : Int):Array<Array<Rectangle>> {
+		return split(count, true).map(function(r) return r.split(count, false));
+	}
+
+	/**
+	  * bisect [this] Rectangle into two Triangles
+	  */
+	public function bisect(mode : Bool = true):Array<Triangle> {
+		var pair:Array<Triangle> = new Array();
+		if ( mode ) {
+			pair.push(new Triangle(topLeft, topRight, bottomRight));
+			pair.push(new Triangle(topLeft, bottomLeft, bottomRight));
+		}
+		else {
+			pair.push(new Triangle(topRight, bottomRight, bottomLeft));
+			pair.push(new Triangle(bottomLeft, topLeft, topRight));
+		}
+		return pair;
+	}
+
+	/**
+	  * bisect [this] Rectangle into four Triangles
+	  */
+	public function bisect2():Array<Triangle> {
+		return bisect().map(function(t) return t.bisect()).flatten();
+	}
+
+	/**
+	  * crop [this] Rectangle, returning the 'cropped off' Rectangles created by the crop
+	  */
+	public function crop(cr : Rectangle):Null<RectangleTrimmings> {
+		var corners = cr.corners.map( containsPoint );
+		if (corners.has( false )) {
+			return null;
+		}
+
+		var left = new Rectangle(x, y, (cr.x - x), h);
+		var top = new Rectangle(cr.x, y, cr.w, (cr.y - y));
+		var bottom = new Rectangle(cr.x, (cr.y + cr.h), cr.w, (y + h));
+		bottom.height -= bottom.y;
+		var right = new Rectangle((cr.x + cr.w), y, 0, h);
+		right.width = ((x + width) - right.x);
+		return {
+			'top': top,
+			'left': left,
+			'bottom': bottom,
+			'right': right
+		};
 	}
 
 	/**
@@ -176,7 +343,7 @@ class CRectangle implements Shape {
 	/**
 	  * Obtain [this] Rect's vertices
 	  */
-	public function getVertices():Vertices {
+	public function getVertices(?precision : Int):Vertices {
 		var self:Rectangle = cast this;
 
 		var verts = new Vertices([
@@ -187,6 +354,32 @@ class CRectangle implements Shape {
 		]);
 
 		return verts;
+	}
+
+	/**
+	  * Obtain an Array of Pointers to the corners of [this] Rectangle
+	  */
+	public function getCornerPointers():Array<Ptr<Point>> {
+		var result:Array<Ptr<Point>> = [
+			Ptr.create( topLeft ),
+			Ptr.create( topRight ),
+			Ptr.create( bottomLeft ),
+			Ptr.create( bottomRight )
+		];
+		return result;
+	}
+
+	/**
+	  * get an Array of Rectangles, representing the z-layers of [this] one
+	  */
+	public function layers():Array<Rectangle> {
+		var results:Array<Rectangle> = new Array();
+		for (i in round(z)...round(z + depth)) {
+			var layer = new Rectangle(x, y, w, h);
+			layer.z = i;
+			results.push( layer );
+		}
+		return results;
 	}
 
 	/**
@@ -263,32 +456,53 @@ class CRectangle implements Shape {
 	/**
 	  * The top-right corner
 	  */
-	public var topRight(get, never):Point;
+	public var topRight(get, set):Point;
 	private inline function get_topRight():Point {
 		return new Point((x + width), y);
-	} 
+	}
+	private function set_topRight(v : Point):Point {
+		x = (v.x - width);
+		y = v.y;
+		return topRight;
+	}
+
 	/**
 	  * The top-left corner
 	  */
-	public var topLeft(get, never):Point;
+	public var topLeft(get, set):Point;
 	private inline function get_topLeft():Point {
 		return new Point(x, y);
+	}
+	private function set_topLeft(v : Point):Point {
+		x = v.x;
+		y = v.y;
+		return topLeft;
 	}
 
 	/**
 	  * The bottom-left corner
 	  */
-	public var bottomLeft(get, never):Point;
+	public var bottomLeft(get, set):Point;
 	private inline function get_bottomLeft():Point {
 		return new Point(x, (y + height));
+	}
+	private function set_bottomLeft(v : Point):Point {
+		x = v.x;
+		y = (v.y - height);
+		return bottomLeft;
 	}
 
 	/**
 	  * The bottom-right
 	  */
-	public var bottomRight(get, never):Point;
+	public var bottomRight(get, set):Point;
 	private inline function get_bottomRight():Point {
 		return new Point((x + width), (y + height));
+	}
+	private function set_bottomRight(v : Point):Point {
+		x = (v.x - w);
+		y = (v.y - h);
+		return bottomRight;
 	}
 
 	/**
@@ -330,3 +544,10 @@ class CRectangle implements Shape {
 		return Percent.percent(what, of);
 	}
 }
+
+typedef RectangleTrimmings = {
+	top : Rectangle,
+	left : Rectangle,
+	bottom : Rectangle,
+	right : Rectangle
+};

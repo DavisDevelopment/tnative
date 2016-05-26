@@ -36,9 +36,10 @@ class MessagerPool {
 			}
 		});
 
-		for (p in listeners.iterator()) {
-			for (handler in p.value)
+		for (p in listeners.pairs()) {
+			for (handler in p.value) {
 				m.on(p.key, handler);
+			}
 		}
 	}
 

@@ -4,12 +4,16 @@ import js.Browser.window in win;
 import js.html.Window in CWin;
 
 import tannus.ds.Object;
+import tannus.ds.Obj;
 import tannus.ds.Maybe;
 import tannus.ds.Range;
 import tannus.io.Ptr;
+import tannus.io.Setter;
+import tannus.io.Getter;
 import tannus.io.Signal;
 import tannus.events.KeyboardEvent;
 import tannus.events.EventMod;
+import tannus.html.fs.WebFileSystem;
 
 import tannus.geom.Point;
 import tannus.geom.Rectangle;
@@ -96,6 +100,51 @@ abstract Win (CWin) from CWin to CWin {
 		return sig;
 	}
 
+	/**
+	  * Request a FileSystem for use
+	  */
+	public function requestFileSystem(size:Int, cb:WebFileSystem->Void):Void {
+		untyped {
+			var self:Obj = this;
+			var rfs:Dynamic = self['requestFileSystem'];
+			if (rfs == null) {
+				rfs = self['webkitRequestFileSystem'];
+			}
+			rfs(self['TEMPORARY'], size, cb);
+		};
+	}
+
+	/**
+	  * Expose some value globally
+	  */
+	public inline function expose(name:String, value:Dynamic):Void {
+		var self:Obj = this;
+		self[name] = value;
+	}
+
+	/**
+	  * expose a Getter
+	  */
+	public inline function exposeGetter<T>(name:String, get:Getter<T>):Void {
+		untyped (this.__defineGetter__(name, get));
+	}
+
+	/**
+	  * expose a Setter
+	  */
+	public inline function exposeSetter<T>(name:String, set:Setter<T>):Void {
+		untyped this.__defineSetter__(name, set);
+	}
+
+	/**
+	  * expose a Pointer
+	  */
+	public inline function exposeRef<T>(name:String, ref:Ptr<T>):Void {
+		exposeGetter(name, ref.getter);
+		exposeSetter(name, ref.setter);
+	}
+
+
 /* === Instance Fields === */
 
 	/**
@@ -105,6 +154,15 @@ abstract Win (CWin) from CWin to CWin {
 	private inline function get_viewport():Rectangle {
 		return new Rectangle(this.scrollX, this.scrollY, this.innerWidth, this.innerHeight);
 	}
+
+	/**
+	  * [this] Window, as an object
+	  */
+	public var self(get, never):Obj;
+	private inline function get_self():Obj return Obj.fromDynamic( this );
+
+	public var document(get, never):js.html.HTMLDocument;
+	private inline function get_document():js.html.HTMLDocument return cast this.document;
 
 /* === Static Fields === */
 

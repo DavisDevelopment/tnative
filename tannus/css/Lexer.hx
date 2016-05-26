@@ -2,7 +2,11 @@ package tannus.css;
 
 import tannus.io.Byte;
 import tannus.io.ByteArray;
+import tannus.io.ByteStack;
+import tannus.ds.Stateful;
 import tannus.ds.Stack;
+import tannus.css.vals.Lexer.parseString in toval;
+
 import tannus.css.Token;
 
 using StringTools;
@@ -10,38 +14,36 @@ using tannus.ds.StringUtils;
 using Lambda;
 using tannus.ds.ArrayTools;
 
-class Lexer {
+class Lexer implements Stateful<LexerState> {
 	/* Constructor Function */
 	public function new():Void {
-		reset();
+		null;
 	}
 
 /* === Instance Methods === */
 
 	/**
-	  * Parse a String into an Array of Tokens
+	  * tokenize the given input
 	  */
-	public function tokenize(s : String):Array<Token> {
-		reset();
-		buffer = new Stack(ByteArray.fromString(s).toArray());
+	public function tokenize(data : ByteArray):Array<Token> {
+		buffer = new ByteStack( data );
+		tokens = new Array();
 
-		while (!buffer.empty) {
-			var tk:Null<Token> = nextToken();
-			if (tk == null) {
-				break;
-			}
-			else
+		while ( !done ) {
+			var tk = token();
+			if (tk != null) {
 				tokens.push( tk );
+			}
 		}
 
 		return tokens;
 	}
 
 	/**
-	  * Find and return the next Token
+	  * attempt to generate the next Token
 	  */
-	private function nextToken(?prev:Token):Null<Token> {
-		if (buffer.empty) {
+	private function token():Null<Token> {
+		if ( done ) {
 			return null;
 		}
 		else {
@@ -50,259 +52,160 @@ class Lexer {
 			/* == Whitespace == */
 			if (c.isWhiteSpace()) {
 				advance();
-				return nextToken();
+				return token();
 			}
 
-			/* === Variable References === */
+			/* == variable declaration == */
 			else if (c == '@'.code) {
 				advance();
-				var state = save();
-				var next:Null<Token> = nextToken();
-				if (next != null) {
-					switch ( next ) {
-						/* == Identifier == */
-						case TIdent( s ):
-							return TRef( s );
-
-						/* == Anything Else == */
-						default:
-							unexpected( c );
-					}
-				}
-				else {
-					unexpected( c );
-				}
+				var name:String = buffer.readUntil( ':' ).toString().trim();
+				advance();
+				var valtext:String = buffer.readUntil( ';' ).toString().trim();
+				advance();
+				return TVar(name, toval( valtext ));
 			}
 
-			/* == Identifiers == */
-			else if (isSel(c)) {
-				var s:String = '';
-				var white:String = '';
-				s += c;
-				advance();
+			/* == Selectors and Properties == */
+			else if (isSel( c )) {
+				var str:String = advance();
+				var tok:Null<Token> = null;
+				while ( !done ) {
+					c = next();
 
-				//- collect all Bytes that are valid Selector Bytes
-				while (!done && isSel(next())) {
-					c = advance();
-					if (c.isWhiteSpace()) {
-						white += c;
+					/* block -- this is a ruleset */
+					if (c == '{'.code) {
+						// [str] is a selector
+						var sel:String = str.trim();
+						var props = block();
+						tok = TRule(sel, props);
 					}
+
+					/* this is a property, or a mixin */
+					else if (c == ';'.code) {
+						if (str.startsWith( '.' )) {
+							var name = str.after( '.' );
+							tok = TMixin( name );
+						}
+						else {
+							var name = str.before(':').trim();
+							var valtext = str.after(':').trim();
+							tok = TProp(name, toval( valtext ));
+						}
+					}
+
+					/* still buffering */
 					else {
-						s += white;
-						white = '';
-						s += c;
+						str += c;
+					}
+
+					advance();
+
+					/* if [tok] has been defined, we're done */
+					if (tok != null) {
+						break;
 					}
 				}
-				
-				var tk:Token = TIdent( s );
 
-				return tk;
+				/* complain if [tok] was not found */
+				if (tok == null) {
+					throw 'Error: unexpected end of input';
+				}
+
+				return tok;
 			}
 
-			/* === Blocks === */
-			else if (c == '{'.code) {
-				//- collect all Bytes between the '{', and the '}'
-				var blockBytes:ByteArray = collect('{', '}');
-
-				//- tokenize the contents of the Block
-				var tree = sub( blockBytes );
-
-				return TBlock( tree );
-			}
-
-			/* === Groups === */
-			else if (c == '('.code) {
-				//- collect all Bytes between the '(', and the ')'
-				var gbytes = collect('(', ')');
-				
-				//- tokenize the contents of the group
-				var tree = sub( gbytes );
-
-				return TParen( tree );
-			}
-
-			/* === Semicolon === */
-			else if (c == ';'.code) {
-				advance();
-				return TSemi;
-			}
-
-			/* === Colon === */
-			else if (c == ':'.code) {
-				advance();
-				return TColon;
-			}
-
-			/* === Comma === */
-			else if (c == ','.code) {
-				advance();
-				return TComma;
-			}
-
-			/* === Anything else === */
+			/* anything else */
 			else {
-				unexpected( c );
+				var err = 'Error: unexpected $c';
+				trace( err );
+				throw err;
 			}
-
-			/* useless return so the compiler won't complain */
-			return null;
 		}
 	}
 
-/* === Utility Methods === */
-
 	/**
-	  * Determine whether a given Byte is a Selector Byte
+	  * tokenize the Block expression which starts at the current byte
 	  */
-	private function isSel(c : Byte):Bool {
-		return (~/[^{}():;,]/.match(c.aschar));
-	}
-
-	/**
-	  * Collect a group of Bytes
-	  */
-	private function collect(starter:Byte, stopper:Byte, levelled:Bool=true, ?escaper:ByteArray):ByteArray {
-		var res:ByteArray = new ByteArray();
-		var level:Int = 0;
-		var c = next();
-		if (c == starter) {
+	private function block():Array<Token> {
+		var c:Byte = next();
+		if (c == '{'.code) {
 			advance();
-			level++;
-			while (!done && level > 0) {
+			var buf:String = '';
+			var lvl:Int = 1;
+			while (!done && lvl > 0) {
 				c = next();
-				if (levelled && c == starter) {
-					level++;
-				}
-				
-				else if (c == stopper) {
-					level--;
-				}
-
-				if (level > 0) {
-					res.push( c );
-				}
-
+				if (c == '{'.code)
+					lvl++;
+				else if (c == '}'.code)
+					lvl--;
+				if (lvl > 0)
+					buf += c;
 				advance();
 			}
+			return quickLex( buf );
 		}
-		return res;
-	}
-
-	/**
-	  * Split an Array of Tokens by the TComma Token
-	  */
-	private function splitByComma(toks : Array<Token>):Array<Token> {
-		var res:Array<Token> = new Array();
-		var last:Null<Token> = null;
-		for (t in toks) {
-			switch ( t ) {
-				case TComma:
-					if (last != null) {
-						res.push( last );
-						last = null;
-					}
-					else {
-						unexpected( ',' );
-					}
-
-				default:
-					if (last == null)
-						last = t;
-					else
-						unexpected( t );
-			}
+		else {
+			throw 'Error: No block at current position';
+			return new Array();
 		}
-		if (last != null)
-			res.push( last );
-		return res;
 	}
 
-	/**
-	  * Peek at the next Byte
-	  */
-	private inline function next():Byte {
-		return buffer.peek();
+	/* get the current Byte */
+	private inline function next(i:Int = 0):Byte return buffer.peek( i );
+
+	/* get the current Byte, and move to the next one */
+	private function advance(i:Int = 0):Byte {
+		var r = buffer.pop();
+		while (i > 0) {
+			buffer.pop();
+			i--;
+		}
+		return r;
 	}
 
-	/**
-	  * Advance to the next Byte
-	  */
-	private inline function advance():Byte {
-		return buffer.pop();
-	}
-
-	/**
-	  * get the current State
-	  */
-	private inline function save():State {
+	/* get the current state of [this] Lexer */
+	public inline function getState():LexerState {
 		return {
-			'buffer': buffer.copy(),
-			'tokens': tokens.copy()
+			buffer: cast buffer.copy(),
+			tokens: tokens.copy()
 		};
 	}
 
-	/**
-	  * restore [this] Lexer to the given State
-	  */
-	private function restore(state : State):Void {
-		buffer = state.buffer;
-		tokens = state.tokens;
+	/* set the current state of [this] Lexer */
+	public inline function setState(s : LexerState):Void {
+		buffer = s.buffer;
+		tokens = s.tokens;
 	}
 
 	/**
-	  * Tokenize the given String within a 'sub-lexer'
+	  * check whether the given Byte is a valid css-selector character
 	  */
-	private function sub(s : String):Array<Token> {
-		var state = save();
-		var results:Array<Token> = tokenize( s );
-		restore( state );
-		return results;
-	}
-
-	/**
-	  * restore [this] Lexer to it's original State
-	  */
-	private function reset():Void {
-		buffer = new Stack<Byte>([]);
-		tokens = new Array();
-	}
-
-	/**
-	  * Raise a CSSError
-	  */
-	private inline function err(msg : String):Void {
-		#if js
-			throw new js.Error('CSSError: $msg');
-		#else
-			throw 'CSSError: $msg';
-		#end
-	}
-
-	/**
-	  * Raise an Unexpected Error
-	  */
-	private inline function unexpected(c : Dynamic):Void {
-		err('Unexpected $c!');
+	private inline function isSel(c : Byte):Bool {
+		return ((~/[^{}():;,]/).match( c.aschar ));
 	}
 
 /* === Computed Instance Fields === */
 
-	/* whether we're at the end of [buffer] */
+	/* whether we've reached the end of input */
 	private var done(get, never):Bool;
-	private inline function get_done():Bool {
-		return buffer.empty;
-	}
+	private inline function get_done():Bool return buffer.empty;
 
 /* === Instance Fields === */
 
-	private var buffer : Stack<Byte>;
+	private var buffer : ByteStack;
 	private var tokens : Array<Token>;
+
+/* === Static Methods === */
+
+	/**
+	  * shorthand tokenization
+	  */
+	public static function quickLex(d : ByteArray):Array<Token> {
+		return (new Lexer().tokenize( d ));
+	}
 }
 
-/**
-  * Type to represent the Lexer's current state
-  */
-private typedef State = {
-	var buffer : Stack<Byte>;
-	var tokens : Array<Token>;
+typedef LexerState = {
+	buffer : ByteStack,
+	tokens : Array<Token>
 };

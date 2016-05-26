@@ -2,6 +2,7 @@ package tannus.sys;
 
 import haxe.io.Input;
 import haxe.io.Output;
+import tannus.io.ByteArray;
 
 import tannus.sys.Path;
 import tannus.io.Prompt;
@@ -55,6 +56,27 @@ class Application {
 		null;
 	}
 
+	/* execute a shell command and return the output */
+	public function system(command:String, ?options:SystemOptions):Void {
+		#if node
+		var opts:Dynamic = {};
+		if (options != null) {
+			opts.cwd = options.cwd;
+			opts.input = (options.input != null ? options.input.getData() : null);
+			opts.env = options.env;
+			opts.shell = options.shell;
+		}
+		tannus.node.ChildProcess.execSync(command, opts);
+		#elseif python
+		python.Syntax.importModule( 'os' );
+		python.Syntax.pythonCode( 'os.system' )( command );
+		#else
+		throw 'Error: not supported on current platform';
+		#end
+	}
+
+
+
 	/* === Computed Instance Fields === */
 
 	/* the current working directory */
@@ -78,3 +100,10 @@ class Application {
 	/* array of all command-line arguments */
 	public var argv : Array<String>;
 }
+
+private typedef SystemOptions = {
+	?cwd : String,
+	?input : ByteArray,
+	?env : Dynamic,
+	?shell : String
+};

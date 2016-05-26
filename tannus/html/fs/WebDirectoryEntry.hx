@@ -9,6 +9,7 @@ import tannus.sys.Path;
 import tannus.ds.Object;
 import tannus.ds.Promise;
 import tannus.ds.promises.*;
+import tannus.ds.AsyncStack;
 import tannus.sys.GlobStar;
 
 using StringTools;
@@ -72,13 +73,86 @@ abstract WebDirectoryEntry (DirectoryEntry) from DirectoryEntry {
 	}
 
 	/**
-	  * Get all entries which match a given Filter
+	  * get an Array of all FileEntries recursively
 	  */
-	public function filter(glob : GlobStar):ArrayPromise<WebFSEntry> {
-		return (readEntries().filter(function(e) {
-			return (glob.test(e.name));
-		}));
+	public function walk(cb:Array<WebFileEntry>->Void, ?filter:WebFileEntry->Bool, ?step:WebFileEntry->Bool):Void {
+		var all:Array<WebFileEntry> = new Array();
+		readEntries().then(function( entries ) {
+			var stack = new AsyncStack();
+			var broken:Bool = false;
+			for (e in entries) {
+				stack.push(function(done) {
+					if ( broken ) {
+						done();
+						return ;
+					}
+
+					if ( e.isFile ) {
+						var add = (filter == null || filter(new WebFileEntry(cast e)));
+						if ( add ) {
+							var wfe = new WebFileEntry(cast e);
+							if (step != null) {
+								var continu = step( wfe );
+								if ( !continu ) {
+									broken = true;
+								}
+							}
+							all.push( wfe );
+						}
+						done();
+					}
+					else {
+						var _f:WebDirectoryEntry = new WebDirectoryEntry(cast e);
+						_f.walk(function( sub ) {
+							all = all.concat( sub );
+							done();
+						}, filter);
+					}
+				});
+			}
+			stack.run(function() {
+				cb( all );
+			});
+		});
 	}
+
+	/**
+	  * Get an Array of all FileEntries recursively
+	  */
+	/*
+	public function walk(?tester : WebFileEntry->Bool):ArrayPromise<WebFileEntry> {
+		return Promise.create({
+			var stack:AsyncStack = new AsyncStack();
+			var files:Array<WebFileEntry> = new Array();
+			readEntries().then(function( entries ) {
+				for (e in entries) {
+					stack.push(function( done ) {
+						if ( e.isFile ) {
+							if (tester == null || tester(cast e)) {
+								files.push(cast e);
+							}
+							done();
+						}
+						else if ( e.isDirectory ) {
+							var p = new WebDirectoryEntry(cast e).walk(tester);
+							p.then(function(dfiles) {
+								files = files.concat( dfiles );
+								done();
+							});
+							p.unless(function(error) {
+								throw error;
+							});
+						}
+					});
+				}
+
+				stack.run(function() {
+					return files;
+				});
+			}).unless(function(error) throw error);
+		}).array();
+	}
+	*/
 }
 
 typedef DirectoryEntry = {

@@ -1,39 +1,14 @@
 package tannus.nore;
 
-import tannus.nore.Lexer;
-import tannus.nore.Parser;
-import tannus.nore.Check;
-import tannus.nore.Compiler;
-
-/**
-  * Class collection of utility methods having to do with Object Regular-Expressions
-  */
 class ORegEx {
-
 	/**
-	  * Private Map of the results of the Compile function
+	  * Compile the given String into a CheckFunction
 	  */
-	private static var ast_results : Map<String, Array<Check>> = {new Map();};
-
-	/**
-	  * Shorthand function to get a selector-function from a String
-	  */
-	public static function compile<T> (description : String) {
-		//- if [description] is present in [ast_results]
-		if (ast_results.exists(description)) {
-
-			var ast = ast_results[description];
-
-			return Compiler.compile( ast );
+	public static function compile(sel:String, ?pred:Compiler->Void):CheckFunction {
+		var comp:Compiler = new Compiler();
+		if (pred != null) {
+			pred( comp );
 		}
-		
-		//- if it is not
-		else {
-			var ast = Parser.parse(Lexer.lex( description ));
-
-			ast_results[description] = ast;
-
-			return Compiler.compile( ast );
-		}
+		return comp.compileString( sel );
 	}
 }

@@ -42,8 +42,7 @@ abstract Tab (CTab) {
 	  * Delete [this] Tab
 	  */
 	public inline function remove(cb : Void->Void) {
-		Tabs.remove(this.id, cb);
-	}
+		Tabs.remove(this.id, cb); }
 
 	/**
 	  * Reload [this] Tab
@@ -72,6 +71,9 @@ abstract Tab (CTab) {
 	public inline function executeScript(path:Null<String>, code:Null<String>, ?cb:Void->Void):Void {
 		Tabs.executeScript(this.id, path, code, cb);
 	}
+
+	public var value(get, never):Tab;
+	private inline function get_value():Tab return cast this;
 }
 
 typedef CTab = {

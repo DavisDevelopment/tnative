@@ -51,7 +51,7 @@ class CVelocity {
 		var l:Line = new Line(new Point(), e);
 
 		speed = l.length;
-		angle = TMath.angleBetween(0.0, 0.0, e.x, e.y);
+		angle = new Angle(TMath.angleBetween(0.0, 0.0, e.x, e.y));
 	}
 
 	/**
@@ -80,6 +80,14 @@ class CVelocity {
 	  */
 	public function minus(other : Velocity):Velocity {
 		return fromPoint(vector - other.vector);
+	}
+
+	/**
+	  * perform linear interpolation on [this] Velocity
+	  */
+	public function lerp(other:Velocity, weight:Float):Velocity {
+		var vec = vector.lerp(other.vector, weight);
+		return fromPoint( vec );
 	}
 
 /* === Computed Instance Fields === */

@@ -15,17 +15,19 @@ class Writer {
 
 	/* Write some data onto [buffer] */
 	private inline function w(data : ByteArray) {
-		buffer.write( data );
+		buffer.append( data );
 	}
 
 	/* Write some data, followed by a line-break */
 	private inline function line(data : ByteArray):Void {
+		data.push('\n'.code);
 		w( data );
-		newline();
 	}
 
 	/* Add a line-break to the buffer */
-	private inline function newline() w('\n');
+	private inline function newline():Void {
+		buffer.push('\n'.code);
+	}
 
 	/* Add a tab to the buffer */
 	private inline function tab(?n:Int=4) w([for (i in 0...n) ' '].join(''));

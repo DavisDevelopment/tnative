@@ -7,9 +7,6 @@ import tannus.sys.FileStat;
 import tannus.sys.Path;
 import tannus.sys.VirtualVolume;
 
-import tannus.sys.FileStreamOptions in Fso;
-import tannus.sys.FileReadStream in IStream;
-
 /**
   * FileSystem Polyfill for Client-Side JavaScript
   */
@@ -124,13 +121,6 @@ class JavaScriptFileSystem {
 	public static function append(name:String, data:ByteArray):Void {
 		v.append(name, data);
 		save();
-	}
-
-	/**
-	  * Create a readable Stream from a File
-	  */
-	public static function istream(name:String, options:Fso):IStream {
-		throw 'Error: Not implemented!';
 	}
 
 	/**

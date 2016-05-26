@@ -11,7 +11,7 @@ using tannus.ds.StringUtils;
 
 @:forward
 abstract Url (CUrl) from CUrl to CUrl {
-	public inline function new(s : String) this = new CUrl(s);
+	public inline function new(?s : String) this = new CUrl(s);
 
 /* === Type Casting === */
 
@@ -25,47 +25,57 @@ abstract Url (CUrl) from CUrl to CUrl {
 @:expose('Href')
 class CUrl {
 	/* Constructor Function */
-	public function new(surl : String):Void {
-		//- extract the protocol (if present)
-		protocol = (~/^([A-Z]+):/i.match(surl) ? surl.substring(0, surl.indexOf(':')) : '');
-		if (protocol.empty())
-			protocol = 'http';
-		
-		//- [surl], stripped of [protocol]
-		var noproto:String = surl.remove(protocol+'://');
-		
-		//- strip the first "/" from [noproto], if "/" is the first character
-		if (noproto.startsWith('/'))
-			noproto = noproto.substring(1);
+	public function new(?surl : String):Void {
+		/* set all default values */
+		protocol = null;
+		hostname = null;
+		pathname = null;
+		search = null;
+		hash = null;
 
-		//- get the hostname
-		hostname = noproto.before('/');
-		
-		//- get the pathname
-		pathname = (noproto.has('/') ? noproto.after('/') : '');
-		
-		//- get the search-string
-		search = (pathname.has('?') ? pathname.after('?') : '');
-		
-		//- strip [search] (if not empty) from [pathname]
-		pathname = pathname.strip('?').strip(search);
+		/* if [surl] was provided, parse it */
+		if (surl != null) {
+			//- extract the protocol (if present)
+			protocol = (~/^([A-Z]+):/i.match(surl) ? surl.substring(0, surl.indexOf(':')) : '');
+			if (protocol.empty())
+				protocol = 'http';
+			
+			//- [surl], stripped of [protocol]
+			var noproto:String = surl.remove(protocol+'://');
+			
+			//- strip the first "/" from [noproto], if "/" is the first character
+			if (noproto.startsWith('/'))
+				noproto = noproto.substring(1);
 
-		//- (if possible) extract hashcode from the search-string
-		hash = (search.has('#') ? search.after('#') : '');
-		search = search.before('#');
+			//- get the hostname
+			hostname = noproto.before('/');
+			
+			//- get the pathname
+			pathname = (noproto.has('/') ? noproto.after('/') : '');
+			
+			//- get the search-string
+			search = (pathname.has('?') ? pathname.after('?') : '');
+			
+			//- strip [search] (if not empty) from [pathname]
+			pathname = pathname.strip('?').strip(search);
 
-		//- (if possible AND necessary) extract hashcode from the pathname
-		if (hash.empty() && pathname.has('#')) {
-			hash = pathname.after('#');
-			pathname = pathname.before('#');
-		}
+			//- (if possible) extract hashcode from the search-string
+			hash = (search.has('#') ? search.after('#') : '');
+			search = search.before('#');
 
-		params = Qs.parse(search);
-		try {
-			hashparams = Qs.parse(hash);
-		}
-		catch(err : String) {
-			hashparams = null;
+			//- (if possible AND necessary) extract hashcode from the pathname
+			if (hash.empty() && pathname.has('#')) {
+				hash = pathname.after('#');
+				pathname = pathname.before('#');
+			}
+
+			params = Qs.parse(search);
+			try {
+				hashparams = Qs.parse(hash);
+			}
+			catch(err : String) {
+				hashparams = null;
+			}
 		}
 	}
 
@@ -116,12 +126,12 @@ class CUrl {
 
 /* === Instance Fields === */
 
-	public var protocol : String;
-	public var hostname : String;
-	public var pathname : String;
+	public var protocol : Null<String>;
+	public var hostname : Null<String>;
+	public var pathname : Null<String>;
 	
-	public var search : String;
-	public var hash : String;
+	public var search : Null<String>;
+	public var hash : Null<String>;
 
 	public var params : Object;
 	public var hashparams : Null<Object>;

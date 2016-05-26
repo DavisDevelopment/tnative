@@ -19,11 +19,11 @@ class Printer {
 	/**
 	  * Compile a String
 	  */
-	public static function compile(s : String):{regex:RegEx, params:Map<String, Int>} {
+	public static function compile(s:String, flags:String):{regex:RegEx, params:Map<String, Int>} {
 		var p = new Printer();
 		var t = (new Lexer()).lex( s );
 		return {
-			'regex' : p.pattern(t),
+			'regex' : p.pattern(t, flags),
 			'params': p.params
 		};
 	}
@@ -31,8 +31,8 @@ class Printer {
 	/**
 	  * Create a RegEx from the given Tree
 	  */
-	public function pattern(tree : Tree):RegEx {
-		return new EReg(print(tree), '');
+	public function pattern(tree:Tree, flags:String=''):RegEx {
+		return new EReg(print(tree), flags);
 	}
 
 	/**

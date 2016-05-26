@@ -37,6 +37,9 @@ class BuildData {
 					target = t;
 					buildPath = new Path(d);
 
+				case BCDebug:
+					defs.push( 'debug' );
+
 				default:
 					var err:String = 'Unrecognized component $e';
 					trace( err );

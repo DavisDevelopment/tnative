@@ -66,14 +66,14 @@ abstract FSEntry (FSEntryType) {
 	/**
 	  * Check if [this] Entry is a File
 	  */
-	public inline function isFile():Bool {
+	public function isFile():Bool {
 		return switchType(f, d, true, false);
 	}
 
 	/**
 	  * Check if [this] Entry is a Folder
 	  */
-	public inline function isDirectory():Bool {
+	public function isDirectory():Bool {
 		return switchType(f, d, false, true);
 	}
 	
@@ -95,13 +95,18 @@ abstract FSEntry (FSEntryType) {
 
 	/* From Path */
 	@:from
-	public static inline function fromPath(p : Path):FSEntry {
-		if (FileSystem.exists(p)) {
+	public static function fromPath(p : Path):FSEntry {
+		if (FileSystem.exists( p )) {
 			if (FileSystem.isDirectory( p ))
 				return new FSEntry(Folder( p ));
 			else
 				return new FSEntry(File( p ));
-		} else throw 'IOError: Cannot create FSEntry instance for Path which does not exist';
+		} 
+		else {
+			var err = 'IOError: Cannot create FSEntry instance for non-existent Path("$p")';
+			trace( err );
+			throw err;
+		}
 	}
 
 	/* From String */

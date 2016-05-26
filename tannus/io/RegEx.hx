@@ -25,9 +25,14 @@ abstract RegEx (EReg) from EReg to EReg {
 			var i:Int = 0;
 			var matched:Bool = true;
 
-			while (matched) {
+			while ( matched ) {
 				try {
-					parts.push(e.matched(i));
+					var p = e.matched( i );
+					if (p == null) {
+						matched = false;
+						break;
+					}
+					parts.push( p );
 					i++;
 				} 
 				catch (err : Dynamic) {

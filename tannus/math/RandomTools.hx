@@ -25,6 +25,18 @@ class RandomTools {
 	public static inline function choice<T>(set : Array<T>):T return rand.choice( set );
 
 	/**
+	  * Random chance
+	  */
+	public static function chance<T>(choices:Array<T>, chances:Array<Int>, shuffleAll:Bool=true):T {
+		return rand.chance(chances, choices, shuffleAll);
+	}
+
+	/**
+	  * Random sample
+	  */
+	public static inline function sample<T>(list:Array<T>, ?size:Int):Array<T> return rand.sample(list, size);
+
+	/**
 	  * Shuffle [set]
 	  */
 	public static inline function shuffle<T>(set : Array<T>):Array<T> return rand.shuffle( set );

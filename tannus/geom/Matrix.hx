@@ -232,22 +232,17 @@ class Matrix {
 	/**
 	  * Transform the given Point using [this] Matrix
 	  */
-	public function transformPoint(pos : Point):Point {
-		return new Point(__transformX(pos), __transformY(pos));
-	}
+	public function transformPoint(pos:Point, ?newpos:Point):Point {
+		if (newpos == null) {
+			newpos = new Point();
+		}
 
-	/**
-	  * Obtain the transformed 'y' axis of the given Point
-	  */
-	public inline function __transformX(pos : Point):Float {
-		return (pos.x * a + pos.y * c + tx);
-	}
-	
-	/**
-	  * Obtain the transformed 'y' axis of the given Point
-	  */
-	public inline function __transformY(pos : Point):Float {
-		return (pos.x * b + pos.y * d + ty);
+		var x = pos.x, y = pos.y;
+		
+		newpos.x = (a * x + c * y + tx);
+		newpos.y = (b * x + d * y + ty);
+
+		return newpos;
 	}
 	
 	/**
@@ -270,14 +265,6 @@ class Matrix {
 		d = Math.round (d * 1000) / 1000;
 		tx = Math.round (tx * 10) / 10;
 		ty = Math.round (ty * 10) / 10;
-	}
-	
-	/**
-	  * Translate by the transformed state of the given Point
-	  */
-	public inline function __translateTransformed(pos : Point):Void {
-		tx = __transformX (pos);
-		ty = __transformY (pos);
 	}
 	
 /* === Instance Fields === */

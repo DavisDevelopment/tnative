@@ -28,6 +28,12 @@ abstract Vertices (VertexArray) from VertexArray to VertexArray {
 		return this.set(i, p);
 	}
 
+	@:op(A += B)
+	public inline function isum(other : Vertices):Vertices return this.append( other );
+
+	@:op(A + B)
+	public inline function sum(other : Vertices):Vertices return this.concat( other );
+
 /* === Type Casting === */
 
 	/* to Array<Point> */
