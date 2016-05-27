@@ -26,51 +26,47 @@ class Tea {
 /* === Instance Methods === */
 
     /* encrypt the given ByteArray */
-    public function encrypt(text:ByteArray, key:ByteArray):ByteArray {
-        key = key.slice(0, 16);
-        var v = toLongs( text );
-        var k = toLongs( key );
-        v = encode(v, k);
-        var cipher = fromLongs( v );
-        return toBase64( cipher );
-    }
+    //public function encrypt(text:ByteArray, key:ByteArray):ByteArray {
+        //key = key.slice(0, 16);
+        //var v = toLongs( text );
+        //var k = toLongs( key );
+        //v = encode(v, k);
+        //var cipher = fromLongs( v );
+        //return toBase64( cipher );
+    //}
     
-    public function encode(data:ByteArray, key:ByteArray):ByteArray {
-        if (data.length < 2)
-            data.push( 0 );
-        data.validatePos = false;
-        key.validatePos = false;
-        var n:Int = data.length;
-        var z:Int = data[n - 1];
-        var y:Int = data[0];
-        var delta:Int = 0x9E3779B9;
-        var mx:Int;
-        var e:Int;
-        var q:Int = floor(6 + 52 / n);
-        var sum:Int = 0;
+    //public function encode(data:ByteArray, key:ByteArray):ByteArray {
+        //if (data.length < 2)
+            //data.push( 0 );
+        //var n:Int = data.length;
+        //var z:Int = data[n - 1];
+        //var y:Int = data[0];
+        //var delta:Int = 0x9E3779B9;
+        //var mx:Int;
+        //var e:Int;
+        //var q:Int = floor(6 + 52 / n);
+        //var sum:Int = 0;
         
-        while (q-- > 0) {
-            sum += delta;
-            e = sum >>> 2 & 3;
-            var p:Int = 0;
-            while (p < n) {
-                y = data[(p + 1) % n];
-                mx = ((z >>> 5 ^ y << 2) + (y >>> 3 ^ z << 4) ^ (sum ^ y) + (key[p & 3 ^ e] ^ z));
-                //trace( mx );
-                z = data[p].asint += mx;
-                //trace( z );
-                p++;
-            }
-        }
+        //while (q-- > 0) {
+            //sum += delta;
+            //e = sum >>> 2 & 3;
+            //var p:Int = 0;
+            //while (p < n) {
+                //y = data[(p + 1) % n];
+                //mx = ((z >>> 5 ^ y << 2) + (y >>> 3 ^ z << 4) ^ (sum ^ y) + (key[p & 3 ^ e] ^ z));
+                //z = data[p].asint += mx;
+                //p++;
+            //}
+        //}
         
-        return data;
-    }
+        //return data;
+    //}
 
     /* convert a piece of data to a Vector of Ints */
-    public function toLongs(s : ByteArray):ByteArray {
+    public function toLongs(s : ByteArray):Array<Int> {
         s = s.copy();
-        while (s.length % 4 != 0)
-            s.push( '='.code );
+	while (s.length % 4 != 0)
+	    s.push( 0 );
             
         var list:Vector<Int> = new Vector(ceil(s.length / 4));
         for (index in 0...list.length) {
@@ -82,18 +78,17 @@ class Tea {
                 s[i+3] << 24
             ].sum());
         }
-        return ByteArray.fromVector( list );
+        return list.toArray();
     }
     
     /* convert a Vector of longs to a ByteArray */
-    public function fromLongs(list : ByteArray):ByteArray {
+    public function fromLongs(list : Array<Int>):ByteArray {
         var res:ByteArray = new ByteArray();
-        var g = (function(i:Int) return list.get( i ));
         for (i in 0...list.length) {
-            res.push(g(i) & 0xFF);
-            res.push(g(i) >>> 8 & 0xFF);
-            res.push(g(i) >>> 16 & 0xFF);
-            res.push(g(i) >>> 24 & 0xFF);
+            res.push(list[i] & 0xFF);
+            res.push(list[i] >>> 8 & 0xFF);
+            res.push(list[i] >>> 16 & 0xFF);
+            res.push(list[i] >>> 24 & 0xFF);
         }
         return res;
     }
