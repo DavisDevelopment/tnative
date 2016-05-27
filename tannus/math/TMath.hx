@@ -3,7 +3,9 @@ package tannus.math;
 import tannus.ds.Maybe;
 import tannus.ds.FloatRange;
 import haxe.Int64;
+import tannus.io.ByteArray;
 
+import Std.*;
 import Math.*;
 
 import haxe.macro.Expr;
@@ -11,6 +13,8 @@ import haxe.macro.Context;
 
 using haxe.macro.ExprTools;
 using tannus.macro.MacroTools;
+using StringTools;
+using tannus.ds.StringUtils;
 
 @:expose('TMath')
 class TMath {
@@ -423,5 +427,24 @@ class TMath {
 				v += step;
 			}
 		}
+	}
+	
+	/* pretty-print the given float */
+	public static function prettify(num:Float, dec:Int=0):String {
+		var i:Int = int( num );
+		var si:String = string( i );
+		trace( si );
+		var res:ByteArray = new ByteArray();
+		var index:Int = (si.length-1);
+		while (index >= 0) {
+			var c = si.byteAt( index );
+			res.push( c );
+			if ((index + 1) % 3 == 0) {
+				res.push(','.code);
+			}
+			index--;
+		}
+		res.reverse();
+		return res.toString();
 	}
 }
