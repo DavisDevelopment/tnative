@@ -89,9 +89,22 @@ abstract Object (Dynamic) from Dynamic to Dynamic {
 	public inline function iterator():Iterator<{name:String, value:Dynamic}> {
 		return (pairs().iterator());
 	}
+	
+	/**
+	  * Write another Object anto [this] one
+	  */
+	@:op(A += B)
+	public function increment(other : Object):Object {
+		for (key in other.keys) {
+			if (!exists( key )) {
+				set(key, other.get(key));
+			}
+		}
+		return new Object( this );
+	}
 
 	/**
-	  * Write another object onto [this] one
+	  * Get the 'sum' of [this] Object and another
 	  */
 	@:op(A + B)
 	public function plus(other : Object):Object {

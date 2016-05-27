@@ -3,6 +3,7 @@ package tannus.io;
 import tannus.io.Byte;
 
 import haxe.io.Bytes;
+import haxe.ds.Vector;
 
 @:forward
 abstract ByteArray (Binary) from Binary to Binary {
@@ -82,11 +83,19 @@ abstract ByteArray (Binary) from Binary to Binary {
 	public static inline function fromBase64(s : String):ByteArray {
 		return cast BinaryImpl.fromBase64( s );
 	}
+	
+	public static function fromVector<T:Int>(vec : Vector<T>):ByteArray {
+		var data:ByteArray = new ByteArray( vec.length );
+		for (index in 0...vec.length) {
+			data[index] = vec.get( index );
+		}
+		return data;
+	}
 }
 
-#if python
-	typedef BinaryImpl = tannus.io.impl.PythonBinary;
-#elseif (js && !node)
+//#if python
+	//typedef BinaryImpl = tannus.io.impl.PythonBinary;
+#if (js && !node)
 	typedef BinaryImpl = tannus.io.impl.BrowserBinary;
 #elseif (js && node)
 	typedef BinaryImpl = tannus.io.impl.NodeBinary;

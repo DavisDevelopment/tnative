@@ -83,19 +83,11 @@ private class CPath {
 		var _root = norm.startsWith('/');
 		if ( _root )
 			norm = norm.after('/');
-		var target:Array<String> = new Array();
-		for (tk in norm.split('/')) {
-			if (tk == '..' && (!target.empty() && target.last() == '..')) {
-				target.pop();
-			}
-			else if (tk != '.') {
-				target.push( tk );
-			}
+		var r = new Path( norm );
+		if ( absolute ) {
+			r = r.absolutize();
 		}
-		norm = target.join( '/' );
-		if ( _root )
-			norm = ('/' + norm);
-		return new Path( norm );
+		return r;
 	}
 
 	/* make [this] Path absolute */
@@ -107,29 +99,35 @@ private class CPath {
 	}
 
 	/* expand [this] Path */
-	public inline function expand():Path {
-		return _expand( this );
+	public function expand():Path {
+		var pieces:Array<String> = this.pieces;
+		var res:Array<String> = new Array();
+		for (n in pieces) {
+			switch ( n ) {
+				case '.', '':
+					null;
+
+				case '..':
+					res.pop();
+
+				default:
+					res.push( n );
+			}
+		}
+		var p:Path = new Path(res.join('/'));
+		if ( absolute ) p = p.absolutize();
+		return p;
 	}
 
 	/**
 	 * obtain a Path which is [other] relative to [this]
 	 */
 	public function resolve(other : Path):Path {
-		if ( !absolute ) {
-			err('Cannot resolve a relative Path by another relative Path; One of them must be absolute!');
+		var res:Path = join([this, other]).expand();
+		if ( absolute ) {
+			res = res.absolutize();
 		}
-		else {
-			// the sum of [this] and [other]
-			var joined:CPath = join([toString(), other.toString()]).normalize();
-
-			// [joined], with all expansions resolved
-			var result:Path = joined.expand();
-
-			return result;
-		}
-
-		//- placeholder return, so the compiler doesn't complain
-		return new Path('');
+		return res;
 	}
 
 	/* create a relative Path from [this] to [other] */
