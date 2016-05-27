@@ -2,6 +2,7 @@ package tannus.ds;
 
 import tannus.io.Ptr;
 import tannus.ds.tuples.Tup2;
+import tannus.ds.dict.DictKey;
 
 import haxe.macro.Expr;
 import haxe.macro.Context;
@@ -413,6 +414,20 @@ class ArrayTools {
 	}
 
 	/**
+	  * partition the given Array
+	  */
+	public static function partition<T>(list:Array<T>, pred:T->Bool):Array<Array<T>> {
+		var results:Array<Array<T>> = [[], []];
+		for (x in list) results[pred(x) ? 0 : 1].push( x );
+		return results;
+	}
+
+	public static macro function macpartition<T>(list:ExprOf<Array<T>>, pred:Expr):ExprOf<Array<Array<T>>> {
+		pred = pred.replace(macro _, macro x).buildFunction(['x']);
+		return macro tannus.ds.ArrayTools.partition($list, $pred);
+	}
+
+	/**
 	  * filter and map simultaneously
 	  */
 	public static function mapfilter<A, B>(list:Array<A>, test:A->Bool, map:A->B):Array<B> {
@@ -499,6 +514,16 @@ class ArrayTools {
 	}
 
 	/**
+	  * Build a Dict from a zipped Array
+	  */
+	//@:generic
+	//public static function dict<K : DictKey>(pairs : Array<Pair<K, Dynamic>>):Dict<K, Dynamic> {
+		//var d = new Dict();
+		//for (p in pairs) d.set(p.left, p.right);
+		//return d;
+	//}
+
+	/**
 	  * build a Grid<T> from an Array<Array<T>>
 	  */
 	public static inline function gridify<T>(arr : Array<Array<T>>):Grid<T> {
@@ -534,6 +559,61 @@ class ArrayTools {
 			return res;
 		}
 	}
+
+	/**
+	  * iterate over the given Array and apply [keygen] to each item
+	  * the value returned by [keygen] is the key under which an Array is stored,
+	  * and every 'item' for which [keygen] returns that same key is appended to 
+	  * said Array
+	  */
+	//@:generic
+	//public static function group<K, V>(list:Iterable<V>, keygen:V->K):Dict<K, Array<V>> {
+		//var d = new Dict();
+		//for (item in list) {
+			//var key:K = keygen( item );
+			//if (!d.exists( key )) {
+				//d.set(key, new Array());
+			//}
+			//d.get( key ).push( item );
+		//}
+		//return d;
+	//}
+
+	/**
+	  * iterate over [list], and apply [keygen] to each item
+	  * the value returned by [keygen] becomes the key under which the 
+	  * value returned by applying [mapper] to the item is stored
+	  */
+	//@:generic
+	//public static inline function index<K, V:Dynamic>(list:Iterable<V>, keygen:V -> K):Dict<K, V> {
+		//var d = new Dict();
+		//for (item in list) {
+			//d.set(keygen(item), item);
+		//}
+		//return d;
+	//}
+
+	/**
+	  * macro-licious 'group'
+	  */
+	//public static macro function macgroup<K,V>(list:ExprOf<Iterable<V>>, key:Expr):ExprOf<Dict<K, Array<V>>> {
+		//var keygen:Expr;
+		//key = key.replace(macro _, macro item);
+		//keygen = key.buildFunction(['item']);
+
+		//return macro tannus.ds.ArrayTools.group($list, $keygen);
+	//}
+
+	/**
+	  * macro-licious 'group'
+	  */
+	//public static macro function macindex<K, V>(list:ExprOf<Iterable<V>>, key:Expr):ExprOf<Dict<K, V>> {
+		//var keygen:Expr;
+		//key = key.replace(macro _, macro item);
+		//keygen = key.buildFunction(['item']);
+
+		//return macro tannus.ds.ArrayTools.index($list, $keygen);
+	//}
 
 	#if macro
 
