@@ -9,6 +9,8 @@ import Math.*;
 import haxe.macro.Expr;
 import haxe.macro.Context;
 
+using StringTools;
+using tannus.ds.StringUtils;
 using haxe.macro.ExprTools;
 using tannus.macro.MacroTools;
 
@@ -54,6 +56,31 @@ class TMath {
 	/** Determines and Returns the angle between two points */
 	public static inline function angleBetween(x1:Float, y1:Float, x2:Float, y2:Float):Float {
 		return (toDegrees(Math.atan2(y2 - y1, x2 - x1)));
+	}
+
+	/**
+	  * Does the shit
+	  */
+	public static function toFixed<T:Float>(n:T, c:Int=0):String {
+		var sn:String = Std.string( n );
+		var bd:String = sn.before('.');
+		var wn:Int = Std.parseInt( bd );
+		var ad:String = '';
+		var res:String = (wn + '');
+		if (sn.has('.')) {
+			ad = sn.after('.');
+			var sl = ad.slice(0, c);
+			if (ad.length > sl.length) {
+				sl = ad.slice(0, c + 1);
+				var idec:Int = Std.parseInt( sl );
+				idec = round(idec / 10);
+				res += ('.' + idec);
+			}
+			else {
+				res += ('.' + sl);
+			}
+		}
+		return res;
 	}
 
 	#if !js @:generic #end
