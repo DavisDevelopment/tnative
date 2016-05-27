@@ -95,6 +95,13 @@ class Stack<T> {
 	}
 
 	/**
+	  * Get the underlying data
+	  */
+	public inline function getData():Array<T> {
+		return data;
+	}
+
+	/**
 	  * Test whether [this] Stack is empty
 	  */
 	public var empty(get, never):Bool;
