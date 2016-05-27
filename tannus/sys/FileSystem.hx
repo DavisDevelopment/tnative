@@ -106,16 +106,17 @@ class FileSystem {
 	  * Reads data from a file, and returns it
 	  */
 	public static inline function read(path:String, ?length:Int):ByteArray {
-		#if python
+		/*#if python
 			var f:Dynamic = (python.Syntax.pythonCode('open'))(path, 'rb');
 			var _data:python.Bytearray = new python.Bytearray(length!=null?f.read():f.read(length));
 			f.close();
 
 			return (untyped ByteArray.ofData(_data));
 		#else
+		*/
 			var b:haxe.io.Bytes = F.getBytes(path);
 			return ByteArray.fromBytes(b);
-		#end
+		//#end
 	}
 
 	/**
