@@ -4,8 +4,14 @@ import haxe.macro.Expr;
 import haxe.macro.Context;
 import haxe.macro.Type;
 
+using StringTools;
+using tannus.ds.StringUtils;
+using Lambda;
+using tannus.ds.ArrayTools;
 using haxe.macro.ExprTools;
 using haxe.macro.ExprTools.ExprArrayTools;
+using haxe.macro.TypeTools;
+using haxe.macro.ComplexTypeTools;
 
 class MacroTools {
 	/**
@@ -68,6 +74,83 @@ class MacroTools {
 	}
 
 	/**
+	  * Build a function expression with [body] as the function body
+	  */
+	public static function buildFunction(body:Expr, args:Array<String>, noreturn:Bool=false):Expr {
+		/* = format the function body = */
+		/* if [body] does not contain a 'return' statement */
+		if (!hasReturn( body ) && !noreturn) {
+			/* convert the last expression in the body to a return expression */
+			var abody:Array<Expr> = toArray( body );
+			var last = abody.pop();
+			last = (macro return $last);
+			abody.push( last );
+			body = fromArray( abody );
+		}
+
+		// build the function arguments
+		var fargs:Array<FunctionArg> = args.map( functionArg );
+		
+		// build the function object
+		var func:Function = {
+			args   : fargs,
+			expr   : body,
+			ret    : null,
+			params : null
+		};
+
+		// return the function expression
+		return {
+			expr: EFunction(null, func),
+			pos: Context.currentPos()
+		};
+	}
+
+	/**
+	  * Build a function argument from the given String
+	  */
+	public static function functionArg(s : String):FunctionArg {
+		var arg:FunctionArg = {
+			value : null,
+			type  : null,
+			opt   : false,
+			name  : 'arg'
+		};
+
+		/* optional */
+		//if (s.startsWith('?')) {
+			//s = s.after('?');
+			//arg.opt = true;
+		//}
+
+		/* type specified */
+		//if (s.has(':')) {
+			//var type = s.after(':');
+			//s = s.before(':');
+			//if (type.has('=')) {
+				//var val = type.after('=');
+				//type = type.before('=');
+				//s += ('=' + val);
+			//}
+			//var ctype:ComplexType = Context.getType( type ).toComplexType();
+			//trace(ctype);
+			//arg.type = ctype;
+		//}
+
+		/* default value */
+		//if (s.has('=')) {
+			//var sval = s.after('=');
+			//s = s.before('=');
+			//var value:Expr = Context.parse(sval, Context.currentPos());
+			//arg.value = value;
+		//}
+
+		arg.name = s;
+
+		return arg;
+	}
+
+	/**
 	  * Replace all references to '_' with [repl]
 	  */
 	public static function mapUnderscoreTo(e:Expr, repl:String):Expr {
@@ -96,7 +179,12 @@ class MacroTools {
 	  * Replace all instances of [what] with [with] in [e]
 	  */
 	public static function replace(e:Expr, what:Expr, with:Expr):Expr {
-		return e.map(replacer.bind(_, [what], with));
+		if (e.expr.equals( what.expr )) {
+			return with;
+		}
+		else {
+			return e.map(replacer.bind(_, [what], with));
+		}
 	}
 
 	/**
