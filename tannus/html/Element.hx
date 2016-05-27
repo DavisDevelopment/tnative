@@ -263,6 +263,13 @@ abstract Element (JQuery) from JQuery to JQuery {
 	}
 
 	/**
+	  * Check whether [this] is contained by [other]
+	  */
+	public inline function containedBy(other : Element):Bool {
+		return other.contains( this );
+	}
+
+	/**
 	  * Append some shit to [this] Element
 	  */
 	public inline function appendElementable(child : Elementable):Element {
