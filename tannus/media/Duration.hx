@@ -18,6 +18,13 @@ abstract Duration (CDur) from CDur to CDur {
 
 	@:op(A == B)
 	public inline function equals(other : Duration):Bool return this.equals( other );
+	@:op(A != B)
+	public inline function nequals(other : Duration):Bool return !equals( other );
+	@:op(A > B)
+	public inline function gt(other : Duration):Bool return this.greaterThan( other );
+	@:op(A < B)
+	public inline function lt(other : Duration):Bool return this.lessThan( other );
+
 	@:op(A + B)
 	public inline function plus(other : Duration):Duration return this.plus( other );
 
@@ -53,6 +60,7 @@ abstract Duration (CDur) from CDur to CDur {
 	public static inline function fromString(s : String):Duration return CDur.fromString( s );
 }
 
+@:expose( 'tannus.media.Duration' )
 class CDur implements Comparable<CDur> {
 	/* Constructor Function */
 	public function new(s:Int, m:Int, h:Int):Void {
@@ -88,11 +96,46 @@ class CDur implements Comparable<CDur> {
 	}
 
 	/**
+	  * test whether [this] is 'greater than' [other]
+	  */
+	public inline function greaterThan(other : Duration):Bool {
+		return (toInt() > other.toInt());
+	}
+
+	/**
+	  * test whether [this] is 'less than' [other]
+	  */
+	public inline function lessThan(other : Duration):Bool {
+		return (toInt() < other.toInt());
+	}
+
+	/**
+	  * compare [this] with [other]
+	  */
+	public function compare(other : Duration):Int {
+		return (
+			if (equals( other )) 0
+			else if (greaterThan( other )) 1
+			else -1
+		);
+	}
+
+	/**
 	  * get the sum of [this] and [other]
 	  */
 	public function plus(other : Duration):Duration {
 		return fromSecondsI(totalSeconds + other.totalSeconds);
 	}
+
+	/**
+	  * Convert [this] to an Int
+	  */
+	public inline function toInt():Int return totalSeconds;
+
+	/**
+	  * Convert [this] to a Float
+	  */
+	public inline function toFloat():Float return (toInt() + 0.0);
 
 /* === Computed Instance Fields === */
 
@@ -134,6 +177,7 @@ class CDur implements Comparable<CDur> {
 		d.totalSeconds = i;
 		return d;
 	}
+	public static inline function fromInt(i : Int):Duration return fromSecondsI( i );
 
 	/**
 	  * create a Duration from a Float
@@ -141,158 +185,11 @@ class CDur implements Comparable<CDur> {
 	public static inline function fromSecondsF(n : Float):Duration {
 		return fromSecondsI(floor( n ));
 	}
+	public static inline function fromFloat(n : Float):Duration return fromSecondsF( n );
 
 	/**
 	  * create a Duration from a String
 	  */
-	public static function fromString(s : String):Duration {
-		var data = s.trim().split(':').map( Std.parseInt );
-		switch( data ) {
-			case [s]:
-				return new Duration( s );
-			case [m, s]:
-				return new Duration(s, m);
-			case [h, m, s]:
-				return new Duration(s, m, h);
-			default:
-				throw 'Invalid Duration string "$s"';
-		}
-	}
-}
-
-/**
-  * Abstract class to represent to duration of some playable media (sound, video, slideshow, etc)
-  */
-abstract OldDuration (Dur) {
-	/* Constructor Function */
-	public inline function new(s:Int=0, m:Int=0, h:Int=0):Void {
-		this = {
-			'seconds' : s,
-			'minutes' : m,
-			'hours'   : h
-		};
-	}
-
-/* === Instance Methods === */
-
-	/**
-	  * Convert [this] Duration into a nice, sexy String
-	  */
-	@:to
-	public function toString():String {
-		var bits:Array<String> = new Array();
-		bits.unshift(seconds+'');
-		bits.unshift(minutes+'');
-		if (hours > 0)
-			bits.unshift(hours+'');
-		bits = bits.map(function(s : String) {
-			if (s.length < 2)
-				s = ('0'.times(2 - s.length) + s);
-			return s;
-		});
-		return bits.join(':');
-	}
-
-	/**
-	  * Obtain the 'sum' of [this] Duration, and another
-	  */
-	@:op(A + B)
-	public inline function add(other : Duration):Duration {
-		return new Duration((seconds + other.seconds), (minutes + other.minutes), (hours + other.hours));
-	}
-
-/* === Instance Fields === */
-
-	/**
-	  * Total Seconds of [this] Duration
-	  */
-	public var totalSeconds(get, set):Int;
-	private inline function get_totalSeconds():Int {
-		return ((60 * 60 * hours) + (60 * minutes) + seconds);
-	}
-	private inline function set_totalSeconds(v : Int):Int {
-		hours = floor(v / 3600);
-		v = (v - hours * 3600);
-		minutes = floor(v / 60);
-		seconds = (v - minutes * 60);
-		return totalSeconds;
-	}
-
-	/**
-	  * Total Minutes of [this] Duration
-	  */
-	public var totalMinutes(get, never):Float;
-	private inline function get_totalMinutes():Float {
-		var res:Float = 0;
-		//- Hours
-		res += (60 * hours);
-		//- Minutes
-		res += minutes;
-		//- Seconds
-		res += (seconds / 60.0);
-		return res;
-	}
-
-	/**
-	  * Total Hours
-	  */
-	public var totalHours(get, never):Float;
-	private inline function get_totalHours():Float {
-		var res:Float = 0;
-		//- Hours
-		res += hours;
-		//- Minutes
-		res += (totalMinutes / 60.0);
-		return res;
-	}
-
-	/**
-	  * Hours of [this] Duration
-	  */
-	public var hours(get, set):Int;
-	private inline function get_hours() return this.hours;
-	private inline function set_hours(nh) return (this.hours = nh);
-
-	/**
-	  * Minutes of [this] Duration
-	  */
-	public var minutes(get, set):Int;
-	private inline function get_minutes() return this.minutes;
-	private inline function set_minutes(nm) return (this.minutes = nm);
-
-	/**
-	  * Seconds of [this] Duration
-	  */
-	public var seconds(get, set):Int;
-	private inline function get_seconds() return this.seconds;
-	private inline function set_seconds(ns) return (this.seconds = ns);
-
-/* === Static Methods === */
-
-	/**
-	  * Cast to Duration from Int
-	  */
-	@:from
-	public static function fromSecondsI(i : Int):Duration {
-		var d:Duration = new Duration();
-		d.totalSeconds = i;
-		return d;
-	}
-
-	/**
-	  * From Float
-	  */
-	@:from
-	public static function fromSecondsF(i : Float):Duration {
-		var d:Duration = new Duration();
-		d.totalSeconds = Math.floor( i );
-		return d;
-	}
-
-	/**
-	  * from String
-	  */
-	@:from
 	public static function fromString(s : String):Duration {
 		var data = s.trim().split(':').map( Std.parseInt );
 		switch( data ) {
