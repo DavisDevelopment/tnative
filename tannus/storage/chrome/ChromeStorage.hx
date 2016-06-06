@@ -39,8 +39,10 @@ class ChromeStorage extends Storage {
 	  */
 	override private function _push(map_data:Data, cb:Err->Void):Void {
 		var data:Object = encode( map_data ).toObject();
-		area.set(data, function() {
-			cb( null );
+		area.remove(deleted, function() {
+			area.set(data, function() {
+				cb( null );
+			});
 		});
 	}
 
