@@ -118,10 +118,46 @@ class Ellipse implements Shape implements PathComponent {
 	}
 
 	/* the center of [this] Ellipse */
-	public var center(get, never):Point;
-	private inline function get_center():Point {
-		return rect.center;
+	public var center(get, set):Point;
+	private inline function get_center():Point return Point.linked(centerX, centerY);
+	private function set_center(v : Point):Point {
+		centerX = v.x;
+		centerY = v.y;
+		return center;
 	}
+
+	public var x(get, set):Float;
+	private function get_x():Float {
+		return pos.x;
+	}
+	private function set_x(v : Float):Float {
+		return (pos.x = v);
+	}
+
+	public var y(get, set):Float;
+	private function get_y():Float {
+		return pos.y;
+	}
+	private function set_y(v : Float):Float {
+		return (pos.y = v);
+	}
+
+	public var centerX(get, set):Float;
+	private function get_centerX():Float {
+		return (x + width / 2);
+	}
+	private function set_centerX(v : Float):Float {
+		return x = v - width / 2;
+	}
+
+	public var centerY(get, set):Float;
+	private function get_centerY():Float {
+		return (y + height / 2);
+	}
+	private function set_centerY(v : Float):Float {
+		return y = v - height / 2;
+	}
+
 
 /* === Static Methods === */
 
