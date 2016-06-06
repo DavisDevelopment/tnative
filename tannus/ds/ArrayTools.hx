@@ -201,7 +201,8 @@ class ArrayTools {
 	  * Perform [action] on every item in the list
 	  */
 	public static macro function each<T>(list:ExprOf<Iterable<T>>, action:Expr):Expr {
-		action = action.mapUnderscoreTo( 'item' );
+		action = action.replace(macro _, macro item);
+
 		return macro {
 			for (item in $list) {
 				$action;
