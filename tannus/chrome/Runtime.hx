@@ -83,6 +83,13 @@ class Runtime {
 	  */
 	public static var id(get, never):String;
 	private static inline function get_id() return (lib.id + '');
+
+	/**
+	  * asyncronous error message defined by some chrome-specific api in the event of an error
+	  */
+	public static var lastError(get, never):Null<String>;
+	private static inline function get_lastError():Null<String> return lib.lastError;
+
 	/**
 	  * Reference to the object being used internally
 	  */
