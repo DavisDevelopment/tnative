@@ -7,6 +7,8 @@ import tannus.html.fs.FilePromise;
 import tannus.sys.Path;
 import tannus.internal.TypeTools.typename;
 
+import tannus.chrome.Runtime in Rt;
+
 import tannus.ds.Promise;
 import tannus.ds.promises.*;
 
@@ -128,6 +130,13 @@ class FileSystem {
 			};
 
 			chooseEntry(options, function(entries) {
+				if (Rt.lastError != null) {
+					var error:String = Rt.lastError;
+					trace( error );
+					throw error;
+					@ignore return ;
+				}
+
 				if (entries.length > 0) {
 					return (cast entries[0]);
 				}
@@ -170,9 +179,9 @@ typedef ChooseEntryOptions = {
 	?suggestedName : String,
 	?acceptsAllTypes : Bool,
 	?acceptsMultiple : Bool,
-	?accepts : {
+	?accepts : Array<{
 		?description:String,
 		?mimeTypes:Array<String>,
 		?extensions:Array<String>
-	}
+	}>
 };
