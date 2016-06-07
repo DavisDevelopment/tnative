@@ -36,6 +36,35 @@ class LexerBase {
 		return data;
 	}
 
+	/**
+	  * Read until the given delimiter
+	  */
+	private function readUntil(end:Byte, ?esc:Byte):ByteArray {
+		var d:ByteArray = new ByteArray();
+		var escaped:Bool = false;
+
+		while ( !done ) {
+			var c = next();
+
+			if ( !escaped ) {
+				if (c == end) {
+					advance();
+					break;
+				}
+				else if (esc != null && c == esc) {
+					escaped = true;
+				}
+			}
+			else {
+				escaped = false;
+			}
+
+			d.push(advance());
+		}
+
+		return d;
+	}
+
 	/* get the next Byte in [buffer] */
 	private inline function next(?dis : Int):Byte {
 		return buffer.peek( dis );

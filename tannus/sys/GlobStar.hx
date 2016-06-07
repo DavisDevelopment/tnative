@@ -68,6 +68,28 @@ class CGlobStar {
 		}
 	}
 
+	/**
+	  * Convert [this] to a String
+	  */
+	public function toString():String {
+		var s:String = 'GlobStar($spat => ${patternString()})';
+		return s;
+	}
+
+	/**
+	  * Convert the given EReg to a String
+	  */
+	@:access( EReg )
+	private function patternString():String {
+		#if python
+		return pattern.pattern.pattern;
+		#elseif js
+		return pattern.r.toString();
+		#else
+		return spat;
+		#end
+	}
+
 /* === Instance Fields === */
 
 	private var spat : String;
