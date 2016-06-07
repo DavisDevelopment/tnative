@@ -3,14 +3,17 @@ package tannus.io;
 import tannus.io.BinaryData;
 import tannus.io.impl.BinaryIterator;
 import tannus.io.impl.BinaryError;
+import tannus.internal.TypeTools.typename;
 
 import tannus.io.Byte;
 import tannus.sys.Mime;
 import tannus.math.TMath;
+import tannus.ds.Obj;
 import haxe.Int64;
 
 import Math.*;
 
+using Type;
 using Lambda;
 using StringTools;
 using tannus.ds.StringUtils;
@@ -181,6 +184,11 @@ class Binary {
 		return position;
 	}
 
+	/* write a Float to the end of [this] data */
+	public function pushFloat(n : Float):Int {
+		return pushInt32(TMath.floatToI32( n ));
+	}
+
 	/* add a Byte to the beginning of [this] data */
 	public function unshift(c : Byte):Int {
 		shiftRight( 1 );
@@ -219,6 +227,36 @@ class Binary {
 	/* append a String to [this] */
 	public function appendString(foot:String, ?len:Int):ByteArray {
 		return append(_ofString(foot), len);
+	}
+
+	/* append an Object to [this] */
+	public function appendStruct(od : Dynamic):Int {
+		var o:Obj = Obj.fromDynamic( od );
+		if (o.exists( '_append_ba' )) {
+			var a:Binary->Void = o.method( '_append_ba' );
+			var _i:Int = position;
+			a( this );
+			var len:Int = (position - _i);
+			return len;
+		}
+		else {
+			throw 'Error: $o Cannot be written to a ByteArray';
+			return -1;
+		}
+	}
+
+	/**
+	  * read data from [this] ByteArray, as an instance of the given Class
+	  */
+	public function readStruct(type : Class<Dynamic>):Dynamic {
+		var ocl:Obj = Obj.fromDynamic( type );
+		if (ocl.exists( '_from_ba' )) {
+			var _from:ByteArray->Dynamic = ocl.method( '_from_ba' );
+			return _from( this );
+		}
+		else {
+			throw 'Error: ${typename( type )} has no "_from_ba" method';
+		}
 	}
 
 	/* add [header] to the beginning of [this] data */
