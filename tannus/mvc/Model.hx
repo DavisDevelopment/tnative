@@ -18,6 +18,8 @@ import tannus.mvc.Requirements;
 
 import haxe.rtti.Meta;
 
+using tannus.ds.ArrayTools;
+
 class Model extends EventDispatcher implements Asset {
 	/* Constructor Function */
 	public function new():Void {
@@ -223,6 +225,15 @@ class Model extends EventDispatcher implements Asset {
 		return [for (k in _a.keys()) k];
 	}
 	public inline function keys():Array<String> return allAttributes();
+
+	/**
+	  * Erase all data stored in [this] Model
+	  */
+	public function clearAttributes():Void {
+		keys().each(remove( _ ));
+		save();
+	}
+	public inline function clear():Void clearAttributes();
 
 	/**
 	  * Perform metadata-based event-binding
