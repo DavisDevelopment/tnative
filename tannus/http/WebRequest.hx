@@ -2,6 +2,7 @@ package tannus.http;
 
 import tannus.html.Win;
 import tannus.io.EventDispatcher;
+import tannus.io.ByteArray;
 import tannus.io.VoidSignal;
 import tannus.ds.Obj;
 
@@ -11,6 +12,7 @@ import js.html.ArrayBuffer;
 import js.html.Blob;
 import js.html.Document;
 
+@:expose( 'WebRequest' )
 class WebRequest extends EventDispatcher {
 	/* Constructor Function */
 	public function new():Void {
@@ -76,6 +78,15 @@ class WebRequest extends EventDispatcher {
 	public inline function loadAsDocument(cb : Document -> Void):Void {
 		responseType = TDoc;
 		onres( cb );
+	}
+
+	/**
+	  * wait for the response, as a ByteArray
+	  */
+	public inline function loadAsByteArray(cb : ByteArray -> Void):Void {
+		loadAsArrayBuffer(function(ab) {
+			cb(ByteArray.ofData( ab ));
+		});
 	}
 
 	/**
