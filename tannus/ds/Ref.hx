@@ -51,6 +51,13 @@ class CRef<T> {
 		}
 	}
 
+	/**
+	  * reset [this] Ref
+	  */
+	public inline function reset():Void {
+		_value = null;
+	}
+
 /* === Instance Fields === */
 
 	private var getter : Getter<T>;
