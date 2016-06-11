@@ -8,6 +8,7 @@ import tannus.ds.Delta;
 import tannus.ds.Destructible;
 import tannus.ds.Memory;
 import tannus.ds.Object;
+import tannus.ds.Maybe;
 import tannus.io.Ptr;
 import tannus.io.Signal;
 import tannus.io.EventDispatcher;
@@ -154,6 +155,7 @@ class Model extends EventDispatcher implements Asset {
 		return untyped _a.get( key );//(storage.get(map_key( key )));
 	}
 	public inline function get<T>(k : String):Null<T> return getAttribute( k );
+	public inline function mget<T>(k : String):Maybe<T> return get( k );
 
 	/**
 	  * Set the value of an attribute of [this] Model
