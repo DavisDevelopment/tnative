@@ -6,7 +6,8 @@ import tannus.io.Pointer;
 /**
   * Maybe Type = provides tools to make dealing with nullable data easier
   */
-abstract Maybe<T> (Null<T>) from Null<T> {
+@:forward
+abstract Maybe<T> (Null<T>) from Null<T> to Null<T> {
 	/* Constructor Function */
 	public inline function new(x : Null<T>):Void {
 		this = x;
