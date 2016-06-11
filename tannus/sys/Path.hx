@@ -63,7 +63,7 @@ abstract Path (CPath) from CPath to CPath {
 }
 
 @:access( haxe.io.Path )
-private class CPath {
+class CPath {
 	/* Constructor Function */
 	public function new(str : String):Void {
 		s = str;
