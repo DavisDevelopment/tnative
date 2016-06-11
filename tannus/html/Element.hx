@@ -2,6 +2,7 @@ package tannus.html;
 
 import tannus.ds.Maybe;
 import tannus.ds.Object;
+import tannus.ds.Obj;
 import tannus.io.Ptr;
 import tannus.io.Getter;
 import tannus.geom.Point;
@@ -18,7 +19,12 @@ import Reflect.*;
 // using Reflect;
 using Lambda;
 using tannus.ds.ArrayTools;
+using StringTools;
+using tannus.ds.StringUtils;
+using tannus.math.TMath;
+using tannus.macro.MacroTools;
 using tannus.html.JSTools;
+using Reflect;
 
 @:forward
 abstract Element (JQuery) from JQuery to JQuery {
@@ -210,9 +216,7 @@ abstract Element (JQuery) from JQuery to JQuery {
 	  * Get attribute
 	  */
 	@:arrayAccess
-	public inline function get(key : String):Maybe<String> {
-		return (this.attr(key));
-	}
+	public inline function get(key : String):Maybe<String> return (this.attr( key ));
 
 	/**
 	  * Set attribute
@@ -226,12 +230,12 @@ abstract Element (JQuery) from JQuery to JQuery {
 	/* invoke a plugin method on [this] Element */
 	public function plugin<T>(name:String, ?arguments:Array<Dynamic>):T {
 		if (arguments == null) arguments = new Array();
-		return callMethod(this, getProperty(this, name), arguments);
+		return callMethod(getProperty( name ), arguments);
 	}
 
 	/* get a Function for the requested method, already bound to [this] */
 	public function method<T:Function>(name : String):T {
-		var _f:Dynamic = makeVarArgs(callMethod.bind(this, getProperty(this, name), _));
+		var _f:Dynamic = callMethod.bind(getProperty( name ), _).makeVarArgs();
 		return untyped _f;
 	}
 
@@ -274,6 +278,15 @@ abstract Element (JQuery) from JQuery to JQuery {
 	  */
 	public inline function appendElementable(child : Elementable):Element {
 		return (this.append(child.toElement()));
+	}
+	public inline function prependElementable(child : Elementable):Element {
+		return (this.prepend(child.toElement()));
+	}
+	public inline function afterElementable(child : Elementable):Element {
+		return this.after(child.toElement());
+	}
+	public inline function beforeElementable(child : Elementable):Element {
+		return this.before(child.toElement());
 	}
 
 /* === Operator Overloading === */
@@ -358,4 +371,26 @@ abstract Element (JQuery) from JQuery to JQuery {
 	public static inline function fromDOMElement(el : js.html.DOMElement):Element {
 		return new Element( el );
 	}
+
+	/**
+	  * Extend jQuery
+	  */
+	public static function extend(name:String, f:JSFunction):Void {
+		function ext(args : Array<Dynamic>):Dynamic {
+			var self:Dynamic = js.Lib.nativeThis;
+			args.unshift( self );
+			return f.apply(self, args);
+		}
+
+		jqfn().set(name, ext.makeVarArgs());
+	}
+
+	/**
+	  * Get the jQuery variable (if available)
+	  */
+	private static inline function jq():Dynamic {
+		return Win.current.get( 'jQuery' );
+	}
+	private static inline function jqo():Obj return Obj.fromDynamic(jq());
+	private static inline function jqfn():Obj return Obj.fromDynamic(jqo()['fn']);
 }
