@@ -144,6 +144,14 @@ abstract Win (CWin) from CWin to CWin {
 		exposeSetter(name, ref.setter);
 	}
 
+	/**
+	  * get a global variable
+	  */
+	@:arrayAccess
+	public inline function get<T>(name : String):T {
+		return untyped this[name];
+	}
+
 
 /* === Instance Fields === */
 
