@@ -3,6 +3,12 @@ package tannus.ds;
 import tannus.io.Getter;
 import tannus.io.Pointer;
 
+import haxe.macro.Expr;
+import haxe.macro.Context;
+
+using haxe.macro.ExprTools;
+using tannus.macro.MacroTools;
+
 /**
   * Maybe Type = provides tools to make dealing with nullable data easier
   */
@@ -11,6 +17,11 @@ abstract Maybe<T> (Null<T>) from Null<T> to Null<T> {
 	/* Constructor Function */
 	public inline function new(x : Null<T>):Void {
 		this = x;
+	}
+
+	public macro function ternary<A>(self:ExprOf<Maybe<T>>, ify:Expr, ifn:Expr):ExprOf<A> {
+		ify = ify.replace(macro _, self);
+		return macro ($self.exists ? $ify : $ifn);
 	}
 
 	/**
