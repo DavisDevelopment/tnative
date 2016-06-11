@@ -3,6 +3,7 @@ package tannus.ds;
 import tannus.ds.EitherType;
 import tannus.io.RegEx;
 import tannus.io.Byte;
+import tannus.ds.tuples.Tup2 in Tuple;
 
 import haxe.macro.Expr;
 import haxe.macro.Context;
@@ -225,6 +226,16 @@ class StringUtils {
 	}
 
 	/**
+	  * separate the given String into a pair of Strings, the String before [sep] and the String after [sep]
+	  */
+	public static inline function separate(s:String, sep:String, last:Bool=false):Sep {
+		return new Sep(
+			(last ? beforeLast : before)(s, sep),
+			(last ? afterLast : after)(s, sep)
+		);
+	}
+
+	/**
 	  * Get last byte of [this] String
 	  */
 	public static function lastByte(s : String):Byte {
@@ -265,4 +276,16 @@ class StringUtils {
 		}
 		return true;
 	}
+}
+
+abstract Sep (Tuple<String, String>) {
+	public inline function new(a:String, b:String):Void {
+		this = new Tuple(a, b);
+	}
+
+	public var before(get, never):String;
+	private inline function get_before():String return this._0;
+
+	public var after(get, never):String;
+	private inline function get_after():String return this._1;
 }
