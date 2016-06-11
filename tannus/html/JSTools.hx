@@ -4,6 +4,7 @@ import tannus.ds.Obj;
 
 import haxe.macro.Expr;
 import haxe.macro.Context;
+import haxe.extern.*;
 
 using haxe.macro.ExprTools;
 using StringTools;
