@@ -67,6 +67,16 @@ class StoredModel extends Model {
 		});
 	}
 
+	/**
+	  * Delete all local changes to [storage], and re-fetch the remote
+	  */
+	public function rollback(?cb : Void->Void):Void {
+		storage.rollback();
+		storage.fetch(function() {
+			if (cb != null) cb();
+		});
+	}
+
 /* === Computed Instance Fields === */
 
 	/* the Storage instance in use by [this] Model */
