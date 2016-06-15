@@ -44,7 +44,7 @@ private class AsyncTask extends Task {
 }
 
 private typedef TAsync0 = AsyncComplete0 -> Void;
-private typedef TAsync1<T> = AsyncComplete1<T> -> Void;
+private typedef TAsync1<T> = Int -> AsyncComplete1<T> -> Void;
 
 private typedef AsyncComplete0 = Void -> Void;
-private typedef AsyncComplete1<T> = T -> Void;
+private typedef AsyncComplete1<T> = Null<Dynamic> -> Null<T> -> Void;
