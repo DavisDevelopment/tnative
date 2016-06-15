@@ -58,6 +58,8 @@ abstract Duration (CDur) from CDur to CDur {
 	public static inline function fromSecondsF(n : Float):Duration return CDur.fromSecondsF( n );
 	@:from
 	public static inline function fromString(s : String):Duration return CDur.fromString( s );
+	@:from
+	public static inline function fromIntArray(a : Array<Int>):Duration return CDur.fromIntArray( a );
 }
 
 @:expose( 'tannus.media.Duration' )
@@ -202,6 +204,13 @@ class CDur implements Comparable<CDur> {
 			default:
 				throw 'Invalid Duration string "$s"';
 		}
+	}
+
+	/**
+	  * create a Duration from an Array<Int>
+	  */
+	public static inline function fromIntArray(a : Array<Int>):Duration {
+		return new Duration(a[0], a[1], a[2]);
 	}
 }
 
