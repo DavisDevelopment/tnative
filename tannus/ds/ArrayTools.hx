@@ -515,6 +515,32 @@ class ArrayTools {
 	}
 
 	/**
+	  * macro-licious sort
+	  */
+	public static macro function macsort<T>(list:ExprOf<Array<T>>, parameters:Array<Expr>):Expr {
+		var leftExpr:Array<Expr> = [macro x];
+		var rightExpr:Array<Expr> = [macro y];
+		var func:Expr = macro 0;
+
+		switch ( parameters ) {
+			case [left, right, action]:
+				leftExpr.push( left );
+				rightExpr.push( right );
+				func = action;
+
+			case [action]:
+				func = action;
+
+			default:
+				null;
+		}
+
+		func = func.replaceMultiple(leftExpr, macro left).replaceMultiple(rightExpr, macro right);
+		func = func.buildFunction(['left', 'right']);
+		return macro haxe.ds.ArraySort.sort($list, $func);
+	}
+
+	/**
 	  * Build a Dict from a zipped Array
 	  */
 	//@:generic
