@@ -10,7 +10,7 @@ typedef WebFSEntry = {
 	var name : String;
 
 	/* The Path to [this] Entry */
-	var fullPath : Path;
+	var fullPath : String;
 
 	/* Whether [this] is a Directory */
 	var isDirectory : Bool;
