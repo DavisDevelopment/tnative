@@ -254,7 +254,21 @@ class Promise<T> {
 	public function array<A>():ArrayPromise<A> {
 		var res:ArrayPromise<A> = new ArrayPromise(function(yep, nope) {
 			then(function(data : Dynamic) {
-				if (is(data, Array)) {
+				try {
+					#if js
+					data = tannus.html.JSTools.arrayify( data );
+					yep(cast data);
+					#else
+					var list:Array<A> = cast data;
+					yep( list );
+					#end
+				}
+				catch (error : Dynamic) {
+					nope( error );
+				}
+				/*
+				// trace(tannus.internal.TypeTools.typename( data ));
+				if (is(data, Array<Dynamic>)) {
 					try {
 						var list:Array<A> = [for (x in cast(data, Array<Dynamic>)) cast x];
 						yep( list );
@@ -266,6 +280,7 @@ class Promise<T> {
 				else {
 					nope(typeError('Cannot cast $data to Array!'));
 				}
+				*/
 			});
 
 			unless( nope );
