@@ -72,7 +72,7 @@ abstract Element (JQuery) from JQuery to JQuery {
 	  */
 	public var style(get, never):ElStyles;
 	private function get_style():ElStyles {
-		return new ElStyles(_cs.bind(_));
+		return ElStyles.create( this );
 	}
 
 	/* Utility Function, only used for the [style] field */
