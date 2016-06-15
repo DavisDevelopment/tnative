@@ -64,12 +64,15 @@ abstract WebDirectoryEntry (DirectoryEntry) from DirectoryEntry {
 	public inline function createDirectory(path : Path):Promise<WebDirectoryEntry> {
 		return new Promise(this.getDirectory.bind(path, {'create': true}));
 	}
+	public inline function getDirectory(path : Path):Promise<WebDirectoryEntry> {
+		return new Promise(this.getDirectory.bind(path, {}));
+	}
 
 	/**
 	  * Obtain a List of Entries within [this] Directory
 	  */
 	public inline function readEntries():ArrayPromise<WebFSEntry> {
-		return new ArrayPromise(this.createReader().readEntries.bind(_, _));
+		return this.createReader().read();
 	}
 
 	/**
@@ -159,7 +162,7 @@ typedef DirectoryEntry = {
 	> WebFSEntry,
 
 	/* Obtain a Reader for [this] Directory */
-	function createReader():DirectoryReader;
+	function createReader():WebDirectoryReader;
 
 	/* Get a File Reference */
 	function getFile(path:Path, options:Object, success:WebFileEntry->Void, failure:Err->Void):Void;
@@ -170,7 +173,3 @@ typedef DirectoryEntry = {
 	/* Delete [this] Directory */
 	function removeRecursively(success:Void->Void, failure:Dynamic->Void):Void;
 }
-
-typedef DirectoryReader = {
-	function readEntries(success:Array<WebFSEntry>->Void, ?failure:Err->Void):Void;
-};
