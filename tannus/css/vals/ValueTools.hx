@@ -61,4 +61,36 @@ class ValueTools {
 				throw 'CSSError: Cannot convert $v to String!';
 		}
 	}
+
+	/**
+	  * Apply function [predicate] to every sub-Value of the given Value
+	  */
+	public static function iter(value:Value, predicate:Value -> Void):Void {
+		predicate( value );
+		switch ( value ) {
+			case VCall(_, args):
+				for (v in args) {
+					iter(v, predicate);
+				}
+
+			default:
+				null;
+		}
+	}
+
+	/**
+	  * transform the given Value using the given mapper function, and return the result
+	  */
+	public static function map(value:Value, mapper:Value -> Value):Value {
+		var val:Value = value;
+		switch ( value ) {
+			case VCall(name, args):
+				val = VCall(name, args.macmap(map(_, mapper)));
+
+			default:
+				null;
+		}
+		val = mapper( val );
+		return val;
+	}
 }
