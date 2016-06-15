@@ -140,6 +140,7 @@ abstract Obj (CObj) from CObj {
 	}
 }
 
+@:expose( 'tannus.ds.Obj' )
 class CObj {
 	/* Constructor Function */
 	public function new(obj : Dynamic):Void {
