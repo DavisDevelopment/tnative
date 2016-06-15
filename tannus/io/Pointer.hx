@@ -11,6 +11,8 @@ import haxe.macro.Expr;
 
 using tannus.macro.MacroTools;
 
+#if js using tannus.html.JSTools; #end
+
 @:generic
 abstract Pointer<T> (Ref<T>) from Ref<T> {
 	/* Constructor Function */
@@ -269,6 +271,15 @@ private class Ref<T> {
 		getter = g;
 		setter = s;
 		deleter = d;
+
+		#if js
+		function prop(n : String) {
+			defineGetter(n, get);
+			defineSetter(n, set);
+		}
+		for (n in ['value', 'v', '_'])
+			prop( n );
+		#end
 	}
 
 /* === Instance Methods === */
