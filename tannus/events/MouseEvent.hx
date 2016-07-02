@@ -17,6 +17,15 @@ class MouseEvent extends Event {
 		emods = mods.or([]);
 	}
 
+/* === Instance Methods === */
+
+	/**
+	  * create and return a clone of [this]
+	  */
+	override public function clone(deep:Bool=false):Event {
+		return new MouseEvent(type, position.clone(), button, emods);
+	}
+
 /* === Computed Instance Fields === */
 
 	/* ShiftKey Mod */
