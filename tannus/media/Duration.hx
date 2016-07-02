@@ -27,6 +27,8 @@ abstract Duration (CDur) from CDur to CDur {
 
 	@:op(A + B)
 	public inline function plus(other : Duration):Duration return this.plus( other );
+	@:op(A - B)
+	public inline function minus(other : Duration):Duration return this.minus( other );
 
 	/**
 	  * Cast [this] to a String
@@ -56,6 +58,10 @@ abstract Duration (CDur) from CDur to CDur {
 	public static inline function fromSecondsI(i : Int):Duration return CDur.fromSecondsI( i );
 	@:from
 	public static inline function fromSecondsF(n : Float):Duration return CDur.fromSecondsF( n );
+	@:from
+	public static inline function fromInt(i : Int):Duration return CDur.fromInt( i );
+	@:from
+	public static inline function fromFloat(n : Float):Duration return CDur.fromFloat( n );
 	@:from
 	public static inline function fromString(s : String):Duration return CDur.fromString( s );
 	@:from
@@ -127,6 +133,13 @@ class CDur implements Comparable<CDur> {
 	  */
 	public function plus(other : Duration):Duration {
 		return fromSecondsI(totalSeconds + other.totalSeconds);
+	}
+
+	/**
+	  * get the difference between [this] and [other]
+	  */
+	public function minus(other : Duration):Duration {
+		return fromInt(toInt() - other.toInt());
 	}
 
 	/**
