@@ -258,6 +258,11 @@ class TMath {
 		);
 	}
 
+	/* check whether the given number is greater than [min] and less than [max] */
+	public static inline function inRange<T:Float>(value:T, min:T, max:T):Bool {
+		return (value >= min && value <= max);
+	}
+
 	public static function sign (value : Float):Int {
 		return if (value < 0) -1
 			else if (value > 0) 1
