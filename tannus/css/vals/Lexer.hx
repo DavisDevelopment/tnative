@@ -13,6 +13,7 @@ using Lambda;
 using tannus.ds.ArrayTools;
 using tannus.ds.StringUtils;
 
+@:expose
 class Lexer {
 	/* Constructor Function */
 	public function new():Void {
@@ -41,126 +42,121 @@ class Lexer {
 	  * Attempt to parse the next Value
 	  */
 	private function parseNext():Null<Value> {
-		var c = next();
 		if ( end ) {
 			return null;
 		}
-		else {
-			/* Whitespace */
-			if (c.isWhiteSpace()) {
-				advance();
-				return parseNext();
+
+		var c = next();
+		/* Whitespace */
+		if (c.isWhiteSpace()) {
+			advance();
+			return parseNext();
+		}
+
+		/* Identifiers, References, and Function-Calls */
+		else if (c.isLetter() || c == '_'.code || cur == '@'.code) {
+			var ident:String = advance();
+			while (!end && (next().isLetter() || next().isNumeric() || next().equalsChar('_'))) {
+				ident += advance();
 			}
 
-			/* Identifiers, References, and Function-Calls */
-			else if (c.isLetter() || c == '_'.code || cur == '@'.code) {
-				var ident:String = advance();
-				c = next();
-				while (!end && (c.isLetter() || c.isNumeric() || c == '_'.code)) {
-					ident += advance();
-					c = next();
-				}
-
-				/* References */
-				if (ident.startsWith( '@' )) {
-					ident = ident.after( '@' );
-					return VRef( ident );
-				} 
-				
-				else {
-					if (c == '('.code) {
-						return VCall(ident, tuple());
-					}
-					else {
-						return VIdent( ident );
-					}
-				}
-			}
-
-			/* Numbers */
-			else if (c.isNumeric()) {
-				/* Tokenize the Number itself */
-				var snum:String = advance();
-				c = next();
-				while (!end && (c.isNumeric() || c == '.'.code)) {
-					snum += advance();
-					c = next();
-				}
-
-				/* Parse it as a Float */
-				var num:Float = Std.parseFloat( snum );
-				var unit:Null<Unit> = null;
-				
-				/* If the very next Byte appears to be the beginning of a Unit */
-				if (isUnit( c )) {
-					/* Tokenize that Unit */
-					var su:String = advance();
-					c = next();
-					while (!end && isUnit( c )) {
-						su += advance();
-						c = next();
-					}
-					/* Assert that what was parsed is, in fact, a valid Unit */
-					if (Unit.isValidUnit( su ))
-						unit = su;
-					/* if not, complain about it */
-					else {
-						var e:String = 'CSSUnitError: $su is not a valid unit!';
-						trace( e );
-						throw e;
-					}
-				}
-				/* return the Number */
-				return VNumber(num, unit);
-			}
-
-			/* Colors */
-			else if (c == '#'.code) {
-				var scol:String = advance();
-				c = next();
-				while (!end && ~/[0-9A-F]/i.match( c )) {
-					scol += advance();
-					c = next();
-				}
-				var color:Color = Color.fromString( scol );
-				return VColor( color );
-			}
-
-			/* Strings */
-			else if (c == '"'.code || c == "'".code) {
-				var del:Byte = c;
-				var str:String = '';
-				advance();
-				c = next();
-				while ( !end ) {
-					/* Delimiter */
-					if (c == del) {
-						advance();
-						break;
-					}
-
-					/* String Content */
-					else {
-						str += cur;
-						advance();
-					}
-
-					c = next();
-				}
-
-				return VString( str );
-			}
-
-			/* Commas */
-			else if (c == ','.code) {
-				advance();
-				return VComma;
-			}
-
+			/* References */
+			if (ident.startsWith( '@' )) {
+				ident = ident.after( '@' );
+				return VRef( ident );
+			} 
+			
 			else {
-				unex( cur );
-				return Value.VNumber( 0 );
+				if ( end ) {
+					return VIdent( ident );
+				}
+				c = next();
+				if (c == '('.code) {
+					return VCall(ident, tuple());
+				}
+				else {
+					return VIdent( ident );
+				}
 			}
+		}
+
+		/* Numbers */
+		else if (c.isNumeric()) {
+			/* Tokenize the Number itself */
+			var snum:String = advance();
+			while (!end && (next().isNumeric() || next().equalsChar('.'))) {
+				snum += advance();
+			}
+
+			/* Parse it as a Float */
+			var num:Float = Std.parseFloat( snum );
+			var unit:Null<Unit> = null;
+			
+			/* If the very next Byte appears to be the beginning of a Unit */
+			if (!end && isUnit(next())) {
+				/* Tokenize that Unit */
+				var su:String = advance();
+				while (!end && isUnit(next())) {
+					su += advance();
+				}
+				/* Assert that what was parsed is, in fact, a valid Unit */
+				if (Unit.isValidUnit( su ))
+					unit = su;
+				/* if not, complain about it */
+				else {
+					var e:String = 'CSSUnitError: $su is not a valid unit!';
+					throw e;
+				}
+			}
+
+			/* return the Number */
+			return VNumber(num, unit);
+		}
+
+		/* Colors */
+		else if (c == '#'.code) {
+			var scol:String = advance();
+			while (!end && ~/[0-9A-F]/i.match(next())) {
+				scol += advance();
+			}
+			var color:Color = Color.fromString( scol );
+			return VColor( color );
+		}
+
+		/* Strings */
+		else if (c == '"'.code || c == "'".code) {
+			var del:Byte = c;
+			var str:String = '';
+			advance();
+			c = next();
+			while ( !end ) {
+				/* Delimiter */
+				if (c == del) {
+					advance();
+					break;
+				}
+
+				/* String Content */
+				else {
+					str += cur;
+					advance();
+				}
+
+				c = next();
+			}
+
+			return VString( str );
+		}
+
+		/* Commas */
+		else if (c == ','.code) {
+			advance();
+			return VComma;
+		}
+
+		else {
+			unex( cur );
+			return Value.VNumber( 0 );
 		}
 	}
 
