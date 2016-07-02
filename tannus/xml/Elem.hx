@@ -280,7 +280,11 @@ class Elem {
 	public static function fromXml(x : Xml):Elem {
 		var el:Elem = new Elem(x.nodeName);
 		try {
-			el.text = x.firstChild().nodeValue;
+			var firstNode = x.firstChild();
+			if (firstNode != null) {
+				el.text = firstNode.nodeValue;
+			}
+			else el.text = '';
 		} catch (err : String) {}
 
 		for (k in x.attributes()) {
