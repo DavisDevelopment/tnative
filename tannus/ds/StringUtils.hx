@@ -58,6 +58,51 @@ class StringUtils {
 	}
 
 	/**
+	  * Convert the given String from dashed to camel-cased
+	  */
+	public static function toCamelCase(s:String, sep:String='-'):String {
+		var parts = s.split( sep );
+		if (parts.length <= 1) {
+			return parts.join('');
+		}
+		var result:String = '';
+		result += parts.shift().toLowerCase();
+		for (x in parts) {
+			result += capitalize( x );
+		}
+		return result;
+	}
+
+	/**
+	  * Convert the given String from camel-cased to dash-separated
+	  */
+	public static inline function toDashed(s : String):String {
+		return camelWords( s ).join( '-' );
+	}
+
+	/**
+	  * Get the words in the given camel-cased String
+	  */
+	public static function camelWords(s : String):Array<String> {
+		var words:Array<String> = new Array();
+		var word:String = '';
+		for (i in 0...s.length) {
+			var c = byteAt(s, i);
+			if (c.isUppercase()) {
+				words.push( word );
+				word = c.aschar.toLowerCase();
+			}
+			else {
+				word += c;
+			}
+		}
+		if (!empty( word )) {
+			words.push( word );
+		}
+		return words;
+	}
+
+	/**
 	  * Count the number of times that the given pattern is matched in [str]
 	  */
 	public static function count(str:String, pattern:EitherType<String, EReg>):Int {
