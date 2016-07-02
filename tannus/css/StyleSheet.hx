@@ -7,6 +7,7 @@ import tannus.io.ByteArray;
 
 using tannus.ds.ArrayTools;
 
+@:expose
 class StyleSheet {
 	/* Constructor Function */
 	public function new():Void {
