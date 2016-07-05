@@ -43,7 +43,10 @@ abstract Getter<T> (Get<T>) from Get<T> {
 	  * Apply a transformation to [this] Getter
 	  */
 	public function transform<O>(f : T->O):Getter<O> {
-		return create(f(get()));
+		function trans_get():O {
+			return f(get());
+		}
+		return new Getter( trans_get );
 	}
 
 	/**
@@ -79,4 +82,4 @@ abstract Getter<T> (Get<T>) from Get<T> {
 }
 
 /* Alias for underlying type */
-private typedef Get<T> = Void -> T;
+typedef Get<T> = Void -> T;
