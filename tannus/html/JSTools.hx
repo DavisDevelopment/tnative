@@ -5,7 +5,7 @@ import tannus.io.*;
 
 import haxe.macro.Expr;
 import haxe.macro.Context;
-import haxe.extern.*;
+import haxe.Constraints;
 
 using haxe.macro.ExprTools;
 using StringTools;
