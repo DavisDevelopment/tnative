@@ -11,8 +11,9 @@ using haxe.macro.ExprTools;
 using tannus.macro.MacroTools;
 
 using Lambda;
+using tannus.ds.FunctionTools;
 
-@:expose( 'ArrayTools' )
+// @:expose( 'ArrayTools' )
 class ArrayTools {
 	/**
 	  * Determine whether all items in the given Array are equal
@@ -137,16 +138,45 @@ class ArrayTools {
 
 	/**
 	  * Obtain a copy of [list] with all instances of [blacklist] removed */
-	public static function without<T>(list:Array<T>, blacklist:Array<T>):Array<T> {
-		var c = list.copy();
-		for (v in blacklist) {
-			while ( true ) {
-				if (!c.remove( v )) {
-					break;
+	public static function without<T>(list:Iterable<T>, blacklist:Iterable<T>, ?compare:T->T->Bool):Array<T> {
+		if (compare == null) {
+			compare = (function(x,y) return (x == y));
+		}
+		var result:Array<T> = new Array();
+		for (x in list) {
+			for (y in blacklist) {
+				if (compare(x, y)) {
+					continue;
 				}
 			}
+			result.push( x );
 		}
-		return c;
+		return result;
+	}
+
+	/**
+	  * Obtain the differences between two arrays
+	  */
+	/*
+	public static function difference<T>(a:Array<T>, b:Array<T>, eq:T->T->Bool):ArrayDelta<T> {
+		eq = eq.memoize();
+		var delta = {
+			add: [],
+			//move: [],
+			remove: []
+		};
+
+		var remove = a.without(b, eq);
+		var _add = b.without(a, eq);
+		var add = new Array();
+		for (x in _add) {
+			var i = b.indexOf( x );
+			add.push({item:x, index:i});
+		}
+		return {
+			add: add,
+			remove: remove
+		};
 	}
 
 	/**
@@ -670,3 +700,8 @@ class ArrayTools {
 }
 
 typedef SplitFilterResult<T> = {pass:Array<T>, fail:Array<T>};
+typedef ArrayDelta<T> = {
+	add: Array<T>,
+	remove: Array<T>,
+	move: Array<{item:T, index:Int}>
+};
