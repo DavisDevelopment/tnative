@@ -4,6 +4,9 @@ import tannus.math.Random;
 import tannus.ds.Range;
 import Std.*;
 
+using Lambda;
+using tannus.ds.ArrayTools;
+
 class RandomTools {
 	/**
 	  * Choose a 'random' integer between [min] and [max]
@@ -22,7 +25,9 @@ class RandomTools {
 	/**
 	  * Choose an item randomly from [set]
 	  */
-	public static inline function choice<T>(set : Array<T>):T return rand.choice( set );
+	public static inline function choice<T>(set : Iterable<T>):T {
+		return rand.choice(set.array());
+	}
 
 	/**
 	  * Random chance
