@@ -17,7 +17,13 @@ class BrowserBinary extends Binary {
 		array = (arr != null ? arr : new Uint8Array( data ));
 	}
 
-	/* === Instance Methods === */
+/* === Instance Methods === */
+
+	/* ensure that [data] is defined */
+	private inline function idat():Void {
+		if (data == null) 
+			data = new DataView(array.buffer, array.byteOffset, array.byteLength);
+	}
 
 	/* get a byte */
 	override public function get(i:Int):Byte {
@@ -101,6 +107,7 @@ class BrowserBinary extends Binary {
 	/* === Instance Fields === */
 
 	private var array : Null<Uint8Array>;
+	private var data : Null<DataView>;
 
 	/* === Static Methods === */
 
@@ -113,14 +120,15 @@ class BrowserBinary extends Binary {
 
 	/* create new Binary from existing data */
 	public static function ofData(d : BinaryData):BrowserBinary {
-		var copy = cast(d, ArrayBuffer).slice(0);
-		return new BrowserBinary(d.byteLength, copy);
+		//var copy = cast(d, ArrayBuffer).slice(0);
+		return new BrowserBinary(d.byteLength, d);
 	}
 
 	/* create a new Binary from a String */
 	public static function ofString(s : String):BrowserBinary {
 		if (s == '') {
-			throw 'Error: Dealing with empty Strings is too much bullshit';
+			//throw 'Error: Dealing with empty Strings is too much bullshit';
+			return alloc( 0 );
 		}
 
 		var a:Array<Int> = new Array();
