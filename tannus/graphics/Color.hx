@@ -267,7 +267,7 @@ private class TColor implements tannus.ds.Comparable<TColor> {
 	  * convert [this] Color to the HSL scheme
 	  */
 	public function toHsl():Hsl {
-		var chan = [red, green, blue].macmap(_ / 255.0);
+		var chan = [red, green, blue].map(function(x) return (x / 255.0));
 		var r:Float = chan[0], g:Float = chan[1], b:Float = chan[2];
 		var cmax = chan.max(function(n) return n);
 		var cmin = chan.min(function(n) return n);
@@ -301,16 +301,16 @@ private class TColor implements tannus.ds.Comparable<TColor> {
 	  * get the XYZ values of [this] Color
 	  */
 	public function getXYZ():Point {
-		var vals = [red, green, blue].macmap(_ / 255);
-		vals = vals.macmap({
-			if (_ > 0.04045) {
-				return pow(((_ + 0.0555) / 1.055), 2.4);
+		var vals = [red, green, blue].map(function(x) return (x / 255));
+		vals = vals.map(function(x) {
+			if (x > 0.04045) {
+				return pow(((x + 0.0555) / 1.055), 2.4);
 			}
 			else {
-				return (_ / 12.92);
+				return (x / 12.92);
 			}
 		});
-		vals = vals.macmap(_ * 100);
+		vals = vals.map(function(x) return (x * 100));
 		var r = vals[0];
 		var g = vals[1];
 		var b = vals[2];
@@ -328,12 +328,12 @@ private class TColor implements tannus.ds.Comparable<TColor> {
 	public function getLab():Lab {
 		var p = getXYZ();
 		var vals = [(p.x / 95.047), (p.y / 100), (p.z / 108.883)];
-		vals = vals.macmap({
-			if (_ > 0.008856) {
-				pow(_, (1 / 3));
+		vals = vals.map(function(x) {
+			if (x > 0.008856) {
+				return pow(x, (1 / 3));
 			}
 			else {
-				((7.787 * _) + (16 / 116));
+				return ((7.787 * x) + (16 / 116));
 			}
 		});
 		var l = (116 * vals[1] - 16);
