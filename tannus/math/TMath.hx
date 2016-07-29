@@ -263,10 +263,12 @@ class TMath {
 		return (value >= min && value <= max);
 	}
 
-	public static function sign (value : Float):Int {
-		return if (value < 0) -1
-			else if (value > 0) 1
-				else 0;
+	public static inline function sign (value : Float):Int {
+		return (value < 0 ? -1 : (value > 0 ? 1 : 0));
+	}
+
+	public static inline function applySign<T:Float>(value:T, sign:Int):T {
+		return (value * sign);
 	}
 
 	/**
