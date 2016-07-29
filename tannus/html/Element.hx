@@ -222,7 +222,7 @@ abstract Element (JQuery) from JQuery to JQuery {
 	  * Set attribute
 	  */
 	@:arrayAccess
-	public inline function set(key:String, value:String):String {
+	public function set(key:String, value:String):String {
 		this.attr(key, value);
 		return value;
 	}
@@ -258,6 +258,7 @@ abstract Element (JQuery) from JQuery to JQuery {
 	public inline function at(index : Int):js.html.Element {
 		return this.get( index );
 	}
+	//public inline function _at(i : Int):
 
 	/**
 	  * Check whether [this] Element contains [other]
