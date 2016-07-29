@@ -38,6 +38,10 @@ abstract Obj (CObj) from CObj {
 	public inline function get<T>(key:String):T 
 		return this.get(key);
 
+	public inline function mget<T>(key : String):Maybe<T> {
+		return this.get( key );
+	}
+
 	/**
 	  * Set an attribute of [this]
 	  */
