@@ -45,6 +45,35 @@ class MacroTools {
 		return macro throw new tannus.utils.Error( $message );
 	}
 
+	/**
+	  * Create a TypePath from a String
+	  */
+	public static function toTypePath(s : String):TypePath {
+		var path:TypePath = {
+			name: '',
+			pack: [],
+			params: null,
+			sub: null
+		};
+		var bits = s.split('.');
+		for (b in bits) {
+			if (b.toLowerCase() == b) {
+				path.pack.push( b );
+			}
+			else if (b.charAt(0).toUpperCase() == b.charAt(0)) {
+				if (path.name == '') {
+					path.name = b;
+				}
+				else {
+					path.sub = b;
+				}
+			}
+		}
+		return path;
+	}
+
+
+
 	#if macro
 
 	/**
@@ -357,6 +386,5 @@ class MacroTools {
 	public static function fromArray(list : Array<Expr>):Expr {
 		return macro $b{ list };
 	}
-
 	#end
 }
