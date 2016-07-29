@@ -705,3 +705,7 @@ typedef ArrayDelta<T> = {
 	remove: Array<T>,
 	move: Array<{item:T, index:Int}>
 };
+
+private typedef Measurable = {
+	var length : Int;
+};
