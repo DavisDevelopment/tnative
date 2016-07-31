@@ -618,6 +618,24 @@ class ArrayTools {
 	}
 
 	/**
+	  * check that [test] returns 'true' for every item in [list]
+	  */
+	public static function every<T>(list:Iterable<T>, test:T->Bool):Bool {
+		for (x in list) {
+			if (!test( x )) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public static macro function macevery<T>(list:ExprOf<Iterable<T>>, test:Expr):ExprOf<Bool> {
+		test = test.replace(macro _, macro x);
+		test = test.buildFunction(['x']);
+		return macro tannus.ds.ArrayTools.every($list, $test);
+	}
+
+	/**
 	  * iterate over the given Array and apply [keygen] to each item
 	  * the value returned by [keygen] is the key under which an Array is stored,
 	  * and every 'item' for which [keygen] returns that same key is appended to 
