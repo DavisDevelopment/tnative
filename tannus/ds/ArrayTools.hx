@@ -182,7 +182,7 @@ class ArrayTools {
 	/**
 	  * Obtain the first item in [list] Array which matches the given pattern
 	  */
-	public static function firstMatch<T>(list:Array<T>, test:T->Bool):Null<T> {
+	public static function firstMatch<T>(list:Iterable<T>, test:T->Bool):Null<T> {
 		for (item in list) {
 			if (test( item )) {
 				return item;
@@ -206,7 +206,7 @@ class ArrayTools {
 	/**
 	  * macro-licious firstMatch
 	  */
-	public static macro function macfirstMatch<T>(list:ExprOf<Array<T>>, test:Expr):ExprOf<Null<T>> {
+	public static macro function macfirstMatch<T>(list:ExprOf<Iterable<T>>, test:Expr):ExprOf<Null<T>> {
 		test = test.mapUnderscoreTo( 'item' );
 		if (!test.hasReturn()) {
 			test = macro return $test;
