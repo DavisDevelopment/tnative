@@ -70,13 +70,21 @@ class MouseEvent extends Event {
 			mods.push( Control );
 		if (event.metaKey)
 			mods.push( Meta );
-		var pos:Point = new Point(event.pageX, event.pageY);
-		var result = new MouseEvent(event.type, pos, event.which, mods);
+		var pos = new Point(event.pageX, event.pageY);
 		
-		result.onDefaultPrevented.once( event.preventDefault );
-		result.onPropogationStopped.once( event.stopPropagation );
+		var e = new MouseEvent(event.type, pos, event.which, mods);
+		e.onCancelled.once(event.preventDefault);
+		e.onDefaultPrevented.once(event.preventDefault);
+		e.onPropogationStopped.once(event.stopPropagation);
+		function copyEvent(copy : Event):Void {
+			copy.onCancelled.once(event.preventDefault);
+			copy.onDefaultPrevented.once(event.preventDefault);
+			copy.onPropogationStopped.once(event.stopPropagation);
+			copy._onCopy.on( copyEvent );
+		}
+		e._onCopy.on( copyEvent );
 
-		return result;
+		return e;
 	}
 
 	/**
