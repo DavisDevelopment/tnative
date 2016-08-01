@@ -1,14 +1,16 @@
 package tannus.internal;
 
 import Type;
+import Type.*;
+import Std.*;
+import Reflect.*;
 
 /**
   * === Class for Determining the Type of an Object, or other various information regarding Type ===
   */
 @:expose('TypeTools')
 class TypeTools {
-/* === Class-Level Methods === *
-
+/* === Static Methods === *
    	
    	/**
    	  * Determine the type of argument [o]
@@ -163,5 +165,74 @@ class TypeTools {
 		}
 		
 		return [];
+	}
+
+	/**
+	  * create and return a deep-copy of the given Haxe value
+	  */
+	public static function deepCopy<T>(o : T):T {
+		if (isPrimitive( o  )) {
+			return o;
+		}
+		else {
+			if (isEnumValue( o  )) {
+				var en = getEnum(cast o);
+				var env:EnumValue = cast o;
+				var clonedParams = env.getParameters().map( deepCopy );
+				return en.createByIndex(env.getIndex(), clonedParams);
+			}
+			else if (is(o, Array)) {
+				return untyped cast(o, Array<Dynamic>).map( deepCopy );
+			}
+			else if (isObject( o )) {
+				if (isDeepCopyable( o )) {
+					return untyped callMethod(o, getProperty(o, '_hxDeepCopy'), []);
+				}
+				else {
+					var klass = getClass( o  );
+					if (klass != null) {
+						var copy = createEmptyInstance( klass  );
+						var fieldNames = getInstanceFields(klass);
+						for (n in fieldNames) {
+							var val = getProperty(o, n);
+							if (isFunction( val  )) {
+								val = makeVarArgs(callMethod.bind(o, val)); 
+							}
+							else {
+								val = deepCopy( val );
+							}
+
+							setProperty(copy, n, val);
+						}
+						return copy;
+					}
+					else {
+						return copy( o  );
+					}
+				}
+			}
+			else if (isFunction( o  )) {
+				return untyped makeVarArgs(callMethod.bind(null, cast o));
+			}
+			else {
+				var vt = typeof( o  );
+				var err = 'Error: Could not clone $vt';
+				throw err;
+			}
+		}
+	}
+
+	/**
+	  * Determine whether the given value is a primitive value
+	  */
+	public static inline function isPrimitive(v : Dynamic):Bool {
+		return (v == null || is(v, Bool) || is(v, Float) || is(v, String));
+	}
+
+	/**
+	  * Determine whether the given value defines its own method for deep-cloning
+	  */
+	public static inline function isDeepCopyable(v : Dynamic):Bool {
+		return (isObject( v ) && hasField(v, '_hxDeepCopy') && isFunction(getProperty(v, '_hxDeepCopy')));
 	}
 }
