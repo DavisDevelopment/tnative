@@ -210,6 +210,17 @@ abstract Element (JQuery) from JQuery to JQuery {
 		return position;
 	}
 
+	/**
+	  * the scroll-coordinates
+	  */
+	public var scrollPos(get, set):Point;
+	private inline function get_scrollPos():Point return new Point(this.scrollLeft(), this.scrollTop());
+	private function set_scrollPos(p : Point):Point {
+		this.scrollLeft( p.ix );
+		this.scrollTop( p.iy );
+		return scrollPos;
+	}
+
 /* === Instance Methods === */
 
 	/**
