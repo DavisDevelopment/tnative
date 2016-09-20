@@ -636,6 +636,27 @@ class ArrayTools {
 	}
 
 	/**
+	  * break the given Array into chunks of [size] length
+	  */
+	public static function chunk<T>(array:Array<T>, size:Int):Array<Array<T>> {
+		var chunks = new Array();
+		var chunk = new Array();
+		for (item in array) {
+			if (chunk.length == size) {
+				chunks.push( chunk );
+				chunk = new Array();
+			}
+			else {
+				chunk.push( item );
+			}
+		}
+		if (chunk.length > 0) {
+			chunks.push( chunk );
+		}
+		return chunks;
+	}
+
+	/**
 	  * iterate over the given Array and apply [keygen] to each item
 	  * the value returned by [keygen] is the key under which an Array is stored,
 	  * and every 'item' for which [keygen] returns that same key is appended to 
