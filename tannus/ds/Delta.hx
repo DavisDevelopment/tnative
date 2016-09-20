@@ -23,6 +23,14 @@ abstract Delta<T> (Tup2<Null<T>, Null<T>>) {
 		return res;
 	}
 
+	/**
+	  * Convert to an Array for `switch` statements
+	  */
+	@:to
+	public inline function toPair():Array<Null<T>> {
+		return [previous, current];
+	}
+
 /* === Instance Fields === */
 
 	/* The current value */
