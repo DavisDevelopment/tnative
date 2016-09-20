@@ -25,6 +25,16 @@ abstract Maybe<T> (Null<T>) from Null<T> to Null<T> {
 	}
 
 	/**
+	  * macro method to perform an action only if [this] is non-null
+	  */
+	public macro function attempt<A>(self:ExprOf<Maybe<T>>, action:Expr):ExprOf<A> {
+		action = action.replace(macro _, self);
+		return macro if ( $self.exists ) {
+			$action;
+		}
+	}
+
+	/**
 	  * If [this] != null,
 	  * @returns [this], otherwise
 	  * @returns [alt]
