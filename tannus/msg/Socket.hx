@@ -22,8 +22,11 @@ class Socket implements Pipeline {
 
 /* === Instance Methods === */
 
+	public function connect(callback : Void->Void):Void {
+		context.connectSocket(this, callback);
+	}
 	public function sendMessage(m : Message<Dynamic>):Void {
-		context.getPipe().send( m );
+		context.sendMessage( m );
 	}
 	public function send(action:String, data:Dynamic, ?onreply:Dynamic->Void):Void {
 		router.send(action, data, onreply);
@@ -82,6 +85,7 @@ class Socket implements Pipeline {
 		channels.remove( name );
 	}
 	public function hasChannel(name : String):Bool return channels.exists( name );
+	public function channel(name:String):Channel return (hasChannel(name)?openChannel:createChannel)( name );
 
 	public function getPeerAddress():Maybe<Address> {
 		return peer;

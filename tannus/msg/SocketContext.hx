@@ -3,7 +3,8 @@ package tannus.msg;
 import tannus.msg.MessageType;
 
 @:allow( tannus.msg.Address )
-class SocketContext <T:Socket> {
+@:access( tannus.msg.Socket )
+class SocketContext <T : Socket> {
 	/* Constructor Function */
 	public function new():Void {
 		sockets = new Map();
@@ -26,8 +27,6 @@ class SocketContext <T:Socket> {
 		}
 
 		pipe.receive.on( packetReceived );
-
-		bus.receive.on( messageReceived );
 	}
 
 	/**
@@ -35,11 +34,28 @@ class SocketContext <T:Socket> {
 	  */
 	public function packetReceived(packet : Dynamic):Void {
 		var message:Message<Dynamic> = modem.decode( packet );
+
+		if (message.type.equals( Connect )) {
+			var addr:Address = message.address;
+			var sock = createSocket( addr );
+			attachSocket( sock );
+			var metaChannel:Channel = sock.channel('::meta::');
+			metaChannel.send('connected', true, function(res) {
+				trace('response: $res');
+			});
+			return ;
+		}
+
 		messageReceived( message );
 	}
 
 	public function messageReceived(message : Message<Dynamic>):Void {
+		if (message.type.equals( Connect )) {
 
+		}
+		resolve(message.address, function(p) {
+			p.receive( message );
+		});
 	}
 
 	/**
@@ -53,7 +69,35 @@ class SocketContext <T:Socket> {
 	  * gets the underlying base Pipe
 	  */
 	public function getPipe():Pipe<Message<Dynamic>> {
-		return pipe;
+		return bus;
+	}
+
+	public function sendMessage(m : Message<Dynamic>):Void {
+		var raw = modem.encode( m );
+		pipe.send( raw );
+	}
+
+	public function attachSocket(s : T):Void {
+		s.context = cast this;
+	}
+
+	public function createSocket(address : Address):T {
+		return new Socket();
+	}
+
+	public function connectSocket(s:Socket, done:Void->Void):Void {
+		var connectMessage = new Message();
+		connectMessage.type = Connect;
+		var a = connectMessage.address;
+		a.socketId = s.id;
+		sendMessage( connectMessage );
+		var meta = s.channel('::meta::');
+		meta.on('connected', function(m : Message<Bool>) {
+			var status:Bool = m.data;
+			trace('connection status: $status');
+			m.reply('dope');
+			done();
+		});
 	}
 
 /* === Instance Fields === */

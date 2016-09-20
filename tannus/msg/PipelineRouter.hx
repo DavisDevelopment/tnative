@@ -4,6 +4,13 @@ import tannus.ds.Memory in Mem;
 import tannus.ds.Maybe;
 import tannus.io.Signal;
 
+using Slambda;
+using Lambda;
+using StringTools;
+using tannus.ds.ArrayTools;
+using tannus.ds.StringUtils;
+using tannus.math.TMath;
+
 class PipelineRouter {
 	/* Constructor Function */
 	public function new(pipeline : Pipeline):Void {
@@ -30,7 +37,7 @@ class PipelineRouter {
 	}
 
 	public inline function on<T>(action:String, handler:Message<T>->Void):Void {
-		actionSignal( action ).on( handler );
+		actionSignal( action ).on(untyped handler);
 	}
 
 	/**
@@ -64,6 +71,9 @@ class PipelineRouter {
 
 			case Close:
 				trace('Pipeline peer has closed');
+
+			case Connect:
+				throw 'WhatLeFuck?';
 		}
 	}
 
