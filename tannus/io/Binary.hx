@@ -189,6 +189,10 @@ class Binary {
 		return pushInt32(TMath.floatToI32( n ));
 	}
 
+	public inline function pushString(s : String):Void {
+		appendString( s );
+	}
+
 	/* add a Byte to the beginning of [this] data */
 	public function unshift(c : Byte):Int {
 		shiftRight( 1 );
