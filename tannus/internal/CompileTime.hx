@@ -21,6 +21,7 @@ using Lambda;
 using haxe.macro.ExprTools;
 using tannus.macro.MacroTools;
 using tannus.ds.StringUtils;
+using haxe.macro.PositionTools;
 
 /**
   * Class of utility macro methods
@@ -40,6 +41,15 @@ class CompileTime {
 		var seconds = toExpr(d.getSeconds());
 
 		return macro new Date($year, $month, $day, $hours, $minutes, $seconds);
+	}
+
+	/**
+	  * inlined current position
+	  */
+	public static macro function currentPos():Expr {
+		var pos = Context.currentPos().getInfos();
+		var pose:Expr = macro {file: $v{pos.file}, max: $v{pos.max}, min: $v{pos.min}};
+		return pose;
 	}
 
 	/**
