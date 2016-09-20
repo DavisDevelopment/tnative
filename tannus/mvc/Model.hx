@@ -30,7 +30,11 @@ class Model extends EventDispatcher implements Asset {
 		change = new Signal();
 		assets = new Array();
 		readyReqs = new Requirements();
+		_isready = false;
 		_ready = new VoidSignal();
+		_ready.once(function() {
+			_isready = true;
+		});
 		_a = new Map();
 
 		_bindMethodsToEvents();
@@ -267,6 +271,12 @@ class Model extends EventDispatcher implements Asset {
 /* === Computed Instance Fields === */
 
 	/**
+	  * whether [this] Model is currently ready to be used
+	  */
+	public var isReady(get, never):Bool;
+	private inline function get_isReady():Bool return _isready;
+
+	/**
 	  * Storage object in use by [this] Model currently
 	  */
 	/*
@@ -303,6 +313,7 @@ class Model extends EventDispatcher implements Asset {
 
 	/* signal fired when [this] Model becomes 'ready' */
 	private var _ready : VoidSignal;
+	private var _isready : Bool;
 
 	/* a Map to store attribute values in */
 	private var _a : Map<String, Dynamic>;
