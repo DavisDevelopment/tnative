@@ -62,6 +62,11 @@ class TMath {
 		return (toDegrees(Math.atan2(y2 - y1, x2 - x1)));
 	}
 
+	/* distance formula */
+	public static inline function distance(x1:Float, y1:Float, x2:Float, y2:Float):Float {
+		return Math.sqrt(Math.pow(Math.abs(x2 - x1), 2) + Math.pow(Math.abs(y2 - y1), 2));
+	}
+
 	/**
 	  * Does the shit
 	  */
