@@ -19,7 +19,11 @@ using StringTools;
 using tannus.ds.StringUtils;
 using tannus.ds.ArrayTools;
 
+#if js
+class Binary implements tannus.html.Blobable {
+#else
 class Binary {
+#end
 	/* Constructor Function */
 	public function new(size:Int, _b:BinaryData):Void {
 		_length = size;
@@ -403,6 +407,12 @@ class Binary {
 	public function toArray():Array<Byte> {
 		return [for (c in this) c];
 	}
+
+#if js
+	public inline function toBlob(callback:js.html.Blob->Void, ?type:String):Void {
+		callback(new js.html.Blob([untyped getData()], {type: type}));
+	}
+#end
 
 	/* check if [this] and [other] are equivalent in content */
 	public function equals(other : Binary):Bool {
