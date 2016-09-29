@@ -1,8 +1,7 @@
 package tannus.math;
 
-import tannus.math.TMath;
+import tannus.math.random.*;
 import tannus.math.TMath.*;
-import tannus.math.Ratio;
 import tannus.geom.*;
 import tannus.utils.Error;
 
@@ -16,17 +15,24 @@ using tannus.math.TMath;
 class Random {
 	/* Constructor Function */
 	public function new(?seed:Int):Void {
-		this.state = (seed != null ? seed : Math.floor(Math.random() * TMath.INT_MAX));
+		//this.state = (seed != null ? seed : Math.floor(Math.random() * TMath.INT_MAX));
+		rng = createRandomNumberGenerator( seed );
 	}
 
 /* === Instance Methods === */
 
 	/**
+	  * method used to create the RandomNumberGenerator (to change the class used as the Generator, override this method)
+	  */
+	private function createRandomNumberGenerator(?seed : Int):RandomNumberGenerator {
+		return new BasicRandomNumberGenerator( seed );
+	}
+
+	/**
 	 * Increment the 'seed' of [this] Random-Number-Generator, and return it's integer value
 	 */
 	public function nextInt():Int {
-		this.state = cast ((1103515245.0 * this.state + 12345) % TMath.INT_MAX);
-		return this.state;
+		return rng.nextInt();
 	}
 
 	/**
@@ -40,7 +46,7 @@ class Random {
 	 * Set the seed to [value]
 	 */
 	public function reset(value : Int):Void {
-		this.state = value;
+		null;
 	}
 
 	/**
@@ -163,7 +169,8 @@ class Random {
 
 /* === Instance Fields === */
 
-	private var state : Int;
+	//private var state : Int;
+	private var rng : RandomNumberGenerator;
 
 /* === Static Methods === */
 
