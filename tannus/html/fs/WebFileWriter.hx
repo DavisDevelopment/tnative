@@ -4,6 +4,9 @@ import tannus.ds.Promise;
 import tannus.io.ByteArray;
 import tannus.io.Signal;
 import tannus.io.VoidSignal;
+import tannus.html.Blobable;
+
+import js.html.Blob;
 
 @:forward
 abstract WebFileWriter (CWebFileWriter) from CWebFileWriter {
@@ -39,7 +42,7 @@ class CWebFileWriter {
 		}
 	}
 
-	public function write(data:ByteArray, ?cb:Null<Dynamic>->Void):Void {
+	public function write(data:Blobable, ?cb:Null<Dynamic>->Void):Void {
 		if (cb == null)
 			cb = (function(x) null);
 		var cbed:Bool = false;
@@ -55,9 +58,11 @@ class CWebFileWriter {
 				cb( err );
 			}
 		});
-		var blob = new js.html.Blob([cast data.getData()]);
-		w.seek( 0 );
-		w.write( blob );
+
+		data.toBlob(function( blob ) {
+			w.seek( 0 );
+			w.write( blob );
+		});
 	}
 
 	public inline function truncate(len : Int):Void {
