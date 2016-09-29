@@ -16,6 +16,27 @@ using tannus.ds.FunctionTools;
 // @:expose( 'ArrayTools' )
 class ArrayTools {
 	/**
+	  * macro-magic for extracting values from an Array
+	  */
+	public static macro function with<T>(a:ExprOf<Array<T>>, enames:Expr, action:Expr) {
+		var names:Array<Expr> = new Array();
+		switch ( enames.expr ) {
+			case EArrayDecl( list ):
+				names = list;
+
+			default:
+				Context.error('Error: Invalid argument for ArrayTools.with', Context.currentPos());
+		}
+
+		for (index in 0...names.length) {
+			var ename:Expr = (macro $a[$v{ index }]);
+			action = action.replace(names[index], ename);
+		}
+
+		return action;
+	}
+
+	/**
 	  * Determine whether all items in the given Array are equal
 	  */
 	public static function equal<T>(a : Array<T>):Bool {
