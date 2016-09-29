@@ -115,13 +115,54 @@ class Rect <T:Float> {
 	public function enlarge(dw:T, dh:T):Void {
 		w += dw;
 		h += dh;
-		x -= round(dw / 2);
-		y -= round(dh / 2);
+		x -= Math.round(dw / 2);
+		y -= Math.round(dh / 2);
 	}
 
 	/**
-	  * scale [this] Rect
+	  * Convert [this] Rect to a String
 	  */
+	public inline function toString():String {
+		return 'Rect($x, $y, $width, $height)';
+	}
+
+	/**
+	  * Convert [this] into an Array
+	  */
+	public inline function toArray():Array<T> {
+		return [x, y, w, h];
+	}
+
+	/**
+	  * Scale [this] Rect
+	  */
+	public function scale(?sw:Float, ?sh:Float):Rect<Float> {
+		if (sw != null) {
+			var ratio:Float = (sw / width);
+			return cast new Rect(x, y, untyped sw, untyped (ratio * height));
+		}
+		else if (sh != null) {
+			var ratio:Float = (sh / height);
+			return cast new Rect(x, y, untyped (ratio * width), untyped sh);
+		}
+		else {
+			return cast new Rect(x, y, w, h);
+		}
+	}
+
+	/**
+	  * Round [this] Rect
+	  */
+	public inline function round():Rect<Int> return apply(untyped Math.round);
+	public inline function floor():Rect<Int> return apply(untyped Math.floor);
+	public inline function ceil():Rect<Int> return apply(untyped Math.ceil);
+
+	/**
+	  * apply the given function to all values in [this] Rect
+	  */
+	private inline function apply<A:Float>(f : T->A):Rect<A> {
+		return new Rect(f(x), f(y), f(w), f(h));
+	}
 
 /* === Computed Instance Fields === */
 
@@ -190,14 +231,14 @@ class Rect <T:Float> {
 	public var centerX(get, set):Float;
 	private inline function get_centerX():Float return (x + (w / 2));
 	private function set_centerX(v : Float):Float {
-		x = cast round(v - ((cast w) / 2));
+		x = cast Math.round(v - ((cast w) / 2));
 		return centerX;
 	}
 
 	public var centerY(get, set):Float;
 	private inline function get_centerY():Float return (y + (h / 2));
 	private function set_centerY(v : Float):Float {
-		y = cast round(v - ((cast h) / 2));
+		y = cast Math.round(v - ((cast h) / 2));
 		return centerY;
 	}
 
