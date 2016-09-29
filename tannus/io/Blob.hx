@@ -7,6 +7,11 @@ import tannus.sys.Path;
 import tannus.sys.Mime;
 import tannus.sys.Mimes;
 
+#if js
+import tannus.html.Blobable;
+import js.html.Blob in JBlob;
+#end
+
 /**
   * Abstract around Blob, which allows it to unify with multiple other types
   */
@@ -46,7 +51,11 @@ abstract Blob (CBlob) from CBlob to CBlob {
 /**
   * Unerlying class for Blob
   */
+#if js
+class CBlob implements Blobable {
+#else
 class CBlob {
+#end
 	/* Constructor Function */
 	public function new(nam:String, ?mime:Mime, ?dat:ByteArray):Void {
 		name = nam;
@@ -80,6 +89,19 @@ class CBlob {
 		return data.toDataUrl(type);
 	}
 
+#if js
+	/**
+	  * Convert to Blob
+	  */
+	public function toBlob(cb:JBlob->Void, ?type:String):Void {
+		if (type == null) {
+			type = this.type;
+		}
+		cb(new JBlob([untyped data.getData()], {
+			type: type
+		}));
+	}
+#end
 
 /* === Static Methods === */
 
