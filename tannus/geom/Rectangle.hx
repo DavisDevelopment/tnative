@@ -75,6 +75,11 @@ abstract Rectangle (CRectangle) from CRectangle to CRectangle {
 				return new Rectangle(a[0], a[1], a[2], a[3]);
 		}
 	}
+
+	@:from
+	public static inline function fromRect2D<T:Float>(rect : tannus.geom2.Rect<T>):Rectangle {
+		return new Rectangle(rect.x, rect.y, rect.width, rect.height);
+	}
 }
 
 class CRectangle implements Shape {
