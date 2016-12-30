@@ -732,6 +732,18 @@ class ArrayTools {
 		//return macro tannus.ds.ArrayTools.index($list, $keygen);
 	//}
 
+	/**
+	  * Check whether [test] returned true for any of the given items
+	  */
+	public static function any<T>(items:Iterable<T>, test:T->Bool):Bool {
+		for (item in items) {
+			if (test( item )) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	#if macro
 
 	/**

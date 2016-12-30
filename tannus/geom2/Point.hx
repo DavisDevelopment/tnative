@@ -2,7 +2,7 @@ package tannus.geom2;
 
 import tannus.ds.DataView;
 
-import Math.*;
+//import Math.*;
 import tannus.math.TMath.*;
 
 using Lambda;
@@ -28,7 +28,7 @@ class Point <T:Float> {
 		return new tannus.geom.Angle(angleBetween(x, other.x, y, other.y));
 	}
 	public inline function distanceFrom(other : Point<T>):Float {
-		return sqrt(pow((x - other.x), 2) + pow((y - other.y), 2));
+		return Math.sqrt(Math.pow((x - other.x), 2) + Math.pow((y - other.y), 2));
 	}
 	public inline function copyFrom(other : Point<T>):Void {
 		x = other.x;

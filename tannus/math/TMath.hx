@@ -6,7 +6,7 @@ import haxe.Int64;
 import tannus.io.ByteArray;
 
 import Std.*;
-import Math.*;
+//import Math.*;
 
 import haxe.macro.Expr;
 import haxe.macro.Context;
@@ -82,7 +82,7 @@ class TMath {
 			if (ad.length > sl.length) {
 				sl = ad.slice(0, c + 1);
 				var idec:Int = Std.parseInt( sl );
-				idec = round(idec / 10);
+				idec = Math.round(idec / 10);
 				res += ('.' + idec);
 			}
 			else {
@@ -162,7 +162,7 @@ class TMath {
 	  * Check whether [n] is "almost" equal to [v]
 	  */
 	public static inline function almostEquals<T:Float>(n:T, v:T, threshold:T):Bool {
-		return (abs(n - v) <= threshold);
+		return (Math.abs(n - v) <= threshold);
 	}
 
 	/** Cast from Float to Int */
@@ -342,12 +342,12 @@ class TMath {
 		if(f == 0)
 			return 0;
 		var af = (f < 0 ? -f : f);
-		var exp = floor(log( af ) / LN2);
+		var exp = Math.floor(Math.log( af ) / LN2);
 		if (exp < -127)
 			exp = -127 
 		else if( exp > 128 ) 
 			exp = 128;
-		var sig = (round((af / pow(2, exp) - 1) * 0x800000) & 0x7FFFFF);
+		var sig = (Math.round((af / Math.pow(2, exp) - 1) * 0x800000) & 0x7FFFFF);
 		return ((f < 0 ? 0x80000000 : 0) | ((exp + 127) << 23) | sig);
 	}
 
@@ -360,7 +360,7 @@ class TMath {
 		var sig = (high&0xFFFFF) * 4294967296. + (low>>>31) * 2147483648. + (low&0x7FFFFFFF);
 		if( sig == 0 && exp == -1023 )
 			return 0.0;
-		return sign*(1.0 + pow(2, -52)*sig) * pow(2, exp);
+		return sign*(1.0 + Math.pow(2, -52)*sig) * Math.pow(2, exp);
 	}
 
 	/**
@@ -486,4 +486,60 @@ class TMath {
 		res.reverse();
 		return res.toString();
 	}
+
+	/**
+	  * Perform chain comparisons
+	  */
+	public static function compareChain(nums : Iterable<Int>):Int {
+		for (n in nums) {
+			if (n == 0) {
+				continue;
+			}
+			else {
+				return n;
+			}
+		}
+		return 0;
+	}
+
+	/**
+	  * Perfrom a lambda chain comparison
+	  */
+	public static function fcompareChain(getters : Iterable<Void->Int>):Int {
+		for (get in getters) {
+			var n = get();
+			if (n == 0) {
+				continue;
+			}
+			else {
+				return n;
+			}
+		}
+		return 0;
+	}
+
+/* === Standard Library's Math class mixins === */
+
+	public static inline function abs(v : Float):Float return Math.abs( v );
+	public static inline function acos(v:Float):Float return Math.acos( v );
+	public static inline function asin(v:Float):Float return Math.asin( v );
+	public static inline function atan(v:Float):Float return Math.atan( v );
+	public static inline function atan2(x:Float,y:Float):Float return Math.atan2(x, y);
+	public static inline function ceil(v:Float):Int return Math.ceil( v );
+	public static inline function floor(v:Float):Int return Math.floor( v );
+	public static inline function cos(v:Float):Float return Math.cos( v );
+	public static inline function exp(v:Float):Float return Math.exp( v );
+	public static inline function fceil(v:Float):Float return Math.fceil( v );
+	public static inline function ffloor(v:Float):Float return Math.ffloor( v );
+	//public static inline function floor(v:Float):Float return Math.floor( v );
+	public static inline function fround(v:Float):Float return Math.fround( v );
+	public static inline function isFinite(v:Float):Bool return Math.isFinite( v );
+	public static inline function isNaN(v:Float):Bool return Math.isNaN( v );
+	public static inline function log(v:Float):Float return Math.log( v );
+	public static inline function pow(v:Float, exp:Float):Float return Math.pow(v, exp);
+	public static inline function random():Float return Math.random();
+	public static inline function round(v:Float):Int return Math.round( v );
+	public static inline function sin(v:Float):Float return Math.sin( v );
+	public static inline function sqrt(v:Float):Float return Math.sqrt( v );
+	public static inline function tan(v:Float):Float return Math.tan( v );
 }

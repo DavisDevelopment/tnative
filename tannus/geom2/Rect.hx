@@ -3,7 +3,6 @@ package tannus.geom2;
 import tannus.ds.DataView;
 
 import Std.*;
-import Math.*;
 import tannus.math.TMath.*;
 
 using Lambda;
@@ -132,6 +131,9 @@ class Rect <T:Float> {
 	public inline function toArray():Array<T> {
 		return [x, y, w, h];
 	}
+
+	public inline function toRectangle():tannus.geom.Rectangle 
+		return tannus.geom.Rectangle.fromRect2D( this );
 
 	/**
 	  * Scale [this] Rect

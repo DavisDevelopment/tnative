@@ -1,7 +1,6 @@
 package tannus.graphics;
 
 import Std.*;
-import Math.*;
 import tannus.math.TMath.*;
 
 import haxe.macro.Context;

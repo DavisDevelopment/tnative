@@ -38,6 +38,10 @@ class Lexer {
 	  * Tokenize the next Word in the Stack
 	  */
 	private function nextWord():Null<Word> {
+		if ( buffer.empty ) {
+			return null;
+		}
+
 		var c:Byte = next();
 
 		/* === Whitespace === */
@@ -46,17 +50,11 @@ class Lexer {
 			return nextWord();
 		}
 
-		/*
-		else if (c == '('.code) {
+		/* === Rejected Characters === */
+		else if (isWordDelimiter( c ) || isIgnored( c )) {
 			advance();
-			var lvl = 1;
-			while (!buffer.empty && lvl > 0) {
-				c = next();
-				if (c == '('.code)
-					lvl++
-			}
+			return nextWord();
 		}
-		*/
 
 		else if (buffer.empty) {
 			return null;
@@ -66,7 +64,7 @@ class Lexer {
 		else {
 			var str:String = '';
 			str += advance();
-			while (!buffer.empty && !next().isWhiteSpace()) {
+			while (!buffer.empty && !next().isWhiteSpace() && !isWordDelimiter(next())) {
 				str += advance();
 			}
 			var hasletter:Bool = false;
@@ -77,7 +75,7 @@ class Lexer {
 				}
 			}
 			if (hasletter) {
-				return new Word( str );
+				return new Word(stripOfIgnoredCharacters( str ));
 			}
 			else if (buffer.empty) {
 				return null;
@@ -86,6 +84,30 @@ class Lexer {
 				return nextWord();
 			}
 		}
+	}
+
+	/**
+	  * Strip the given String of any character that is ignored by [this] Lexer
+	  */
+	private function stripOfIgnoredCharacters(s : String):String {
+		var result:String = '';
+		for (i in 0...s.length) {
+			var c = s.byteAt( i );
+			if (!isIgnored( c )) {
+				result += c;
+			}
+		}
+		return result;
+	}
+
+	/**
+	  * Check whether the given Byte is a non-word character
+	  */
+	private function isWordDelimiter(c : Byte):Bool {
+		return false;
+	}
+	private function isIgnored(c : Byte):Bool {
+		return false;
 	}
 
 	/**

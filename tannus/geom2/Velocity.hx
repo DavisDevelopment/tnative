@@ -5,7 +5,6 @@ import tannus.ds.DataView;
 import tannus.geom.Angle;
 
 import Std.*;
-import Math.*;
 import tannus.math.TMath.*;
 
 using Lambda;

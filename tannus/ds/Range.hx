@@ -1,8 +1,13 @@
 package tannus.ds;
 
+import Slambda.fn;
+import Reflect.compare;
+
 import tannus.math.TMath in N;
 
-class Range<T : Float> {
+using tannus.math.TMath;
+
+class Range<T : Float> implements IComparable<Range<T>> {
 	/* Constructor Function */
 	public inline function new(mi:T, ma:T):Void {
 		min = mi;
@@ -32,6 +37,13 @@ class Range<T : Float> {
 	  */
 	public inline function toString():String {
 		return 'Range($min => $max)';
+	}
+
+	/**
+	  * Compare to another Range
+	  */
+	public function compareTo(other : Range<T>):Int {
+		return [compare(min, other.min), compare(max, other.max)].compareChain();
 	}
 
 /* === Computed Instance Fields === */

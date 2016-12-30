@@ -6,7 +6,7 @@ import tannus.geom.Line;
 import tannus.geom.Shape;
 import tannus.geom.Vertices;
 
-import Math.*;
+import tannus.math.TMath.*;
 
 /**
   * Class to represent a Triangle

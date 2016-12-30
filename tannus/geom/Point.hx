@@ -1,6 +1,6 @@
 package tannus.geom;
 
-import tannus.math.TMath;
+import tannus.math.TMath.*;
 import tannus.math.TMath.i;
 import tannus.math.Percent;
 import tannus.geom.Angle;
@@ -11,7 +11,6 @@ import tannus.io.Getter;
 
 import haxe.macro.Expr;
 
-import Math.*;
 
 #if python
 	import python.Tuple;

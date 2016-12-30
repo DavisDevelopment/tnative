@@ -11,7 +11,7 @@ import tannus.math.TMath;
 import tannus.ds.Obj;
 import haxe.Int64;
 
-import Math.*;
+//import Math.*;
 
 using Type;
 using Lambda;
@@ -324,7 +324,7 @@ class Binary {
 
 	/* reverse [this] data in-place */
 	public function reverse():Void {
-		for (i in 0...floor(length / 2)) {
+		for (i in 0...Math.floor(length / 2)) {
 			var temp = get( i );
 			set(i, get(length - i - 1));
 			set((length - i - 1), temp);

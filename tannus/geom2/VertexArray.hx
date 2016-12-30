@@ -3,7 +3,6 @@ package tannus.geom2;
 import tannus.ds.DataView;
 
 import Std.*;
-import Math.*;
 import tannus.math.TMath.*;
 import tannus.math.TMath.min in minn;
 import tannus.math.TMath.max in maxx;

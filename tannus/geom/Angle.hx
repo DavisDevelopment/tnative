@@ -1,7 +1,7 @@
 package tannus.geom;
 
 import tannus.math.TMath;
-import Math.*;
+//import Math.*;
 
 using tannus.math.TMath;
 
@@ -97,13 +97,13 @@ class CAngle {
 	/* the x-shit of [this] Angle */
 	public var x(get, never):Float;
 	private inline function get_x():Float {
-		return cos( radians );
+		return Math.cos( radians );
 	}
 
 	/* the y-shit of [this] Angle */
 	public var y(get, never):Float;
 	private inline function get_y():Float {
-		return sin( radians );
+		return Math.sin( radians );
 	}
 
 /* === Instance Fields === */

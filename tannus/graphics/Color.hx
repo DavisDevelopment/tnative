@@ -9,8 +9,8 @@ import tannus.io.RegEx;
 import tannus.geom.Point;
 
 import Std.*;
-import Math.*;
 import tannus.math.TMath;
+import tannus.math.TMath.*;
 
 import haxe.macro.Expr;
 

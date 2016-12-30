@@ -38,7 +38,7 @@ class Random {
 	/**
 	 * Increment [this]'s seed, and return it's float value
 	 */
-	public function nextFloat():Float {
+	public inline function nextFloat():Float {
 		return (nextInt() / TMath.INT_MAX);
 	}
 
@@ -50,10 +50,18 @@ class Random {
 	}
 
 	/**
+	  * Get a random double between [min] and [max]
+	  */
+	public inline function randfloat(min:Float, max:Float):Float {
+		return (nextFloat() * (max - min + 1) + min);
+	}
+
+	/**
 	 * Get a random integer between [min] and [max]
 	 */
-	public function randint(min:Int, max:Int):Int {
-		return Math.floor(nextFloat() * (max - min + 1) + min);
+	public inline function randint(min:Int, max:Int):Int {
+		//return Math.floor(nextFloat() * (max - min + 1) + min);
+		return Math.floor(randfloat(min, max));
 	}
 
 	/**
@@ -105,14 +113,14 @@ class Random {
 	/**
 	 * Choose randomly between 'true' and 'false'
 	 */
-	public function randbool():Bool {
+	public inline function randbool():Bool {
 		return (randint(0, 1) == 1);
 	}
 
 	/**
 	 * Choose an item from [set] at random
 	 */
-	public function choice<T>(set : Array<T>):T {
+	public inline function choice<T>(set : Array<T>):T {
 		return set[(randint(0, set.length - 1))];
 	}
 

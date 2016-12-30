@@ -1,6 +1,7 @@
 package tannus.io;
 
 import tannus.ds.Maybe;
+import tannus.io.impl.RegExMatch;
 
 using StringTools;
 
@@ -46,6 +47,45 @@ abstract RegEx (EReg) from EReg to EReg {
 		});
 
 		return ma;
+	}
+
+	/**
+	  * Get an Array of match objects
+	  */
+	public function allMatches(text : String):Array<RegExMatch> {
+		var all:Array<RegExMatch> = new Array();
+		this.map(text, function(e : EReg) {
+			var pos:Pos = mpos(e.matchedPos());
+			var groups:Array<String> = new Array();
+			var index:Int = 0;
+			var matched:Bool = true;
+
+			while ( matched ) {
+				try {
+					var s = e.matched( index );
+					if (s == null) {
+						matched = false;
+						break;
+					}
+					groups.push( s );
+					index++;
+				}
+				catch (error : Dynamic) {
+					matched = false;
+					break;
+				}
+			}
+
+			var matchedText:String = groups.shift();
+			var matchObject:RegExMatch = new RegExMatch(this, [text, matchedText], pos, groups);
+			all.push( matchObject );
+			return '';
+		});
+		return all;
+	}
+
+	private inline function mpos(p : ERegPos):Pos {
+		return {start: p.pos, len: p.len};
 	}
 
 	/**
@@ -122,3 +162,5 @@ abstract RegEx (EReg) from EReg to EReg {
 		return (this.match.bind(_));
 	}
 }
+
+private typedef ERegPos = {pos:Int, len:Int};

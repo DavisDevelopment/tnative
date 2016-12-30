@@ -13,7 +13,7 @@ import tannus.html.Elementable;
 
 import haxe.Constraints.Function;
 
-import js.JQuery;
+//import js.JQuery;
 import Reflect.*;
 
 // using Reflect;

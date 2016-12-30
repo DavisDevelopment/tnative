@@ -65,9 +65,11 @@ class Data<T> implements IData<T> {
 
 /* === Computed Instance Fields === */
 
+	// total slots in [this] DataView
 	public var capacity(get, never):Int;
 	private inline function get_capacity():Int return size[0];
 
+	// number of available slots
 	public var length(get, never):Int;
 	private inline function get_length():Int return size[1];
 

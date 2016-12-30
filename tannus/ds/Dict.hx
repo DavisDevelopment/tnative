@@ -35,6 +35,11 @@ abstract Dict<K, V> (IDict<K, V>) {
 	}
 
 	@:to
+	public static inline function toIComparableDict<K:IComparable<K>, V>(v : IDict<K, V>):IComparableDict<K, V> {
+		return new IComparableDict();
+	}
+
+	@:to
 	public static inline function toComparableDict<K:Comparable<K>, V>(v : IDict<K, V>):ComparableDict<K, V> {
 		return new ComparableDict();
 	}

@@ -63,6 +63,38 @@ class ValueTools {
 	}
 
 	/**
+	  * extract an integer value from the given Value
+	  */
+	public static function toInt(v : Value):Null<Int> {
+		switch ( v ) {
+			case VNumber(n, _):
+				return Std.int( n );
+			case VString( s ):
+				return Std.parseInt( s );
+			default:
+				return null;
+		}
+	}
+
+	public static function toBool(v : Value):Null<Bool> {
+		switch ( v ) {
+			case VIdent( s ):
+				if (~/true|false|yes|no|on|off/i.match( s )) {
+					return switch (s.toLowerCase()) {
+						case 'true','yes','on': true;
+						case 'false', 'no', 'off': false;
+						default: null;
+					};
+				}
+				else {
+					return null;
+				}
+			default:
+				return null;
+		}
+	}
+
+	/**
 	  * Apply function [predicate] to every sub-Value of the given Value
 	  */
 	public static function iter(value:Value, predicate:Value -> Void):Void {

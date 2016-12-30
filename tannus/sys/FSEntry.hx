@@ -31,7 +31,7 @@ abstract FSEntry (FSEntryType) {
 	  * The name of [this] Entry
 	  */
 	public var name(get, never):String;
-	private inline function get_name():String {
+	private function get_name():String {
 		return (path.name);
 	}
 
@@ -141,6 +141,8 @@ abstract FSEntry (FSEntryType) {
 				d = name;
 				ff = fH;
 				dd = dH;
+			default:
+				null;
 		}
 
 		return macro switch ($self.type) {

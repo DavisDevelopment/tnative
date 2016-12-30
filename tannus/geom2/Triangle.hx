@@ -3,7 +3,6 @@ package tannus.geom2;
 import tannus.ds.DataView;
 
 import Std.*;
-import Math.*;
 import tannus.math.TMath.*;
 
 using Lambda;

@@ -14,6 +14,7 @@ import tannus.sys.GlobStar;
 
 using StringTools;
 using tannus.ds.StringUtils;
+using Slambda;
 
 @:forward
 abstract WebDirectoryEntry (DirectoryEntry) from DirectoryEntry {
@@ -73,6 +74,13 @@ abstract WebDirectoryEntry (DirectoryEntry) from DirectoryEntry {
 	  */
 	public inline function readEntries():ArrayPromise<WebFSEntry> {
 		return this.createReader().read();
+	}
+
+	/**
+	  * Get all Subdirectories of [this]
+	  */
+	public function getDirectories():ArrayPromise<WebDirectoryEntry> {
+		return readEntries().filter.fn( _.isDirectory ).map.fn(new WebDirectoryEntry(cast _));
 	}
 
 	/**

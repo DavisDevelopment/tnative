@@ -6,7 +6,6 @@ import tannus.ds.Pair;
 
 import tannus.geom.*;
 import tannus.geom.Point;
-import Math.*;
 import tannus.math.TMath.*;
 
 using Lambda;

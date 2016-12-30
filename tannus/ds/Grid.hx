@@ -28,6 +28,10 @@ class Grid<T> {
 		} else return value;
 	}
 
+	public function setAt(pos:GridPos, value:Null<T>):Null<T> {
+		return set(pos.x, pos.y, value);
+	}
+
 	/* get the value stored at the given position */
 	public function get(x:Int, y:Int):Null<T> {
 		if ((x >= w || x < 0) || (y >= h || y < 0)) {

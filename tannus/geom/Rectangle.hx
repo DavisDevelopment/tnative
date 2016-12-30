@@ -10,7 +10,6 @@ import tannus.geom.Vertices;
 import tannus.math.Percent;
 import tannus.ds.EitherType in Either;
 
-import Math.*;
 import tannus.math.TMath.*;
 
 using Lambda;
@@ -392,6 +391,9 @@ class CRectangle implements Shape {
 	  */
 	public inline function toString():String {
 		return 'Rectangle($x, $y, $w, $h)';
+	}
+	public inline function toArray():Array<Float> {
+		return [x, y, w, h];
 	}
 
 
