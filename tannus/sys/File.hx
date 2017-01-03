@@ -100,6 +100,10 @@ class CFile {
 		FileSystem.deleteFile(path.toString());
 	}
 
+	public function toString():String {
+		return 'File($path)';
+	}
+
 /* === Fancy Instance Methods === */
 
 	/**
