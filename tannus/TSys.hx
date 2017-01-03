@@ -56,7 +56,7 @@ class TSys {
 		#elseif node	
 			return Std.string(untyped __js__('__filename'));
 		#else
-			return NSys.executablePath();
+			return NSys.programPath();
 		#end
 	}
 
