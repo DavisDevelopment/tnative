@@ -137,6 +137,10 @@ class CDirectory {
 		_path = npath;
 	}
 
+	public function toString():String {
+		return 'Directory($path)';
+	}
+
 /* === Computed Instance Fields === */
 
 	/* the path to this Dir */
