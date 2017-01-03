@@ -24,7 +24,7 @@ class Application {
 	/* === Instance Methods === */
 
 	/* terminate [this] Application */
-	public function exit(code:Int = 0):Void {
+	public inline function exit(code:Int = 0):Void {
 		Sys.exit( code );
 	}
 
@@ -68,8 +68,8 @@ class Application {
 		}
 		tannus.node.ChildProcess.execSync(command, opts);
 		#elseif python
-		python.Syntax.importModule( 'os' );
-		python.Syntax.pythonCode( 'os.system' )( command );
+		//python.Syntax.importModule( 'os' );
+		//python.Syntax.pythonCode( 'os.system' )( command );
 		#else
 		throw 'Error: not supported on current platform';
 		#end
@@ -77,7 +77,7 @@ class Application {
 
 
 
-	/* === Computed Instance Fields === */
+/* === Computed Instance Fields === */
 
 	/* the current working directory */
 	public var cwd(get, set):Path;
