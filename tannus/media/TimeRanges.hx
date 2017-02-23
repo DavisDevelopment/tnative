@@ -8,7 +8,6 @@ import js.html.TimeRanges in Ntr;
 #end
 
 import Std.*;
-import Math.*;
 import tannus.math.TMath.*;
 
 using Lambda;

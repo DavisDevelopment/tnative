@@ -1,7 +1,6 @@
 package tannus.media;
 
 import tannus.ds.ThreeTuple;
-import Math.*;
 import tannus.math.TMath.*;
 import tannus.ds.Comparable;
 
