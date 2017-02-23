@@ -5,8 +5,6 @@ import tannus.math.TMath.*;
 import tannus.geom.*;
 import tannus.utils.Error;
 
-import Math.*;
-
 using Lambda;
 using tannus.ds.ArrayTools;
 using tannus.math.TMath;
