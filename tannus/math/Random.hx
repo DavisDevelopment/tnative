@@ -155,6 +155,23 @@ class Random {
 		return result;
 	}
 
+    /**
+      * shuffle [array] in place
+      */
+	public function ishuffle<T>(array : Array<T>):Void {
+	    var ci:Int = array.length;
+	    var ri : Int;
+	    var tmp : T;
+
+	    while (ci > 0) {
+	        ri = randint(0, ci);
+	        ci--;
+	        tmp = array[ci];
+	        array[ci] = array[ri];
+	        array[ri] = tmp;
+	    }
+	}
+
 	/**
 	 * Choose a random construct from [_enum], and return a function to generate that construct
 	 */
