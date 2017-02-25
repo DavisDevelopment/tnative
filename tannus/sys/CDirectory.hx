@@ -44,7 +44,7 @@ class CDirectory {
 
 	/* get a File by name */
 	public inline function file(name : String):File {
-		return new File((path.absolute?'/':'')+path + name);
+	    return new File(path.plusString( name ));
 	}
 
 	/* get a Dir by name */
