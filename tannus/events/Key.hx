@@ -92,6 +92,16 @@ abstract Key (Int) from Int to Int {
     var Number7 = 55;
     var Number8 = 56;
     var Number9 = 57;
+    var Numpad0 = 96;
+    var Numpad1 = 97;
+    var Numpad2 = 98;
+    var Numpad3 = 99;
+    var Numpad4 = 100;
+    var Numpad5 = 101;
+    var Numpad6 = 102;
+    var Numpad7 = 103;
+    var Numpad8 = 104;
+    var Numpad9 = 105;
 
 /* === Fields === */
 
