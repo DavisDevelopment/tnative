@@ -19,21 +19,24 @@ class History<T> {
 			return ;
 		}
 
-		index = stack.push( entry );
+		index = (stack.push( entry ) - 1);
 	}
 
 	/**
 	  * Get the value of the [i]th entry from the top
 	  */
 	public function peek(i : Int = 0):Null<T> {
-		return stack[stack.length - (i + 1)];
+		//return stack[stack.length - (i + 1)];
+		return stack[index - i];
 	}
 
 	/**
 	  * Remove the top entry from the stack
 	  */
 	public function pop():Null<T> {
-		return stack.pop();
+		var result = stack.pop();
+		index--;
+		return result;
 	}
 
 	/**
