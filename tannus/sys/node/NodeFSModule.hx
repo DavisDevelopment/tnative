@@ -1,6 +1,7 @@
 package tannus.sys.node;
 
 import tannus.sys.node.NodeFStat;
+import tannus.node.Buffer;
 
 @:jsRequire('fs')
 extern class NodeFSModule {
@@ -36,4 +37,8 @@ extern class NodeFSModule {
 
 	/* Open a Readable Stream from a File */
 	public static function createReadStream(path:String, ?options:Dynamic):tannus.node.ReadableStream;
+
+	public static function openSync(path:String, flags:String):Int;
+	public static function readSync(id:Int, buffer:Buffer, offset:Int, length:Int, position:Int):Int;
+	public static function closeSync(id:Int):Void;
 }

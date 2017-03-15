@@ -105,18 +105,21 @@ class FileSystem {
 	/**
 	  * Reads data from a file, and returns it
 	  */
-	public static inline function read(path:String, ?length:Int):ByteArray {
-		/*#if python
-			var f:Dynamic = (python.Syntax.pythonCode('open'))(path, 'rb');
-			var _data:python.Bytearray = new python.Bytearray(length!=null?f.read():f.read(length));
-			f.close();
-
-			return (untyped ByteArray.ofData(_data));
-		#else
-		*/
-			var b:haxe.io.Bytes = F.getBytes(path);
-			return ByteArray.fromBytes(b);
-		//#end
+	public static function read(path:String, ?offset:Int, ?length:Int):ByteArray {
+	    if (offset == null || offset == 0) {
+	        return ByteArray.fromBytes(F.getBytes(path));
+	    }
+        else {
+            var inp = F.read(path, true);
+	        inp.seek(offset, sys.io.FileSeek.SeekCur);
+	        if (length == null) {
+	            length = (stat( path ).size - offset);
+	        }
+	        var b = haxe.io.Bytes.alloc( length );
+	        inp.readBytes(b, 0, length);
+	        inp.close();
+	        return ByteArray.fromBytes( b );
+        }
 	}
 
 	/**

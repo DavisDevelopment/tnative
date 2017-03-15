@@ -4,6 +4,8 @@ import tannus.io.ByteArray;
 import tannus.io.ByteArray.BinaryImpl;
 import tannus.sys.FileStat;
 
+import tannus.node.Buffer;
+
 #if (js && node)
 class NodeFileSystem {
 	public static inline function exists(path : String):Bool {
@@ -31,9 +33,18 @@ class NodeFileSystem {
 		NFS.writeFileSync(path, data.getData());
 	}
 	
-	public static function read(path:String, ?length:Int):ByteArray {
-		var buf = NFS.readFileSync(path);
-		return ByteArray.ofData( buf );
+	public static function read(path:String, ?offset:Int, ?length:Int):ByteArray {
+	    if (offset == null && length == null) {
+	        var buf = NFS.readFileSync(path);
+            return ByteArray.ofData( buf );
+        }
+        else {
+            var id = NFS.openSync(path, 'r+');
+            var buff:Buffer = new Buffer( length );
+            NFS.readSync(id, buff, 0, length, offset);
+            NFS.closeSync( id );
+            return ByteArray.ofData( buff );
+        }
 	}
 
 	public static function copy(src:Path, dest:Path, cb:Null<Dynamic>->Void):Void {

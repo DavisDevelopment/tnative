@@ -24,7 +24,8 @@ class NodeBinary extends Binary {
 	  */
 	override public function get(index : Int):Byte {
 		super.get( index );
-		return buffer[ index ];
+		//return buffer[ index ];
+		return buffer.readUInt8(index);
 	}
 
 	/**

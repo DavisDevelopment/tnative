@@ -9,7 +9,9 @@ import tannus.io.Byte;
 import tannus.sys.Mime;
 import tannus.math.TMath;
 import tannus.ds.Obj;
+
 import haxe.Int64;
+import haxe.io.*;
 
 //import Math.*;
 
@@ -51,7 +53,11 @@ class Binary {
 
 	/* read a 32bit integer from the given index */
 	public function getInt32(i : Int):Int {
-		return (get(i) | (get(i + 1) << 8) | (get(i + 2) << 16) | (get(i + 3) << 24));
+	    var a:Int = get( i );
+	    var b:Int = get(i + 1);
+	    var c:Int = get(i + 2);
+	    var d:Int = get(i + 3);
+		return (bigEndian ? (d | (c << 8) | (b << 16) | (a << 24)) : (a | (b << 8) | (c << 16) | (d << 24)));
 	}
 
 	/* store a 32bit integer to the given position */
@@ -114,12 +120,83 @@ class Binary {
 	public inline function readByte():Byte {
 		return get(position++);
 	}
+	public inline function readUInt8():Int return get(position++);
+
+	public function readInt8():Int {
+	    var n:Int = readByte();
+	    if (n >= 128) {
+	        return (n - 256);
+	    }
+	    return n;
+	}
+
+	public function readInt16():Int {
+	    var a:Int = readByte(), b:Int = readByte();
+	    var n = bigEndian ? b | (a << 8) : a | (b << 8);
+	    if (n & 0x8000 != 0) {
+	        return n - 0x10000;
+	    }
+	    return n;
+	}
+
+    // read an unsigned 24-bit integer
+	public function readUInt24():Int {
+	    var a=readUInt8(),b=readUInt8(),c=readUInt8();
+	    return bigEndian ? (c | (b << 8) | (a << 16)) : (a | (b << 16) | (c << 8));
+	}
+
+    // read a signed 24-bit integer
+	public function readInt24():Int {
+	    var a=readUInt8(),b=readUInt8(),c=readUInt8();
+	    var n = bigEndian ? (c | (b << 8) | (a << 16)) : (a | (b << 16) | (c << 8));
+	    if (n & 0x800000 != 0) {
+	        return n - 0x1000000;
+	    }
+	    return n;
+	}
+
+	public function readUInt16():Int {
+	    var a:Int = readByte(), b:Int = readByte();
+	    return bigEndian ? b | (a << 8) : a | (b << 8);
+	}
 
 	/* read a 32bit integer */
 	public function readInt32():Int {
-		var v = getInt32( position );
-		position += 4;
-		return v;
+        var v = getInt32( position );
+        position += 4;
+        return v;
+        /*
+		var a:Int = readByte();
+		var b:Int = readByte();
+		var c:Int = readByte();
+		var d:Int = readByte();
+		return (bigEndian ? (d | (c << 8) | (b << 16) | (a << 24)) : (a | (b << 8) | (c << 16) | (d << 24)));
+		*/
+	}
+
+    // read unsigned 32bit integer
+	public inline function readUInt32():Int {
+	    return signedToUnsigned(readInt32());
+	}
+
+    private static var MAX64:Int = {Std.int(Math.pow(2, 32));};
+	public function readUInt64():Int {
+	    return ((readInt32() * MAX64) + readInt32());
+	}
+
+	public function readInt64():Int {
+	    var a = readInt32(), b = readInt32();
+	    var res:Int = a;
+	    res = (res << 32);
+	    return (res | b);
+	}
+
+	public function readUInt8Array(len : Int):UInt8Array {
+	    var arr = new UInt8Array( len );
+	    for (i in 0...len) {
+	        arr.set(i, readByte());
+	    }
+	    return arr;
 	}
 
 	/* write a 32bit integer */
@@ -142,6 +219,10 @@ class Binary {
 	public inline function writeByte(c : Byte):Void {
 		set(position++, c);
 	}
+
+	private inline function signedToUnsigned(n : Int):Int return (n >>> 0);
+
+	/* 
 
 	/* read the next [len] bytes */
 	public function read(len : Int):Binary {
@@ -479,4 +560,5 @@ class Binary {
 	private var _length : Int;
 	private var b : BinaryData;
 	public var position : Int;
+	public var bigEndian: Bool = false;
 }
