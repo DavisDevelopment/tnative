@@ -140,5 +140,20 @@ class TSys {
 	public static inline function tempDir():Path {
 		return (getEnv('HOME')+'/tmp/');
 	}
+
+	/**
+	  * get the system on which we are running
+	  */
+	public static function systemName():String {
+	    #if node
+	        var nt:String = tannus.node.Os.type();
+	        if (nt == 'Windows_NT') {
+	            nt = 'Windows';
+	        }
+	        return nt;
+	    #else
+	        return Sys.systemName();
+	    #end
+	}
 }
 
