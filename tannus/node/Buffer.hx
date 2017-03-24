@@ -1,5 +1,7 @@
 package tannus.node;
 
+import js.html.ArrayBuffer;
+
 @:native('Buffer')
 extern class Buffer implements ArrayAccess<Int> {
 	/**
@@ -11,6 +13,7 @@ extern class Buffer implements ArrayAccess<Int> {
 
 /* === Instance Fields === */
 
+    public var buffer : ArrayBuffer;
 	var length(default, never) : Int;
 	var INSPECT_MAX_BYTES : Int;
 
