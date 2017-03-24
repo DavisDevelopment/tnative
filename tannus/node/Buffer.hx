@@ -73,7 +73,13 @@ extern class Buffer implements ArrayAccess<Int> {
 
 	/* Test whether a given value [o] is a Buffer */
 	static function isBuffer(o:Dynamic):Bool;
+	static function isEncoding(enc : String):Bool;
 
 	static function byteLength(s:String,?enc:String):Int;
 	static function concat(list:Array<Buffer>, ?totalLength:Float):Buffer;
+
+    @:overload(function(arrayBuffer:js.html.ArrayBuffer, ?byteOffset:Int, ?length:Int):Buffer {})
+    @:overload(function(buffer:Buffer):Buffer {})
+    @:overload(function(string:String, encoding:String):Buffer {})
+	static function from(array : Array<Int>):Buffer;
 }
