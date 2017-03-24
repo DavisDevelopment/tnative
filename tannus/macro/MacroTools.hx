@@ -268,6 +268,57 @@ class MacroTools {
 	}
 
 	/**
+	  * get a Function from an expression of a function
+	  */
+	public static function isFunction(e : Expr):Bool {
+	    try {
+	        var t = Context.typeof( e );
+	        switch ( t ) {
+                case TFun(_, _):
+                    return true;
+                default:
+                    return false;
+	        }
+	    }
+	    catch(error : Dynamic) {
+	        return false;
+	    }
+	}
+
+	public static function funcInfo(e : Expr):Null<FuncInfo> {
+	    try {
+	        var t = Context.typeof( e );
+	        switch ( t ) {
+                case TFun(args, ret):
+                    return {
+                        args: args,
+                        ret: ret
+                    };
+
+                default:
+                    return null;
+	        }
+	    }
+	    catch (error : Dynamic) {
+	        return null;
+	    }
+	}
+
+	public static function getRootClass(t : Type):Null<ClassType> {
+        t = t.followWithAbstracts();
+        try {
+            var ct:ClassType = t.getClass();
+            while (ct.superClass != null) {
+                ct = ct.superClass.t.get();
+            }
+            return ct;
+        }
+        catch (error : Dynamic) {
+            return null;
+        }
+	}
+
+	/**
 	  * Pointer-ify an expression
 	  */
 	public static function pointer<T>(e : ExprOf<T>):ExprOf<tannus.io.Ptr<T>> {
@@ -388,3 +439,8 @@ class MacroTools {
 	}
 	#end
 }
+
+typedef FuncInfo = {
+    args:Array<{t:Type, opt:Bool, name:String}>,
+    ret:Type
+};
