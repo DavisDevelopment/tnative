@@ -58,4 +58,10 @@ abstract Path (CPath) from CPath to CPath {
 	public static inline function fromByteArray(b : ByteArray):Path {
 		return fromString(b.toString());
 	}
+
+    /* from Array<String> */
+	@:from
+	public static inline function fromPieces(bits : Array<String>):Path {
+	    return CPath.sjoin( bits );
+	}
 }

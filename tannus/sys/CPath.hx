@@ -257,6 +257,20 @@ class CPath {
 		return sum;
 	}
 
+	/* join the given Strings */
+	public static function sjoin(list : Array<String>):Path {
+	    var isabsolute:Bool = (list.length > 0 && P.isAbsolute(list[0]));
+	    var bits:Array<String> = new Array();
+	    for (s in list) {
+	        bits = bits.concat(ssplit( s ));
+	    }
+	    var result:Path = new Path(bits.join( separator )).normalize();
+	    if ( isabsolute ) {
+	        result = result.absolutize();
+	    }
+	    return result;
+	}
+
 	/**
 	  * perform manual split
 	  */
@@ -288,8 +302,6 @@ class CPath {
 	public static inline function split(p : Path):Array<String> {
 		return ssplit( p.s );
 	}
-
-	private static function sjoin(slist : Array<String>):Path return join(slist.map(function(s) return new Path(s)));
 
 	/* interpret/resolve any expansions in the given Path */
 	public static function _expand(p : CPath):CPath {
@@ -326,6 +338,7 @@ class CPath {
 
 /* === Static Fields === */
 
+    /* platform-specific path separator */
     private static var separator(get, never):String;
     private static function get_separator():String {
         if (_sep == null) {
