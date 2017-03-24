@@ -429,8 +429,9 @@ class Binary {
 	}
 
 	/* iterate over all Bytes in [this] */
-	public function iterator():BinaryIterator {
-		return new BinaryIterator( this );
+	public function iterator():Iterator<Byte> {
+		//return new BinaryIterator( this );
+		return tannus.ds.IteratorTools.map((0...length), get);
 	}
 
 	/* get a subset of [this] data as a String */
