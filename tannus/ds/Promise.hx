@@ -12,6 +12,7 @@ import tannus.internal.TypeTools.typename;
 import Std.is;
 
 using haxe.macro.ExprTools;
+using haxe.macro.TypeTools;
 using tannus.macro.MacroTools;
 
 class Promise<T> {
@@ -440,6 +441,15 @@ class Promise<T> {
 						case 'promise':
 							switch ( ex.expr ) {
 								case ExprDef.ECall(efunc, args):
+									var fi = efunc.funcInfo();
+									if (fi != null) {
+									    var rc = fi.ret.getRootClass();
+									    if (rc != null) {
+									        if (rc.fullName() == 'tannus.ds.Promise') {
+									            return macro $ex.then($yes).unless($no);
+									        }
+									    }
+									}
 									args = args.concat([yes, no]);
 									return {
 										'expr': ECall(efunc, args),
