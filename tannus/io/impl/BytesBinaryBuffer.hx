@@ -42,6 +42,7 @@ class BytesBinaryBuffer extends BinaryBuffer {
 		
 	//}
 	override function addString(s : String):Void {
+	    addInt32( s.length );
 		b.addString( s );
 	}
 	override function getByteArray():ByteArray {
