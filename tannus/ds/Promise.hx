@@ -513,6 +513,19 @@ class Promise<T> {
 		}));
 	}
 
+#if js
+
+    /**
+      * Create a tannus Promise from a js Promise
+      */
+    public static function fromJsPromise<T>(jsp : js.Promise<T>):Promise<T> {
+        return new Promise(function(accept, reject) {
+            jsp.then(accept, reject);
+        });
+    }
+
+#end
+
 /* === Instance Fields === */
 
 	private var executor : PromiseFunction<T>;
