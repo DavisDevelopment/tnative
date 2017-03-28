@@ -45,4 +45,11 @@ extern class Fs {
     public static function open(path:String, flags:String, callback:Null<Dynamic>->Int->Void):Void;
     public static function read(id:Int, buffer:Buffer, offset:Int, length:Int, position:Null<Int>, callback:Null<Dynamic>->Int->Buffer->Void):Void;
 	public static function close(id:Int, callback:Null<Dynamic>->Void):Void;
+
+	public static function watch(path:String, listener:String->String->Void):FSWatcher;
+}
+
+@:jsRequire('fs', 'FSWatcher')
+extern class FSWatcher extends EventEmitter {
+    function close():Void;
 }
