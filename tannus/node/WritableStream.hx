@@ -20,4 +20,17 @@ extern class WritableStream extends EventEmitter {
 	@:overload(function(chunk:Buffer, ?enc:String):Void {})
 	@:overload(function(cb:Function):Void {})
 	function end(?chunk:Buffer, ?encoding:String, ?cb:Function):Void;
+
+/* === Event Methods === */
+
+	inline function onClose(f : Void->Void):Void on('close', f);
+	inline function onceClose(f : Void->Void):Void once('close', f);
+	inline function onDrain(f : Void->Void):Void on('drain', f);
+	inline function onceDrain(f : Void->Void):Void once('drain', f);
+	inline function onError(f : Null<Dynamic>->Void):Void on('error', f);
+	inline function onceError(f : Null<Dynamic>->Void):Void once('error', f);
+	inline function onFinish(f : Void->Void):Void on('finish', f);
+	inline function onceFinish(f : Void->Void):Void once('finish', f);
+	inline function onPipe(f : ReadableStream->Void):Void on('pipe', f);
+	inline function onUnpipe(f : ReadableStream->Void):Void on('unpipe', f);
 }
