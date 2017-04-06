@@ -12,7 +12,7 @@ using tannus.ds.StringUtils;
 using tannus.ds.ArrayTools;
 
 @:access( haxe.io.Path )
-class CPath {
+class CPath implements tannus.ds.IComparable<CPath> {
 	/* Constructor Function */
 	public function new(str : String):Void {
 		s = str;
@@ -134,6 +134,10 @@ class CPath {
 			err('Both Paths must be absolute!');
 		}
 		return '';
+	}
+
+	public function compareTo(other : CPath):Int {
+	    return Reflect.compare(s, other.s);
 	}
 	
 /* === Computed Instance Fields === */
