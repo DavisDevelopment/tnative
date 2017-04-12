@@ -25,6 +25,7 @@ extern class Fs {
 
 	/* Reads file */
 	public static function readFileSync(path : String):Dynamic;
+	public static function readFile(path:String, callback:Null<Dynamic>->Buffer->Void):Void;
 
 	/* Writes to file */
 	public static function writeFileSync(path:String, data:Dynamic):Void;
