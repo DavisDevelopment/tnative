@@ -13,4 +13,5 @@ extern class ChildProcess extends EventEmitter {
 	static function exec(cmd:String, options:Dynamic, callback:Null<Dynamic>->Buffer->Buffer->Void):ChildProcess;
 	static function execSync(cmd:String, ?opts:Dynamic):Buffer;
 	static function fork(modulePath:String, ?args:Array<String>, ?options:Dynamic):ChildProcess;
+	static function spawn(command:String, args:Array<String>, ?options:Dynamic):ChildProcess;
 }
