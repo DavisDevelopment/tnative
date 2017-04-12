@@ -127,8 +127,24 @@ abstract Object (Dynamic) from Dynamic to Dynamic {
 	/**
 	  * Obtain a method instance
 	  */
-	public inline function method<T>(mname : String):Method<T> {
-		return new Method(get(mname), this);
+	//public inline function method<T>(mname : String):Method<T> {
+		//return new Method(get(mname), this);
+	//}
+
+    /**
+      * invoke this[name] as a method of this, with [params]
+      */
+	public inline function call<T>(name:String, ?params:Array<Dynamic>):T {
+	    return untyped Reflect.callMethod(this, get( name ), (params!=null?params:[]));
+	}
+
+	/**
+	  * get [this]'s [name] method
+	  */
+	public function method<T:Function>(name : String):T {
+	    return Reflect.makeVarArgs(function(args) {
+	        return call(name, args);
+	    });
 	}
 
 	/**
