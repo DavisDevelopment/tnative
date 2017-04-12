@@ -82,6 +82,8 @@ class WebFile {
 		return _objectUrl;
 	}
 
+	public inline function getNativeFile():NFile return file;
+
 /* === Computed Instance Fields === */
 
 	/* the name of [this] File */
@@ -101,6 +103,13 @@ class WebFile {
 	private inline function get_lastModified():Date {
 		return file.lastModifiedDate;
 	}
+
+#if (node || node_webkit || electron)
+
+	public var path(get, never):String;
+	private inline function get_path():String return (untyped file).path;
+
+#end
 
 /* === Instance Fields === */
 

@@ -4,7 +4,6 @@ import tannus.ds.*;
 import tannus.ds.tuples.Tup2;
 
 import Std.*;
-import Math.*;
 import tannus.math.TMath.*;
 
 using Lambda;

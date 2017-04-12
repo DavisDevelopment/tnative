@@ -24,7 +24,8 @@ class NodeBinary extends Binary {
 	  */
 	override public function get(index : Int):Byte {
 		super.get( index );
-		return buffer[ index ];
+		//return buffer[ index ];
+		return buffer.readUInt8(index);
 	}
 
 	/**
@@ -33,6 +34,16 @@ class NodeBinary extends Binary {
 	override public function set(index:Int, value:Byte):Byte {
 		super.set(index, value);
 		return (buffer[index] = value);
+	}
+
+	override function fill(c:Byte, ?offset, ?end) {
+	    b.fill(c, offset, end);
+	}
+	override function copy():Binary {
+	    return NodeBinary.ofData(Buffer.from( b ));
+	}
+	override function equals(o : Binary):Bool {
+	    return (b.compare( o.b ));
 	}
 
 	/**
@@ -57,9 +68,11 @@ class NodeBinary extends Binary {
 	  * copy the given chunk of data onto [this] one
 	  */
 	override public function blit(index:Int, src:Binary, srcIndex:Int, size:Int):Void {
-		for (i in 0...size) {
-			set((index + i), src.get(srcIndex + i));
-		}
+	    var end = (srcIndex + size);
+	    src.b.copy(b, index, srcIndex, end);
+		//for (i in 0...size) {
+			//set((index + i), src.get(srcIndex + i));
+		//}
 	}
 
 	/**
@@ -87,14 +100,9 @@ class NodeBinary extends Binary {
 	  * return the sum of [this] data and another
 	  */
 	override public function concat(other : ByteArray):ByteArray {
-		// calculate the total length of the resulting data
-		var len:Int = (length + other.length);
-		// create a new Binary object to hold the resulting data
-		var sum:NodeBinary = alloc( len );
-		// write [this] data onto [sum]
-		sum.blit(0, this, 0, length);
-		// write [other] onto [sum]
-		sum.blit(length, other, 0, other.length);
+		var sum:NodeBinary = alloc(length + other.length);
+		b.copy(sum.b, 0, 0, length);
+		other.b.copy(sum.b, length, 0, other.length);
 		return sum;
 	}
 
@@ -104,6 +112,13 @@ class NodeBinary extends Binary {
 	override private function setData(data : BinaryData):Void {
 		b = data;
 		_length = data.length;
+	}
+
+	override function toBytes() {
+	    return haxe.io.Bytes.ofData(new js.html.Uint8Array(untyped buffer).buffer);
+	}
+	override function base64Encode() {
+	    return b.toString('base64');
 	}
 
 /* === Computed Instance Fields === */
@@ -124,10 +139,8 @@ class NodeBinary extends Binary {
 	/**
 	  * Create and return a new Binary from the given BinaryData
 	  */
-	public static function ofData(data : BinaryData):NodeBinary {
-		var bufferTarget:Buffer = new Buffer( data.length );
-		data.copy(bufferTarget, 0, 0, data.length);
-		return new NodeBinary(data.length, bufferTarget);
+	public static inline function ofData(data : BinaryData):NodeBinary {
+		return new NodeBinary(data.length, Buffer.from( data ));
 	}
 
 	/**
@@ -140,18 +153,15 @@ class NodeBinary extends Binary {
 	/**
 	  * create and return a new Binary, from a haxe.io.Bytes object
 	  */
-	public static function fromBytes(b : haxe.io.Bytes):NodeBinary {
-		var nb:NodeBinary = alloc( b.length );
-		for (index in 0...b.length) {
-			nb.set(index, b.get( index ));
-		}
-		return nb;
+	public static inline function fromBytes(b : haxe.io.Bytes):NodeBinary {
+	    return ofData(Buffer.from(b.getData().slice(0)));
 	}
 	
 	/**
 	  * create and return a new Binary, from Base64 data
 	  */
 	public static inline function fromBase64(s : String):NodeBinary {
-		return fromBytes(haxe.crypto.Base64.decode( s ));
+		//return fromBytes(haxe.crypto.Base64.decode( s ));
+		return ofData(Buffer.from(s, 'base64'));
 	}
 }

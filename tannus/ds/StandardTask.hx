@@ -11,9 +11,19 @@ class StandardTask<Status, Result> extends ProgressiveTask {
 
 		statusChange = new Signal();
 		resultChange = new Signal();
+		failureEvent = new Signal();
 		_res = null;
 		_status = null;
 	}
+
+/* === Instance Methods === */
+
+    /**
+      * report an error that caused the Task to fail
+      */
+    public function fail(error : Dynamic):Void {
+        failureEvent.call( error );
+    }
 
 /* === Computed Instance Fields === */
 
@@ -50,4 +60,7 @@ class StandardTask<Status, Result> extends ProgressiveTask {
 
 	/* Signal fired when [result] changes */
 	public var resultChange : Signal<Delta<Result>>;
+
+	/* Signal fired when an error occurs */
+	public var failureEvent : Signal<Dynamic>;
 }

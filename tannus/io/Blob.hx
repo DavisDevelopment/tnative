@@ -24,7 +24,7 @@ abstract Blob (CBlob) from CBlob to CBlob {
 
 /* === Implicit Type Casting === */
 
-	#if (js && !node)
+	#if js
 		/**
 		  * Convert to a native Blob
 		  */

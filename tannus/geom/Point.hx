@@ -351,7 +351,7 @@ abstract Point (TPoint) from TPoint to TPoint {
 }
 
 /* Base Point Class */
-class TPoint implements tannus.ds.Comparable<TPoint> {
+class TPoint implements tannus.ds.Comparable<TPoint> implements tannus.ds.IComparable<TPoint> {
 	/* Constructor Function */
 	public function new(x:Float, y:Float, z:Float):Void {
 		_x = x;
@@ -360,6 +360,17 @@ class TPoint implements tannus.ds.Comparable<TPoint> {
 	}
 
 /* === Instance Methods === */
+
+    public function compareTo(other : TPoint):Int {
+        var xd = Reflect.compare(x, other.x);
+        if (xd != 0)
+            return xd;
+        var yd = Reflect.compare(y, other.y);
+        if (yd != 0)
+            return yd;
+        var zd = Reflect.compare(z, other.z);
+        return zd;
+    }
 
 	/**
 	  * Get the Angle between [this] and [other]

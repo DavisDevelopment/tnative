@@ -21,4 +21,13 @@ extern class ReadableStream extends EventEmitter {
 	function unpipe(?dest : WritableStream):Void;
 
 	function unshift(chunk : Buffer):Void;
+
+/* === Event Methods === */
+
+    inline function onOpen(f : Void->Void):Void on('open', f);
+    inline function onClose(f : Void->Void):Void on('close', f);
+    inline function onData(f : Dynamic->Void):Void on('data', f);
+    inline function onEnd(f : Void->Void):Void on('end', f);
+    inline function onError(f : Dynamic->Void):Void on('error', f);
+    inline function onReadable(f : Void->Void):Void on('readable', f);
 }

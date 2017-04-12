@@ -1,6 +1,5 @@
 package tannus.math.random;
 
-import Math.*;
 import tannus.math.TMath.*;
 
 class BasicRandomNumberGenerator implements RandomNumberGenerator {

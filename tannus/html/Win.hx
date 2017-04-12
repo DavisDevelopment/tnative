@@ -118,8 +118,14 @@ abstract Win (CWin) from CWin to CWin {
 	  * Expose some value globally
 	  */
 	public inline function expose(name:String, value:Dynamic):Void {
-		var self:Obj = this;
-		self[name] = value;
+	    Reflect.setProperty(this, name, value);
+	}
+
+	/**
+	  * Unexpose a value
+	  */
+	public inline function unexpose(name:String):Void {
+	    Reflect.deleteField(this, name);
 	}
 
 	/**

@@ -12,6 +12,11 @@ import js.html.ArrayBuffer;
 import js.html.Blob;
 import js.html.Document;
 
+using StringTools;
+using tannus.ds.StringUtils;
+using Lambda;
+using tannus.ds.ArrayTools;
+
 @:expose( 'WebRequest' )
 class WebRequest extends EventDispatcher {
 	/* Constructor Function */
@@ -85,8 +90,39 @@ class WebRequest extends EventDispatcher {
 	  */
 	public inline function loadAsByteArray(cb : ByteArray -> Void):Void {
 		loadAsArrayBuffer(function(ab) {
+#if node
+			cb(ByteArray.ofData((untyped __js__('Buffer'))( ab )));
+#else
 			cb(ByteArray.ofData( ab ));
+#end
 		});
+	}
+
+	/**
+	  * wait for the request to finish, but don't retrieve the response data
+	  */
+	public inline function load(done : Void->Void):Void {
+		onres(untyped done);
+	}
+
+	/**
+	  * get a response header
+	  */
+	public inline function getResponseHeader(name : String):Null<String> return req.getResponseHeader( name );
+	public inline function getAllResponseHeadersRaw():Null<String> return req.getAllResponseHeaders();
+	public inline function setRequestHeader(name:String, value:String):Void req.setRequestHeader(name, value);
+	public inline function abort():Void req.abort();
+	public function getAllResponseHeaders():Map<String, String> {
+		var m = new Map();
+		var s = getAllResponseHeadersRaw();
+		if (s != null) {
+			var lines = s.split( '\r\n' );
+			for (line in lines) {
+				var p = line.separate(':');
+				m[p.before] = p.after;
+			}
+		}
+		return m;
 	}
 
 	/**

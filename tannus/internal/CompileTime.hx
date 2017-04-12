@@ -82,6 +82,15 @@ class CompileTime {
 	}
 
 	/**
+	  * Read, parse, and execute the given file
+	  */
+	public static macro function executeFile(file : String):Expr {
+		var code:String = loadFile( file ).toString();
+		var expr:Expr = Context.parse(code, Context.currentPos());
+		return expr;
+	}
+
+	/**
 	  * Inline an entire File as Binary data
 	  */
 	public static macro function readFile(path : String):ExprOf<ByteArray> {
