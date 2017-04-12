@@ -383,6 +383,8 @@ abstract Element (JQuery) from JQuery to JQuery {
 	public static inline function fromDOMElement(el : js.html.DOMElement):Element {
 		return new Element( el );
 	}
+	@:from
+	public static inline function fromElement(e : js.html.Element):Element return new Element( e );
 
 	/**
 	  * Extend jQuery
