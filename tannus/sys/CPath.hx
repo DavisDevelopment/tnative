@@ -10,8 +10,10 @@ using StringTools;
 using Lambda;
 using tannus.ds.StringUtils;
 using tannus.ds.ArrayTools;
+//using haxe.io.Path;
 
 @:access( haxe.io.Path )
+@:expose('tannus.sys.Path')
 class CPath implements tannus.ds.IComparable<CPath> {
 	/* Constructor Function */
 	public function new(str : String):Void {
@@ -20,19 +22,24 @@ class CPath implements tannus.ds.IComparable<CPath> {
 
 /* === Instance Methods === */
 
-    public inline function plusPath(other : Path):Path {
-        return join([this, other]);
-    }
-    public inline function plusString(other : String):Path {
-        return plusPath(new Path( other ));
+    // return the sum of [this] and [other]
+    public function plusPath(other : Path):Path {
+        //return join([this, other]);
+        return plusString( other.s );
     }
 
-	/* convert [this] Path to a String */
+    // return the sum of [this] and [other]
+    public function plusString(other : String):Path {
+        var sum = P.normalize((absolute?separator:'') + sjoin(ssplit( s ).concat(ssplit( other ))));
+        return new Path( sum );
+    }
+
+	// convert [this] Path to a String 
 	public inline function toString():String {
 		return s;
 	}
 
-	/* normalize [this] Path */
+	// normalize [this] Path
 	public function normalize():Path {
 		var norm:String = s;
 		//norm = norm.split('\\').join(separator).replace((separator+separator), separator);
@@ -88,7 +95,7 @@ class CPath implements tannus.ds.IComparable<CPath> {
 	 * obtain a Path which is [other] relative to [this]
 	 */
 	public function resolve(other : Path):Path {
-		var res:Path = join([this, other]).expand();
+		var res:Path = join([s, other.s]).expand();
 		if ( absolute ) {
 			res = res.absolutize();
 		}
@@ -188,7 +195,7 @@ class CPath implements tannus.ds.IComparable<CPath> {
 	/* the basename of [this] Path */
 	public var basename(get, set):String;
 	private function get_basename():String {
-		return P.withoutExtension(s);
+		return P.withoutExtension(name);
 	}
 	private function set_basename(v : String):String {
 		name = (v + '.$extension');
@@ -206,6 +213,7 @@ class CPath implements tannus.ds.IComparable<CPath> {
 	}
 
 	/* the Mime-Type (based on [extension]) of [this] Path */
+	/*
 	public var mime(get, never):Null<Mime>;
 	private function get_mime():Null<Mime> {
 		if (!extension.empty()) {
@@ -215,6 +223,7 @@ class CPath implements tannus.ds.IComparable<CPath> {
 			return null;
 		}
 	}
+	*/
 
 	/* whether [this] is the root directory */
 	public var root(get, never):Bool;
@@ -245,7 +254,19 @@ class CPath implements tannus.ds.IComparable<CPath> {
 /* === Static Methods === */
 
 	/* join the given array into a Path */
-	public static function join(list : Array<Path>):Path {
+	public static function join(list : Array<String>):Path {
+	    var bits = [];
+	    for (s in list) {
+	        bits = bits.concat(ssplit(s));
+	    }
+	    bits = bits.filter(function(s) return (s!=null&&s.length>0));
+	    var sum = new Path(bits.join( separator )).normalize();
+	    if (list[0] == null || P.isAbsolute(list[0])) {
+	        sum = sum.absolutize();
+	    }
+	    return sum;
+	}
+	public static function join_(list : Array<Path>):Path {
 		var bits:Array<String> = new Array();
 		var resroot = (list[0] != null && list[0].absolute);
 
@@ -343,7 +364,7 @@ class CPath implements tannus.ds.IComparable<CPath> {
 /* === Static Fields === */
 
     /* platform-specific path separator */
-    private static var separator(get, never):String;
+    public static var separator(get, never):String;
     private static function get_separator():String {
         if (_sep == null) {
             _sep = (isWindows() ? '\\' : '/');
