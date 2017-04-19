@@ -10,11 +10,11 @@ using Lambda;
 using tannus.ds.ArrayTools;
 using tannus.math.TMath;
 
-class TimeRange implements Comparable<TimeRange> {
+class TimeRange implements Comparable<TimeRange> implements IComparable<TimeRange> {
 	/* Constructor Function */
-	public function new(s:Duration, e:Duration):Void {
-		start = s;
-		end = e;
+	public function new(start:Float, end:Float):Void {
+	    this.start = start;
+	    this.end = end;
 	}
 
 /* === Instance Methods === */
@@ -23,16 +23,31 @@ class TimeRange implements Comparable<TimeRange> {
 	  * Test whether [this] Range is equivalent to [other]
 	  */
 	public function equals(other : TimeRange):Bool {
-		return (start.equals(other.start) && end.equals(other.end));
+	    return (start == other.start && end == other.end);
+	}
+
+	/**
+	  * compare [this] to [other]
+	  */
+	public function compareTo(other : TimeRange):Int {
+	    var d = Reflect.compare(start, other.start);
+	    if (d != 0) {
+	        return d;
+	    }
+        d = Reflect.compare(end, other.end);
+        return d;
 	}
 
 	/**
 	  * Check that [time] is 'between' [start] and [end] ([time.totalSeconds] >= [start.totalSeconds] && [time.totalSeconds] <= [end.totalSeconds])
 	  */
-	public inline function contains(time : Duration):Bool {
-		return (time.toInt().inRange(start.toInt(), end.toInt()));
+	public inline function contains(time : Float):Bool {
+	    return time.inRange(start, end);
 	}
 
+    /**
+      * check whether [this] and [other] overlap
+      */
 	public inline function overlapsWith(other : TimeRange):Bool {
 		return (
 			contains( other.start ) ||
@@ -42,9 +57,62 @@ class TimeRange implements Comparable<TimeRange> {
 		);
 	}
 
-	public inline function toIntRange():IntRange return new IntRange(start.toInt(), end.toInt());
-	public inline function toFloatRange():FloatRange return new FloatRange(start.toFloat(), end.toFloat());
+	/**
+	  * get the sum of [this] TimeRange and [other]
+	  */
+	public function plus(other : TimeRange):TimeRange {
+	    return new TimeRange(min(start, other.start), max(end, other.end));
+	}
 
+	/**
+	  * divide [this] TimeRange into [n] pieces
+	  */
+	public function divide(n : Int):Array<TimeRange> {
+	    var s = start;
+	    var result = [];
+	    var len = (length / n);
+	    for (i in 0...n) {
+	        var tr = new TimeRange(s, (s + len));
+	        result.push( tr );
+	        s += len;
+	    }
+	    return result;
+	}
+
+	/**
+	  * split [this] TimeRange into pieces of at most [len] length
+	  */
+	public function split(len : Float):Array<TimeRange> {
+	    var rem:Float = length;
+	    var res:Array<TimeRange> = new Array();
+	    var s = start;
+	    while (rem > 0) {
+	        var l = min(rem, len);
+	        var tr = new TimeRange(s, (s + l));
+	        s += l;
+	        rem -= l;
+	        res.push( tr );
+	    }
+	    return res;
+	}
+
+    /**
+      * convert [this] to an IntRange
+      */
+	public function toIntRange(?i : Float->Int):IntRange {
+	    if (i == null)
+	        i = Std.int;
+	    return new IntRange(i(start), i(end));
+    }
+
+	/**
+	  * convert [this] to a FloatRange
+	  */
+	public inline function toFloatRange():FloatRange return new FloatRange(start, end);
+
+    /**
+      * convert [this] to a String
+      */
 	public function toString():String {
 		return 'TimeRange(from $start to $end)';
 	}
@@ -52,62 +120,13 @@ class TimeRange implements Comparable<TimeRange> {
 /* === Computed Instance Fields === */
 
 	public var duration(get, never):Duration;
-	private inline function get_duration():Duration {
-		return Duration.fromFloat(end.toFloat() - start.toFloat());
-	}
+	private inline function get_duration() return Duration.fromFloat( length );
+
+	public var length(get, never):Float;
+	private inline function get_length() return (end - start);
 
 /* === Instance Fields === */
 
-	public var start : Duration;
-	public var end : Duration;
+	public var start : Float;
+	public var end : Float;
 }
-
-abstract OldTimeRange (TimeTuple) from TimeTuple to TimeTuple {
-	/* Constructor Function */
-	public inline function new(start:Duration, end:Duration):Void {
-		this = new TimeTuple(start, end);
-	}
-
-/* === Instance Methods === */
-
-	/* compare [this] to [other] */
-	@:op(A == B)
-	public inline function equals(other : TimeRange):Bool {
-		return (start.equals( other.start ) && end.equals( other.end ));
-	}
-
-	/**
-	  * Check whether the given time falls within [this] Range
-	  */
-	public inline function contains(time : Duration):Bool {
-		return time.toInt().inRange(start.toInt(), end.toInt());
-	}
-
-	@:to
-	public inline function toIntRange():IntRange return new IntRange(start.toInt(), end.toInt());
-	@:to
-	public inline function toFloatRange():FloatRange return new FloatRange(start.toFloat(), end.toFloat());
-
-/* === Instance Fields === */
-
-	public var duration(get, never):Duration;
-	private inline function get_duration():Duration return (end - start);
-
-	public var start(get, set):Duration;
-	private inline function get_start() return this._0;
-	private inline function set_start(v) return (this._0 = v);
-	
-	public var end(get, set):Duration;
-	private inline function get_end() return this._1;
-	private inline function set_end(v) return (this._1 = v);
-
-	public var startn(get, set):Float;
-	private inline function get_startn():Float return start.totalSeconds;
-	private inline function set_startn(v : Float):Float return (start = Duration.fromSecondsF( v )).totalSeconds;
-
-	public var endn(get, set):Float;
-	private inline function get_endn():Float return end.totalSeconds;
-	private inline function set_endn(v : Float):Float return (end = Duration.fromSecondsF( v )).totalSeconds;
-}
-
-private typedef TimeTuple = Tup2<Duration, Duration>;

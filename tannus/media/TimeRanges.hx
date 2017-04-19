@@ -24,23 +24,25 @@ abstract TimeRanges (Array<TimeRange>) from Array<TimeRange> to Array<TimeRange>
 /* === Instance Methods === */
 
 	/* the total duration of all ranges */
-	public inline function getTotal():Duration {
-		return Duration.fromSecondsF(this.macsum(_.duration.toFloat()));
+	public function getTotal():Float {
+	    return this.macsum( _.length );
 	}
 
 	/* find and return the first range in [this] that 'contains' [time] */
-	public inline function findContainingRange(time : Duration):Null<TimeRange> {
+	public function findContainingRange(time : Float):Null<TimeRange> {
 		return this.macfirstMatch(_.contains( time ));
 	}
 
 	/* check whether any range in [this] contains [time] */
-	public inline function inAnyRange(time : Duration):Bool {
+	public function inAnyRange(time : Float):Bool {
 		return (findContainingRange( time ) != null);
 	}
 
 	/* sort the ranges into numerical order */
 	public function sortRanges():Void {
-		this.macsort(y.start.toInt() - x.start.toInt());
+	    this.sort(function(x, y) {
+	        return x.compareTo( y );
+	    });
 	}
 
 #if js
