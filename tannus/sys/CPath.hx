@@ -30,8 +30,10 @@ class CPath implements tannus.ds.IComparable<CPath> {
 
     // return the sum of [this] and [other]
     public function plusString(other : String):Path {
-        var sum = P.normalize((absolute?separator:'') + sjoin(ssplit( s ).concat(ssplit( other ))));
-        return new Path( sum );
+        var ssum:String = P.normalize((absolute?separator:'') + sjoin(ssplit( s ).concat(ssplit( other ))));
+        var sum = new Path( ssum );
+        sum = sum.normalize();
+        return sum;
     }
 
 	// convert [this] Path to a String 
@@ -51,6 +53,12 @@ class CPath implements tannus.ds.IComparable<CPath> {
 		if ( absolute ) {
 			r = r.absolutize();
 		}
+		var drive = r.drive;
+		while (r.drive != null) {
+		    drive = r.drive;
+		    r = new Path(r.withoutDrive());
+		}
+		r.drive = drive;
 		return r;
 	}
 
@@ -63,7 +71,7 @@ class CPath implements tannus.ds.IComparable<CPath> {
             }
         }
         else {
-            if (!spath.startsWith( separator )) {
+            if (!spath.startsWith( separator ) && drive == null) {
                 spath = (separator + spath);
             }
         }
@@ -143,8 +151,21 @@ class CPath implements tannus.ds.IComparable<CPath> {
 		return '';
 	}
 
+    /**
+      * compare [this] Path to [other]
+      */
 	public function compareTo(other : CPath):Int {
 	    return Reflect.compare(s, other.s);
+	}
+
+    /**
+      * get a textual representation of [this] Path without the 'drive'
+      */
+	public function withoutDrive():String {
+	    if (s.has(':$separator')) {
+	        return s.after(':$separator');
+	    }
+        else return s;
 	}
 	
 /* === Computed Instance Fields === */
@@ -164,9 +185,22 @@ class CPath implements tannus.ds.IComparable<CPath> {
 		return (s = v);
 	}
 
-    public var drive(get, never):Null<String>;
-    private inline function get_drive():Null<String> {
-        return (s.has(':')?s.before(':'):null);
+    /* [this] Path's drive */
+    public var drive(get, set):Null<String>;
+    private function get_drive():Null<String> {
+        if (s.has(':$separator')) {
+            return s.before(':$separator');
+        }
+        else return null;
+    }
+    private function set_drive(v : Null<String>):Null<String> {
+        if (v == null) {
+            s = withoutDrive();
+        }
+        else {
+            s = '$v:$separator$s';
+        }
+        return drive;
     }
 
 	/* the parent-directory of [this] Path */
