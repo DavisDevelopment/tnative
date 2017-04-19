@@ -1,6 +1,7 @@
 package tannus.ds;
 
 import tannus.io.Signal;
+import tannus.math.Percent;
 
 import tannus.ds.ProgressiveTask;
 
@@ -23,6 +24,28 @@ class StandardTask<Status, Result> extends ProgressiveTask {
       */
     public function fail(error : Dynamic):Void {
         failureEvent.call( error );
+    }
+
+    /**
+      * link another Task to [this] one as a subtask
+      * [child_percentage] is the percentage of [this] Task that [child] accounts for
+      */
+    public function link(child:StandardTask<Status,Dynamic>, child_percentage:Percent):Void {
+        var total:Float = child_percentage;
+        child.onProgress.on(function(delta) {
+            if (delta.current.exists && delta.previous.exists) {
+                var dif:Float = (delta.current.value - delta.previous.value);
+                var step:Percent = new Percent( dif );
+                step = new Percent(step.of( total ));
+                progress( step );
+            }
+        });
+        child.statusChange.on(function(d) {
+            status = d.current;
+        });
+        //child.onfinish.once(function() {
+            //progress( child_percentage );
+        //});
     }
 
 /* === Computed Instance Fields === */
