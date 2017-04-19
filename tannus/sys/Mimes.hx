@@ -92,6 +92,8 @@ class Mimes {
 	/**
 	  * The data used internally by this class, in Object form
 	  */
+	private static var primitive:Object = {{};};
+	/*
 	private static var primitive:Object = {{
 		"3dml": "text/vnd.in3d.3dml",
 		"3ds": "image/x-3ds",
@@ -1118,4 +1120,5 @@ class Mimes {
 		"zmm": "application/vnd.handheld-entertainment+xml",
 		"123": "application/vnd.lotus-1-2-3"
 	};};
+    */
 }
