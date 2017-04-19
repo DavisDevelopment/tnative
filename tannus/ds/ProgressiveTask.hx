@@ -25,11 +25,16 @@ class ProgressiveTask extends Task {
 
 	public var completion(default, set): Percent;
 	private function set_completion(v : Percent):Percent {
-		onProgress.call( v );
+	    var pc = completion;
+	    completion = v;
+	    if (pc.value != completion.value) {
+	        var delta:Delta<Percent> = new Delta(completion, pc);
+	        onProgress.call( delta );
+	    }
 		return (completion = v);
 	}
 
 /* === Instance Fields === */
 
-	public var onProgress : Signal<Percent>;
+	public var onProgress : Signal<Delta<Percent>>;
 }
