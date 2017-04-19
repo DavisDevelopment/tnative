@@ -64,5 +64,5 @@ class Task {
 	private inline function get_doing() return _doing;
 	
 	private var onkill : VoidSignal;
-	private var onfinish : VoidSignal;
+	public var onfinish : VoidSignal;
 }
