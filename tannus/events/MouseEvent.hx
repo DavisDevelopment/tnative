@@ -44,6 +44,9 @@ class MouseEvent extends Event {
 	public var metaKey(get, never):Bool;
 	private inline function get_metaKey() return emods.has(Meta);
 
+	public var noMods(get, never):Bool;
+	private inline function get_noMods() return !(shiftKey||altKey||ctrlKey||metaKey);
+
 /* === Instance Fields === */
 
 	//- The coordinates of the Mouse
@@ -60,7 +63,7 @@ class MouseEvent extends Event {
 	/**
 	  * Create a Tannus MouseEvent from a jQuery MouseEvent
 	  */
-	public static function fromJqEvent(event : js.JQuery.JqEvent):MouseEvent {
+	public static function fromJqEvent(event : js.jquery.Event):MouseEvent {
 		var mods:Array<EventMod> = new Array();
 		if (event.shiftKey)
 			mods.push( Shift );
@@ -72,7 +75,7 @@ class MouseEvent extends Event {
 			mods.push( Meta );
 		var pos = new Point(event.pageX, event.pageY);
 		
-		var e = new MouseEvent(event.type, pos, event.which, mods);
+		var e = new MouseEvent(event.type, pos, Std.int( event.which ), mods);
 		e.onCancelled.once(event.preventDefault);
 		e.onDefaultPrevented.once(event.preventDefault);
 		e.onPropogationStopped.once(event.stopPropagation);

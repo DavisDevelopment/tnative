@@ -17,6 +17,7 @@ class KeyboardEvent extends Event {
 		ctrlKey = mods.has(Control);
 		shiftKey = mods.has(Shift);
 		metaKey = mods.has(Meta);
+		noMods = !(altKey||ctrlKey||shiftKey||metaKey);
 	}
 
 /* === Instance Methods === */
@@ -37,13 +38,14 @@ class KeyboardEvent extends Event {
 	public var ctrlKey : Bool;
 	public var shiftKey : Bool;
 	public var metaKey : Bool;
+	public var noMods : Bool;
 
 /* === Static Methods === */
 
 	/**
 	  * Create a tannus KeyboardEvent from a jQuery one
 	  */
-	public static function fromJqEvent(e : js.JQuery.JqEvent):KeyboardEvent {
+	public static function fromJqEvent(e : js.jquery.Event):KeyboardEvent {
 		var mods:Array<EventMod> = new Array();
 		if (e.altKey) mods.push( Alt );
 		if (e.ctrlKey) mods.push( Control );
