@@ -24,6 +24,8 @@ class SortingTools {
         }
         return n;
     }
+
+    public static inline function comparePrims<T:EitherType<Float, String>>(x:T, y:T):Int return Reflect.compare(x, y);
 	/**
 	  * chain together any number of sorters, which will be evaluated in order
 	  */
