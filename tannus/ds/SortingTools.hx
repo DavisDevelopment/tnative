@@ -28,6 +28,8 @@ class SortingTools {
     public static inline function comparePrims<T:EitherType<Float, String>>(x:T, y:T):Int return Reflect.compare(x, y);
     public static inline function compareDates(x:Date, y:Date):Int return comparePrims(x.getTime(), y.getTime());
     public static inline function compareIComparables<T:IComparable<T>>(x:T, y:T):Int return x.compareTo( y );
+    public static inline function compareArrays<T>(x:Array<T>, y:Array<T>):Int return compareEnumValueParams(x, y);
+
 	/**
 	  * chain together any number of sorters, which will be evaluated in order
 	  */
