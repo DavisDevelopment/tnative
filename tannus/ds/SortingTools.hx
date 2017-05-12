@@ -2,11 +2,28 @@ package tannus.ds;
 
 import tannus.math.TMath.*;
 
+import haxe.extern.EitherType;
+
 import Reflect.*;
+import Type;
 
 import Slambda.fn;
 
 class SortingTools {
+    /**
+      * 
+      */
+    public static function compresolve(comparisonResults : Iterable<Int>):Int {
+        var n:Int = 0, i:Iterator<Int> = comparisonResults.iterator();
+        while (i.hasNext()) {
+            n = i.next();
+            if (n == 0) {
+                continue;
+            }
+            else return n;
+        }
+        return n;
+    }
 	/**
 	  * chain together any number of sorters, which will be evaluated in order
 	  */
