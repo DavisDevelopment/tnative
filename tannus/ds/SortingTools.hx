@@ -26,6 +26,7 @@ class SortingTools {
     }
 
     public static inline function comparePrims<T:EitherType<Float, String>>(x:T, y:T):Int return Reflect.compare(x, y);
+    public static inline function compareDates(x:Date, y:Date):Int return comparePrims(x.getTime(), y.getTime());
 	/**
 	  * chain together any number of sorters, which will be evaluated in order
 	  */
