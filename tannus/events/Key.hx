@@ -10,6 +10,7 @@ abstract Key (Int) from Int to Int {
     var NumpadDot = 110;
     var NumpadForwardSlash = 111;
     var Command = 91;
+    var Meta = 91;
     var ForwardSlash = 191;
     var Enter = 13;
     var Shift = 16;
