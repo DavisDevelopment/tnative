@@ -155,6 +155,12 @@ class Signal<T> {
 		broadcast(data);
 	}
 
+	/**
+	  * get the number of handlers attached to [this] Signal
+	  */
+	public inline function listenerCount():Int {
+	    return handlers.length;
+	}
 /* === Instance Fields === */
 
 	/* The Handlers attached to [this] Signal */
