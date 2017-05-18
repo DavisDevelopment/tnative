@@ -161,6 +161,14 @@ class Signal<T> {
 	public inline function listenerCount():Int {
 	    return handlers.length;
 	}
+
+	/**
+	  * check whether there is at least one listener attached to [this]
+	  */
+	public inline function hasListeners():Bool {
+	    return (listenerCount() > 0);
+	}
+
 /* === Instance Fields === */
 
 	/* The Handlers attached to [this] Signal */
