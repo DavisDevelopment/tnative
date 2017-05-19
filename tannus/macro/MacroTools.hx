@@ -415,7 +415,7 @@ class MacroTools {
 		if (ct.module != '' && ct.name != ct.module)
 			a.push( ct.module );
 		a.push( ct.name );
-		return a.join('.');
+		return ct.module;
 	}
 
 	/**
