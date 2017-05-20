@@ -17,7 +17,7 @@ class FileInput {
 	/* Constructor Function */
 	public function new():Void {
 		inputElement = Win.current.document.createInputElement();
-		inputElement.with({
+		inputElement.owith({
 			type = 'file';
 		});
 

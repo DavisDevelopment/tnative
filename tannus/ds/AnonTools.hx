@@ -15,10 +15,50 @@ using haxe.macro.ExprTools;
 using haxe.macro.TypeTools;
 
 class AnonTools {
+    /**
+      * more generic and commonly useful 'owith'
+      */
+    public static macro function with(o:Expr, action:Expr) {
+        var ers:Array<Expr> = new Array();
+        switch ( action.expr ) {
+            case EBinop(OpArrow, {pos:_,expr:EArrayDecl(names)}, body):
+                action = body;
+                ers = names;
+
+            case EBinop(OpArrow, name, body):
+                action = body;
+                ers[0] = name;
+
+            default:
+                null;
+        }
+
+        switch ( o.expr ) {
+            case EArrayDecl( values ):
+                for (index in 0...values.length) {
+                    var e = values[index];
+                    if (ers[index] != null)
+                        action = action.replace(ers[index], e);
+                    else {
+                        var er:Expr = (macro $i{'_' + (index + 1)});
+                        action = action.replace(er, e);
+                    }
+                }
+
+            default:
+                if (ers[0] != null)
+                    action = action.replace(ers[0], o);
+                else
+                    action = action.replace(macro _, o);
+        }
+
+        return action;
+    }
+
 	/**
 	  * 'with'
 	  */
-	public static macro function with<T>(o:ExprOf<T>, action:Expr) {
+	public static macro function owith<T>(o:ExprOf<T>, action:Expr) {
 		var type = Context.typeof( o ).getClass();
 		var map:Map<String, ClassField> = new Map();
 		var list = type.fields.get();
