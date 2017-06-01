@@ -30,6 +30,11 @@ abstract Dict<K, V> (IDict<K, V>) {
 	}
 
 	@:to
+	public static inline function toFloatDict<K:Float, V>(v : IDict<K, V>):FloatDict<V> {
+	    return new FloatDict();
+	}
+
+	@:to
 	public static inline function toEnumValueDict<K:EnumValue, V>(v : IDict<K, V>):EnumValueDict<K, V> {
 		return new EnumValueDict();
 	}
