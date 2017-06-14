@@ -98,9 +98,13 @@ class FileSystem {
 	/**
 	  * Opens and Returns an Output instance, bound to the given File
 	  */
-	public static function fileOutput(path : String):sys.io.FileOutput {
-		return sys.io.File.write(path, true);
-	}
+	public static function openOutput(path : String):FileOutput {
+		return new FileOutput(sys.io.File.write( path ));
+    }
+
+    public static function openInput(path : String):FileInput {
+        return new FileInput(sys.io.File.read( path ));
+    }
 
 	/**
 	  * Reads data from a file, and returns it

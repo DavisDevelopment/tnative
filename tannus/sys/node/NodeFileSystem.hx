@@ -92,6 +92,14 @@ class NodeFileSystem {
 		};
 	}
 
+	public static inline function openOutput(path : String):FileOutput {
+	    return new tannus.sys.FileOutput(new NodeFileOutput( path ));
+	}
+
+	public static inline function openInput(path : String):FileInput {
+	    return new tannus.sys.FileInput(new NodeFileInput( path ));
+	}
+
 /* === Private utility methods === */
 
 	/**

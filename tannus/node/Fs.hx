@@ -41,6 +41,7 @@ extern class Fs {
 
 	public static function openSync(path:String, flags:String):Int;
 	public static function readSync(id:Int, buffer:Buffer, offset:Int, length:Int, position:Int):Int;
+	public static function writeSync(id:Int, buffer:Buffer, offset:Int, length:Int, position:Int):Int;
 	public static function closeSync(id:Int):Void;
 
     public static function open(path:String, flags:String, callback:Null<Dynamic>->Int->Void):Void;
