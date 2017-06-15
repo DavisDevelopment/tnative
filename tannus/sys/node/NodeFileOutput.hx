@@ -11,10 +11,11 @@ import tannus.node.Fs;
 
 class NodeFileOutput extends Output {
     /* Constructor Function */
-    public function new(path : String):Void {
+    public function new(path:String, append:Bool):Void {
         this.path = path;
-        this.fid = Fs.openSync(path, 'w');
+        this.fid = Fs.openSync(path, (append?'a':'w'));
         b = new BytesBuffer();
+        seek(0, SeekEnd);
     }
 
 /* === Instance Methods === */

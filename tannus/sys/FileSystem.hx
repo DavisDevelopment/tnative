@@ -98,10 +98,16 @@ class FileSystem {
 	/**
 	  * Opens and Returns an Output instance, bound to the given File
 	  */
-	public static function openOutput(path : String):FileOutput {
-		return new FileOutput(sys.io.File.write( path ));
+	public static function openOutput(path:String, append:Bool=false):FileOutput {
+		return new FileOutput((append?sys.io.File.append:sys.io.File.write)( path ));
+    }
+    public static function openAppend(path : String):FileOutput {
+        return openOutput(path, true);
     }
 
+    /**
+      * opens and returns an Input instance bound to the given File
+      */
     public static function openInput(path : String):FileInput {
         return new FileInput(sys.io.File.read( path ));
     }
