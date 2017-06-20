@@ -511,6 +511,16 @@ class TPoint implements tannus.ds.Comparable<TPoint> implements tannus.ds.ICompa
 	}
 
 	/**
+	  * check whether [this] Point is 'inside' of the given rect
+	  */
+	public inline function containedBy(rx:Float, ry:Float, rw:Float, rh:Float):Bool {
+	    return (
+            (x > rx && x < (rx + rw)) &&
+            (y > ry && y < (ry + rh))
+	    );
+	}
+
+	/**
 	  * A clamped version of [this] Point
 	  */
 	public function clamped():Point {
