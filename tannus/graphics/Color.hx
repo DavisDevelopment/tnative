@@ -104,6 +104,9 @@ abstract Color (TColor) from TColor to TColor {
 		return TColor.fromString( s );
 	}
 
+    @:from
+    public static inline function fromHsl(hsl : Hsl):Color return TColor.fromHsl( hsl );
+
 
 	#if java
 
@@ -526,6 +529,32 @@ private class TColor implements tannus.ds.Comparable<TColor> {
 	  */
 	public static function fromInt(color : Int):TColor {
 		return new Color((color >> 16 & 0xFF), (color >> 8 & 0xFF), (color & 0xFF));
+	}
+
+    /**
+      * build a color from an Hsl object
+      */
+	public static function fromHsl(hsl : Hsl):TColor {
+	    var r:Float, g:Float, b:Float;
+	    var h = hsl.hue, s = hsl.saturation, l = hsl.lightness;
+        function hue2rgb(p:Float, q:Float, t:Float):Float {
+            if(t < 0) t += 1;
+            if(t > 1) t -= 1;
+            if(t < 1/6) return p + (q - p) * 6 * t;
+            if(t < 1/2) return q;
+            if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+            return p;
+        }
+        if (s == 0.0)
+            r = g = b = l;
+        else {
+            var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+            var p = 2 * l - q;
+            r = hue2rgb(p, q, h + 1/3);
+            g = hue2rgb(p, q, h);
+            b = hue2rgb(p, q, h - 1/3);
+        }
+        return new TColor(floor(r * 255), floor(g * 255), floor(b * 255));
 	}
 
 	/**
