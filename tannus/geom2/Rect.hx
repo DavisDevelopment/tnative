@@ -12,6 +12,7 @@ using tannus.math.TMath;
 class Rect <T:Float> {
 	/* Constructor Function */
 	public function new(?x:T, ?y:T, ?width:T, ?height:T):Void {
+	    #if !js
 		d = new DataView(4, untyped 0);
 
 		if (x == null) x = untyped 0;
@@ -20,6 +21,16 @@ class Rect <T:Float> {
 		if (height == null) height = untyped 0;
 
 		d.sets([x, y, width, height]);
+	    #else
+		if (x == null) x = untyped 0;
+		if (y == null) y = untyped 0;
+		if (width == null) width = untyped 0;
+		if (height == null) height = untyped 0;
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+	    #end
 	}
 
 /* === Instance Methods === */
@@ -168,6 +179,7 @@ class Rect <T:Float> {
 
 /* === Computed Instance Fields === */
 
+#if !js
 	public var x(get, set):T;
 	private inline function get_x():T return d[0];
 	private inline function set_x(v : T):T return (d[0] = v);
@@ -183,14 +195,15 @@ class Rect <T:Float> {
 	public var height(get, set):T;
 	private inline function get_height():T return d[3];
 	private inline function set_height(v : T):T return (d[3] = v);
+#end
 	
 	public var w(get, set):T;
-	private inline function get_w():T return d[2];
-	private inline function set_w(v : T):T return (d[2] = v);
+	private inline function get_w():T return width;
+	private inline function set_w(v : T):T return (width = v);
 	
 	public var h(get, set):T;
-	private inline function get_h():T return d[3];
-	private inline function set_h(v : T):T return (d[3] = v);
+	private inline function get_h():T return height;
+	private inline function set_h(v : T):T return (height = v);
 
 	public var topLeft(get, set):Point<T>;
 	private inline function get_topLeft():Point<T> return new Point(x, y);
@@ -257,5 +270,12 @@ class Rect <T:Float> {
 
 /* === Instance Fields === */
 
+#if !js
 	private var d : DataView<T>;
+#else
+    public var x : T;
+    public var y : T;
+    public var width : T;
+    public var height : T;
+#end
 }
