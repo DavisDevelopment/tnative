@@ -12,11 +12,20 @@ using tannus.math.TMath;
 class Point <T:Float> {
 	/* Constructor Function */
 	public function new(?x:T, ?y:T, ?z:T):Void {
+	    #if !js
 		d = new DataView(3, untyped 0);
 		if (x == null) x = untyped 0;
 		if (y == null) y = untyped 0;
 		if (z == null) z = untyped 0;
 		d.sets([x, y, z]);
+	    #else
+		if (x == null) x = untyped 0;
+		if (y == null) y = untyped 0;
+		if (z == null) z = untyped 0;
+		this.x = x;
+		this.y = y;
+		this.z = z;
+	    #end
 	}
 
 /* === Instance Methods === */
@@ -35,12 +44,15 @@ class Point <T:Float> {
 		y = other.y;
 		z = other.z;
 	}
-	public inline function mutate<A:Float>(f : T -> A):Point<A> {
+	
+	public function mutate<A:Float>(f : T -> A):Point<A> {
 		return new Point(f( x ), f( y ), f( z ));
 	}
-	public inline function mutate2(o:Point<T>, f:T->T->T):Point<T> {
+
+	public function mutate2(o:Point<T>, f:T->T->T):Point<T> {
 		return new Point(f(x, o.x), f(y, o.y), f(z, o.z));
 	}
+
 	public inline function plusPoint(other : Point<T>):Point<T> {
 		return new Point((x + other.x), (y + other.y), (z + other.z));
 	}
@@ -72,6 +84,7 @@ class Point <T:Float> {
 
 /* === Computed Instance Fields === */
 
+#if !js
 	public var x(get, set):T;
 	private inline function get_x():T return d[0];
 	private inline function set_x(v : T):T return (d[0] = v);
@@ -87,4 +100,9 @@ class Point <T:Float> {
 /* === Instance Fields === */
 
 	private var d : DataView<T>;
+#else
+    public var x : T;
+    public var y : T;
+    public var z : T;
+#end
 }
