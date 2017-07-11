@@ -8,10 +8,12 @@ import tannus.math.TMath.*;
 using Lambda;
 using tannus.ds.ArrayTools;
 using tannus.math.TMath;
+using Slambda;
 
 class Triangle<T:Float> {
 	/* Constructor Function */
-	public function new(?a:Point<T>, ?b:Point<T>, ?c:Point<T>):Void {
+	public function new(?one:Point<T>, ?two:Point<T>, ?three:Point<T>):Void {
+	    /*
 		// initialize core data
 		a_x = cast 0;
 		a_y = cast 0;
@@ -26,6 +28,7 @@ class Triangle<T:Float> {
 		// initialize Point data
 		d = new DataView( 3 );
 		initializeDataView();
+		*/
 
 		if (a != null) {
 			one = a;
@@ -44,50 +47,40 @@ class Triangle<T:Float> {
 	  * Create and return a copy of [this] Triangle
 	  */
 	public function clone():Triangle<T> {
-		return new Triangle(one, two, three);
+		return apply.fn(_.clone());
 	}
 
-	/**
-	  * initialize the DataView
-	  */
-	private function initializeDataView():Void {
-		var one:Point<T> = LinkedPoint.create(a_x, a_y, a_z);
-		var two:Point<T> = LinkedPoint.create(b_x, b_y, b_z);
-		var three:Point<T> = LinkedPoint.create(c_x, c_y, c_z);
-
-		d.sets([one, two, three]);
+    // create a new Triangle by applying [f] to all three points in this one
+	public function apply<O:Float>(f : Point<T>->Point<O>):Triangle<O> {
+	    return new Triangle(f(a), f(b), f(c));
 	}
+
+	public function round():Triangle<Int> return apply.fn(_.round());
+	public function floor():Triangle<Int> return apply.fn(_.floor());
+	public function ceil():Triangle<Int> return apply.fn(_.ceil());
 
 /* === Computed Instance Fields === */
 
 	public var one(get, set):Point<T>;
-	private function get_one():Point<T> return d[0];
-	private function set_one(v : Point<T>):Point<T> {
-		var p:Point<T> = a;
-		p.copyFrom( v );
-		return p;
-	}
+	private inline function get_one():Point<T> return a;
+	private inline function set_one(v) return (a = v);
 	
 	public var two(get, set):Point<T>;
-	private function get_two():Point<T> return d[1];
-	private function set_two(v : Point<T>):Point<T> {
-		var p:Point<T> = two;
-		p.copyFrom( v );
-		return p;
-	}
+	private inline function get_two():Point<T> return b;
+	private inline function set_two(v) return (b = v);
 
 	public var three(get, set):Point<T>;
-	private function get_three():Point<T> return d[2];
-	private function set_three(v : Point<T>):Point<T> {
-		var p:Point<T> = three;
-		p.copyFrom( v );
-		return p;
-	}
+	private inline function get_three() return c;
+	private inline function set_three(v) return (c = v);
 
 /* === Instance Fields === */
 
-	private var d : DataView<Point<T>>;
+    public var a : Point<T>;
+    public var b : Point<T>;
+    public var c : Point<T>;
 
+    /*
+	private var d : DataView<Point<T>>;
 	private var a_x : T;
 	private var a_y : T;
 	private var a_z : T;
@@ -97,4 +90,5 @@ class Triangle<T:Float> {
 	private var c_x : T;
 	private var c_y : T;
 	private var c_z : T;
+	*/
 }
