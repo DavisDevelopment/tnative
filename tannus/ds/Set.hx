@@ -36,6 +36,11 @@ abstract Set<T> (ISet<T>) {
     public static inline function toIntSet<T:Int>(s : ISet<T>):IntSet {
         return new IntSet();
     }
+
+    @:to
+    public static inline function toFloatSet<T:Float>(s : ISet<T>):FloatSet {
+        return new FloatSet();
+    }
     
     @:to
     public static inline function toEnumValueSet<T:EnumValue>(s : ISet<T>):EnumValueSet<T> {
