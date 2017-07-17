@@ -262,6 +262,13 @@ private class TColor implements tannus.ds.Comparable<TColor> {
 		return res;
 	}
 
+	public function sepia(?amount : Float):Color {
+        var r = (red * .393) + (green *.769) + (blue * .189);
+        var g = (red * .349) + (green *.686) + (blue * .168);
+        var b = (red * .272) + (green *.534) + (blue * .131);
+        return new Color(int(r), int(g), int(b));
+	}
+
 	/**
 	  * calculate the luminance of [this] Color
 	  */
