@@ -411,6 +411,15 @@ private class TColor implements tannus.ds.Comparable<TColor> {
 	}
 
 	/**
+	  * manipulate contrast
+	  */
+	public function contrast(amount : Int):Color {
+	    var factor:Int = round((259 * (amount + 255)) / (255 * (259 - amount)));
+	    inline function fac(x:Int):Int return factor * (x - 128) + 128;
+	    return new Color(fac(red), fac(green), fac(blue), alpha);
+	}
+
+	/**
 	  * do some number magic
 	  */
 	private function bound(n:Int, max:Int):Int {
