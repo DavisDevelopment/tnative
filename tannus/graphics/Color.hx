@@ -49,7 +49,7 @@ abstract Color (TColor) from TColor to TColor {
 	  * Invert [this] Color
 	  */
 	@:op(!A)
-	public inline function invert():Color return this.invert();
+	public inline function invertNot():Color return this.invert();
 
 	/**
 	  * Mix [this] with another Color
