@@ -254,8 +254,12 @@ private class TColor implements tannus.ds.Comparable<TColor> {
 	/**
 	  * Invert [this] Color
 	  */
-	public function invert():TColor {
-		return new TColor(255-red, 255-green, 255-blue, alpha);
+	public function invert(?amount : Float):TColor {
+		var res = new Color(255-red, 255-green, 255-blue, alpha);
+		if (amount != null) {
+		    res = res.lerp(this, abs(amount - 1.0));
+		}
+		return res;
 	}
 
 	/**
