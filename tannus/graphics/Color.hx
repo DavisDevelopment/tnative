@@ -402,7 +402,7 @@ private class TColor implements tannus.ds.Comparable<TColor> {
 		var avg = int(gray.channels.average());
 		gray.channels = [avg, avg, avg];
 		if (amount != null) {
-		    gray = gray.lerp(this, amount);
+		    gray = gray.lerp(this, (1.0 - amount));
 		}
 		return gray;
 	}
