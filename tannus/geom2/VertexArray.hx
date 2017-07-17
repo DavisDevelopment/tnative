@@ -7,7 +7,7 @@ import tannus.math.TMath.*;
 import tannus.math.TMath.min in minn;
 import tannus.math.TMath.max in maxx;
 
-using Lambda;
+using Slambda;
 using tannus.ds.ArrayTools;
 using tannus.math.TMath;
 
@@ -75,24 +75,31 @@ class VertexArray<T:Float> {
 	public inline function get(index : Int):Null<Point<T>> {
 		return data[index];
 	}
+
 	public inline function set(index:Int, p:Point<T>):Point<T> {
 		return (data[index] = p);
 	}
+
 	public inline function push(p : Point<T>):Void {
 		data.push( p );
 	}
+
 	public inline function pop():Null<Point<T>> {
 		return data.pop();
 	}
+
 	public inline function unshift(p : Point<T>):Void {
 		data.unshift( p );
 	}
+
 	public inline function shift():Null<Point<T>> {
 		return data.shift();
 	}
+
 	public inline function insert(index:Int, p:Point<T>):Void {
 		data.insert(index, p);
 	}
+
 	public function indexOf(point : Point<T>):Int {
 		for (i in 0...data.length) {
 			if (data[i].equals( point )) {
@@ -101,19 +108,25 @@ class VertexArray<T:Float> {
 		}
 		return -1;
 	}
-	public inline function clone():VertexArray<T> {
-		return new VertexArray(data.macmap(_.clone()));
+
+	public function clone():VertexArray<T> {
+		//return new VertexArray(data.macmap(_.clone()));
+		return mutate.fn(_.clone());
 	}
+
 	public inline function filter(f : Point<T>->Bool):VertexArray<T> {
 		return new VertexArray(data.filter( f ));
 	}
-	public inline function map<A:Float>(f : Point<T>->Point<A>):VertexArray<A> {
+
+	public function map<A:Float>(f : Point<T>->Point<A>):VertexArray<A> {
 		return new VertexArray(data.map( f ));
 	}
+
 	public inline function remove(point : Point<T>):Bool {
 		return data.remove( point );
 	}
-	public inline function iterator():Iterator<Point<T>> {
+
+	public function iterator():Iterator<Point<T>> {
 		return data.iterator();
 	}
 
@@ -122,14 +135,14 @@ class VertexArray<T:Float> {
 	public function mutate<A:Float>(f : T->A):VertexArray<A> {
 		return map(function(x) return x.mutate( f ));
 	}
-	public inline function round():VertexArray<Int> {
-		return mutate( Math.round );
+	public function round():VertexArray<Int> {
+		return mutate( round );
 	}
-	public inline function floor():VertexArray<Int> {
-		return mutate( Math.floor );
+	public function floor():VertexArray<Int> {
+		return mutate( floor );
 	}
-	public inline function ceil():VertexArray<Int> {
-		return mutate( Math.ceil );
+	public function ceil():VertexArray<Int> {
+		return mutate( ceil );
 	}
 
 /* === Computed Instance Fields === */

@@ -21,7 +21,18 @@ class LinkedPoint<T:Float> extends Point<T> {
 	public function new(x_ref:Ptr<T>, y_ref:Ptr<T>, z_ref:Ptr<T>):Void {
 		super(untyped 0, untyped 0, untyped 0);
 
+        #if !js
 		d = new BoundData([x_ref, y_ref, z_ref]);
+	    #else
+	    inline function desc(x : Ptr<T>) {
+	        return {get:(function() return x.get()), set: (function(v) return x.set(v))};
+	    }
+	    tannus.html.JSTools.defineProperties(this, untyped {
+            x: desc( x_ref ),
+            y: desc( y_ref ),
+            z: desc( z_ref )
+	    });
+	    #end
 	}
 
 /* === Static Methods === */

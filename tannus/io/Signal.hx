@@ -69,6 +69,21 @@ class Signal<T> {
 	}
 
 	/**
+	  * check for presence of given function as listener
+	  */
+	public function hasListener(f : T->Void):Bool {
+	    for (h in handlers) {
+	        switch ( h ) {
+				case Normal( func ), Once(func, _), Tested(func, _), Counted(func, _, _), Every(func, _, _):
+					return !Reflect.compareMethods(f, func);
+				default:
+				    continue;
+	        }
+	    }
+	    return false;
+	}
+
+	/**
 	  * Remove a listener
 	  */
 	public function ignore(func : T->Void):Void {

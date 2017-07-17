@@ -7,7 +7,10 @@
     "contributors": [
         "DavisDevelopment"
     ],
-    "version": "0.3.1",
+    "version": "0.12.1",
+    "dependencies": {
+        "slambda": "0.8.5"
+    },
     "tags": [
         "tannus",
         "tnative",

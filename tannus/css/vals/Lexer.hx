@@ -54,9 +54,9 @@ class Lexer {
 		}
 
 		/* Identifiers, References, and Function-Calls */
-		else if (c.isLetter() || c == '_'.code || cur == '@'.code) {
+		else if (c.isLetter() || c == '_'.code || cur == '@'.code || cur == '-'.code) {
 			var ident:String = advance();
-			while (!end && (next().isLetter() || next().isNumeric() || next().equalsChar('_'))) {
+			while (!end && (next().isLetter() || next().isNumeric() || next().equalsChar('_') || next().equalsChar('-'))) {
 				ident += advance();
 			}
 
@@ -100,13 +100,14 @@ class Lexer {
 					su += advance();
 				}
 				/* Assert that what was parsed is, in fact, a valid Unit */
-				if (Unit.isValidUnit( su ))
-					unit = su;
+				//if (Unit.isValidUnit( su ))
+					//unit = su;
 				/* if not, complain about it */
-				else {
-					var e:String = 'CSSUnitError: $su is not a valid unit!';
-					throw e;
-				}
+				//else {
+					//var e:String = 'CSSUnitError: $su is not a valid unit!';
+					//throw e;
+				//}
+				unit = su;
 			}
 
 			/* return the Number */

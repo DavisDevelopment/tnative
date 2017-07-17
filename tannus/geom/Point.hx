@@ -20,6 +20,10 @@ import haxe.macro.Expr;
 using tannus.math.TMath;
 using tannus.macro.MacroTools;
 
+#if js
+using tannus.html.JSTools;
+#end
+
 @:forward
 abstract Point (TPoint) from TPoint to TPoint {
 	/* Constructor Function */
@@ -350,13 +354,22 @@ abstract Point (TPoint) from TPoint to TPoint {
 	}
 }
 
-/* Base Point Class */
+
+/* 
+   Base Point Class 
+*/
 class TPoint implements tannus.ds.Comparable<TPoint> implements tannus.ds.IComparable<TPoint> {
 	/* Constructor Function */
 	public function new(x:Float, y:Float, z:Float):Void {
-		_x = x;
+	    #if js
+	    this.x = x;
+	    this.y = y;
+	    this.z = z;
+	    #else
+        _x = x;
 		_y = y;
 		_z = z;
+	    #end
 	}
 
 /* === Instance Methods === */
@@ -581,6 +594,7 @@ class TPoint implements tannus.ds.Comparable<TPoint> implements tannus.ds.ICompa
 		return [x, y, z];
 	}
 
+    #if !js
 	private function get_x():Float return (_x);
 	private function get_y():Float return (_y);
 	private function get_z():Float return (_z);
@@ -588,9 +602,15 @@ class TPoint implements tannus.ds.Comparable<TPoint> implements tannus.ds.ICompa
 	private function set_x(v:Float):Float return (_x = v);
 	private function set_y(v:Float):Float return (_y = v);
 	private function set_z(v:Float):Float return (_z = v);
+    #end
 
 /* === Instance Fields === */
 
+    #if js
+    public var x : Float;
+    public var y : Float;
+    public var z : Float;
+    #else
 	public var x(get, set):Float;
 	public var y(get, set):Float;
 	public var z(get, set):Float;
@@ -598,6 +618,7 @@ class TPoint implements tannus.ds.Comparable<TPoint> implements tannus.ds.ICompa
 	private var _x:Float;
 	private var _y:Float;
 	private var _z:Float;
+    #end
 
 /* === Static Methods === */
 
@@ -618,9 +639,21 @@ class LinkedPoint extends TPoint {
 
 		rx = x;
 		ry = y;
-		rz = (z != null ? z : Ptr.create(_z));
+		rz = (z != null ? z : Ptr.create(#if !js _z #else z #end));
+
+        #if js
+        inline function desc(ref:Ptr<Float>) {
+            return {get: function() return ref.get(), set: function(v) return ref.set(v)};
+        }
+        defineProperties(untyped {
+            x: desc( rx ),
+            y: desc( ry ),
+            z: desc( rz )
+        });
+        #end
 	}
 
+    #if !js
 	override private function get_x():Float return (rx._);
 	override private function get_y():Float return (ry._);
 	override private function get_z():Float return (rz._);
@@ -628,6 +661,7 @@ class LinkedPoint extends TPoint {
 	override private function set_x(v:Float):Float return (rx._ = v);
 	override private function set_y(v:Float):Float return (ry._ = v);
 	override private function set_z(v:Float):Float return (rz._ = v);
+    #end
 
 	private var rx : Ptr<Float>;
 	private var ry : Ptr<Float>;

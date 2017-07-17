@@ -49,13 +49,16 @@ abstract Color (TColor) from TColor to TColor {
 	  * Invert [this] Color
 	  */
 	@:op(!A)
-	public inline function invert():Color return this.invert();
+	public inline function invertNot():Color return this.invert();
 
 	/**
 	  * Mix [this] with another Color
 	  */
 	public inline function mix(other:Color, ratio:Percent):Color {
 		return this.mix(other, ratio);
+	}
+	public inline function lerp(other:Color, ratio:Float):Color {
+	    return this.lerp(other, ratio);
 	}
 
 	/**
@@ -181,14 +184,17 @@ private class TColor implements tannus.ds.Comparable<TColor> {
 	/**
 	  * Mix [this] Color with another one
 	  */
-	public function mix(t:TColor, weight:Percent):Color {
-		var ratio:Float = weight.of( 1.0 );
+	public function lerp(t:TColor, ratio:Float):Color {
+		//var ratio:Float = weight.of( 1.0 );
 		return new TColor(
 			int(red.lerp(t.red, ratio)),
 			int(green.lerp(t.green, ratio)),
 			int(blue.lerp(t.blue, ratio)),
 			alpha
 		);
+	}
+	public inline function mix(t:TColor, amount:Percent):Color {
+	    return lerp(t, amount.of( 1.0 ));
 	}
 
 	/**
@@ -248,8 +254,19 @@ private class TColor implements tannus.ds.Comparable<TColor> {
 	/**
 	  * Invert [this] Color
 	  */
-	public function invert():TColor {
-		return new TColor(255-red, 255-green, 255-blue, alpha);
+	public function invert(?amount : Float):TColor {
+		var res = new Color(255-red, 255-green, 255-blue, alpha);
+		if (amount != null) {
+		    res = res.lerp(this, abs(amount - 1.0));
+		}
+		return res;
+	}
+
+	public function sepia(?amount : Float):Color {
+        var r = (red * .393) + (green *.769) + (blue * .189);
+        var g = (red * .349) + (green *.686) + (blue * .168);
+        var b = (red * .272) + (green *.534) + (blue * .131);
+        return new Color(int(r), int(g), int(b));
 	}
 
 	/**
@@ -380,11 +397,26 @@ private class TColor implements tannus.ds.Comparable<TColor> {
 	/**
 	  * greyscale [this] Color
 	  */
-	public function greyscale():Color {
+	public function greyscale(?amount : Float):Color {
 		var gray = clone();
 		var avg = int(gray.channels.average());
 		gray.channels = [avg, avg, avg];
+		if (amount != null) {
+		    gray = gray.lerp(this, (1.0 - amount));
+		}
 		return gray;
+	}
+	public inline function grayscale(?amount : Float):Color {
+	    return greyscale( amount );
+	}
+
+	/**
+	  * manipulate contrast
+	  */
+	public function contrast(amount : Int):Color {
+	    var factor:Int = round((259 * (amount + 255)) / (255 * (259 - amount)));
+	    inline function fac(x:Int):Int return factor * (x - 128) + 128;
+	    return new Color(fac(red), fac(green), fac(blue), alpha);
 	}
 
 	/**

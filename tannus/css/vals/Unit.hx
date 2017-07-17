@@ -17,6 +17,7 @@ abstract Unit (String) from String to String {
 	var Px = 'px';
 	var Pt = 'pt';
 	var Pc = 'pc';
+	var Deg = 'deg';
 
 /* === Static Methods === */
 
@@ -29,7 +30,7 @@ abstract Unit (String) from String to String {
 			/* Relative Units */
 			'em', 'ex', 'ch', 'rem', 'vw', 'vh', '%',
 			/* Absolute Units */
-			'cm', 'mm', 'in', 'px', 'pt', 'pc'
+			'cm', 'mm', 'in', 'px', 'pt', 'pc', 'deg'
 		]);
 	}
 
