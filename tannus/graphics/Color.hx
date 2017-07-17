@@ -57,6 +57,9 @@ abstract Color (TColor) from TColor to TColor {
 	public inline function mix(other:Color, ratio:Percent):Color {
 		return this.mix(other, ratio);
 	}
+	public inline function lerp(other:Color, ratio:Float):Color {
+	    return this.lerp(other, ratio);
+	}
 
 	/**
 	  * Lighten [this] Color
@@ -181,14 +184,17 @@ private class TColor implements tannus.ds.Comparable<TColor> {
 	/**
 	  * Mix [this] Color with another one
 	  */
-	public function mix(t:TColor, weight:Percent):Color {
-		var ratio:Float = weight.of( 1.0 );
+	public function lerp(t:TColor, ratio:Float):Color {
+		//var ratio:Float = weight.of( 1.0 );
 		return new TColor(
 			int(red.lerp(t.red, ratio)),
 			int(green.lerp(t.green, ratio)),
 			int(blue.lerp(t.blue, ratio)),
 			alpha
 		);
+	}
+	public inline function mix(t:TColor, amount:Percent):Color {
+	    return lerp(t, amount.of( 1.0 ));
 	}
 
 	/**
@@ -380,11 +386,17 @@ private class TColor implements tannus.ds.Comparable<TColor> {
 	/**
 	  * greyscale [this] Color
 	  */
-	public function greyscale():Color {
+	public function greyscale(?amount : Float):Color {
 		var gray = clone();
 		var avg = int(gray.channels.average());
 		gray.channels = [avg, avg, avg];
+		if (amount != null) {
+		    gray = gray.lerp(this, amount);
+		}
 		return gray;
+	}
+	public inline function grayscale(?amount : Float):Color {
+	    return greyscale( amount );
 	}
 
 	/**
