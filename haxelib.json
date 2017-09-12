@@ -7,7 +7,7 @@
     "contributors": [
         "DavisDevelopment"
     ],
-    "version": "0.12.1",
+    "version": "1.2.1",
     "dependencies": {
         "slambda": "0.8.5"
     },
