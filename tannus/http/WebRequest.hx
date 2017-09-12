@@ -249,6 +249,10 @@ class WebRequest extends EventDispatcher {
 	    on('loadend', f);
 	}
 
+	public function onAbort(f : AbortEvent->Void):Void {
+	    on('abort', f);
+	}
+
 /* === Computed Instance Fields === */
 
 	/* the ready state of [this] shit */
@@ -295,3 +299,23 @@ abstract ReadyState (Int) from Int to Int {
 	var Loading = 3;
 	var Done = 4;
 }
+
+typedef Event = {
+    type: String
+};
+
+typedef ProgressEvent = {
+    >Event,
+    lengthComputable: Bool,
+    loaded: Int,
+    total: Int
+};
+
+typedef LoadStartEvent = { > ProgressEvent, };
+typedef LoadEndEvent = { > ProgressEvent, };
+typedef AbortEvent = { > ProgressEvent, };
+typedef TimeoutEvent = {>ProgressEvent, };
+typedef ErrorEvent = {
+    >Event,
+    detail: Float
+};
