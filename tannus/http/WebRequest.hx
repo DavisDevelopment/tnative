@@ -85,7 +85,7 @@ class WebRequest extends EventDispatcher {
 	/**
 	  * wait for the response, as a Document
 	  */
-	public inline function loadAsDocument(cb : Document -> Void):Void {
+	public function loadAsDocument(cb : Document -> Void):Void {
 		responseType = TDoc;
 		onres( cb );
 	}
