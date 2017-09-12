@@ -236,6 +236,11 @@ class WebRequest extends EventDispatcher {
 	public function onTimeout(f : TimeoutEvent->Void):Void {
 	    on('timeout', f);
 	}
+
+	public function onError(f : ErrorEvent->Void):Void {
+	    on('error', f);
+	}
+
 /* === Computed Instance Fields === */
 
 	/* the ready state of [this] shit */
