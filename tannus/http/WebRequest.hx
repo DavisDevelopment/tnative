@@ -233,6 +233,9 @@ class WebRequest extends EventDispatcher {
 		return 'got-$responseType';
 	}
 
+	public function onTimeout(f : TimeoutEvent->Void):Void {
+	    on('timeout', f);
+	}
 /* === Computed Instance Fields === */
 
 	/* the ready state of [this] shit */
