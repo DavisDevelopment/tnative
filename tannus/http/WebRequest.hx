@@ -241,6 +241,10 @@ class WebRequest extends EventDispatcher {
 	    on('error', f);
 	}
 
+	public function onLoadStart(f : LoadStartEvent->Void):Void {
+	    on('loadstart', f);
+	}
+
 /* === Computed Instance Fields === */
 
 	/* the ready state of [this] shit */
