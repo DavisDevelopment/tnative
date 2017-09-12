@@ -93,7 +93,7 @@ class WebRequest extends EventDispatcher {
 	/**
 	  * wait for the response, as a ByteArray
 	  */
-	public inline function loadAsByteArray(cb : ByteArray -> Void):Void {
+	public function loadAsByteArray(cb : ByteArray -> Void):Void {
 		loadAsArrayBuffer(function(ab) {
 #if node
 			cb(ByteArray.ofData((untyped __js__('Buffer'))( ab )));
