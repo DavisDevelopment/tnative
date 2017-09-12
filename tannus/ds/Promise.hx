@@ -524,6 +524,10 @@ class Promise<T> {
         });
     }
 
+    public inline function toJsPromise():js.Promise<T> {
+        return new js.Promise(untyped executor);
+    }
+
 #end
 
 /* === Instance Fields === */

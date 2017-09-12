@@ -12,7 +12,7 @@ using Lambda;
 using tannus.ds.ArrayTools;
 using tannus.math.TMath;
 
-class ByteArrayOutput extends Output<ByteArray> {
+class ByteArrayOutput extends AsyncOutput<ByteArray> {
 	/* Constructor Function */
 	public function new():Void {
 		super();

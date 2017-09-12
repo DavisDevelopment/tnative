@@ -3,12 +3,12 @@ package tannus.io;
 import tannus.io.Byte;
 import tannus.io.ByteArray;
 
-import tannus.io.Input;
+import tannus.io.AsyncInput;
 
 using Lambda;
 using tannus.ds.ArrayTools;
 
-class ByteArrayInput extends Input<ByteArray> {
+class ByteArrayInput extends AsyncInput<ByteArray> {
 	/* Constructor Function */
 	public function new():Void {
 		super();
@@ -84,7 +84,7 @@ class ByteArrayInput extends Input<ByteArray> {
 	/**
 	  * forward all data on [this] Input to the given Output
 	  */
-	override public function pipe(o : Output<ByteArray>):Void {
+	override public function pipe(o : AsyncOutput<ByteArray>):Void {
 		if (Std.is(o, ByteArrayOutput)) {
 			var bo:ByteArrayOutput = cast o;
 			bo.seek( position );

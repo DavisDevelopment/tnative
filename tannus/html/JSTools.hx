@@ -32,6 +32,21 @@ class JSTools {
 		defineGetter(o, name, value.getter);
 		defineSetter(o, name, value.setter);
 	}
+	public static inline function defineProperty(o:Dynamic, name:String, descriptor:JsPropDescriptor):Void {
+	    (untyped __js__('Object.defineProperty'))(o, name, descriptor);
+	}
+	public static inline function defineProperties(o:Dynamic, descriptors:Dynamic<JsPropDescriptor>):Void {
+	    (untyped __js__('Object.defineProperties'))(o, descriptors);
+	}
 
 /* === Private Shit === */
 }
+
+typedef JsPropDescriptor = {
+    ?configurable: Bool,
+    ?enumerable: Bool,
+    ?value: Dynamic,
+    ?writable: Bool,
+    ?get: Void->Dynamic,
+    ?set: Dynamic->Dynamic
+};

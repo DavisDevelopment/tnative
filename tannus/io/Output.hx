@@ -1,123 +1,36 @@
 package tannus.io;
 
-import tannus.io.ByteArray;
-import tannus.io.Signal;
+import haxe.io.Output as Out;
 
-import tannus.internal.Error;
+class Output <T:Out> {
+    private var o : T;
+    public function new(o : T):Void {
+        this.o = o;
+    }
 
-@:allow(tannus.io.IOAccessor)
-class Output<T> {
-	/* Constructor Function */
-	public function new():Void {
-		//writeEvent = new Signal();
-		__b = new Array();
+    public var bigEndian(get, set):Bool;
+    private inline function get_bigEndian() return o.bigEndian;
+    private inline function set_bigEndian(v) return (o.bigEndian = v);
 
-		opened = closed = paused = false;
-	}
+    public function close():Void o.close();
+    public function flush():Void o.flush();
+    public function prepare(nbytes:Int):Void o.prepare(nbytes);
+    public function write(s : ByteArray):Void o.write(s);
+    public function writeByte(c : Int):Void o.writeByte( c );
+    public function writeBytes(s:ByteArray, pos:Int, len:Int):Int return o.writeBytes(s, pos, len);
+    public function writeDouble(x : Float):Void o.writeDouble( x );
+    public function writeFloat(x : Float):Void o.writeFloat( x );
+    public function writeFullBytes(s:ByteArray, pos:Int, len:Int):Void return o.writeFullBytes(s, pos, len);
+    public function writeInt16(x : Int):Void o.writeInt16( x );
+    public function writeInt24(x : Int):Void o.writeInt24( x );
+    public function writeInt32(x : Int):Void o.writeInt32( x );
+    public function writeInt8(x : Int):Void o.writeInt8( x );
+    public function writeString(s : String):Void o.writeString( s );
+    public function writeUInt16(x : Int):Void o.writeUInt16( x );
+    public function writeUInt24(x : Int):Void o.writeUInt24( x );
 
-/* === Instance Methods === */
-
-	/**
-	  * Open [this] Stream
-	  */
-	public function open(?f : Void->Void):Void {
-		opened = true;
-	}
-
-	/**
-	  * Close [this] Stream
-	  */
-	public function close(?f : Void->Void):Void {
-		closed = true;
-	}
-
-	/**
-	  * Pause [this] Stream
-	  */
-	public inline function pause():Void {
-		paused = true;
-	}
-
-	/**
-	  * Resume [this] Stream
-	  */
-	public function resume():Void {
-		if ( paused ) {
-			paused = false;
-			flush();
-		}
-	}
-
-	/**
-	  * Write some data onto [this] Stream
-	  */
-	public function write(data:T, ?onwritten:Void->Void):Void {
-		if ( writable ) {
-			if ( paused ) {
-				__b.push( data );
-			}
-			else {
-				if (onwritten == null) {
-					onwritten = (function() null);
-				}
-
-				__write(data, onwritten);
-			}
-		}
-		else {
-			error('Cannot write to closed or unopened Stream!');
-		}
-	}
-
-	/**
-	  * method used internally to write data
-	  */
-	private function __write(data:T, onwritten:Void->Void):Void {
-		throw 'Not implemented';
-	}
-
-	/**
-	  * Flush the Buffer
-	  */
-	public function flush(?done : Void -> Void):Void {
-		var stack = new tannus.ds.AsyncStack();
-		while (__b.length > 0) {
-			stack.push(__write.bind(__b.shift(), _));
-		}
-		stack.run(function() {
-			if (done != null) {
-				done();
-			}
-		});
-	}
-
-	/**
-	  * Add the given data to the Buffer
-	  */
-	private inline function buffer(data : T):Void {
-		__b.push( data );
-	}
-
-	/**
-	  * Throw an Error
-	  */
-	private inline function error(e : Error):Void {
-		throw e;
-	}
-
-/* === Computed Instance Fields === */
-
-	/* whether [this] stream can be written */
-	public var writable(get, never) : Bool;
-	private inline function get_writable():Bool {
-		return (opened && !closed);
-	}
-
-/* === Instance Fields === */
-
-	private var __b : Array<T>;
-
-	private var opened : Bool;
-	private var closed : Bool;
-	private var paused : Bool;
+    public inline function writeInput<I:haxe.io.Input>(i:Input<I>, ?bufsize:Int):Void {
+        @:privateAccess
+        o.writeInput(i.i, bufsize);
+    }
 }

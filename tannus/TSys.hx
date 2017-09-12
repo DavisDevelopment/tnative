@@ -20,6 +20,8 @@ class TSys {
 		#if node
 			var a:Array<String> = cast (untyped __js__('process.argv'));
 			return a.slice(2);
+		#elseif js
+		    return [];
 		#else
 			return NSys.args();
 		#end
@@ -31,6 +33,8 @@ class TSys {
 	public static inline function print(x : Dynamic):Void {
 		#if node
 			(untyped __js__('process.stdout.write'))(Std.string( x ));
+        #elseif js
+            return ;
 		#else
 			NSys.print( x );
 		#end
@@ -42,6 +46,8 @@ class TSys {
 	public static inline function println(x : Dynamic):Void {
 		#if node
 			print(Std.string(x) + '\n');
+        #elseif js
+            return ;
 		#else
 			NSys.println( x );
 		#end
@@ -55,6 +61,8 @@ class TSys {
 			return Std.string(untyped __js__('process.execPath'));
 		#elseif node	
 			return Std.string(untyped __js__('__filename'));
+        #elseif js
+            return new Path('');
 		#else
 			return NSys.programPath();
 		#end
@@ -66,6 +74,8 @@ class TSys {
 	public static inline function getCwd():Path {
 		#if node
 			return Std.string(untyped __js__('process.cwd()'));
+        #elseif js
+            return new Path('');
 		#else
 			return NSys.getCwd();
 		#end
@@ -78,6 +88,8 @@ class TSys {
 		var _n:String = ncwd;
 		#if node
 			untyped __js__('process.chdir(_n)');
+        #elseif js
+            return ;
 		#else
 			NSys.setCwd(_n);
 		#end
@@ -91,6 +103,8 @@ class TSys {
 			var node_env:Object = new Object(untyped __js__('process.env'));
 			var result:Map<String, String> = cast node_env.toMap();
 			return result;
+        #elseif js
+            return new Map();
 		#else
 			return NSys.environment();
 		#end
@@ -103,6 +117,8 @@ class TSys {
 		var _vn:String = vn;
 		#if node
 			return Std.string(untyped __js__('process.env[_vn]'));
+        #elseif js
+            return '';
 		#else
 			return NSys.getEnv(vn);
 		#end
@@ -115,6 +131,8 @@ class TSys {
 		var _n:String = n, _v:String = v;
 		#if node
 			untyped __js__('process.env[_n] = _v');
+        #elseif js
+            return ;
 		#else
 			NSys.putEnv(n, v);
 		#end
@@ -151,6 +169,8 @@ class TSys {
 	            nt = 'Windows';
 	        }
 	        return nt;
+        #elseif js
+            return 'Browser';
 	    #else
 	        return Sys.systemName();
 	    #end

@@ -69,9 +69,12 @@ class NodeFileSystem {
 	}
 
 	public static function append(path:String, data:ByteArray):Void {
-		var c:ByteArray = read(path);
-		c = c.concat( data );
-		write(path, c);
+		//var c:ByteArray = read(path);
+		//c = c.concat( data );
+		//write(path, c);
+		var a = openAppend( path );
+		a.write( data );
+		a.close();
 	}
 
 	public static function deleteFile(path : String):Void {
@@ -90,6 +93,17 @@ class NodeFileSystem {
 			'mtime': fromJSDate(s.mtime),
 			'ctime': fromJSDate(s.ctime)
 		};
+	}
+
+	public static inline function openOutput(path:String, append:Bool=false):FileOutput {
+	    return new tannus.sys.FileOutput(new NodeFileOutput(path, append));
+	}
+	public static inline function openAppend(path:String):FileOutput {
+	    return openOutput(path, true);
+	}
+
+	public static inline function openInput(path : String):FileInput {
+	    return new tannus.sys.FileInput(new NodeFileInput( path ));
 	}
 
 /* === Private utility methods === */

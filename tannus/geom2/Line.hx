@@ -9,21 +9,9 @@ using Lambda;
 using tannus.ds.ArrayTools;
 using tannus.math.TMath;
 
-class Line<T:Float> {
+class Line <T:Float> {
 	/* Constructor Function */
-	public function new(?a:Point<T>, ?b:Point<T>):Void {
-		// initialize core data
-		a_x = cast 0;
-		a_y = cast 0;
-		a_z = cast 0;
-		b_x = cast 0;
-		b_y = cast 0;
-		b_z = cast 0;
-
-		// initialize Point data
-		d = new DataView( 2 );
-		initializeDataView();
-
+	public inline function new(?a:Point<T>, ?b:Point<T>):Void {
 		// initialize starting values
 		if (a != null) {
 			one = a;
@@ -42,51 +30,40 @@ class Line<T:Float> {
 		return new Line(one, two);
 	}
 
-	/**
-	  * initialize the DataView
-	  */
-	private function initializeDataView():Void {
-		var one:Point<T> = LinkedPoint.create(a_x, a_y, a_z);
-		var two:Point<T> = LinkedPoint.create(b_x, b_y, b_z);
-
-		d.set(0, one);
-		d.set(1, two);
+	public inline function pointAlong(prog : Float):Point<Float> {
+	    return a.lerp(b, prog);
 	}
 
 /* === Computed Instance Fields === */
 
 	public var one(get, set):Point<T>;
-	private inline function get_one():Point<T> return d[0];
-	private function set_one(v : Point<T>):Point<T> {
-		one.copyFrom( v );
-		return one;
-	}
+	private inline function get_one():Point<T> return a;
+	private inline function set_one(v) return (a = v);
 
 	public var two(get, set):Point<T>;
-	private inline function get_two():Point<T> return d[1];
-	private function set_two(v : Point<T>):Point<T> {
-		two.copyFrom( v );
-		return two;
-	}
+	private inline function get_two():Point<T> return b;
+	private inline function set_two(v) return (b = v);
 
 	public var length(get, never):Float;
-	private inline function get_length():Float {
-		return one.distanceFrom( two );
-	}
+	private inline function get_length():Float return a.distanceFrom( b );
 
 	public var mid(get, never):Point<Float>;
 	private inline function get_mid():Point<Float> {
-		return one.lerp(two, 0.5);
+		return a.lerp(b, 0.5);
 	}
 
 /* === Instance Fields === */
 
+    /*
 	private var a_x : T;
 	private var a_y : T;
 	private var a_z : T;
 	private var b_x : T;
 	private var b_y : T;
 	private var b_z : T;
-
 	private var d : DataView<Point<T>>;
+	*/
+
+    public var a : Point<T>;
+    public var b : Point<T>;
 }

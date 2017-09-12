@@ -30,12 +30,12 @@ class EventDispatcher {
 	/**
 	  * get a Signal
 	  */
-	private function getSignal(name : String):Signal<Dynamic> {
+	private function getSignal(name:String, create:Bool=true):Maybe<Signal<Dynamic>> {
 		if (!canDispatch( name )) {
 			if ( __checkEvents ) {
 				throw 'InvalidEvent: "$name" is not a valid Event';
 			}
-			else {
+			else if ( create ) {
 				_sigs[name] = new Signal();
 			}
 		}
@@ -79,6 +79,8 @@ class EventDispatcher {
 			sig.off( action );
 		else
 			sig.clear();
+		if (!sig.hasListeners())
+		    _sigs.remove( name );
 	}
 
 	/**
@@ -88,6 +90,18 @@ class EventDispatcher {
 		untyped {
 			getSignal( name ).when(test, action);
 		};
+	}
+
+	/**
+	  * check whether an event has any listeners attached to it
+	  */
+	public function hasListener<T>(name:String, ?l:T->Void):Bool {
+	    var sig = getSignal(name, false);
+	    if (sig == null)
+	        return false;
+        else {
+            return sig.ternary(l != null ? _.hasListener( l ) : _.hasListeners(), false);
+        }
 	}
 
 /* === Instance Fields === */

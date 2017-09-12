@@ -320,6 +320,7 @@ class VerticeIterator {
   * underlying type for Point that disallows the changing of Point's fields
   */
 class ImmutablePoint extends TPoint {
+#if !js
 	override private function set_x(v:Float):Float return v;
 	override private function set_y(v:Float):Float return v;
 	override private function set_z(v:Float):Float return v;
@@ -329,4 +330,5 @@ class ImmutablePoint extends TPoint {
 		_y = p.y;
 		_z = p.z;
 	}
+#end
 }

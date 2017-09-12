@@ -1,139 +1,43 @@
 package tannus.io;
 
-/**
-  * base-class for providing providing data to a 'reader' in chunks, rather than all at once
-  */
-@:allow( tannus.io.IOAccessor )
-class Input<T> {
-	/* Constructor Functoin */
-	public function new():Void {
-		__b = new Array();
-		__eoi = false;
+import haxe.io.Input as In;
 
-		opened = false;
-		closed = false;
-	}
+class Input <T:In> {
+    private var i:T;
+    public function new(i : T):Void {
+        this.i = i;
+    }
 
-/* === Instance Methods === */
 
-	/**
-	  * read a 'chunk' from [this] Stream
-	  */
-	public function read(provide:T->Void, ?reject:Err->Void):Void {
-		if ( !opened ) {
-			throw 'Error: ReadableStream must be opened (by calling the "open" method) before data can be read from it';
-		}
-		else if ( closed ) {
-			throw 'Error: Cannot read from a closed Stream';
-		}
+    public var bigEndian(get, set):Bool;
+    private inline function get_bigEndian() return i.bigEndian;
+    private inline function set_bigEndian(v) return i.bigEndian = v;
 
-		if (__b.length > 0) {
-			provide(__b.shift());
-		}
-		else {
-			if (reject == null) {
-				reject = (function(err) throw err);
-			}
-
-			__get(
-				function(chunk : Null<T>) {
-					if (chunk == null) {
-						var error = 'No data available on ReadableStream';
-						reject( error );
-					}
-					else {
-						provide( chunk );
-					}
-				},
-				function(error : Err) {
-					reject( error );
-				}
-			);
-		}
-	}
-
-	/**
-	  * must be defined by sub-classes
-	  */
-	private function __get(provide:Null<T>->Void, reject:Err->Void):Void {
-		provide( null );
-	}
-
-	/**
-	  * Read all available chunks
-	  */
-	public function readAll(?onchunk:T->Void, ?onerror:Err->Void, ?oncomplete:Void->Void):Void {
-		if (onchunk == null)
-			onchunk = (function(data) null);
-		if (onerror == null)
-			onerror = (function(error) throw error);
-		if (oncomplete == null)
-			oncomplete = (function() null);
-		
-		function step(data : T):Void {
-			onchunk( data );
-
-			if ( eoi ) {
-				oncomplete();
-			}
-			else {
-				read(step, onerror);
-			}
-		}
-
-		read(step, onerror);
-	}
-
-	/**
-	  * Open [this] Stream
-	  */
-	public function open(?cb : Void->Void):Void {
-		opened = true;
-	}
-
-	/**
-	  * Close [this] Stream
-	  */
-	public function close():Void {
-		closed = true;
-	}
-
-	/**
-	  * Forward all data to the given Output
-	  */
-	public function pipe(o : Output<T>):Void {
-		function onchunk(chunk : T) {
-			o.write( chunk );
-		}
-		
-		readAll( onchunk );
-	}
-
-	/**
-	  * Write data to the Buffer
-	  */
-	private function buffer(d : T):Void {
-		__b.push( d );
-	}
-
-	/**
-	  * report that the end of input has been reached
-	  */
-	private function endOfInput():Void {
-		__eoi = true;
-	}
-
-/* === Computed Instance Fields === */
-
-	public var eoi(get, never):Bool;
-	private inline function get_eoi():Bool return __eoi;
-
-/* === Instance Fields === */
-
-	private var __b : Array<T>;
-	private var opened : Bool;
-	private var closed : Bool;
-	private var __eoi : Bool;
+    public inline function close():Void i.close();
+    public inline function read(nbytes:Int):ByteArray return i.read(nbytes);
+    public inline function readAll(?bufsize:Int):ByteArray return i.readAll(bufsize);
+    public inline function readByte():Byte return i.readByte();
+    public function readBytes(s:ByteArray, pos:Int, len:Int):Int {
+        var bytesRead:Int = 0;
+        for (n in pos...(pos+len)) {
+            s[n] = readByte();
+            bytesRead++;
+        }
+        return bytesRead;
+    }
+    public inline function readDouble():Float return i.readDouble();
+    public inline function readFloat():Float return i.readFloat();
+    public inline function readFullBytes(s:ByteArray, pos:Int, len:Int):Void {
+        readBytes(s, pos, len);
+    }
+    public inline function readInt16():Int return i.readInt16();
+    public inline function readInt24():Int return i.readInt24();
+    public inline function readInt32():Int return i.readInt32();
+    public inline function readInt8():Int return i.readInt8();
+    public inline function readLine():String return i.readLine();
+    public inline function readString(len:Int):String return i.readString(len);
+    public inline function readUInt16():Int return i.readUInt16();
+    public inline function readUInt24():Int return i.readUInt24();
+    public inline function readUntil(end : Byte):String return i.readUntil( end );
 }
 
-typedef Err = Dynamic;

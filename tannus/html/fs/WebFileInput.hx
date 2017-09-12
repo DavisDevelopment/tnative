@@ -2,7 +2,7 @@ package tannus.html.fs;
 
 import tannus.io.Byte;
 import tannus.io.ByteArray;
-import tannus.io.Input;
+import tannus.io.AsyncInput;
 import tannus.io.ByteArrayInput;
 import tannus.math.TMath.*;
 
