@@ -12,16 +12,21 @@ import js.html.ArrayBuffer;
 import js.html.Blob;
 import js.html.Document;
 
+import Slambda.fn;
+
 using StringTools;
 using tannus.ds.StringUtils;
 using Lambda;
 using tannus.ds.ArrayTools;
+using Slambda;
 
 @:expose( 'WebRequest' )
 class WebRequest extends EventDispatcher {
 	/* Constructor Function */
 	public function new():Void {
 		super();
+
+		__checkEvents = false;
 
 		req = new XMLHttpRequest();
 		_listen();
@@ -64,7 +69,7 @@ class WebRequest extends EventDispatcher {
 	/**
 	  * Wait for the response, as a Blob
 	  */
-	public inline function loadAsBlob(cb : Blob -> Void):Void {
+	public function loadAsBlob(cb : Blob -> Void):Void {
 		responseType = TBlob;
 		onres( cb );
 	}
