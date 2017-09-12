@@ -77,7 +77,7 @@ class WebRequest extends EventDispatcher {
 	/**
 	  * Wait for the response, as an ArrayBuffer
 	  */
-	public inline function loadAsArrayBuffer(cb : ArrayBuffer -> Void):Void {
+	public function loadAsArrayBuffer(cb : ArrayBuffer -> Void):Void {
 		responseType = TArrayBuffer;
 		onres( cb );
 	}
