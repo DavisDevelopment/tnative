@@ -15,7 +15,8 @@ class Prompt {
 	  * Prompt the user for some input
 	  */
 	public function getLine(cb : String->Void):Void {
-		#if (cpp || neko || cs || php || java)
+		//#if (cpp || neko || cs || php || java)
+	    #if (sys && !python)
 
 			/* get input/output streams */
 			var inp = Sys.stdin();

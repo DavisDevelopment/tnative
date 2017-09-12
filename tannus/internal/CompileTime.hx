@@ -14,7 +14,13 @@ import haxe.macro.Compiler;
 import haxe.macro.Expr;
 import haxe.macro.Type;
 import haxe.macro.Format;
+
 import haxe.Json;
+
+#if macro
+import sys.io.File as F;
+import sys.FileSystem as Fs;
+#end
 
 using StringTools;
 using Lambda;
@@ -155,6 +161,28 @@ class CompileTime {
 		var data:Dynamic = haxe.Json.parse( sdata );
 
 		return toExpr( data );
+	}
+
+    /**
+      * read a directory into a JSON object and inline it
+      */
+	public static macro function readDirectoryToJson(spath:String, ?relToCurFile:ExprOf<Bool>):ExprOf<{}> {
+	    var r2c:Bool = false;
+	    if (relToCurFile.getValue() == true)
+	        r2c = true;
+	    var path:Path = new Path( spath );
+	    if ( r2c ) {
+	        var cf:Path = new Path(Context.getPosInfos(Context.currentPos()).file);
+	        var cwd:Path = Sys.getCwd();
+	        var cfp:Path = (cf.absolute ? cf : (cwd + cf)).normalize();
+	        path = cfp.directory.resolve( path ).normalize();
+	    }
+	    var map = loadDirectory( path );
+	    var o:Dynamic = {};
+	    for (key in map.keys()) {
+	        Reflect.setProperty(o, key, map[key]);
+	    }
+	    return toExpr( o );
 	}
 
 	/**
@@ -345,6 +373,24 @@ class CompileTime {
 		} catch (err : String) {
 			return haxe.macro.Context.error(err, Context.currentPos());
 		}
+	}
+
+    /**
+      * loads the contents of a directory
+      */
+	public static function loadDirectory(path : String):Map<String, String> {
+        var dirp:Path = new Path( path );
+        var names = Fs.readDirectory(dirp.toString());
+        var result = new Map();
+        var itemp:Path;
+        for (name in names) {
+            itemp = dirp.plusString( name );
+            if (!Fs.isDirectory( itemp )) {
+                var data = F.getContent(itemp.toString());
+                result[name] = data;
+            }
+        }
+        return result;
 	}
 	
 #end

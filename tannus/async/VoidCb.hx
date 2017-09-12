@@ -7,8 +7,10 @@ abstract VoidCb (?Dynamic->Void) from ?Dynamic->Void {
     }
 
     @:to
+    #if python @:native('_void') #end
     public inline function void():Void->Void return f.bind(null);
     @:to
+    #if python @:native('_raise') #end
     public inline function raise():Dynamic->Void return untyped f.bind(_);
     
     public var f(get, never):?Dynamic->Void;
