@@ -231,6 +231,14 @@ class CObj {
 	}
 
 	/**
+	  * extract a value from [this]
+	  */
+	public function extract<T>(fieldName : String):T {
+	    var key = new ObjectPath( fieldName );
+	    return key.get( o );
+	}
+
+	/**
 	  * create a new anonymous object with the same properties/property-values as [this]
 	  */
 	public function rawclone():Obj {
