@@ -7,13 +7,16 @@ abstract Cb<T> (?Dynamic->?T->Void) from ?Dynamic->?T->Void {
     }
 
     @:to
+    #if python @:native('_raise') #end
     public inline function raise():Dynamic->Void return untyped f.bind(_, null);
     
     @:to
+    #if python @:native('_yield') #end
     public inline function yield():T->Void return untyped f.bind(null, _);
     
     @:to
     public inline function toVoid():Void->Void return void();
+    #if python @:native('_void') #end
     public inline function void(?val : T):Void->Void {
         return f.bind(null, val);
     }
