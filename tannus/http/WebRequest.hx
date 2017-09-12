@@ -114,9 +114,25 @@ class WebRequest extends EventDispatcher {
 	  * get a response header
 	  */
 	public inline function getResponseHeader(name : String):Null<String> return req.getResponseHeader( name );
+
+	/**
+	  * get all response headers
+	  */
 	public inline function getAllResponseHeadersRaw():Null<String> return req.getAllResponseHeaders();
+
+	/**
+	  * set a request header
+	  */
 	public inline function setRequestHeader(name:String, value:String):Void req.setRequestHeader(name, value);
+
+	/**
+	  * abort [this] request
+	  */
 	public inline function abort():Void req.abort();
+
+	/**
+	  * get a Map<String, String> of all response headers
+	  */
 	public function getAllResponseHeaders():Map<String, String> {
 		var m = new Map();
 		var s = getAllResponseHeadersRaw();
