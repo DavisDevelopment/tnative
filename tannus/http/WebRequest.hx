@@ -190,6 +190,33 @@ class WebRequest extends EventDispatcher {
 				done();
 			}, 10);
 		});
+
+        /* utility function to forward events from [req] to [this] */
+		function forward<T>(name:String, ?mapper:T->Dynamic):Void {
+		    if (mapper == null) {
+		        mapper = untyped fn( _ );
+		    }
+		    req.addEventListener(name, function(event : T) {
+                dispatch(name, mapper( event ));
+		    });
+		}
+
+        var pext:js.html.ProgressEvent->Dynamic = fn({
+            type: _.type,
+            lengthComputable: _.lengthComputable,
+            loaded: _.loaded,
+            total: _.total
+        });
+
+        forward('loadstart', pext);
+        forward('loadend', pext);
+        forward('progress', pext);
+        forward('abort');
+        forward('error', fn({
+            type: _.type,
+            detail: _.detail
+        }));
+        forward('timeout', pext);
 	}
 
 	/**
