@@ -51,7 +51,7 @@ class WebRequest extends EventDispatcher {
 	/**
 	  * Wait for the response, as a String
 	  */
-	public inline function loadAsText(cb : String -> Void):Void {
+	public function loadAsText(cb : String -> Void):Void {
 		responseType = TText;
 		onres( cb );
 	}
