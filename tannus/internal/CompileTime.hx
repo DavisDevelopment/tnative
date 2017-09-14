@@ -168,7 +168,7 @@ class CompileTime {
       */
 	public static macro function readDirectoryToJson(spath:String, ?relToCurFile:ExprOf<Bool>):ExprOf<{}> {
 	    var r2c:Bool = false;
-	    if (relToCurFile.getValue() == true)
+	    if (relToCurFile == null || relToCurFile.getValue() == true)
 	        r2c = true;
 	    var path:Path = new Path( spath );
 	    if ( r2c ) {
