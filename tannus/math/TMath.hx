@@ -234,7 +234,6 @@ class TMath {
 		}
 	}
 
-	#if !js @:generic #end
 	public static function minmax<T>(items:Iterable<T>, predicate:T->Float):FloatRange {
 		var res:FloatRange = new FloatRange(Math.NaN, Math.NaN);
 		for (item in items) {
