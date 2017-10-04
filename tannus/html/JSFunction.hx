@@ -12,6 +12,7 @@ using tannus.ds.StringUtils;
 using Lambda;
 using tannus.ds.ArrayTools;
 
+@:callable
 abstract JSFunction (Dynamic) from Dynamic to Dynamic {
 	/* Constructor Function */
 	public inline function new(f : Dynamic):Void {
