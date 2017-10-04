@@ -31,6 +31,13 @@ abstract Delta<T> (Tup2<Null<T>, Null<T>>) {
 		return [previous, current];
 	}
 
+	/**
+	  * create and return a Delta that is the "reverse" of [this] one
+	  */
+	public inline function reverse():Delta<T> {
+	    return new Delta(previous, current);
+	}
+
 /* === Instance Fields === */
 
 	/* The current value */
