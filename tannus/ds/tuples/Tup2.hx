@@ -12,4 +12,6 @@ abstract Tup2<A, B> (Array<Dynamic>) {
     private inline function get__1():B return (untyped this[1]);
     private inline function set__1(v : B):B return (untyped this[1] = v);
     
+    @:from
+    public static function fromArray<A,B>(a : Array<Dynamic>):Tup2<A,B> return new Tup2(untyped a[0], untyped a[1]);
 }
