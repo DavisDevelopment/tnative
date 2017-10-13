@@ -74,7 +74,7 @@ class MacroTools {
 
 
 
-	#if macro
+#if macro
 
 	/**
 	  * Check the given Expr for errors
@@ -106,6 +106,21 @@ class MacroTools {
 	  * Build a function expression with [body] as the function body
 	  */
 	public static function buildFunction(body:Expr, args:Array<String>, noreturn:Bool=false):Expr {
+	    var vfe:Expr = macro function() return;
+	    switch (vfe.expr) {
+            case EFunction(_, func):
+                func.args = args.map( functionArg );
+                if (!hasReturn( body ) && !noreturn) {
+                    var abody:Array<Expr> = toArray( body );
+                    abody.push(macro return ${abody.pop()});
+                    body = fromArray(abody);
+                }
+                func.expr = body;
+                return vfe;
+            default:
+                throw 'Error: What the fuck';
+	    }
+
 		/* = format the function body = */
 		/* if [body] does not contain a 'return' statement */
 		if (!hasReturn( body ) && !noreturn) {
@@ -265,6 +280,40 @@ class MacroTools {
 		e.iter( walker );
 		
 		return ret;
+	}
+
+	public static function getFunction(e : Expr):Null<Function> {
+	    var ee = getFirst( e );
+	    if (ee == null) {
+	        return null;
+	    }
+        else {
+            switch ( ee.expr ) {
+                case EFunction(_, func):
+                    return func;
+
+                default:
+                    return null;
+            }
+        }
+	}
+
+	public static function getFirst(e : Expr):Null<Expr> {
+	    switch ( e.expr ) {
+            case EParenthesis(pe):
+                return getFirst( pe );
+
+            case EBlock(exprs):
+                if (exprs.length > 0) {
+                    return getFirst(exprs[0]);
+                }
+                else {
+                    return null;
+                }
+
+            default:
+                return e;
+	    }
 	}
 
 	/**
@@ -437,7 +486,7 @@ class MacroTools {
 	public static function fromArray(list : Array<Expr>):Expr {
 		return macro $b{ list };
 	}
-	#end
+#end
 }
 
 typedef FuncInfo = {
