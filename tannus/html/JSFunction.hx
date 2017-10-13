@@ -33,9 +33,18 @@ abstract JSFunction (Dynamic) from Dynamic to Dynamic {
 		return this.bind( thisValue );
 	}
 
+	public inline function toString():String return this.toString();
+	public inline function toSource():String return this.toSource();
+
 /* === Instance Fields === */
 
 	public var prototype(get, set):Dynamic;
 	private inline function get_prototype():Dynamic return this.prototype;
 	private inline function set_prototype(v : Dynamic):Dynamic return (this.prototype = v);
+
+	public var length(get, never):Int;
+	private inline function get_length() return this.length;
+
+	public var name(get, never):String;
+	private inline function get_name() return this.name;
 }
