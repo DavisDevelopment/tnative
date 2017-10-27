@@ -10,6 +10,9 @@ import tannus.node.Buffer;
 using Lambda;
 using tannus.ds.ArrayTools;
 
+#if (js && node)
+@:expose('tannus.io.ByteArray')
+#end
 @:expose('Binary')
 class NodeBinary extends Binary {
 	/* Constructor Function */

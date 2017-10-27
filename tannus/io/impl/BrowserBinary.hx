@@ -8,6 +8,10 @@ import js.html.Uint8Array;
 using Lambda;
 using tannus.ds.ArrayTools;
 
+#if (js && !node)
+@:expose('tannus.io.ByteArray')
+#end
+@:expose
 @:expose('Binary')
 class BrowserBinary extends Binary {
 	/* Constructor Function */

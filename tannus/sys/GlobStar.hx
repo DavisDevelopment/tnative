@@ -25,7 +25,7 @@ abstract GlobStar (CGlobStar) from CGlobStar {
 	}
 }
 
-@:expose('globstar')
+@:expose('tannus.sys.GlobStar')
 class CGlobStar {
 	/* Constructor Function */
 	public function new(pat:String, flags:String):Void {
