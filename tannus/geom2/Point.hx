@@ -9,6 +9,7 @@ using Lambda;
 using tannus.ds.ArrayTools;
 using tannus.math.TMath;
 
+@:expose
 class Point <T:Float> {
 	/* Constructor Function */
 	public function new(?x:T, ?y:T, ?z:T):Void {
@@ -80,6 +81,24 @@ class Point <T:Float> {
 	}
 	public inline function ceil():Point<Int> {
 		return mutate( Math.ceil );
+	}
+
+    /**
+      * encode [this] for structured cloning
+      */
+    @:keep
+	public function hxscGetData():Array<T> {
+	    return [x, y, z];
+	}
+
+    /**
+      * decode [this] from structured cloning
+      */
+	@:keep
+	public function hxscSetData(data : Array<T>):Void {
+	    x = data[0];
+	    y = data[1];
+	    z = data[2];
 	}
 
 /* === Computed Instance Fields === */

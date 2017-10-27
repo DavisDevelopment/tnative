@@ -186,7 +186,7 @@ class WebRequest extends EventDispatcher {
 		/* request has finished loading */
 		req.addEventListener('load', function(event) {
 			complete = true;
-			Win.current.setTimeout(function() {
+			(untyped __js__('setTimeout'))(function() {
 				done();
 			}, 10);
 		});

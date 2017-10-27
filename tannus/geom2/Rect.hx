@@ -9,6 +9,7 @@ using Lambda;
 using tannus.ds.ArrayTools;
 using tannus.math.TMath;
 
+@:expose
 class Rect <T:Float> {
 	/* Constructor Function */
 	public function new(?x:T, ?y:T, ?width:T, ?height:T):Void {

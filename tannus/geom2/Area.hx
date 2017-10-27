@@ -30,6 +30,7 @@ abstract Area<T:Float> (CArea<T>) from CArea<T> to CArea<T> {
 	}
 }
 
+@:expose('tannus.geom2.Area')
 class CArea<T:Float> implements IComparable<CArea<T>> {
 	/* Constructor Function */
 	public function new(w:T, h:T):Void {
