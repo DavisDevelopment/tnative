@@ -63,7 +63,7 @@ abstract WebFileEntry (FileEntry) from FileEntry {
 	  */
 	public inline function type():StringPromise {
 		return file().transform(function(f) {
-			return (f.type);
+			return (f.type+'');
 		}).string();
 	}
 	

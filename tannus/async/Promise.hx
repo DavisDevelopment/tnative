@@ -106,9 +106,9 @@ class Promise<T> implements Thenable<T, Promise<T>> {
     /**
       * promise a transformation on [this] Promise's data
       */
-    public function transform<TOut>(transformer:T->TOut, ?nomake:Bool):Promise<TOut> {
+    public function transform<TOut, TRes:PromiseResolution<TOut>>(transformer:T->TRes, ?nomake:Bool):Promise<TOut> {
         return derive(function(_from, resolve, reject) {
-            _from.then((result) -> resolve(transformer( result )), reject);
+            _from.then((result) -> resolve(untyped transformer( result )), reject);
         }, nomake);
     }
 
