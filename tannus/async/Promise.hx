@@ -391,7 +391,7 @@ class Promise<T> implements Thenable<T, Promise<T>> {
             case EMeta(meta, expr):
                 switch ( meta.name ) {
                     case 'ignore':
-                        return expr;
+                        return e;
 
                     case 'forward':
                         return macro $expr.then($yes, $no);
