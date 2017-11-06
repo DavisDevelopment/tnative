@@ -16,17 +16,19 @@ using Slambda;
 class BoolPromise extends TypeDedicatedPromise<Bool> {
     private static inline function boolean(p : Promise<Bool>):BoolPromise return new BoolPromise( p );
 
-    public function yep(action : Void->Void):Void {
+    public function yep(action : Void->Void):BoolPromise {
         then(function(result : Bool) {
             if ( result )
                 action();
         });
+        return this;
     }
 
-    public function nope(action : Void->Void):Void {
+    public function nope(action : Void->Void):BoolPromise {
         then(function(result : Bool) {
             if ( !result )
                 action();
         });
+        return this;
     }
 }
