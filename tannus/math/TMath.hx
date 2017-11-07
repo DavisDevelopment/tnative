@@ -19,6 +19,7 @@ using StringTools;
 using tannus.ds.StringUtils;
 
 @:expose('TMath')
+@:expose
 class TMath {
 	public static inline var E = 2.718281828459045;
 	public static inline var LN2 = 0.6931471805599453;
@@ -234,7 +235,6 @@ class TMath {
 		}
 	}
 
-	#if !js @:generic #end
 	public static function minmax<T>(items:Iterable<T>, predicate:T->Float):FloatRange {
 		var res:FloatRange = new FloatRange(Math.NaN, Math.NaN);
 		for (item in items) {

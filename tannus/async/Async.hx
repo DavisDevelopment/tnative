@@ -13,10 +13,8 @@ abstract Async<T> (Cb<T>->Void) from Cb<T>->Void {
             this(function(?error, ?result) {
                 if (error != null)
                     return raise( error );
-                else if (result != null)
-                    return yield( result );
                 else {
-                    trace('Promise left unresolved!');
+                    return yield( result );
                 }
             });
         });

@@ -11,6 +11,7 @@ using Lambda;
 using tannus.ds.ArrayTools;
 using tannus.math.TMath;
 
+@:expose
 class Velocity {
 	/* Constructor Function */
 	public function new(speed:Float, angle:Angle):Void {

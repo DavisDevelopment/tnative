@@ -3,6 +3,7 @@ package tannus.io;
 import haxe.macro.Expr;
 import haxe.macro.Context;
 
+using StringTools;
 using tannus.ds.StringUtils;
 using tannus.macro.MacroTools;
 
@@ -128,7 +129,8 @@ abstract Byte (Int) from Int to Int {
 	  */
 	@:op(A == B)
 	public inline function equalss(other : String):Bool {
-		return (this == other.charCodeAt(0));
+		//return (this == other.charCodeAt(0));
+		return (this == other.fastCodeAt(0));
 	}
 
 	public macro function equalsChar(self:ExprOf<Byte>, c:ExprOf<String>):ExprOf<Bool> {
@@ -140,6 +142,49 @@ abstract Byte (Int) from Int to Int {
 			i = macro $c.charCodeAt( 0 );
 		}
 		return macro ($self == $i);
+	}
+
+	public macro function ec(self:ExprOf<Byte>, c:ExprOf<String>):ExprOf<Bool> {
+	    var i:ExprOf<Int>;
+	    if (c.isConstant()) {
+	        i = macro $c.code;
+	    }
+        else {
+            i = macro StringTools.fastCodeAt($c, 0);
+        }
+        return macro ($self == $i);
+	}
+
+	public macro function isAny(self:ExprOf<Byte>, rest:Array<Expr>):ExprOf<Bool> {
+	    var nums:Array<ExprOf<Int>> = new Array();
+	    for (e in rest) {
+	        switch ( e.expr ) {
+                case EConst(Constant.CString(s)):
+                    if (s.length == 1)
+                        nums.push(macro $e.code);
+                    else {
+                        for (i in 0...s.length) {
+                            nums.push(macro $v{s.charCodeAt(i)});
+                        }
+                    }
+
+                case EConst(Constant.CInt(_)):
+                    nums.push(macro $e);
+
+                case EConst(Constant.CIdent(_)):
+                    nums.push(macro StringTools.fastCodeAt($e, 0));
+
+                default:
+                    throw 'Error: Unexpected ${e}';
+	        }
+	    }
+	    inline function expr(e:ExprDef):Expr return {pos:Context.currentPos(),expr:e};
+	    function or(i : Array<Expr>):Expr {
+	        return expr(EBinop(Binop.OpBoolOr, i.shift(), (i.length>=2?or(i):i.shift())));
+	    }
+	    return or(nums.map(function(num) {
+	        return macro ($self == $num);
+	    }));
 	}
 
 	/**

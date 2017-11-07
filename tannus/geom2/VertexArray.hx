@@ -11,6 +11,7 @@ using Slambda;
 using tannus.ds.ArrayTools;
 using tannus.math.TMath;
 
+@:expose
 class VertexArray<T:Float> {
 	/* Constructor Function */
 	public function new(?points : Array<Point<T>>):Void {

@@ -10,6 +10,7 @@ using tannus.ds.ArrayTools;
 using tannus.math.TMath;
 using Slambda;
 
+@:expose
 class Triangle<T:Float> {
 	/* Constructor Function */
 	public function new(?one:Point<T>, ?two:Point<T>, ?three:Point<T>):Void {

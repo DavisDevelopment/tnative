@@ -9,6 +9,7 @@ using Lambda;
 using tannus.ds.ArrayTools;
 using tannus.math.TMath;
 
+@:expose
 class Line <T:Float> {
 	/* Constructor Function */
 	public inline function new(?a:Point<T>, ?b:Point<T>):Void {

@@ -66,4 +66,9 @@ class Asyncs {
     public static function toPromiser<T>(asyn : Cb<T>->Void):Void->Promise<T> {
         return new Async( asyn ).promiser();
     }
+
+    public static inline function toAsync<T>(promise:Promise<T>, done:Cb<T>):Void {
+        promise.then(done.yield());
+        promise.unless(done.raise());
+    }
 }

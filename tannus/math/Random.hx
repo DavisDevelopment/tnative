@@ -10,6 +10,7 @@ using tannus.ds.ArrayTools;
 using tannus.math.TMath;
 
 @:expose('Random')
+@:expose
 class Random {
 	/* Constructor Function */
 	public function new(?seed:Int):Void {

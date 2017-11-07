@@ -17,7 +17,7 @@ class TSys {
 	  * Gets the list of arguments which were passed to this program
 	  */
 	public static inline function args():Array<String> {
-		#if node
+		#if (js && node)
 			var a:Array<String> = cast (untyped __js__('process.argv'));
 			return a.slice(2);
 		#elseif js
@@ -31,7 +31,7 @@ class TSys {
 	  * Prints some data to the console
 	  */
 	public static inline function print(x : Dynamic):Void {
-		#if node
+		#if (js && node)
 			(untyped __js__('process.stdout.write'))(Std.string( x ));
         #elseif js
             return ;
@@ -44,7 +44,7 @@ class TSys {
 	  * Prints some data, followed by a newline, to the console
 	  */
 	public static inline function println(x : Dynamic):Void {
-		#if node
+		#if (js && node)
 			print(Std.string(x) + '\n');
         #elseif js
             return ;
@@ -57,9 +57,9 @@ class TSys {
 	  * Gets the Path to the current executable
 	  */
 	public static inline function executablePath():Path {
-		#if node_webkit
+		#if (js && node_webkit)
 			return Std.string(untyped __js__('process.execPath'));
-		#elseif node	
+		#elseif (js && node)
 			return Std.string(untyped __js__('__filename'));
         #elseif js
             return new Path('');
@@ -72,7 +72,7 @@ class TSys {
 	  * Gets the CWD as a Path
 	  */
 	public static inline function getCwd():Path {
-		#if node
+		#if (js && node)
 			return Std.string(untyped __js__('process.cwd()'));
         #elseif js
             return new Path('');
@@ -86,7 +86,7 @@ class TSys {
 	  */
 	public static inline function setCwd(ncwd : String):Void {
 		var _n:String = ncwd;
-		#if node
+		#if (js && node)
 			untyped __js__('process.chdir(_n)');
         #elseif js
             return ;
@@ -99,7 +99,7 @@ class TSys {
 	  * Get a Map of all environment variables
 	  */
 	public static function environment():Map<String, String> {
-		#if node
+		#if (js && node)
 			var node_env:Object = new Object(untyped __js__('process.env'));
 			var result:Map<String, String> = cast node_env.toMap();
 			return result;
@@ -115,7 +115,7 @@ class TSys {
 	  */
 	public static function getEnv(vn : String):String {
 		var _vn:String = vn;
-		#if node
+		#if (js && node)
 			return Std.string(untyped __js__('process.env[_vn]'));
         #elseif js
             return '';
@@ -129,7 +129,7 @@ class TSys {
 	  */
 	public static function putEnv(n:String, v:String):Void {
 		var _n:String = n, _v:String = v;
-		#if node
+		#if (js && node)
 			untyped __js__('process.env[_n] = _v');
         #elseif js
             return ;
@@ -142,9 +142,8 @@ class TSys {
 	  * Stop the current Process, with the given exit code
 	  */
 	public static inline function exit(ecode : Int):Void {
-		var code:Int = ecode;
-		#if node
-			untyped __js__('process.exit(code)');
+		#if (js && node)
+			(untyped __js__('process.exit'))( ecode );
 		#elseif js
 			js.Browser.window.close();
 		#else
@@ -156,14 +155,14 @@ class TSys {
 	  * Get the temp-file directory
 	  */
 	public static inline function tempDir():Path {
-		return (getEnv('HOME')+'/tmp/');
+		return (getEnv( 'HOME' ) + '/tmp/');
 	}
 
 	/**
 	  * get the system on which we are running
 	  */
 	public static function systemName():String {
-	    #if node
+	    #if (js && node)
 	        var nt:String = tannus.node.Os.type();
 	        if (nt == 'Windows_NT') {
 	            nt = 'Windows';

@@ -23,6 +23,7 @@ abstract Url (CUrl) from CUrl to CUrl {
 }
 
 @:expose('Href')
+@:expose('tannus.http.Url')
 class CUrl {
 	/* Constructor Function */
 	public function new(?surl : String):Void {

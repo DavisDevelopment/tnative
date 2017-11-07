@@ -12,16 +12,21 @@ import js.html.ArrayBuffer;
 import js.html.Blob;
 import js.html.Document;
 
+import Slambda.fn;
+
 using StringTools;
 using tannus.ds.StringUtils;
 using Lambda;
 using tannus.ds.ArrayTools;
+using Slambda;
 
 @:expose( 'WebRequest' )
 class WebRequest extends EventDispatcher {
 	/* Constructor Function */
 	public function new():Void {
 		super();
+
+		__checkEvents = false;
 
 		req = new XMLHttpRequest();
 		_listen();
@@ -46,7 +51,7 @@ class WebRequest extends EventDispatcher {
 	/**
 	  * Wait for the response, as a String
 	  */
-	public inline function loadAsText(cb : String -> Void):Void {
+	public function loadAsText(cb : String -> Void):Void {
 		responseType = TText;
 		onres( cb );
 	}
@@ -64,7 +69,7 @@ class WebRequest extends EventDispatcher {
 	/**
 	  * Wait for the response, as a Blob
 	  */
-	public inline function loadAsBlob(cb : Blob -> Void):Void {
+	public function loadAsBlob(cb : Blob -> Void):Void {
 		responseType = TBlob;
 		onres( cb );
 	}
@@ -72,7 +77,7 @@ class WebRequest extends EventDispatcher {
 	/**
 	  * Wait for the response, as an ArrayBuffer
 	  */
-	public inline function loadAsArrayBuffer(cb : ArrayBuffer -> Void):Void {
+	public function loadAsArrayBuffer(cb : ArrayBuffer -> Void):Void {
 		responseType = TArrayBuffer;
 		onres( cb );
 	}
@@ -80,7 +85,7 @@ class WebRequest extends EventDispatcher {
 	/**
 	  * wait for the response, as a Document
 	  */
-	public inline function loadAsDocument(cb : Document -> Void):Void {
+	public function loadAsDocument(cb : Document -> Void):Void {
 		responseType = TDoc;
 		onres( cb );
 	}
@@ -88,7 +93,7 @@ class WebRequest extends EventDispatcher {
 	/**
 	  * wait for the response, as a ByteArray
 	  */
-	public inline function loadAsByteArray(cb : ByteArray -> Void):Void {
+	public function loadAsByteArray(cb : ByteArray -> Void):Void {
 		loadAsArrayBuffer(function(ab) {
 #if node
 			cb(ByteArray.ofData((untyped __js__('Buffer'))( ab )));
@@ -109,9 +114,25 @@ class WebRequest extends EventDispatcher {
 	  * get a response header
 	  */
 	public inline function getResponseHeader(name : String):Null<String> return req.getResponseHeader( name );
+
+	/**
+	  * get all response headers
+	  */
 	public inline function getAllResponseHeadersRaw():Null<String> return req.getAllResponseHeaders();
+
+	/**
+	  * set a request header
+	  */
 	public inline function setRequestHeader(name:String, value:String):Void req.setRequestHeader(name, value);
+
+	/**
+	  * abort [this] request
+	  */
 	public inline function abort():Void req.abort();
+
+	/**
+	  * get a Map<String, String> of all response headers
+	  */
 	public function getAllResponseHeaders():Map<String, String> {
 		var m = new Map();
 		var s = getAllResponseHeadersRaw();
@@ -165,10 +186,37 @@ class WebRequest extends EventDispatcher {
 		/* request has finished loading */
 		req.addEventListener('load', function(event) {
 			complete = true;
-			Win.current.setTimeout(function() {
+			(untyped __js__('setTimeout'))(function() {
 				done();
 			}, 10);
 		});
+
+        /* utility function to forward events from [req] to [this] */
+		function forward<T>(name:String, ?mapper:T->Dynamic):Void {
+		    if (mapper == null) {
+		        mapper = untyped fn( _ );
+		    }
+		    req.addEventListener(name, function(event : T) {
+                dispatch(name, mapper( event ));
+		    });
+		}
+
+        var pext:js.html.ProgressEvent->Dynamic = fn({
+            type: _.type,
+            lengthComputable: _.lengthComputable,
+            loaded: _.loaded,
+            total: _.total
+        });
+
+        forward('loadstart', pext);
+        forward('loadend', pext);
+        forward('progress', pext);
+        forward('abort');
+        forward('error', fn({
+            type: _.type,
+            detail: _.detail
+        }));
+        forward('timeout', pext);
 	}
 
 	/**
@@ -183,6 +231,26 @@ class WebRequest extends EventDispatcher {
 	  */
 	private function eventName():String {
 		return 'got-$responseType';
+	}
+
+	public function onTimeout(f : TimeoutEvent->Void):Void {
+	    on('timeout', f);
+	}
+
+	public function onError(f : ErrorEvent->Void):Void {
+	    on('error', f);
+	}
+
+	public function onLoadStart(f : LoadStartEvent->Void):Void {
+	    on('loadstart', f);
+	}
+
+	public function onLoadEnd(f : LoadEndEvent->Void):Void {
+	    on('loadend', f);
+	}
+
+	public function onAbort(f : AbortEvent->Void):Void {
+	    on('abort', f);
 	}
 
 /* === Computed Instance Fields === */
@@ -231,3 +299,23 @@ abstract ReadyState (Int) from Int to Int {
 	var Loading = 3;
 	var Done = 4;
 }
+
+typedef Event = {
+    type: String
+};
+
+typedef ProgressEvent = {
+    >Event,
+    lengthComputable: Bool,
+    loaded: Int,
+    total: Int
+};
+
+typedef LoadStartEvent = { > ProgressEvent, };
+typedef LoadEndEvent = { > ProgressEvent, };
+typedef AbortEvent = { > ProgressEvent, };
+typedef TimeoutEvent = {>ProgressEvent, };
+typedef ErrorEvent = {
+    >Event,
+    detail: Float
+};

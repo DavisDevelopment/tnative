@@ -63,7 +63,7 @@ abstract WebFileEntry (FileEntry) from FileEntry {
 	  */
 	public inline function type():StringPromise {
 		return file().transform(function(f) {
-			return (f.type);
+			return (f.type+'');
 		}).string();
 	}
 	
@@ -71,15 +71,15 @@ abstract WebFileEntry (FileEntry) from FileEntry {
 	  * Read the Bytes of [this] File into memory
 	  */
 	public function read():Promise<ByteArray> {
-		return Promise.create({
+		return cast Promise.create({
 			getFile(function( file ) {
 				var reader = new FileReader();
 				reader.onerror = function(error) {
 					throw error;
 				};
 				reader.onload = function(event) {
-					var data:ByteArray = ByteArray.ofData(cast event.target.result);
-					return data;
+					//var data:ByteArray = ByteArray.ofData(cast event.target.result);
+					return ByteArray.ofData(cast event.target.result);
 				};
 				reader.readAsArrayBuffer(cast file);
 			});
@@ -107,14 +107,14 @@ abstract WebFileEntry (FileEntry) from FileEntry {
 	  */
 	@:access( tannus.html.fs.WebDirectoryEntry )
 	public function moveTo(parent:WebDirectoryEntry, ?name:String):Promise<WebFileEntry> {
-		return Promise.create(@promise this.moveTo(parent, name));
+		return Promise.create(@promise(_cast_) this.moveTo(parent, name));
 	}
 
 	/**
 	  * Copy [this] Entry
 	  */
 	public function copyTo(parent:WebDirectoryEntry, ?name:String):Promise<WebFileEntry> {
-		return Promise.create(@promise this.copyTo(parent, name));
+		return Promise.create(@promise(_cast_) this.copyTo(parent, name));
 	}
 
 	/**

@@ -7,6 +7,9 @@ import tannus.nore.Selector;
 
 import haxe.macro.Expr;
 
+using haxe.macro.ExprTools;
+using tannus.macro.MacroTools;
+
 /**
   * Allows for the use of any Dynamic object as if it were a Map
   */
@@ -136,6 +139,23 @@ abstract Object (Dynamic) from Dynamic to Dynamic {
       */
 	public inline function call<T>(name:String, ?params:Array<Dynamic>):T {
 	    return untyped Reflect.callMethod(this, get( name ), (params!=null?params:[]));
+	}
+
+	/**
+	  * attempt to invoke this[name] as a method of this, with [params]
+	  */
+	public macro function tryCall<T>(self:ExprOf<Object>, name:ExprOf<String>, params:ExprOf<Null<Array<Dynamic>>>, failure:Expr):ExprOf<T> {
+	    params = params.replace(macro _, self);
+	    failure = failure.replace(macro _, self);
+	    return macro {
+	        var method:Null<Dynamic> = $self.get($name);
+	        if (method != null) {
+	            return untyped Reflect.callMethod($self, method, $params);
+	        }
+            else {
+                return untyped $failure;
+            }
+	    };
 	}
 
 	/**

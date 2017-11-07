@@ -222,12 +222,22 @@ class CObj {
 	  * create and return an object with a subset of the properties/values attached to [this] one
 	  */
 	public function pluck(keys : Array<String>):Obj {
-		var o:Dynamic = {};
-		var copy:Obj = Obj.fromDynamic( o );
-		for (k in this.keys())
-			if (keys.has( k ))
-				copy.set(k, get( k ));
+		var co:Dynamic = {};
+		var copy:Obj = Obj.fromDynamic( co );
+		var path : ObjectPath;
+		for (key in keys) {
+		    path = new ObjectPath( key );
+		    path.set(co, path.get( o ));
+        }
 		return copy;
+	}
+
+	/**
+	  * extract a value from [this]
+	  */
+	public function extract<T>(fieldName : String):T {
+	    var key = new ObjectPath( fieldName );
+	    return key.get( o );
 	}
 
 	/**

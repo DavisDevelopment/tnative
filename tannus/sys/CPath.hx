@@ -341,7 +341,7 @@ class CPath implements tannus.ds.IComparable<CPath> {
 		var i:Int = 0;
 		while (i < s.length) {
 			var c = s.byteAt( i );
-			if (c.equalsChar('/') || c.equalsChar('\\')) {
+			if (c == '/'.code || c == '\\'.code) {
 				if (bit.length > 0) {
 					bits.push( bit );
 					bit = '';
