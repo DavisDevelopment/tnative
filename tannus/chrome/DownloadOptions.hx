@@ -38,11 +38,29 @@ abstract DownloadOptions (Object) from Dynamic {
 }
 
 typedef DownloadDelta = {
+    id: Int,
+    ?url: Delta<String>,
+    ?finalUrl: Delta<String>,
+    ?filename: Delta<String>,
+    ?startTime: Delta<String>,
+    ?endTime: Delta<String>,
+    ?mime: Delta<String>,
+    ?state: Delta<DownloadState>,
+    ?paused: Delta<Bool>,
+    ?error: Delta<String>,
+    ?totalBytes: Delta<Float>,
+    ?fileSize: Delta<Float>,
+    ?exists: Delta<Bool>
+};
+
+/*
+typedef DownloadDelta = {
 	var id : Int;
 	@:optional var url : Delta<String>;
 	@:optional var mime : Delta<String>;
 	@:optional var state : Delta<DownloadState>;
 };
+*/
 
 typedef Delta<T> = {
 	?previous:T,
