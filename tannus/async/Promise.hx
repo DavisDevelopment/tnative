@@ -1,5 +1,6 @@
 package tannus.async;
 
+import tannus.ds.Pair;
 import tannus.ds.Delta;
 import tannus.io.Signal;
 import tannus.io.Signal2;
@@ -138,7 +139,7 @@ class Promise<T> implements Thenable<T, Promise<T>> {
     /**
       * resolve [this] Promise
       */
-    private function _resolve(resolution : PromiseResolution<T>):Void {
+    private function _resolve<Res:PromiseResolution<T>>(resolution : Res):Void {
         if (resolution.isPromise()) {
             resolution.asPromise().then(_resolve, _reject);
         }
@@ -285,9 +286,15 @@ class Promise<T> implements Thenable<T, Promise<T>> {
 
 /* === Static Methods === */
 
-    public static function resolve<T>(res : PromiseResolution<T>):Promise<T> {
-        return new Promise(function(_resolve, _throw) {
-            _resolve( res );
+    public static function resolve<T, R:PromiseResolution<T>>(res : R):Promise<T> {
+        return new Promise(function(_resolve:PromiseResolution<T>->Void, _throw) {
+            _resolve(untyped res);
+        });
+    }
+
+    public static function pair<A, B>(resPair : Pair<PromiseResolution<A>, PromiseResolution<B>>):Promise<Pair<A, B>> {
+        return all(untyped [resolve(resPair.left), resolve(resPair.right)]).transform(function(a : Array<Dynamic>) {
+            return untyped (new Pair(untyped a[0], untyped a[1]));
         });
     }
 
@@ -538,8 +545,8 @@ typedef PromiseResolution<T> = Either<T, Promise<T>>;
 
 /*
 @:forward
-abstract PromiseResolution<T> (Either<T, Promise<T>>) from Either<T, Promise<T>> to Either<T, Promise<T>> {
-    public inline function new(res : Either<T,Promise<T>>) {
+abstract PromiseResolution<T> (TPRes<T>) from TPRes<T> to TPRes<T> {
+    public inline function new(res : TPRes<T>):Void {
         this = res;
     }
     public inline function isPromise():Bool return (this is Promise<T>);
@@ -547,6 +554,8 @@ abstract PromiseResolution<T> (Either<T, Promise<T>>) from Either<T, Promise<T>>
     public inline function asPromise():Promise<T> return this;
     @:to
     public inline function asValue():T return this;
+    @:from
+    public static inline function fromPromise<T>(p:Promise<T>):PromiseResolution<T> return fromAny( p );
     @:from
     public static inline function fromAny<T>(v : Dynamic):PromiseResolution<T> {
         return new PromiseResolution( v );
