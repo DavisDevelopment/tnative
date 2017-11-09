@@ -160,6 +160,10 @@ class CPath implements tannus.ds.IComparable<CPath> {
 	    return Reflect.compare(s, other.s);
 	}
 
+	public function endsWith(other : CPath):Bool {
+	    return cross(this, other, fn(_1.endsWith(_2)));
+	}
+
     /**
       * format [this] Path
       */
