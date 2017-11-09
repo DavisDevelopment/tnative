@@ -159,6 +159,36 @@ class CPath implements tannus.ds.IComparable<CPath> {
 	}
 
     /**
+      * format [this] Path
+      */
+	public function format(?delimiter:String, leadingDelimiter:Bool=false, trailingDelimiter:Bool=false):String {
+	    if (delimiter == null)
+	        delimiter = separator;
+	    var simple = new CPath(normalize().withoutDrive()).normalize().pieces.join( delimiter );
+	    if ( leadingDelimiter ) {
+	        if (!simple.startsWith( delimiter )) {
+	            simple = (delimiter + simple);
+	        }
+	    }
+        else {
+            if (simple.startsWith( delimiter )) {
+                simple = simple.after( delimiter );
+            }
+        }
+        if ( trailingDelimiter ) {
+            if (!simple.endsWith( delimiter )) {
+                simple += delimiter;
+            }
+        }
+        else {
+            if (simple.endsWith( delimiter )) {
+                simple = simple.beforeLast( delimiter );
+            }
+        }
+        return simple;
+	}
+
+    /**
       * get a textual representation of [this] Path without the 'drive'
       */
 	public function withoutDrive():String {
