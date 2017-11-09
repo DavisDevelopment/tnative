@@ -170,25 +170,26 @@ class VoidPromise {
     /**
       * assign the value of [status]
       */
-    private function setStatus(s : PromiseStatus<T>):Void {
+    private function setStatus(s : VoidPromiseStatus):Void {
         status = s;
     }
 
     /**
       * handle the changing of [status]
       */
-    private function statusChanged(d : Delta<PromiseStatus<T>>):Void {
+    private function statusChanged(d : Delta<VoidPromiseStatus>):Void {
         if (d.current != null) {
-            var newStatus:PromiseStatus<T> = d.current;
+            var newStatus:VoidPromiseStatus = d.current;
             switch ( newStatus ) {
                 case PSUnmade:
                     //
 
                 // when [this] Promise is made, ensure that its 'children' are also made
                 case PSPending:
-                    for (child in _dependants) {
-                        child.make();
-                    }
+                    return ;
+                    //for (child in _dependants) {
+                        //child.make();
+                    //}
 
                 case PSResolved:
                     signals.resolve.fire();
@@ -215,7 +216,7 @@ class VoidPromise {
     /**
       * get the value of [status]
       */
-    public inline function getStatus():PromiseStatus<T> {
+    public inline function getStatus():VoidPromiseStatus {
         return status;
     }
 
@@ -254,11 +255,22 @@ class VoidPromise {
     }
     */
 
+    /**
+      * derive a valued Promise from a Void one
+      */
+    public function promise<T>(promiser : Void->tannus.async.Promise.PromiseResolution<T>):Promise<T> {
+        return new Promise(function(yes, no) {
+            then(function() {
+                yes(promiser());
+            }, no);
+        });
+    }
+
 #if js
 
     public function toJsPromise():js.Promise<Dynamic> {
         return new js.Promise(function(a, b) {
-            untyped then(a, b);
+            untyped then(untyped a, b);
         });
     }
 
@@ -290,6 +302,19 @@ class VoidPromise {
     //private var _dependants : Array<Promise<Dynamic>>;
 
 /* === Static Methods === */
+
+    @:native('_void')
+    public static function void(f : Void->Void):VoidPromise {
+        return create({
+            try {
+                f();
+                return ;
+            }
+            catch (error : Dynamic) {
+                throw error;
+            }
+        });
+    }
 
     /**
       * declarative, less bulky (than using the constructor) macro for creating new promises

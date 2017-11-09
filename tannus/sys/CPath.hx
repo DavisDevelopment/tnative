@@ -6,8 +6,10 @@ import tannus.io.ByteArray;
 import tannus.sys.Mimes;
 import tannus.sys.Mime;
 
+import Slambda.fn;
+
 using StringTools;
-using Lambda;
+using Slambda;
 using tannus.ds.StringUtils;
 using tannus.ds.ArrayTools;
 //using haxe.io.Path;
@@ -156,6 +158,51 @@ class CPath implements tannus.ds.IComparable<CPath> {
       */
 	public function compareTo(other : CPath):Int {
 	    return Reflect.compare(s, other.s);
+	}
+
+	/**
+	  * check whether [this] Path contains [other] Path
+	  */
+	public function contains(other : CPath):Bool {
+		return cross(this, other, fn(_1.has(_2)));
+	}
+
+	public function startsWith(other : CPath):Bool {
+	    return cross(this, other, fn(_1.startsWith(_2)));
+	}
+
+	public function endsWith(other : CPath):Bool {
+	    return cross(this, other, fn(_1.endsWith(_2)));
+	}
+
+    /**
+      * format [this] Path
+      */
+	public function format(?delimiter:String, leadingDelimiter:Bool=false, trailingDelimiter:Bool=false):String {
+	    if (delimiter == null)
+	        delimiter = separator;
+	    var simple = new CPath(normalize().withoutDrive()).normalize().pieces.join( delimiter );
+	    if ( leadingDelimiter ) {
+	        if (!simple.startsWith( delimiter )) {
+	            simple = (delimiter + simple);
+	        }
+	    }
+        else {
+            if (simple.startsWith( delimiter )) {
+                simple = simple.after( delimiter );
+            }
+        }
+        if ( trailingDelimiter ) {
+            if (!simple.endsWith( delimiter )) {
+                simple += delimiter;
+            }
+        }
+        else {
+            if (simple.endsWith( delimiter )) {
+                simple = simple.beforeLast( delimiter );
+            }
+        }
+        return simple;
 	}
 
     /**
@@ -360,6 +407,10 @@ class CPath implements tannus.ds.IComparable<CPath> {
 
 	public static inline function split(p : Path):Array<String> {
 		return ssplit( p.s );
+	}
+
+	public static inline function cross<T>(a:Path, b:Path, f:String->String->T):T {
+	    return f(a.format(), b.format());
 	}
 
 	/* interpret/resolve any expansions in the given Path */
