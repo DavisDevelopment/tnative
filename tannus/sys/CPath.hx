@@ -6,8 +6,10 @@ import tannus.io.ByteArray;
 import tannus.sys.Mimes;
 import tannus.sys.Mime;
 
+import Slambda.fn;
+
 using StringTools;
-using Lambda;
+using Slambda;
 using tannus.ds.StringUtils;
 using tannus.ds.ArrayTools;
 //using haxe.io.Path;
@@ -390,6 +392,10 @@ class CPath implements tannus.ds.IComparable<CPath> {
 
 	public static inline function split(p : Path):Array<String> {
 		return ssplit( p.s );
+	}
+
+	public static inline function cross<T>(a:Path, b:Path, f:String->String->T):T {
+	    return f(a.format(), b.format());
 	}
 
 	/* interpret/resolve any expansions in the given Path */
