@@ -160,6 +160,13 @@ class CPath implements tannus.ds.IComparable<CPath> {
 	    return Reflect.compare(s, other.s);
 	}
 
+	/**
+	  * check whether [this] Path contains [other] Path
+	  */
+	public function contains(other : CPath):Bool {
+		return cross(this, other, fn(_1.has(_2)));
+	}
+
 	public function startsWith(other : CPath):Bool {
 	    return cross(this, other, fn(_1.startsWith(_2)));
 	}
