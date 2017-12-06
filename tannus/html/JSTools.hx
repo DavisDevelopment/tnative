@@ -8,6 +8,8 @@ import haxe.macro.Context;
 import haxe.Constraints;
 import haxe.extern.EitherType;
 
+import js.Symbol;
+
 using haxe.macro.ExprTools;
 using StringTools;
 using tannus.ds.StringUtils;
@@ -16,6 +18,9 @@ using tannus.ds.ArrayTools;
 using Reflect;
 
 class JSTools {
+    public static inline function jsiterator<T>(o : Dynamic):Iterator<T> {
+        return new JsIterator(o, null);
+    }
 	/**
 	  * Convert the given object into an Array
 	  */
@@ -64,6 +69,54 @@ class JSTools {
 /* === Private Shit === */
 }
 
+typedef NativeJsIterator<T> = {
+    next: Void->{value:Null<T>, done:Bool}
+};
+
+class JsIterator<T> {
+    private var i:NativeJsIterator<T>;
+    private var x:Null<{value:Null<T>,done:Bool}>;
+
+    public function new(?o:Dynamic, ?i:NativeJsIterator<T>):Void {
+        x = null;
+        switch ([o, i]) {
+            case [null, null]:
+                throw 'Error: Both constructor arguments to tannus.html.JSTools.JsIterator cannot be null';
+
+            case [_, i] if (i != null):
+                this.i = i;
+
+            case [o, null]:
+                var iterf:Null<Void->NativeJsIterator<T>> = JSTools.nag(o, Symbol.iterator);
+                if (untyped __strict_neq__(js.Lib.typeof( iterf ), 'undefined')) {
+                    if (Reflect.isFunction( iterf )) {
+                        this.i = JSFunctionTools.apply(iterf, o);
+                    }
+                    else {
+                        throw 'TypeError: Invalid Iterator property';
+                    }
+                }
+                else {
+                    throw 'TypeError: Invalid Iterable object';
+                }
+        }
+    }
+
+    public function hasNext():Bool {
+        if (x == null) {
+            return false;
+        }
+        else {
+            return !x.done;
+        }
+    }
+
+    public function next():T {
+        x = i.next();
+        return x.value;
+    }
+}
+
 typedef JsPropDescriptor = {
     ?configurable: Bool,
     ?enumerable: Bool,
@@ -73,4 +126,4 @@ typedef JsPropDescriptor = {
     ?set: Dynamic->Dynamic
 };
 
-typedef OIndex = EitherType<String,Int>;
+typedef OIndex = EitherType<EitherType<String,Int>, js.Symbol>;
