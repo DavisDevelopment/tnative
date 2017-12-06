@@ -32,4 +32,5 @@ extern class Process extends EventEmitter {
 	function send(message:Dynamic, ?options:Dynamic, ?callback:Function):Bool;
 	function seteuid(id : Either<String, Int>):Void;
 	function type():String;
+	function hrtime():Array<Int>;
 }
