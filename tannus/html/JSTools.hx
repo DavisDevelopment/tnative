@@ -69,6 +69,16 @@ class JSTools {
 /* === Private Shit === */
 }
 
+class JSFunctionTools {
+    public static inline function apply<T:Function,TRet>(f:T, ctx:Dynamic, ?args:Array<Dynamic>):TRet {
+        return (untyped f).apply(ctx, (args!=null?args:[]));
+    }
+
+    public static inline function construct<TFunc:Function, TInst>(f:TFunc, ?parameters:Array<Dynamic>):TInst {
+        return Type.createInstance((untyped f), (parameters != null ? parameters : []));
+    }
+}
+
 typedef NativeJsIterator<T> = {
     next: Void->{value:Null<T>, done:Bool}
 };
