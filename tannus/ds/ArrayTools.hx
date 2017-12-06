@@ -12,6 +12,7 @@ using tannus.macro.MacroTools;
 
 using Lambda;
 using tannus.ds.FunctionTools;
+using tannus.FunctionTools;
 
 // @:expose( 'ArrayTools' )
 class ArrayTools {
@@ -742,6 +743,10 @@ class ArrayTools {
 			}
 		}
 		return false;
+	}
+
+	public static function all<T>(items:Iterable<T>, test:T->Bool):Bool {
+	    return !any(items, test.negate());
 	}
 
 	#if macro
