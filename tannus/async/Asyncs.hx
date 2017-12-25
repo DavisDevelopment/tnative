@@ -7,6 +7,7 @@ using Lambda;
 using Slambda;
 using tannus.ds.ArrayTools;
 using tannus.math.TMath;
+//using tannus.async.VoidAsyncs;
 
 /*
    pman.async.VoidAsyncs
@@ -72,3 +73,5 @@ class Asyncs {
         promise.unless(done.raise());
     }
 }
+
+typedef VAsyncs = tannus.async.VoidAsyncs;
