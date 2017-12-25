@@ -386,6 +386,9 @@ abstract Element (JQuery) from JQuery to JQuery {
 	@:from
 	public static inline function fromElement(e : js.html.Element):Element return new Element( e );
 
+	@:to
+	public inline function tojq():JQuery return this;
+
 	/**
 	  * Extend jQuery
 	  */
