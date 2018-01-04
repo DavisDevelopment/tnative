@@ -3,9 +3,13 @@ package tannus.io;
 import haxe.macro.Expr;
 import haxe.macro.Context;
 
+import tannus.math.TMath.*;
+
 using StringTools;
 using tannus.ds.StringUtils;
 using tannus.macro.MacroTools;
+using Lambda;
+using tannus.math.TMath;
 
 /**
   * Abstract class which allows an Integer to behave as both an integer, and a single-character String, simultaneously
@@ -31,9 +35,7 @@ abstract Byte (Int) from Int to Int {
 	  * reference to [this] as an Int
 	  */
 	public var asint(get, set):Int;
-	private inline function get_asint():Int {
-		return this;
-	}
+	private inline function get_asint():Int { return this; }
 	private inline function set_asint(n : Int):Int {
 		assertValid(n);
 		return (this = n);
@@ -43,9 +45,7 @@ abstract Byte (Int) from Int to Int {
 	  * reference to [this] as a String
 	  */
 	public var aschar(get, set):String;
-	private inline function get_aschar():String {
-		return String.fromCharCode(asint);
-	}
+	private inline function get_aschar():String { return String.fromCharCode(asint); }
 	private inline function set_aschar(s : String):String {
 		var n:Int = s.charCodeAt(0);
 		assertValid(n);
@@ -59,35 +59,37 @@ abstract Byte (Int) from Int to Int {
 	  * Tests whether [this] Byte would be a number in String form
 	  */
 	public inline function isNumeric():Bool {
-		return (this >= 48 && this <= 57);
+	    return inRange(48, 57);
+		//return (this >= 48 && this <= 57);
 	}
 
 	/**
 	  * Tests whether [this] Byte would be a letter in String form
 	  */
 	public inline function isLetter():Bool {
-		return ((this >= 65 && this <= 90) || (this >= 97 && this <= 122));
+	    return (inRange(65, 90) || inRange(97, 122));
+		//return ((this >= 65 && this <= 90) || (this >= 97 && this <= 122));
 	}
 
 	/**
 	  * Tests whether [this] Byte would be alphanumeric in String form
 	  */
-	public inline function isAlphaNumeric():Bool {
-		return (isNumeric() || isLetter());
-	}
+	public inline function isAlphaNumeric():Bool { return (isNumeric() || isLetter()); }
 
 	/**
 	  * Check whether [this] Byte is an uppercase Letter
 	  */
 	public inline function isUppercase():Bool {
-		return (this >= 65 && this <= 90);
+	    return inRange(65, 90);
+		//return (this >= 65 && this <= 90);
 	}
 
 	/**
 	  * Check whether [this] Byte is a lowercase letter
 	  */
 	public inline function isLowercase():Bool {
-		return (this >= 97 && this <= 122);
+	    return inRange(97, 122);
+		//return (this >= 97 && this <= 122);
 	}
 
 	/**
@@ -112,6 +114,20 @@ abstract Byte (Int) from Int to Int {
 			33, 44, 45, 46,
 			58, 59, 53
 		], asint);
+	}
+
+	/**
+	  * convert letter-byte into its upper-case form
+	  */
+	public inline function toUpperCase():Byte {
+	    return new Byte(if (isLowercase()) (this - 32) else this);
+	}
+
+	/**
+	  * convert letter-byte into its lower-case form
+	  */
+	public inline function toLowerCase():Byte {
+	    return new Byte(if (isLowercase()) (this - 32) else this);
 	}
 
 /* === Operator Overloading === */
