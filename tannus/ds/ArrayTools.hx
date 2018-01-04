@@ -154,6 +154,21 @@ class ArrayTools {
 	    return a.filter(i -> (null != i));
 	}
 
+    /**
+      *
+      */
+    public static function rotate<T>(a : Array<Array<T>>) : Array<Array<T>> {
+        var result:Array<Array<T>> = [];
+        for(i in 0...a[0].length) {
+            var row:Array<T> = [];
+            result.push( row );
+            for(j in 0...a.length) {
+                row.push(a[j][i]);
+            }
+        }
+        return result;
+    }
+
 	/**
 	  * Obtain an Array of Pointers from an Array of values
 	  */
