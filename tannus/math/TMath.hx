@@ -75,8 +75,8 @@ class TMath {
 		var wn:Int = Std.parseInt( bd );
 		var ad:String = '';
 		var res:String = (wn + '');
-		if (sn.has('.')) {
-			ad = sn.after('.');
+		if (sn.has( '.' )) {
+			ad = sn.after( '.' );
 			var sl = ad.slice(0, c);
 			if (ad.length > sl.length) {
 				sl = ad.slice(0, c + 1);
@@ -90,6 +90,8 @@ class TMath {
 		}
 		return res;
 	}
+
+	public static inline function fixed(n:Float, c:Int=0):Float return Std.parseFloat(toFixed(n, c));
 
 	#if !js @:generic #end
 	inline public static function max<T:Float> (a :T, b :T) :T
