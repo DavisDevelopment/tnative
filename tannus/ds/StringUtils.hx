@@ -310,6 +310,11 @@ class StringUtils {
 	public static inline function ifEmpty(s:String, alt:String):String {
 	    return (hasContent( s ) ? s : alt);
 	}
+
+	public static inline function nullEmpty(s: String):Null<String> {
+	    return (hasContent( s ) ? s : null);
+	}
+
 	/**
 	  * Repeat a String [count] times
 	  */
