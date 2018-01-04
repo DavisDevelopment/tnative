@@ -307,6 +307,9 @@ class StringUtils {
 	    return (s != null && s.length > 0 && s.trim().length > 0);
 	}
 
+	public static inline function ifEmpty(s:String, alt:String):String {
+	    return (hasContent( s ) ? s : alt);
+	}
 	/**
 	  * Repeat a String [count] times
 	  */
