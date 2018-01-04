@@ -16,6 +16,7 @@ using tannus.ds.ArrayTools;
 
 @:access( haxe.io.Path )
 @:expose('tannus.sys.Path')
+@:expose('FsPath')
 class CPath implements tannus.ds.IComparable<CPath> {
 	/* Constructor Function */
 	public function new(str : String):Void {
@@ -213,6 +214,10 @@ class CPath implements tannus.ds.IComparable<CPath> {
 	        return s.after(':$separator');
 	    }
         else return s;
+	}
+
+	public inline function withDrive(driveName: Null<String>):String {
+	    return ((driveName!=null?'$driveName:':'')+withoutDrive());
 	}
 	
 /* === Computed Instance Fields === */
