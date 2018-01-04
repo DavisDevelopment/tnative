@@ -147,6 +147,13 @@ class ArrayTools {
 		return macro tannus.ds.ArrayTools.compare($left, $right, $predicate);
 	}
 
+    /**
+      * remove all null items from [a]
+      */
+	public static function compact<T>(a:Array<Null<T>>):Array<T> {
+	    return a.filter(i -> (null != i));
+	}
+
 	/**
 	  * Obtain an Array of Pointers from an Array of values
 	  */
