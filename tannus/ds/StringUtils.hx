@@ -303,6 +303,10 @@ class StringUtils {
 		return (s.length == 0);
 	}
 
+	public static inline function hasContent(s: String):Bool {
+	    return (s != null && s.length > 0 && s.trim().length > 0);
+	}
+
 	/**
 	  * Repeat a String [count] times
 	  */
