@@ -161,6 +161,13 @@ class ArrayTools {
 	    return (null == a || a.length == 0);
 	}
 
+    /**
+      * check that [a] is not null, has more than one value, and that it doesn't contain only null values
+      */
+	public static inline function hasContent<T>(a: Null<Array<T>>):Bool {
+	    return !(empty( a ) || (empty(compact( a ))));
+	}
+
       *
       */
     public static function rotate<T>(a : Array<Array<T>>) : Array<Array<T>> {
