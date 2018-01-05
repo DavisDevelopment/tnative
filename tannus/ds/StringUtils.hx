@@ -11,6 +11,8 @@ import haxe.macro.Context;
 using StringTools;
 using haxe.macro.ExprTools;
 using tannus.macro.MacroTools;
+using tannus.ds.IteratorTools;
+using tannus.FunctionTools;
 
 /**
   * Class with additional tools for manipulating Strings
@@ -27,6 +29,13 @@ class StringUtils {
 		else {
 			throw 'IndexOutOfBoundError: $i is not within range(0, ${s.length - 1})';
 		}
+	}
+
+	public static function iterBytes(s: String, pos:Int=0, ?len:Int):Iterator<Byte> {
+	    if (len == null) {
+	        len = s.length;
+	    }
+	    return new IntIterator(pos, (pos + len)).map(function(index: Int) return byteAt(s, index));
 	}
 
 	/**
@@ -292,6 +301,18 @@ class StringUtils {
 	  */
 	public static inline function empty(s : String):Bool {
 		return (s.length == 0);
+	}
+
+	public static inline function hasContent(s: String):Bool {
+	    return (s != null && s.length > 0 && s.trim().length > 0);
+	}
+
+	public static inline function ifEmpty(s:String, alt:String):String {
+	    return (hasContent( s ) ? s : alt);
+	}
+
+	public static inline function nullEmpty(s: String):Null<String> {
+	    return (hasContent( s ) ? s : null);
 	}
 
 	/**

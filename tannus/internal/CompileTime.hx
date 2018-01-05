@@ -381,6 +381,7 @@ class CompileTime {
 	public static function loadDirectory(path : String):Map<String, String> {
         var dirp:Path = new Path( path );
         var names = Fs.readDirectory(dirp.toString());
+        names = names.filter((n) -> !n.endsWith('.swp'));
         var result = new Map();
         var itemp:Path;
         for (name in names) {

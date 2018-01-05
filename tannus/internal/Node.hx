@@ -742,13 +742,15 @@ typedef NodeHash = {
 
 typedef NodeCipher = {
 	function update(data:Dynamic,?input_enc:String,?output_enc:String):Dynamic;
-	function final(output_enc:String):Void;
+	@:native('final')
+	function finally(output_enc:String):Void;
 	function setAutoPadding(padding:Bool):Void; // default true
 }
 
 typedef NodeDecipher = {
 	function update(data:Dynamic,?input_enc:String,?output_enc:String):Dynamic;
-	function final(?output_enc:String):Dynamic;
+	@:native('final')
+	function finally(?output_enc:String):Dynamic;
 	function setAutoPadding(padding:Bool):Void; // default true
 }
 

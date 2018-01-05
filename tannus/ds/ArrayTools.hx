@@ -12,6 +12,7 @@ using tannus.macro.MacroTools;
 
 using Lambda;
 using tannus.ds.FunctionTools;
+using tannus.FunctionTools;
 
 // @:expose( 'ArrayTools' )
 class ArrayTools {
@@ -145,6 +146,49 @@ class ArrayTools {
 
 		return macro tannus.ds.ArrayTools.compare($left, $right, $predicate);
 	}
+
+    /**
+      * remove all null items from [a]
+      */
+	public static function compact<T>(a:Array<Null<T>>):Array<T> {
+	    return a.filter(i -> (null != i));
+	}
+
+    /**
+      * check if [a] is either a null value, or an Array without any values
+      */
+	public static inline function empty<T>(a: Array<T>):Bool {
+	    return (null == a || a.length == 0);
+	}
+
+    /**
+      * check that [a] is not null, has more than one value, and that it doesn't contain only null values
+      */
+	public static inline function hasContent<T>(a: Null<Array<T>>):Bool {
+	    return !(empty( a ) || (empty(compact( a ))));
+	}
+
+	/**
+	  * normalize any Array for which [hasContent] would return false to null
+	  */
+	public static inline function nullEmpty<T>(a: Null<Array<T>>):Null<Array<T>> {
+	    return (hasContent( a ) ? a : null);
+	}
+
+    /**
+      *
+      */
+    public static function rotate<T>(a : Array<Array<T>>) : Array<Array<T>> {
+        var result:Array<Array<T>> = [];
+        for(i in 0...a[0].length) {
+            var row:Array<T> = [];
+            result.push( row );
+            for(j in 0...a.length) {
+                row.push(a[j][i]);
+            }
+        }
+        return result;
+    }
 
 	/**
 	  * Obtain an Array of Pointers from an Array of values
@@ -742,6 +786,10 @@ class ArrayTools {
 			}
 		}
 		return false;
+	}
+
+	public static function all<T>(items:Iterable<T>, test:T->Bool):Bool {
+	    return !any(items, test.negate());
 	}
 
 	#if macro

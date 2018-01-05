@@ -47,14 +47,12 @@ class TMath {
 	public static inline var FLOAT_MAX = 1.79769313486231e+308;
 
 	/** Converts an angle in degrees to radians. */
-	inline public static function toRadians (degrees :Float) :Float
-	{
+	inline public static function toRadians (degrees :Float) :Float {
 		return degrees * PI/180;
 	}
 
 	/** Converts an angle in radians to degrees. */
-	inline public static function toDegrees (radians :Float) :Float
-	{
+	inline public static function toDegrees (radians :Float) :Float {
 		return radians * 180/PI;
 	}
 
@@ -77,8 +75,8 @@ class TMath {
 		var wn:Int = Std.parseInt( bd );
 		var ad:String = '';
 		var res:String = (wn + '');
-		if (sn.has('.')) {
-			ad = sn.after('.');
+		if (sn.has( '.' )) {
+			ad = sn.after( '.' );
 			var sl = ad.slice(0, c);
 			if (ad.length > sl.length) {
 				sl = ad.slice(0, c + 1);
@@ -92,6 +90,8 @@ class TMath {
 		}
 		return res;
 	}
+
+	public static inline function fixed(n:Float, c:Int=0):Float return Std.parseFloat(toFixed(n, c));
 
 	#if !js @:generic #end
 	inline public static function max<T:Float> (a :T, b :T) :T
@@ -261,6 +261,14 @@ class TMath {
 			else if (value > max) max
 			else value
 		);
+	}
+
+	public static inline function rclamp<T:Float>(value:T, min:T, max:T):T {
+	    return (
+	        if (value < min) max
+            else if (value > max) min
+            else value
+	    );
 	}
 
 	/* check whether the given number is greater than [min] and less than [max] */

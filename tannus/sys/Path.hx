@@ -64,4 +64,8 @@ abstract Path (CPath) from CPath to CPath {
 	public static inline function fromPieces(bits : Array<String>):Path {
 	    return CPath.sjoin( bits );
 	}
+
+
+    public static var separator(get, never):String;
+    private static inline function get_separator() return CPath.separator;
 }

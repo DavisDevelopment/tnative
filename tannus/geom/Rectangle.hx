@@ -14,6 +14,7 @@ import tannus.math.TMath.*;
 
 using Lambda;
 using tannus.ds.ArrayTools;
+using tannus.math.TMath;
 
 @:forward
 abstract Rectangle (CRectangle) from CRectangle to CRectangle {
@@ -378,7 +379,7 @@ class CRectangle implements Shape {
 	  */
 	public function layers():Array<Rectangle> {
 		var results:Array<Rectangle> = new Array();
-		for (i in round(z)...round(z + depth)) {
+		for (i in z.round()...(z + depth).round()) {
 			var layer = new Rectangle(x, y, w, h);
 			layer.z = i;
 			results.push( layer );
@@ -396,6 +397,16 @@ class CRectangle implements Shape {
 		return [x, y, w, h];
 	}
 
+    /**
+      * apply [f] to x, y, w, and h
+      */
+	private inline function _affect(f:Float->Float):Rectangle {
+	    return new Rectangle(f(x), f(y), f(width), f(height));
+	}
+
+	public function floor():Rectangle return _affect(TMath.floor);
+	public function ceil():Rectangle return _affect(TMath.ceil);
+	public function round():Rectangle return _affect(TMath.round);
 
 /* === Computed Instance Fields === */
 
