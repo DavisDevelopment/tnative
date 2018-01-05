@@ -168,6 +168,14 @@ class ArrayTools {
 	    return !(empty( a ) || (empty(compact( a ))));
 	}
 
+	/**
+	  * normalize any Array for which [hasContent] would return false to null
+	  */
+	public static inline function nullEmpty<T>(a: Null<Array<T>>):Null<Array<T>> {
+	    return (hasContent( a ) ? a : null);
+	}
+
+    /**
       *
       */
     public static function rotate<T>(a : Array<Array<T>>) : Array<Array<T>> {
