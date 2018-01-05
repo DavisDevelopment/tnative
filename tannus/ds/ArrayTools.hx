@@ -155,6 +155,12 @@ class ArrayTools {
 	}
 
     /**
+      * check if [a] is either a null value, or an Array without any values
+      */
+	public static inline function empty<T>(a: Array<T>):Bool {
+	    return (null == a || a.length == 0);
+	}
+
       *
       */
     public static function rotate<T>(a : Array<Array<T>>) : Array<Array<T>> {
