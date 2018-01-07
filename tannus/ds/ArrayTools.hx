@@ -176,6 +176,31 @@ class ArrayTools {
 	}
 
     /**
+      * picks from two arrays based on the given [check] function
+      */
+	public static function or<T>(a:Array<T>, b:Array<T>, ?test:Array<T>->Bool):Array<T> {
+	    if (test != null) {
+	        return (if (test( a )) a else b);
+	    }
+        else {
+            if (empty( a )) {
+                return b;
+            }
+            return a;
+        }
+	}
+
+    /**
+      * 
+      */
+	public static inline function notEmpty<T>(a:Array<T>, defaultVal:Array<T>, hasContent:Bool=false):Array<T> {
+	    if ((hasContent && !ArrayTools.hasContent( a )) || empty( a )) {
+	        return defaultVal;
+	    }
+        return a;
+	}
+
+    /**
       *
       */
     public static function rotate<T>(a : Array<Array<T>>) : Array<Array<T>> {
