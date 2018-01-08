@@ -7,6 +7,10 @@ abstract Callback<Result, Error> (?Error->?Result->Void) from ?Error->?Result->V
         this = f;
     }
 
+    public inline function wrap(body:Callback<Result,Error>->?Error->?Result->Void):Callback<Result,Error> {
+        return new Callback(body.bind(this, _, _));
+    }
+
     @:to
     public inline function raise():Error->Void return untyped this.bind(_, null);
     @:to

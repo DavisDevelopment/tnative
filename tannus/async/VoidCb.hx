@@ -1,9 +1,32 @@
 package tannus.async;
 
+import tannus.FunctionTools;
+
+using tannus.FunctionTools;
+
 @:callable
 abstract VoidCb (?Dynamic->Void) from ?Dynamic->Void {
     public inline function new(f : ?Dynamic->Void):Void {
         this = f;
+    }
+
+    public inline function wrap(body:VoidCb->?Dynamic->Void):VoidCb {
+        return body.bind(this, _);
+    }
+
+    /**
+      * VoidCb that does nothing. Great as a default value
+      */
+    public static function noop(?error: Dynamic):Void {
+        if (error != null) {
+            trace( error );
+        }
+    }
+
+    public static function throwIt(?error: Dynamic):Void {
+        if (error != null) {
+            throw error;
+        }
     }
 
     @:to
