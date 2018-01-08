@@ -70,4 +70,11 @@ class VoidAsyncs {
     public static macro function forward(callback:ExprOf<VoidCb>, error:ExprOf<Null<Dynamic>>) {
         return macro if ($error != null) return $callback( $error );
     }
+
+    public static function toAsync(promise:VoidPromise, ?callback:VoidCb):VoidPromise {
+        if (callback != null) {
+            promise.then(callback.void(), callback.raise());
+        }
+        return promise;
+    }
 }
