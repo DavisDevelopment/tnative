@@ -201,9 +201,9 @@ class Function1Tools {
         }
     }
 
-    public static inline function wrap<A, B, ARet, BRet>(f:A->B->ARet, wrapper:(A->B->ARet)->A->B->BRet):A->B->BRet {
-        return function(a:A, b:B) {
-            return wrapper(f, a, b);
+    public static inline function wrap<A, ARet, BRet>(f:A->ARet, wrapper:(A->ARet)->A->BRet):A->BRet {
+        return function(a: A):BRet {
+            return wrapper(f, a);
         }
     }
 }
@@ -257,6 +257,12 @@ class Function2Tools {
     public inline static function negate<T1, T2>(callback : T1 -> T2 -> Bool) {
         return function(v1 : T1, v2 : T2) {
             return !callback(v1, v2);
+        }
+    }
+
+    public static inline function wrap<A, B, ARet, BRet>(f:A->B->ARet, wrapper:(A->B->ARet)->A->B->BRet):A->B->BRet {
+        return function(a:A, b:B) {
+            return wrapper(f, a, b);
         }
     }
 }
