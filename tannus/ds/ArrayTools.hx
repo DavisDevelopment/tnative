@@ -729,19 +729,13 @@ class ArrayTools {
 	  * break the given Array into chunks of [size] length
 	  */
 	public static function chunk<T>(array:Array<T>, size:Int):Array<Array<T>> {
-		var chunks = new Array();
-		var chunk = new Array();
-		for (item in array) {
-			if (chunk.length == size) {
-				chunks.push( chunk );
-				chunk = new Array();
-			}
-			else {
-				chunk.push( item );
-			}
-		}
-		if (chunk.length > 0) {
-			chunks.push( chunk );
+		var chunks = [], ch = [];
+		for (x in array) {
+		    ch.push( x );
+		    if (ch.length == size) {
+		        chunks.push( ch );
+		        ch = [];
+		    }
 		}
 		return chunks;
 	}
@@ -816,6 +810,8 @@ class ArrayTools {
 	public static function all<T>(items:Iterable<T>, test:T->Bool):Bool {
 	    return !any(items, test.negate());
 	}
+
+
 
 	#if macro
 
