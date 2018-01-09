@@ -1,6 +1,6 @@
 package tannus.io;
 
-import tannus.io.Ptr;
+//import tannus.io.Ptr;
 
 class Signal<T> {
 	/* Constructor Function */
@@ -21,11 +21,10 @@ class Signal<T> {
 	  */
 	public function listen(f:T->Void, once:Bool=false):Void {
 		if (!once) {
-			add(Normal(f));
-		} else {
-			var _fired:Bool = false;
-			var fired:Ptr<Bool> = Ptr.create(_fired);
-			add(Once(f, fired));
+			add(Normal( f ));
+		} 
+		else {
+			add(Once( f ));
 		}
 	}
 
@@ -51,30 +50,12 @@ class Signal<T> {
 	}
 
 	/**
-	  * Listen for data [n] times
-	  */
-	public function times(count:Int, f:T->Void):Void {
-		var _fired:Int = 0;
-		var fired:Ptr<Int> = Ptr.create(_fired);
-		 add(Counted(f, count, fired));
-	}
-
-	/**
-	  * Every Listener
-	  */
-	public function every(wait:Int, f:T->Void):Void {
-		var _rem:Int = 0;
-		var rem:Ptr<Int> = Ptr.create( _rem );
-		add(Every(f, wait, rem));
-	}
-
-	/**
 	  * check for presence of given function as listener
 	  */
 	public function hasListener(f : T->Void):Bool {
 	    for (h in handlers) {
 	        switch ( h ) {
-				case Normal( func ), Once(func, _), Tested(func, _), Counted(func, _, _), Every(func, _, _):
+				case Normal( func ), Once( func ), Tested(func, _):
 					return !Reflect.compareMethods(f, func);
 				default:
 				    continue;
@@ -90,7 +71,7 @@ class Signal<T> {
 		handlers = handlers.filter(function(h : Handler<T>):Bool {
 			switch (h) {
 				/* Standard Handler */
-				case Normal( f ), Once(f, _), Tested(f, _), Counted(f, _, _), Every(f, _, _):
+				case Normal( f ), Once( f ), Tested(f, _):
 					return !Reflect.compareMethods(f, func);
 
 				/* Anything Else */
@@ -124,32 +105,14 @@ class Signal<T> {
 				f( arg );
 
 			/* Once Handler */
-			case Once(f, fired):
-				//- if [this] Handler has been fired
-				if (!fired.v) {
-					f( arg );
-					fired &= true;
-				}
+			case Once( func ):
+                func( arg );
 
 			/* Tested Handler */
 			case Tested(f, test):
 				if (test(arg)) {
 					f( arg );
 				}
-
-			/* Counted Handler */
-			case Counted(f, count, called):
-				if (called._ <= count) {
-					f( arg );
-					called._ += 1;
-				}
-
-			/* Every Handler */
-			case Every(f, wait, rem):
-				if (rem == wait) {
-					f( arg );
-					rem &= 0;
-				} else rem.v += 1;
 		}
 	}
 
@@ -158,9 +121,13 @@ class Signal<T> {
 	  */
 	public function broadcast(data : T):Void {
 		/* invoke the relevant handlers */
+		var _handlers = [];
 		for (h in handlers) {
 			callHandler(h, data);
+			if (!h.match(Once(_)))
+			    _handlers.push( h );
 		}
+		handlers = _handlers;
 	}
 
 	/**
@@ -197,14 +164,8 @@ private enum Handler<T> {
 	/* Handler which can fire any number of times */
 	Normal(func : T->Void);
 
-	/* Handle which will only fire [count] times */
-	Counted(func:T->Void, count:Int, fired:Ptr<Int>);
-
-	/* Handler which will only fire every [rem] times */
-	Every(func:T->Void, wait:Int, remaining:Ptr<Int>);
-
 	/* Handler which only fires once */
-	Once(func:T->Void, fired:Ptr<Bool>);
+	Once(func: T->Void);
 
 	/* Handler which only fires when the data passed to it matches [test] */
 	Tested(func:T->Void, test:T->Bool);
