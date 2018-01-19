@@ -66,6 +66,12 @@ class TMath {
 		return Math.sqrt(Math.pow(Math.abs(x2 - x1), 2) + Math.pow(Math.abs(y2 - y1), 2));
 	}
 
+    /* reciprocal thingy */
+    #if !js @:generic #end
+	public static inline function reciprocal<T:Float>(n: T):Float {
+	    return (1 / n);
+	}
+
 	/**
 	  * Does the shit
 	  */
