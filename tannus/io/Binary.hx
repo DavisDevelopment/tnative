@@ -425,6 +425,12 @@ class Binary {
 		_length = size;
 	}
 
+    /* alter [this] such that it becomes identical to [x] */
+	private function rebase(x: Binary):Void {
+	    setData(x.getData());
+	    resize( x.length );
+	}
+
 	/* reverse [this] data in-place */
 	public function reverse():Void {
 		for (i in 0...Math.floor(length / 2)) {
