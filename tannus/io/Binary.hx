@@ -524,6 +524,12 @@ class Binary {
 	}
 #end
 
+    /* lexicographically compare [this] to [other] */
+    public function compareTo(other: Binary):Int {
+        var compLen = TMath.min(length, other.length);
+        return _compare(this, other, 0, 0, compLen);
+    }
+
 	/* check if [this] and [other] are equivalent in content */
 	public function equals(other : Binary):Bool {
 		if (length != other.length)
@@ -562,6 +568,19 @@ class Binary {
 	@:protected
 	private inline function _ofString(s : String):ByteArray {
 		return ((untyped Reflect.getProperty(Type.getClass(this), 'ofString'))( s ));
+	}
+
+	@:protected
+	private function _compare(a:Binary, b:Binary, posA:Int, posB:Int, len:Int):Int {
+	    inline function ic(a:Int, b:Int):Int return (a == b) ? 0 : ((a > b) ? 1 : -1);
+	    var c: Int;
+	    for (index in 0...len) {
+	        c = ic(a.get(posA + index).asint, b.get(posB + index).asint);
+	        if (c != 0) {
+	            return c;
+	        }
+	    }
+	    return 0;
 	}
 
 	/* === Computed Instance Fields === */
