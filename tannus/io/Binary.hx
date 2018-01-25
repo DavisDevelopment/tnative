@@ -374,13 +374,16 @@ class Binary {
 	}
 
 	/* shift all bytes in [this] data [digits] to the left */
-	public function shiftLeft(digits : Int):Void {
-		var rpad:Binary = _alloc( digits );
-		rpad.fill( 0 );
-		var backward:ByteArray = slice( digits ).concat( rpad );
-		grow( digits );
-		//b = backward.b;
-		setData( backward.b );
+	/* truncate [this] */
+	public function truncate(len: Int):Void {
+	    if (!(!len.isNaN() && len.isFinite()) || len > length || len < 0) {
+	        throw 'BinaryError: Invalid truncation length ($len)';
+	    }
+        else if (len < length) {
+            //shiftLeft((length - len), false);
+            setData(sub(0, len).b);
+            resize( len );
+        }
 	}
 
 	/* get a subset of [this] data */
