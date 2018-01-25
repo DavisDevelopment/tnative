@@ -93,3 +93,22 @@ extern class Stats {
 	public var ctime : Date;
 }
 
+@:jsRequire('fs', 'ReadStream')
+extern class FileReadStream extends ReadableStream {
+    public var bytesRead: Int;
+    public var path: EitherType<String, Buffer>;
+
+    public inline function onOpen(cb: Int->Void):Void this.on('open', cb);
+    //public inline function onClose(f: Void->Void):Void this.on('close', f);
+}
+
+typedef CreateReadStreamOptions = {
+    ?flags: String,
+    ?encoding: String,
+    ?fd: Int,
+    ?mode: Int,
+    ?autoClose: Bool,
+    ?start: Int,
+    ?end: Int,
+    ?highWaterMark: Int
+};
