@@ -811,7 +811,25 @@ class ArrayTools {
 	    return !any(items, test.negate());
 	}
 
+    public static function reduce<T, TAcc>(a:Iterable<T>, f:TAcc->T->TAcc, v:TAcc):TAcc {
+        for (x in a) {
+            v = f(v, x);
+        }
+        return v;
+    }
 
+    public static function reducei<T,TAcc>(a:Array<T>, f:TAcc->T->Int->TAcc, v:TAcc):TAcc {
+        for (i in 0...a.length)
+            v = f(v, a[i], i);
+        return v;
+    }
+
+    public static inline function reduceRight<T,TAcc>(a:Array<T>, f:TAcc->T->TAcc, v:TAcc):TAcc {
+        var i:Int = a.length;
+        while (--i >= 0)
+            v = f(v, a[i]);
+        return v;
+    }
 
 	#if macro
 
