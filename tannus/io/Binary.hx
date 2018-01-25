@@ -415,6 +415,37 @@ class Binary {
 		return sub(min, ((max != null ? max : length) - min));
 	}
 
+    /**
+      * performs splice operation on [this]
+      */
+	public function splice(pos:Int, len:Int):ByteArray {
+	    if (len < 0 || pos > length) {
+	        return ByteArray.alloc( 0 );
+	    }
+        else {
+            if (pos < 0)
+                pos = (length + pos);
+            if (pos < 0)
+                pos = 0;
+            len = TMath.min(len, (length - pos));
+            var max = (pos + len);
+            var result = slice(pos, (max + 1));
+            if (pos == 0) {
+                var remainder = slice(max + 1);
+                rebase( remainder );
+            }
+            else {
+                var pre:ByteArray, post:ByteArray;
+                pre = slice(0, (pos - 1));
+                post = slice(max + 1);
+                blit(0, pre, 0, pre.length);
+                blit(pre.length, post, 0, post.length);
+                truncate(pre.length + post.length);
+            }
+            return result;
+        }
+	}
+
 	/* copy another Binary onto [this] one */
 	public function blit(index:Int, src:Binary, srcIndex:Int, size:Int):Void {
 		throw 'Not implemented';
