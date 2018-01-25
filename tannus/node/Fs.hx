@@ -6,6 +6,8 @@ import tannus.async.VoidCb;
 import tannus.sys.node.NodeFStat;
 import tannus.node.Buffer;
 
+import haxe.extern.EitherType;
+
 @:jsRequire( 'fs' )
 extern class Fs {
 	/* Check for existence */
@@ -34,7 +36,7 @@ extern class Fs {
 
 	/* Reads file */
 	public static function readFileSync(path : String):Dynamic;
-	public static function readFile(path:String, callback:Null<Dynamic>->Buffer->Void):Void;
+	public static function readFile(path:String, callback:Cb<Buffer>):Void;
 
 	/* Writes to file */
 	public static function writeFileSync(path:String, data:Dynamic):Void;
@@ -47,8 +49,7 @@ extern class Fs {
     public static function copyFile(src:String, dest:String, callback:VoidCb):Void;
     public static function copyFileSync(src:String, dest:String):Void;
 
-	public static function truncate(path:String, len:Int, callback:VoidCb):Void;
-	public static function truncateSync(path:String, len:Int):Void;
+	public static function truncate(path:String, len:Int, callback:VoidCb):Void; public static function truncateSync(path:String, len:Int):Void;
 
 	public static function chmodSync(path:String, mod:Int):Void;
 	public static function chmod(path:String, mod:Int, callback:VoidCb):Void;
@@ -57,16 +58,16 @@ extern class Fs {
 	public static function createWriteStream(path:String, ?options:Dynamic):tannus.node.WritableStream;
 
 	/* Open a Readable Stream from a File */
-	public static function createReadStream(path:String, ?options:Dynamic):tannus.node.ReadableStream;
+	public static function createReadStream(path:String, ?options:CreateReadStreamOptions):FileReadStream;
 
 	public static function openSync(path:String, flags:String):Int;
 	public static function readSync(id:Int, buffer:Buffer, offset:Int, length:Int, position:Int):Int;
 	public static function writeSync(id:Int, buffer:Buffer, offset:Int, length:Int, position:Int):Int;
 	public static function closeSync(id:Int):Void;
 
-    public static function open(path:String, flags:String, callback:Null<Dynamic>->Int->Void):Void;
-    public static function read(id:Int, buffer:Buffer, offset:Int, length:Int, position:Null<Int>, callback:Null<Dynamic>->Int->Buffer->Void):Void;
-	public static function close(id:Int, callback:Null<Dynamic>->Void):Void;
+    public static function open(path:String, flags:String, callback:Cb<Int>):Void;
+    public static function read(id:Int, buffer:Buffer, offset:Int, length:Int, position:Null<Int>, callback:?Dynamic->?Int->?Buffer->Void):Void;
+	public static function close(id:Int, callback:VoidCb):Void;
 
 	public static function watch(path:String, listener:String->String->Void):FSWatcher;
 }
