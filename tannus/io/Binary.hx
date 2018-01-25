@@ -530,6 +530,17 @@ class Binary {
         return _compare(this, other, 0, 0, compLen);
     }
 
+    public function indexOf(sub: ByteArray):Int {
+        var ilen = (length - sub.length);
+        for (index in 0...ilen) {
+            var c = _compare(this, sub, index, 0, sub.length);
+            if (c == 0) {
+                return index;
+            }
+        }
+        return -1;
+    }
+
 	/* check if [this] and [other] are equivalent in content */
 	public function equals(other : Binary):Bool {
 		if (length != other.length)
