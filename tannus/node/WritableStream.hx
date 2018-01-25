@@ -3,6 +3,7 @@ package tannus.node;
 import tannus.node.Buffer;
 import tannus.node.EventEmitter;
 
+import tannus.async.*;
 import haxe.Constraints.Function;
 
 @:jsRequire('stream', 'Writable')
@@ -20,6 +21,13 @@ extern class WritableStream extends EventEmitter {
 	@:overload(function(chunk:Buffer, ?enc:String):Void {})
 	@:overload(function(cb:Function):Void {})
 	function end(?chunk:Buffer, ?encoding:String, ?cb:Function):Void;
+
+/* === Implementation === */
+
+    function _write(chunk:Buffer, encoding:String, callback:VoidCb):Void;
+    function _writev(chunks:Array<{chunk:Buffer,encoding:String}>, callback:VoidCb):Void;
+    function _destroy(error:Null<Dynamic>, callback:VoidCb):Void;
+    function _final(callback: VoidCb):Void;
 
 /* === Event Methods === */
 
