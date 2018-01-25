@@ -71,6 +71,10 @@ class VoidAsyncs {
         return macro if ($error != null) return $callback( $error );
     }
 
+    public static function toPromise(f: VoidCb->Void):VoidPromise {
+        return new VoidAsync( f ).promise();
+    }
+
     public static function toAsync(promise:VoidPromise, ?callback:VoidCb):VoidPromise {
         if (callback != null) {
             promise.then(callback.void(), callback.raise());
