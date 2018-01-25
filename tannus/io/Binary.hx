@@ -10,6 +10,8 @@ import tannus.sys.Mime;
 import tannus.math.TMath;
 import tannus.ds.Obj;
 
+import tannus.math.TMath.*;
+
 import haxe.Int64;
 import haxe.io.*;
 
@@ -20,6 +22,7 @@ using Lambda;
 using StringTools;
 using tannus.ds.StringUtils;
 using tannus.ds.ArrayTools;
+using tannus.math.TMath;
 
 #if js
 class Binary implements tannus.html.Blobable {
@@ -374,6 +377,22 @@ class Binary {
 	}
 
 	/* shift all bytes in [this] data [digits] to the left */
+	public function shiftLeft(digits:Int, pad:Bool=true):Void {
+	    if ( pad ) {
+            var rpad:Binary = _alloc( digits );
+            rpad.fill( 0 );
+            var backward:ByteArray = slice( digits ).concat( rpad );
+            grow( digits );
+            //b = backward.b;
+            setData( backward.b );
+        }
+        else {
+            var trunc = slice( digits );
+            resize( trunc.length );
+            setData( trunc.b );
+        }
+	}
+
 	/* truncate [this] */
 	public function truncate(len: Int):Void {
 	    if (!(!len.isNaN() && len.isFinite()) || len > length || len < 0) {
