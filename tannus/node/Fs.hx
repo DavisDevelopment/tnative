@@ -81,3 +81,14 @@ typedef FsWriteFileOptions = {
     ?mode: Int,
     ?flag: String
 };
+
+@:jsRequire('fs', 'Stats')
+extern class Stats {
+	public function isFile():Bool;
+	public function isDirectory():Bool;
+
+	public var size : Int;
+	public var mtime : Date;
+	public var ctime : Date;
+}
+
