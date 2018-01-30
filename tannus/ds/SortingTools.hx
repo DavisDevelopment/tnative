@@ -116,9 +116,37 @@ class SortingTools {
         else if (isIComparable( x ) && isIComparable( y )) {
             return icompare(x, y);
         }
-        else {
+        else if (((x is String) || (x is Float)) && ((y is String) || (y is Float))) {
             return compare(x, y);
         }
+        else {
+            return compareAnon(x, y);
+        }
+	}
+
+	/**
+	  * compare two anonymous structures with one another
+	  */
+	public static function compareAnon(x:Dynamic, y:Dynamic):Int {
+	    if (isObject( x ) && isObject( y )) {
+	        var xkl = fields( x ), ykl = fields( y ), klc = compareEnumValueParams(xkl, ykl);
+	        if (klc == 0) {
+	            var xv:Dynamic, yv:Dynamic;
+	            for (key in xkl) {
+	                xv = getProperty(x, key);
+	                yv = getProperty(y, key);
+	                var vc = compareEnumValueParam(xv, yv);
+	                if (vc == 0)
+	                    continue;
+                    else return vc;
+	            }
+	            return 0;
+	        }
+            else {
+                return klc;
+            }
+	    }
+        else throw 'Error: invalid arguments for SortingTools.compareAnon';
 	}
 
 	/**
