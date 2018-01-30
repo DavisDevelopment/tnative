@@ -70,19 +70,19 @@ class Parser {
 			case TBrackets( group ):
 				switch ( group ) {
 					/* == Existential Check == */
-					case [TConst(CIdent( name ))]:
+					case [TConst(CIdent( name )|CString(name, _))]:
 						return FieldExistsCheck( name );
 
 					/* == Value Block Check == */
-					case [TConst(CIdent(name)), TOperator('=>'), TBoxBrackets(sub(_) => checks)]:
+					case [TConst(CIdent(name)|CString(name, _)), TOperator('=>'), TBoxBrackets(sub(_) => checks)]:
 						return FieldValueBlockCheck(name, checks);
 
 					/* == Strict Type Check == */
-					case [TConst(CIdent(name)), TOperator('is'), TConst(CIdent(type))]:
+					case [TConst(CIdent(name)|CString(name,_)), TOperator('is'), TConst(CIdent(type))]:
 						return FieldValueTypeCheck(name, type, false);
 
 					/* == Loose Type Check == */
-					case [TConst(CIdent(name)), TOperator('is'), TApprox, TConst(CIdent(type))]:
+					case [TConst(CIdent(name)|CString(name, _)), TOperator('is'), TApprox, TConst(CIdent(type))]:
 						return FieldValueTypeCheck(name, type, true);
 
 					/* == Nested Check == */
@@ -90,7 +90,7 @@ class Parser {
 						return NestedCheck(op, valueToken.toValue());
 
 					/* == Value Check == */
-					case [TConst(CIdent(name)), TOperator(op), valueToken]:
+					case [TConst(CIdent(name)|CString(name, _)), TOperator(op), valueToken]:
 						return FieldValueCheck(op, name, valueToken.toValue());
 
 					/* == Anything Else == */
