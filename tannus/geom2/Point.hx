@@ -137,14 +137,36 @@ class Point <T:Float> implements IMultiPoint<T> implements IComparable<Point<T>>
 	    z = nz;
 	}
 
+	/**
+	  * check if [this] Point is inside of [rect]
+	  */
+	public inline function containedBy(ox:T, oy:T, ow:T, oh:T):Bool {
+        return (
+            (x > ox && (x < (ox + ow))) &&
+            (y > oy && (y < (oy + oh)))
+        );
+	}
+	public inline function containedByRect(rect: Rect<T>):Bool return containedBy(rect.x, rect.y, rect.width, rect.height);
+
 /* === Arithmetic Operators === */
 
+    /**
+      * get [this] with its values rounded
+      */
 	public inline function round():Point<Int> {
 		return mutate( Math.round );
 	}
+
+	/**
+	  * get [this] with its values 'floor'd
+	  */
 	public inline function floor():Point<Int> {
 		return mutate( Math.floor );
 	}
+
+	/**
+	  * get [this] with its values 'ceil'd
+	  */
 	public inline function ceil():Point<Int> {
 		return mutate( Math.ceil );
 	}
@@ -165,6 +187,28 @@ class Point <T:Float> implements IMultiPoint<T> implements IComparable<Point<T>>
 	    x = data[0];
 	    y = data[1];
 	    z = data[2];
+	}
+
+    /**
+      * serialize [this] Point
+      */
+	@:keep
+	public function hxSerialize(s: Serializer):Void {
+	    inline function w(x: Dynamic):Void s.serialize( x );
+
+	    w( x );
+	    w( y );
+	    w( z );
+	}
+
+    /**
+      * unserialize [this]
+      */
+	@:keep
+	public function hxUnserialize(u: Unserializer):Void {
+	    inline function v():Dynamic return u.unserialize();
+
+        set(v(), v(), v());
 	}
 
 /* === Computed Instance Fields === */
