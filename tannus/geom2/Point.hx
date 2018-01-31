@@ -74,11 +74,13 @@ class Point <T:Float> implements IMultiPoint<T> implements IComparable<Point<T>>
 	    ]);
 	}
 
+	/**
+	  * copy over [other]'s state onto [this]
+	  */
 	public inline function copyFrom(other : Point<T>):Void {
-		x = other.x;
-		y = other.y;
-		z = other.z;
+	    set(other.x, other.y, other.z);
 	}
+	public inline function pull(other: Point<T>):Void copyFrom( other );
 	
 	public function mutate<A:Float>(f : T -> A):Point<A> {
 		return new Point(f( x ), f( y ), f( z ));
