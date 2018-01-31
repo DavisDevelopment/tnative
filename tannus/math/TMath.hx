@@ -173,9 +173,13 @@ class TMath {
 	}
 
 	/** Cast from Float to Int */
-	public static inline function i(f : Float):Int {
-		return (Std.int(f));
-	}
+	public static inline function int<T:Float>(f : T):Int { return (Std.int( f )); }
+	public static inline function i<T:Float>(f: T):Int return int( f );
+
+	/**
+	  * cast from Int to Float
+	  */
+	public static inline function float<T:Float>(i: T):Float return (0.0 + i);
 
 	/** Round a float to the nearest [digit] decimal place */
 	public static function roundFloat(f:Float, digit:Int):Float {
