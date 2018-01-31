@@ -66,6 +66,14 @@ class Point <T:Float> implements IMultiPoint<T> implements IComparable<Point<T>>
 	public function distanceFromIMultiPoint(other: IMultiPoint<T>):Float {
 	    return sqrt(pow(x - other.getCoordinate(0), 2) + pow(y - other.getCoordinate(1), 2));
 	}
+	public function compareTo(other: Point<T>):Int {
+	    return compresolve([
+	        Reflect.compare(x, other.x),
+	        Reflect.compare(y, other.y),
+	        Reflect.compare(z, other.z)
+	    ]);
+	}
+
 	public inline function copyFrom(other : Point<T>):Void {
 		x = other.x;
 		y = other.y;
