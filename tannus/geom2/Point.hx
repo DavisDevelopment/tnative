@@ -51,6 +51,9 @@ class Point <T:Float> implements IMultiPoint<T> implements IComparable<Point<T>>
 	public inline function distanceFrom(other : Point<T>):Float {
 		return Math.sqrt(Math.pow((x - other.x), 2) + Math.pow((y - other.y), 2));
 	}
+	public function dimensionality():Int {
+	    return 2;
+	}
 	public inline function copyFrom(other : Point<T>):Void {
 		x = other.x;
 		y = other.y;
