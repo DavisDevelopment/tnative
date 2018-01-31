@@ -62,6 +62,7 @@ class Point <T:Float> implements IMultiPoint<T> implements IComparable<Point<T>>
             default: throw 'Error: OutOfBounds';
 	    }
 	}
+	public function getRawData():Array<T> return [x, y, z];
 	public inline function copyFrom(other : Point<T>):Void {
 		x = other.x;
 		y = other.y;
