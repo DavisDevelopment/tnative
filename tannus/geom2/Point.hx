@@ -128,6 +128,15 @@ class Point <T:Float> implements IMultiPoint<T> implements IComparable<Point<T>>
 		);
 	}
 
+	/**
+	  * 'set' [this]'s state
+	  */
+	public inline function set(nx:T, ny:T, nz:T):Void {
+	    x = nx;
+	    y = ny;
+	    z = nz;
+	}
+
 /* === Arithmetic Operators === */
 
 	public inline function round():Point<Int> {
