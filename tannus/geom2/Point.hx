@@ -82,23 +82,44 @@ class Point <T:Float> implements IMultiPoint<T> implements IComparable<Point<T>>
 	}
 	public inline function pull(other: Point<T>):Void copyFrom( other );
 	
+	/**
+	  * create a mutation of [this] by applying [f] to x, y, and z
+	  */
 	public function mutate<A:Float>(f : T -> A):Point<A> {
 		return new Point(f( x ), f( y ), f( z ));
 	}
 
+    /**
+      * 
+      */
 	public function mutate2(o:Point<T>, f:T->T->T):Point<T> {
 		return new Point(f(x, o.x), f(y, o.y), f(z, o.z));
 	}
 
+    /**
+      * get the sum of [this] and [other]
+      */
 	public inline function plusPoint(other : Point<T>):Point<T> {
 		return new Point((x + other.x), (y + other.y), (z + other.z));
 	}
+
+	/**
+	  * subtract [o] from [this]
+	  */
 	public inline function minusPoint(o : Point<T>):Point<T> {
 		return new Point((x - o.x), (y - o.y), (z - o.z));
 	}
+
+	/**
+	  * create and return a clone of [this]
+	  */
 	public inline function clone():Point<T> {
 		return new Point(x, y, z);
 	}
+
+	/**
+	  * get some point between [this] and [other], using linear interpolation
+	  */
 	public inline function lerp(other:Point<T>, weight:Float):Point<Float> {
 		return new Point(
 			TMath.lerp(x, other.x, weight),
