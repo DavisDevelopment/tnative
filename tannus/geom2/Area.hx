@@ -4,36 +4,9 @@ import tannus.ds.IComparable;
 
 using tannus.ds.ArrayTools;
 
-@:forward
-abstract Area<T:Float> (CArea<T>) from CArea<T> to CArea<T> {
-    /* Constructor Function */
-	public inline function new(w:T, h:T):Void {
-		this = new CArea(w, h);
-	}
-
-	@:from
-	public static inline function fromArray<T:Float>(a : Array<T>):Area<T> {
-		return new Area(a[0], a[1]);
-	}
-
-	@:from
-	public static inline function fromRect<T:Float>(r : Rect<T>):Area<T> {
-		return new Area(r.w, r.h);
-	}
-
-	@:to
-	public inline function toRect():Rect<T> return this.toRect();
-
-	@:from
-	public static function fromString(s : String):Area<Float> {
-		return fromArray(s.split('x').map( Std.parseFloat ));
-	}
-}
-
-@:expose('tannus.geom2.Area')
-class CArea<T:Float> implements IComparable<CArea<T>> {
+class Area <T:Float> implements IComparable<Area<T>> {
 	/* Constructor Function */
-	public function new(w:T, h:T):Void {
+	public inline function new(w:T, h:T):Void {
 		width = w;
 		height = h;
 	}
@@ -41,17 +14,17 @@ class CArea<T:Float> implements IComparable<CArea<T>> {
 /* === Instance Methods === */
 
     // clone
-	public function clone():Area<T> {
+	public inline function clone():Area<T> {
 		return new Area(width, height);
 	}
 
     // stringify
-	public function toString():String {
+	public inline function toString():String {
 		return ('${width}x${height}');
 	}
 
 	// transform into a Rect
-	public function toRect():Rect<T> {
+	public inline function toRect():Rect<T> {
 		return new Rect(cast 0, cast 0, cast width, cast height);
 	}
 
@@ -79,4 +52,11 @@ class CArea<T:Float> implements IComparable<CArea<T>> {
 
 	public var width(default, null):T;
 	public var height(default, null):T;
+
+/* === Class Methods === */
+
+    public static inline function make<T:Float>(width:T, height:T):Area<T> return new Area(width, height);
+    public static inline function fromArray<T:Float>(array: Array<T>):Area<T> return make(array[0], array[1]);
+    public static inline function fromPoint<T:Float>(point: Point<T>):Area<T> return make(point.x, point.y);
+    public static inline function fromRect<T:Float>(rect: Rect<T>):Area<T> return make(rect.width, rect.height);
 }
