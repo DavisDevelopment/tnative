@@ -170,22 +170,23 @@ class Rect <T:Float> {
 	public inline function toRectangle():tannus.geom.Rectangle 
 		return tannus.geom.Rectangle.fromRect2D( this );
 
-	/**
-	  * Scale [this] Rect
-	  */
-	public function scale(?sw:Float, ?sh:Float):Rect<Float> {
-		if (sw != null) {
-			var ratio:Float = (sw / width);
-			return cast new Rect(x, y, untyped sw, untyped (ratio * height));
-		}
-		else if (sh != null) {
-			var ratio:Float = (sh / height);
-			return cast new Rect(x, y, untyped (ratio * width), untyped sh);
-		}
-		else {
-			return cast new Rect(x, y, w, h);
-		}
+	public function getTopLeft():Point<T> {
+	    return pt(x, y);
 	}
+
+	public function getTopRight():Point<T> {
+	    return pt(x+w, y);
+	}
+
+	public function getBottomLeft():Point<T> {
+	    return pt(x, y+h);
+	}
+
+	public function getBottomRight():Point<T> {
+	    return pt(x+w, y+h);
+	}
+
+	private static inline function pt<T:Float>(x:T, y:T):Point<T> { return new Point(x, y); }
 
 	/**
 	  * Round [this] Rect
@@ -228,44 +229,6 @@ class Rect <T:Float> {
 	public var h(get, set):T;
 	private inline function get_h():T return height;
 	private inline function set_h(v : T):T return (height = v);
-
-	public var topLeft(get, set):Point<T>;
-	private inline function get_topLeft():Point<T> return new Point(x, y);
-	private function set_topLeft(p : Point<T>):Point<T> {
-		x = p.x;
-		y = p.y;
-		return topLeft;
-	}
-
-	public var topRight(get, set):Point<T>;
-	private inline function get_topRight():Point<T> {
-		return new Point((x + w), y);
-	}
-	private function set_topRight(p : Point<T>):Point<T> {
-		x = untyped (p.x - w);
-		y = p.y;
-		return topRight;
-	}
-
-	public var bottomLeft(get, set):Point<T>;
-	private inline function get_bottomLeft():Point<T> {
-		return new Point(x, (y + h));
-	}
-	private function set_bottomLeft(p : Point<T>):Point<T> {
-		x = p.x;
-		y = untyped (p.y - h);
-		return bottomLeft;
-	}
-
-	public var bottomRight(get, set):Point<T>;
-	private inline function get_bottomRight():Point<T> {
-		return new Point((x + w), (y + h));
-	}
-	private function set_bottomRight(p : Point<T>):Point<T> {
-		x = untyped (p.x - w);
-		y = untyped (p.y - h);
-		return bottomRight;
-	}
 
 	public var centerX(get, set):Float;
 	private inline function get_centerX():Float return (x + (w / 2));
