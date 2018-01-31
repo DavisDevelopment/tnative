@@ -1,16 +1,20 @@
 package tannus.geom2;
 
-import tannus.ds.DataView;
+import tannus.ds.*;
 
 //import Math.*;
 import tannus.math.TMath.*;
+import tannus.ds.SortingTools.compresolve;
+
+import haxe.Serializer;
+import haxe.Unserializer;
 
 using Lambda;
 using tannus.ds.ArrayTools;
 using tannus.math.TMath;
 
 @:expose
-class Point <T:Float> {
+class Point <T:Float> implements IMultiPoint<T> implements IComparable<Point<T>> {
 	/* Constructor Function */
 	public function new(?x:T, ?y:T, ?z:T):Void {
 	    #if !js
@@ -31,11 +35,18 @@ class Point <T:Float> {
 
 /* === Instance Methods === */
 
+    /**
+      * test if [this] is exactly equal to [other]
+      */
 	public inline function equals(other : Point<T>):Bool {
 		return (x == other.x && y == other.y && z == other.z);
 	}
-	public inline function angleTo(other : Point<T>):tannus.geom.Angle {
-		return new tannus.geom.Angle(angleBetween(x, other.x, y, other.y));
+
+	/**
+	  * get the angle between [this] and [other]
+	  */
+	public inline function angleTo(other : Point<T>):Angle {
+		return new Angle(angleBetween(x, other.x, y, other.y));
 	}
 	public inline function distanceFrom(other : Point<T>):Float {
 		return Math.sqrt(Math.pow((x - other.x), 2) + Math.pow((y - other.y), 2));
