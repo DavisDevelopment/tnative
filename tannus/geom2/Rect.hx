@@ -134,6 +134,25 @@ class Rect <T:Float> {
 		y -= Math.round(dh / 2);
 	}
 
+	public function scale(?sw:T, ?sh:T):Rect<T> {
+	    var ratio:Float;
+	    if (sw != null) {
+	        ratio = (sw / width);
+	        width = sw;
+	        height = (untyped ratio * height);
+	    }
+        else if (sh != null) {
+            ratio = (sh / height);
+            height = sh;
+            width = (untyped ratio * width);
+        }
+        return this;
+	}
+
+	public inline function scaled(?sw:Float, ?sh:Float):Rect<Float> {
+	    return cast clone().scale(untyped sw, untyped sh);
+	}
+
 	/**
 	  * Convert [this] Rect to a String
 	  */
