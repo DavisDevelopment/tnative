@@ -1,11 +1,11 @@
 package tannus.events;
 
 import tannus.ds.Delta;
-import tannus.geom.Area;
+import tannus.geom2.Area;
 
 class ResizeEvent extends Event {
 	/* Constructor Function */
-	public function new(old_area:Area, new_area:Area):Void {
+	public function new(old_area:Area<Float>, new_area:Area<Float>):Void {
 		super( 'resize' );
 
 		delta = new Delta(new_area, old_area);
@@ -13,5 +13,5 @@ class ResizeEvent extends Event {
 
 /* === Instance Fields === */
 
-	public var delta : Delta<Area>;
+	public var delta : Delta<Area<Float>>;
 }
