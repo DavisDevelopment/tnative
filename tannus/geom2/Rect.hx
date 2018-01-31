@@ -43,6 +43,13 @@ class Rect <T:Float> {
 		return new Rect(x, y, w, h);
 	}
 
+	public inline function set(nx:T, ny:T, nw:T, nh:T):Void {
+	    x = nx;
+	    y = ny;
+	    width = nw;
+	    height = nh;
+	}
+
 	/**
 	  * copy data from the given Rect<T>
 	  */
