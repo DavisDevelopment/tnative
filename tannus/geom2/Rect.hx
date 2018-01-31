@@ -90,7 +90,7 @@ class Rect <T:Float> {
 	  * get the corners of [this] Rect
 	  */
 	public function getCorners():Array<Point<T>> {
-		return [topLeft, topRight, bottomLeft, bottomRight];
+		return [getTopLeft(), getTopRight(), getBottomLeft(), getBottomRight()];
 	}
 
 	/**
