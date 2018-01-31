@@ -9,9 +9,13 @@ import tannus.ds.SortingTools.compresolve;
 import haxe.Serializer;
 import haxe.Unserializer;
 
+import haxe.macro.Expr;
+
 using Lambda;
 using tannus.ds.ArrayTools;
 using tannus.math.TMath;
+using haxe.macro.ExprTools;
+using tannus.macro.MacroTools;
 
 @:expose
 class Point <T:Float> implements IMultiPoint<T> implements IComparable<Point<T>> {
@@ -154,21 +158,32 @@ class Point <T:Float> implements IMultiPoint<T> implements IComparable<Point<T>>
       * get [this] with its values rounded
       */
 	public inline function round():Point<Int> {
-		return mutate( Math.round );
+		return trans(_.round());
 	}
 
 	/**
 	  * get [this] with its values 'floor'd
 	  */
 	public inline function floor():Point<Int> {
-		return mutate( Math.floor );
+	    return trans(_.floor());
 	}
 
 	/**
 	  * get [this] with its values 'ceil'd
 	  */
 	public inline function ceil():Point<Int> {
-		return mutate( Math.ceil );
+		//return new Point(x.ceil(), y.ceil(), z.ceil());
+		return trans(_.ceil());
+	}
+
+	public inline function int():Point<Int> {
+		//return new Point(x.int(), y.int(), z.int());
+		return trans(_.int());
+	}
+
+	public inline function float():Point<Float> {
+		//return new Point(x.float(), y.float(), z.float());
+		return trans(_.float());
 	}
 
     /**
@@ -209,6 +224,33 @@ class Point <T:Float> implements IMultiPoint<T> implements IComparable<Point<T>>
 	    inline function v():Dynamic return u.unserialize();
 
         set(v(), v(), v());
+	}
+
+	/**
+	  * apply a macro transformation to [this]
+	  */
+	public macro function trans<Out:Float>(self:ExprOf<Point<T>>, varArgs:Array<Expr>):ExprOf<Point<Out>> {
+	    var tx:Expr = macro $self.x;
+	    var ty:Expr = macro $self.y;
+	    var tz:Expr = macro $self.z;
+
+	    switch ( varArgs ) {
+	        // one transformation for all values
+            case [et]:
+                tx = et.replace(macro _, tx);
+                ty = et.replace(macro _, ty);
+                tz = et.replace(macro _, tz);
+
+            case [etx, ety, etz]:
+                tx = etx.replace(macro _, tx);
+                ty = ety.replace(macro _, ty);
+                tz = etz.replace(macro _, tz);
+
+            default:
+                throw 'Error: Invalid varargs for tannus.geom2.Point.trans';
+	    }
+
+	    return macro new tannus.geom2.Point($tx, $ty, $tz);
 	}
 
 /* === Computed Instance Fields === */
