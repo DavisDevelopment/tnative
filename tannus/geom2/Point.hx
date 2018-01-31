@@ -54,6 +54,14 @@ class Point <T:Float> implements IMultiPoint<T> implements IComparable<Point<T>>
 	public function dimensionality():Int {
 	    return 2;
 	}
+	public function getCoordinate(i: Int):T {
+	    return switch ( i ) {
+            case 0: x;
+            case 1: y;
+            case 2: z;
+            default: throw 'Error: OutOfBounds';
+	    }
+	}
 	public inline function copyFrom(other : Point<T>):Void {
 		x = other.x;
 		y = other.y;
