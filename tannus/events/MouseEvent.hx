@@ -1,7 +1,7 @@
 package tannus.events;
 
 import tannus.ds.Maybe;
-import tannus.geom.Point;
+import tannus.geom2.Point;
 
 import tannus.events.Event;
 import tannus.events.EventMod;
@@ -9,7 +9,7 @@ import tannus.events.EventMod;
 using Lambda;
 class MouseEvent extends Event {
 	/* Constructor Function */
-	public function new(type:String, pos:Point, ?btn:Int=-1, ?mods:Maybe<Array<EventMod>>=null):Void {
+	public function new(type:String, pos:Point<Float>, ?btn:Int=-1, ?mods:Maybe<Array<EventMod>>=null):Void {
 		super( type );
 
 		position = pos;
@@ -50,7 +50,7 @@ class MouseEvent extends Event {
 /* === Instance Fields === */
 
 	//- The coordinates of the Mouse
-	public var position : Point;
+	public var position : Point<Float>;
 
 	//- The ID of the Button
 	public var button : Int;
@@ -73,7 +73,7 @@ class MouseEvent extends Event {
 			mods.push( Control );
 		if (event.metaKey)
 			mods.push( Meta );
-		var pos = new Point(event.pageX, event.pageY);
+		var pos:Point<Float> = new Point(event.pageX, event.pageY);
 		
 		var e = new MouseEvent(event.type, pos, Std.int( event.which ), mods);
 		e.onCancelled.once(event.preventDefault);
@@ -103,7 +103,7 @@ class MouseEvent extends Event {
 			mods.push( Control );
 		if (event.metaKey)
 			mods.push( Meta );
-		var pos = new Point(event.pageX, event.pageY);
+		var pos:Point<Float> = cast new Point(event.pageX, event.pageY);
 		
 		var e = new MouseEvent(event.type, pos, event.which, mods);
 		e.onCancelled.once(event.preventDefault);
