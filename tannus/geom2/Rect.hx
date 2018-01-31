@@ -4,10 +4,12 @@ import tannus.ds.DataView;
 
 import Std.*;
 import tannus.math.TMath.*;
+import haxe.macro.Expr;
 
 using Lambda;
 using tannus.ds.ArrayTools;
 using tannus.math.TMath;
+using tannus.macro.MacroTools;
 
 @:expose
 class Rect <T:Float> {
@@ -60,7 +62,7 @@ class Rect <T:Float> {
 	/**
 	  * test whether [this] Rect is equal to [other]
 	  */
-	public function equals(o : Rect<T>):Bool {
+	public inline function equals(o : Rect<T>):Bool {
 		return (
 			(x == o.x) &&
 			(y == o.y) &&
@@ -69,10 +71,19 @@ class Rect <T:Float> {
 		);
 	}
 
+	public inline function nequals(o : Rect<T>):Bool {
+		return (
+			(x != o.x) ||
+			(y != o.y) ||
+			(w != o.w) ||
+			(h != o.h)
+		);
+	}
+
 	/**
 	  * check whether the given coordinates fall within [this] Rect
 	  */
-	public function contains(ox:Float, oy:Float):Bool {
+	public inline function contains(ox:Float, oy:Float):Bool {
 		return (
 			(ox > x && (ox < (x + w))) &&
 			(oy > y && (oy < (y + h)))
@@ -150,7 +161,7 @@ class Rect <T:Float> {
 	}
 
 	public inline function scaled(?sw:Float, ?sh:Float):Rect<Float> {
-	    return cast clone().scale(untyped sw, untyped sh);
+	    return clone().scale(untyped sw, untyped sh).float();
 	}
 
 	/**
@@ -167,8 +178,8 @@ class Rect <T:Float> {
 		return [x, y, w, h];
 	}
 
-	public inline function toRectangle():tannus.geom.Rectangle 
-		return tannus.geom.Rectangle.fromRect2D( this );
+	//public inline function toRectangle():tannus.geom.Rectangle 
+		//return tannus.geom.Rectangle.fromRect2D( this );
 
 	public function getTopLeft():Point<T> {
 	    return pt(x, y);
@@ -191,15 +202,44 @@ class Rect <T:Float> {
 	/**
 	  * Round [this] Rect
 	  */
-	public inline function round():Rect<Int> return apply(untyped Math.round);
-	public inline function floor():Rect<Int> return apply(untyped Math.floor);
-	public inline function ceil():Rect<Int> return apply(untyped Math.ceil);
+	public inline function int():Rect<Int> return trans(_.int());
+	public inline function float():Rect<Float> return trans(_.float());
+	public inline function round():Rect<Int> return trans(_.round());
+	public inline function floor():Rect<Int> return trans(_.floor());
+	public inline function ceil():Rect<Int> return trans(_.ceil());
 
 	/**
 	  * apply the given function to all values in [this] Rect
 	  */
 	private inline function apply<A:Float>(f : T->A):Rect<A> {
 		return new Rect(f(x), f(y), f(w), f(h));
+	}
+
+	public macro function trans<Out:Float>(self:ExprOf<Rect<T>>, varArgs:Array<Expr>):ExprOf<Rect<Out>> {
+	    var cargs:Array<Expr> = [macro $self.x, macro $self.y, macro $self.width, macro $self.height];
+	    var u:Expr = macro _;
+	    switch ( varArgs ) {
+            case [et]:
+                cargs = [
+                    et.replace(u, cargs[0]),
+                    et.replace(u, cargs[1]),
+                    et.replace(u, cargs[2]),
+                    et.replace(u, cargs[3])
+                ];
+
+            case [etx, ety, etw, eth]:
+                cargs = [
+                    etx.replace(u, cargs[0]),
+                    ety.replace(u, cargs[1]),
+                    etw.replace(u, cargs[2]),
+                    eth.replace(u, cargs[3])
+                ];
+
+            default:
+                throw 'Error: Invalid varargs to tannus.geom2.Rect.trans';
+	    }
+
+	    return macro new tannus.geom2.Rect($a{cargs});
 	}
 
 /* === Computed Instance Fields === */
@@ -232,22 +272,22 @@ class Rect <T:Float> {
 
 	public var centerX(get, set):Float;
 	private inline function get_centerX():Float return (x + (w / 2));
-	private function set_centerX(v : Float):Float {
-		x = cast Math.round(v - ((cast w) / 2));
-		return centerX;
+	private inline function set_centerX(v : Float):Float {
+	    return (x = (cast (v - w / 2)));
 	}
 
 	public var centerY(get, set):Float;
 	private inline function get_centerY():Float return (y + (h / 2));
-	private function set_centerY(v : Float):Float {
-		y = cast Math.round(v - ((cast h) / 2));
-		return centerY;
+	private inline function set_centerY(v : Float):Float {
+	    return (y = (cast (v - h / 2)));
 	}
 
 	public var center(get, set):Point<Float>;
+	@:deprecated
 	private function get_center():Point<Float> {
 		var z:Float = 0;
-		return LinkedPoint.create(centerX, centerY, z);
+		//return LinkedPoint.create(centerX, centerY, z);
+		return new Point(centerX, centerY);
 	}
 	private function set_center(v : Point<Float>):Point<Float> {
 		centerX = v.x;
