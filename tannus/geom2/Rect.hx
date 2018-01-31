@@ -53,11 +53,8 @@ class Rect <T:Float> {
 	/**
 	  * copy data from the given Rect<T>
 	  */
-	public function pull(src : Rect<T>):Void {
-		x = src.x;
-		y = src.y;
-		w = src.w;
-		h = src.h;
+	public inline function pull(src : Rect<T>):Void {
+	    set(src.x, src.y, src.width, src.height);
 	}
 
 	/**
