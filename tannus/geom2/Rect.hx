@@ -11,8 +11,27 @@ using tannus.ds.ArrayTools;
 using tannus.math.TMath;
 using tannus.macro.MacroTools;
 
+@:forward
+abstract Rect<T:Float> (CRect<T>) from CRect<T> to CRect<T> {
+	public inline function new(?x:T, ?y:T, ?width:T, ?height:T):Void {
+	    this = new CRect(x, y, width, height);
+	}
+
+	@:op(A == B)
+	public static inline function overloadedEq<T:Float>(a:Rect<T>, b:Rect<T>):Bool {
+	    throw 'EQ';
+	    return a.equals( b );
+	}
+
+	@:op(A != B)
+	public static inline function overloadedNeq<T:Float>(a:Rect<T>, b:Rect<T>):Bool {
+	    throw 'NEQ';
+	    return a.nequals( b );
+	}
+}
+
 @:expose
-class Rect <T:Float> {
+class CRect <T:Float> {
 	/* Constructor Function */
 	public function new(?x:T, ?y:T, ?width:T, ?height:T):Void {
 	    #if !js
