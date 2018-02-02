@@ -19,6 +19,9 @@ class Area <T:Float> implements IComparable<Area<T>> {
 		return new Area(width, height);
 	}
 
+	public inline function equals(o: Area<T>):Bool return (width == o.width && height == o.height);
+	public inline function nequals(o: Area<T>):Bool return (width != o.width || height != o.height);
+
     // stringify
 	public inline function toString():String {
 		return ('${width}x${height}');
