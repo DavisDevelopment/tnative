@@ -831,6 +831,19 @@ class ArrayTools {
         return v;
     }
 
+    /**
+      * filters out elements from [a], modifying [a] in place, and returning the filtered-out elements
+      */
+    public static function filterInPlace<T>(a:Array<T>, f:T->Bool):Array<T> {
+        //f = f.negate();
+        return reduce(a, function(purged:Array<T>, item:T):Array<T> {
+            if (f( item ) && a.remove( item )) {
+                purged.push( item );
+            }
+            return purged;
+        }, new Array());
+    }
+
 	#if macro
 
 	/**
