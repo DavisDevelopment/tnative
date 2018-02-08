@@ -70,7 +70,7 @@ class QueryString {
 		for (p in pairs) {
 			switch (p) {
 				case [_.urlDecode() => key, _.urlDecode() => val] if (ekey.match(key)):
-					var md = ekey.search(key)[0].slice(1);
+					var md = ekey.matches(key)[0].slice(1);
 					key = md[0];
 					var okey:String = md[1];
 					if (!res.exists(key))
@@ -78,7 +78,7 @@ class QueryString {
 					(new Object(res[key])).set(okey, val);
 
 				case [_.urlDecode() => key, _.urlDecode() => val] if (earr.match(key)):
-					var md = earr.search(key)[0].slice(1);
+					var md = earr.matches(key)[0].slice(1);
 					key = md[0];
 					var index:Null<Int> = parseInt(md[1]);
 					if (!res.exists(key))
