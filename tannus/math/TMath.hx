@@ -505,6 +505,26 @@ class TMath {
 		return res.toString();
 	}
 
+    static function baseParseInt(s:String, b:Int=10):Int {
+        var n:Int = s.length;
+        var total:Int = 0;
+        for (index in 0...s.length) {
+            --n;
+            total += int(baseGetDigitValue(s.charAt(index), b) * pow(b, n));
+        }
+        return total;
+    }
+
+    static function baseGetDigitValue(digit:String, base:Int=10):Int {
+        var dv:Int = _baseDigits.indexOf(digit);
+        if (dv == -1 || dv > base) {
+            throw 'Error: Invalid digit';
+        }
+        return dv;
+    }
+
+    private static var _baseDigits:String = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+
 	/**
 	  * Perform chain comparisons
 	  */
