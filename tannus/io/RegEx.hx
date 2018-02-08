@@ -1,9 +1,12 @@
 package tannus.io;
 
 import tannus.ds.Maybe;
-import tannus.io.impl.RegExMatch;
 
 using StringTools;
+using tannus.ds.StringUtils;
+using Lambda;
+using tannus.ds.ArrayTools;
+using tannus.FunctionTools;
 
 @:forward
 /* Abstraction layer on top of the EReg type */
@@ -19,139 +22,85 @@ abstract RegEx (EReg) from EReg to EReg {
 	  * Get an Array of all substrings of [text] which fit [this] pattern
 	  */
 	public function matches(text : String):Array<Array<String>> {
-		var ma:Array<Array<String>> = new Array();
+		return reduce(text, function(self:RegEx, all:Array<Array<String>>) {
+		    all.push(groups());
+		    return all;
+		}, new Array<Array<String>>());
+	}
 
-		this.map(text, function(e:EReg) {
-			var parts:Array<String> = new Array();
-			var i:Int = 0;
-			var matched:Bool = true;
+    /**
+      * calculate list of 'match'es
+      */
+	public function search(text:String):Array<RegExMatch> {
+	    return reduce(text, function(self:RegEx, matches:Array<RegExMatch>) {
+	        matches.push(currentMatch( text ));
+	        return matches;
+	    }, new Array<RegExMatch>());
+	}
 
-			while ( matched ) {
-				try {
-					var p = e.matched( i );
-					if (p == null) {
-						matched = false;
-						break;
-					}
-					parts.push( p );
-					i++;
-				} 
-				catch (err : Dynamic) {
-					matched = false;
-					break;
-				}
-			}
+    /**
+      * get list of matched capture-groups for the current match
+      (the first item in the list is the whole matched substring)
+      */
+	public function groups():Array<String> {
+	    var parts:Array<String> = new Array();
+	    var index:Int = 0;
+	    while ( true ) {
+	        try {
+	            var g = this.matched(index++);
+	            if (g == null)
+	                break;
+	            parts.push( g );
+	        }
+	        catch (error: Dynamic) {
+	            break;
+	        }
+	    }
+	    return parts;
+	}
 
-			ma.push( parts );
-			return '';
-		});
+    /**
+      * get [this]'s current Match object
+      */
+	public function currentMatch(txt: String):Null<RegExMatch> {
+	    var pos = this.matchedPos();
+	    return new RegExMatch(this, txt, pos.pos, pos.len, groups());
+	}
 
-		return ma;
+    /**
+      * same as EReg.map, but [f] receives a RegEx instance as argument
+      */
+	public inline function map(text:String, f:RegEx->String):String {
+	    return this.map(text, f);
 	}
 
 	/**
-	  * Get an Array of match objects
+	  * map by match
 	  */
-	public function allMatches(text : String):Array<RegExMatch> {
-		var all:Array<RegExMatch> = new Array();
-		this.map(text, function(e : EReg) {
-			var pos:Pos = mpos(e.matchedPos());
-			var groups:Array<String> = new Array();
-			var index:Int = 0;
-			var matched:Bool = true;
-
-			while ( matched ) {
-				try {
-					var s = e.matched( index );
-					if (s == null) {
-						matched = false;
-						break;
-					}
-					groups.push( s );
-					index++;
-				}
-				catch (error : Dynamic) {
-					matched = false;
-					break;
-				}
-			}
-
-			var matchedText:String = groups.shift();
-			var matchObject:RegExMatch = new RegExMatch(this, [text, matchedText], pos, groups);
-			all.push( matchObject );
-			return '';
-		});
-		return all;
+	public inline function mmap(text:String, f:RegExMatch->String):String {
+	    return map(text, function(self: RegEx) {
+	        return f(currentMatch( text ));
+	    });
 	}
 
-	private inline function mpos(p : ERegPos):Pos {
-		return {start: p.pos, len: p.len};
+    /**
+      * iterate over each match
+      */
+	public function iter(text:String, f:RegEx->Void):Void {
+	    map(text, function(me) {
+	        f( me );
+	        return '';
+	    });
 	}
 
-	/**
-	  * Alias to 'matches'
-	  */
-	public inline function search(s : String):Array<Array<String>> 
-		return matches( s );
-
-	/**
-	  * Extract the first [x] matches of [this] Pattern, if any
-	  */
-	public inline function extract(str:String, n:Int=0):Null<Array<String>> {
-		return (search(str)[n]);
-	}
-
-	/**
-	  * Extract only the grouped matches
-	  */
-	public inline function extractGroups(str:String, n:Int=0):Null<Array<String>> {
-		return search(str)[0].slice(1);
-	}
-
-	/**
-	  * Return an Array of RegExMatchs
-	  */
-	public function findAll(s : String):Array<Dynamic> {
-		var all:Array<Dynamic> = new Array();
-		this.map(s, function(e : EReg) {
-			var pos = e.matchedPos();
-
-			all.push({
-				'str' : s,
-				'pos' : e.matchedPos()
-			});
-
-			return s;
-		});
-		return all;
-	}
-
-	/**
-	  * Replace each match with some String
-	  */
-	public function replace(rtext:String, text:String) {
-		return this.map(rtext, function(e:EReg):String {
-			var i:Int = 0;
-			var whole:Null<String> = null;
-			var subs:Array<String> = [];
-			while (true) {
-				try {
-					var s:String = this.matched(i++);
-					if (whole == null)
-						whole = s;
-					else
-						subs.push( s );
-				}
-				catch (err : Dynamic) {
-					break;
-				}
-			}
-			var _t:String = text;
-			for (ii in 0...subs.length) {
-				_t = _t.replace('{{$ii}}', subs[ii]);
-			}
-			return _t;
-		});
+    /**
+      * 
+      */
+	public function reduce<TAcc>(text:String, f:RegEx->TAcc->TAcc, acc:TAcc):TAcc {
+	    iter(text, function(self) {
+	        acc = f(self, acc);
+	    });
+	    return acc;
 	}
 
 	/**
@@ -161,6 +110,22 @@ abstract RegEx (EReg) from EReg to EReg {
 	public function toTester():String->Bool {
 		return (this.match.bind(_));
 	}
+}
+
+class RegExMatch {
+    public var regex(default, null): RegEx;
+    public var string(default, null): String;
+    public var start(default, null): Int;
+    public var end(default, null): Int;
+    public var groups(default, null): Array<String>;
+
+    public inline function new(re:RegEx, s:String, x:Int, y:Int, g:Array<String>) {
+        regex = re;
+        string = s;
+        start = x;
+        end = y;
+        groups = g;
+    }
 }
 
 private typedef ERegPos = {pos:Int, len:Int};
