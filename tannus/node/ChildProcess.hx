@@ -9,9 +9,9 @@ extern class ChildProcess extends EventEmitter {
 	function send(message:Dynamic, ?callback:Function):Void;
 
 	var connected:Bool;
-	var stdin:WritableStream;
-	var stdout:ReadableStream;
-	var stderr:ReadableStream;
+	var stdin:Writable;
+	var stdout:Readable;
+	var stderr:Readable;
 
 	static function exec(cmd:String, options:Dynamic, callback:Null<Dynamic>->Buffer->Buffer->Void):ChildProcess;
 	static function execSync(cmd:String, ?opts:Dynamic):Buffer;

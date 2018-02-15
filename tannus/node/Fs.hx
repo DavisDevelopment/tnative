@@ -55,10 +55,10 @@ extern class Fs {
 	public static function chmod(path:String, mod:Int, callback:VoidCb):Void;
 
 	/* Open a Writable Stream to a File */
-	public static function createWriteStream(path:String, ?options:Dynamic):tannus.node.WritableStream;
+	public static function createWriteStream(path:String, ?options:CreateFsStreamOptions):tannus.node.WritableStream<Buffer>;
 
 	/* Open a Readable Stream from a File */
-	public static function createReadStream(path:String, ?options:CreateReadStreamOptions):FileReadStream;
+	public static function createReadStream(path:String, ?options:CreateFsStreamOptions):FileReadStream;
 
 	public static function openSync(path:String, flags:String):Int;
 	public static function readSync(id:Int, buffer:Buffer, offset:Int, length:Int, position:Int):Int;
@@ -94,15 +94,23 @@ extern class Stats {
 }
 
 @:jsRequire('fs', 'ReadStream')
-extern class FileReadStream extends ReadableStream {
+extern class FileReadStream extends ReadableStream<Buffer> {
     public var bytesRead: Int;
-    public var path: EitherType<String, Buffer>;
+    public var path: String;
 
     public inline function onOpen(cb: Int->Void):Void this.on('open', cb);
     //public inline function onClose(f: Void->Void):Void this.on('close', f);
 }
 
-typedef CreateReadStreamOptions = {
+@:jsRequire('fs', 'WriteStream')
+extern class FileWriteStream extends WritableStream<Buffer> {
+    public var bytesWritten: Int;
+    public var path: String;
+
+    public inline function onOpen(cb: Int->Void):Void this.on('open', cb);
+}
+
+typedef CreateFsStreamOptions = {
     ?flags: String,
     ?encoding: String,
     ?fd: Int,
