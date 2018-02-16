@@ -9,6 +9,26 @@ class IteratorTools {
 	public static inline function map<A, B>(iterator:Iterator<A>, mapper:A->B):Iterator<B> {
 		return new FunctionalIterator(iterator, mapper);
 	}
+
+	/**
+	  * reduce an Iterator
+	  */
+	public static inline function reduce<T, TAcc>(iterator:Iterator<T>, f:TAcc->T->TAcc, acc:TAcc):TAcc {
+	    while (iterator.hasNext()) {
+	        acc = f(acc, iterator.next());
+	    }
+	    return acc;
+	}
+
+	/**
+	  * read an Iterator into an Array
+	  */
+	public static function array<T>(iterator: Iterator<T>):Array<T> {
+	    var a = [];
+	    for (x in iterator)
+	        a.push( x );
+	    return (a:Array<T>);
+	}
 }
 
 private class FunctionalIterator<A, B> {
