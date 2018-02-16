@@ -19,11 +19,15 @@ extern class WritableStream<Data> extends EventEmitter {
 	function cork():Void;
 	function uncork():Void;
 	function setDefaultEncoding(enc : String):Void;
+	function destroy(?error: Dynamic):Void;
 
 	@:overload(function(chunk:Data, ?cb:Function):Void {})
 	@:overload(function(chunk:Data, ?enc:String):Void {})
 	@:overload(function(cb:Function):Void {})
 	function end(?chunk:Data, ?encoding:String, ?cb:Function):Void;
+
+	public var writableHighWaterMark: Int;
+	public var writableLength: Int;
 
 /* === Implementation === */
 
@@ -50,6 +54,7 @@ typedef WritableStreamOptions = {
     ?highWaterMark: Int,
     ?decodeStrings: String,
     ?objectMode: Bool,
+    ?encoding: String,
     ?write: Function,
     ?writev: Function,
     ?destroy: Function
