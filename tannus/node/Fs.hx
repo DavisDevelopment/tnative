@@ -55,7 +55,7 @@ extern class Fs {
 	public static function chmod(path:String, mod:Int, callback:VoidCb):Void;
 
 	/* Open a Writable Stream to a File */
-	public static function createWriteStream(path:String, ?options:CreateFsStreamOptions):tannus.node.WritableStream<Buffer>;
+	public static function createWriteStream(path:String, ?options:CreateFsStreamOptions):FileWriteStream;
 
 	/* Open a Readable Stream from a File */
 	public static function createReadStream(path:String, ?options:CreateFsStreamOptions):FileReadStream;
