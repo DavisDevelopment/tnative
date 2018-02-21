@@ -556,9 +556,14 @@ class TMath {
 		return 0;
 	}
 
+    #if !js @:generic #end
+	public static inline function abs<T:Float>(v: T):T {
+	    return (v < 0 ? -v : v);
+	}
+
 /* === Standard Library's Math class mixins === */
 
-	public static inline function abs(v : Float):Float return Math.abs( v );
+	//public static inline function abs(v : Float):Float return Math.abs( v );
 	public static inline function acos(v:Float):Float return Math.acos( v );
 	public static inline function asin(v:Float):Float return Math.asin( v );
 	public static inline function atan(v:Float):Float return Math.atan( v );
