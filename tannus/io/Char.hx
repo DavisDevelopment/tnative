@@ -92,7 +92,7 @@ abstract Char (String) from String to String {
                     }
 
                 case EConst(Constant.CInt( v )):
-                    strings.push(macro $v{v});
+                    strings.push(macro String.fromCharCode(Std.parseInt($v{v})));
 
                 case EConst(Constant.CIdent(_)):
                     strings.push(macro Std.string($e).charAt( 0 ));
