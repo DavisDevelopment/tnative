@@ -12,15 +12,28 @@ class Asserts {
 	/**
 	  * Verify that [condition] evaluates to 'true', and if it doesn't, throw [error]
 	  */
-	public static macro function assert(condition:ExprOf<Bool>, error:Expr) {
-		return macro {
-			if ($condition) {
-				null;
-			}
-			else {
+	public static macro function assert(condition:ExprOf<Bool>, args:Array<Expr>) {
+	    var error:Expr, msg:Null<Array<Expr>> = null;
+	    if (args.length >= 1) {
+	        error = args.shift();
+	    }
+	    if (args.length > 0) {
+	        msg = args;
+	    }
+
+		var res:Expr = macro {
+		    var _as_co:Bool = {$condition;};
+			if ( !_as_co ) {
 				throw $error;
 			}
 		};
+		if (msg != null) {
+		    res = macro {
+		        $res;
+		        trace($a{msg});
+		    };
+        }
+        return res;
 	}
 
 	/**

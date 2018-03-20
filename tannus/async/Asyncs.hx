@@ -3,10 +3,15 @@ package tannus.async;
 import tannus.ds.Promise;
 import tannus.ds.Stack;
 
+import haxe.macro.Expr;
+import haxe.macro.Context;
+
 using Lambda;
 using Slambda;
 using tannus.ds.ArrayTools;
 using tannus.math.TMath;
+using haxe.macro.ExprTools;
+using tannus.macro.MacroTools;
 //using tannus.async.VoidAsyncs;
 
 /*
@@ -41,6 +46,9 @@ class Asyncs {
         next();
     }
 
+    /**
+      * execute all asyncs simultaneously, and invoke [done] when they're all complete
+      */
     public static function callEach<T>(i:Iterable<Async<T>>, done:Cb<Array<T>>):Void {
         var index = [0, 0];
         var values = [];
@@ -68,9 +76,12 @@ class Asyncs {
         return new Async( asyn ).promiser();
     }
 
-    public static inline function toAsync<T>(promise:Promise<T>, done:Cb<T>):Void {
-        promise.then(done.yield());
-        promise.unless(done.raise());
+    public static inline function toAsync<T>(promise:Promise<T>, ?done:Cb<T>):Promise<T> {
+        if (done != null) {
+            promise.then(done.yield());
+            promise.unless(done.raise());
+        }
+        return promise;
     }
 }
 

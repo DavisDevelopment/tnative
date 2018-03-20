@@ -16,6 +16,7 @@ using tannus.math.TMath;
 using haxe.macro.ExprTools;
 using tannus.macro.MacroTools;
 
+@:deprecated
 class LinkedPoint<T:Float> extends Point<T> {
 	/* Constructor Function */
 	public function new(x_ref:Ptr<T>, y_ref:Ptr<T>, z_ref:Ptr<T>):Void {

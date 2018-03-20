@@ -1,11 +1,3 @@
 package tannus.sys.node;
 
-@:jsRequire('fs', 'Stats')
-extern class NodeFStat {
-	public function isFile():Bool;
-	public function isDirectory():Bool;
-
-	public var size : Int;
-	public var mtime : Dynamic;
-	public var ctime : Dynamic;
-}
+typedef NodeFStat = tannus.node.Fs.Stats;

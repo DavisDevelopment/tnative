@@ -55,6 +55,12 @@ abstract Setter<T> (Set<T>) from Set<T> {
 		});
 	}
 
+    @:native('_void') @:to
+	public static inline function void<T>(self: Setter<T>):T -> Void {
+		//#if (js||flash||python||lua||java)
+        return (untyped self);
+	}
+
 	/**
 	  * Assign the value
 	  */

@@ -47,7 +47,14 @@ class NodeFileSystem {
         }
 	}
 
-	public static function copy(src:Path, dest:Path, cb:Null<Dynamic>->Void):Void {
+	public static inline function copy(src:String, dest:String):Void {
+	    try {
+            NFS.copyFileSync(src, dest);
+        }
+        catch (error: Dynamic) {
+            NFS.writeFileSync(dest, NFS.readFileSync(src));
+        }
+	    /*
 		var cbCalled:Bool = false;
 		function done(?err : Dynamic):Void {
 			if (!cbCalled) {
@@ -66,6 +73,7 @@ class NodeFileSystem {
 			done();
 		});
 		rd.pipe( wr );
+		*/
 	}
 
 	public static function append(path:String, data:ByteArray):Void {
@@ -77,7 +85,7 @@ class NodeFileSystem {
 		a.close();
 	}
 
-	public static function deleteFile(path : String):Void {
+	public static inline function deleteFile(path : String):Void {
 		NFS.unlinkSync(path);
 	}
 

@@ -15,7 +15,8 @@ using tannus.ds.StringUtils;
 
 @:forward
 abstract GlobStar (CGlobStar) from CGlobStar {
-	public inline function new(s : String, flags:String=''):Void {
+    /* Constructor Function */
+	public inline function new(s:String, flags:String=''):Void {
 		this = new CGlobStar(s, flags);
 	}
 
@@ -41,8 +42,8 @@ class CGlobStar {
 	  * Test a Path against [this] GlobStar
 	  */
 	public function test(path : String):Bool {
-		return pattern.match(path);
-		var data = pattern.search( path );
+		return pattern.match( path );
+		var data = pattern.matches( path );
 		if (data.length == 0)
 			return false;
 		else {

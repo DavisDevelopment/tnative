@@ -3,26 +3,23 @@ package tannus.html;
 import js.Browser.window in win;
 import js.html.Window in CWin;
 
-import tannus.ds.Object;
-import tannus.ds.Obj;
-import tannus.ds.Maybe;
-import tannus.ds.Range;
-import tannus.io.Ptr;
-import tannus.io.Setter;
-import tannus.io.Getter;
-import tannus.io.Signal;
+import tannus.io.*;
+import tannus.ds.*;
 import tannus.events.KeyboardEvent;
 import tannus.events.EventMod;
 import tannus.html.fs.WebFileSystem;
+import tannus.html.JSTools;
 
-import tannus.geom.Point;
-import tannus.geom.Rectangle;
-import tannus.geom.Angle;
-import tannus.geom.Area;
-import tannus.geom.Velocity;
+import tannus.geom2.*;
+
+import haxe.extern.EitherType;
+import haxe.Constraints.Function;
 
 using StringTools;
-using Lambda;
+using tannus.ds.StringUtils;
+using Slambda;
+using tannus.ds.ArrayTools;
+using tannus.html.JSTools;
 
 @:forward
 abstract Win (CWin) from CWin to CWin {
@@ -36,10 +33,10 @@ abstract Win (CWin) from CWin to CWin {
 	/**
 	  * Listen for 'scroll' events on [this] Window
 	  */
-	public function onScroll():Signal<Point> {
-		var sig:Signal<Point> = new Signal();
+	public function onScroll():Signal<Point<Float>> {
+		var sig:Signal<Point<Float>> = new Signal();
 		var handlr = function(event) {
-			var scroll:Point = new Point(this.scrollX, this.scrollY);
+			var scroll:Point<Float> = cast new Point(this.scrollX, this.scrollY);
 
 			sig.call( scroll );
 		};
@@ -51,8 +48,8 @@ abstract Win (CWin) from CWin to CWin {
 	/**
 	  * Listen for 'resize' events on [this] Window
 	  */
-	public function onResize():Signal<Area> {
-		var sig:Signal<Area> = new Signal();
+	public function onResize():Signal<Area<Float>> {
+		var sig:Signal<Area<Float>> = new Signal();
 		var handlr = function(event) {
 			var area = new Area(this.innerWidth, this.innerHeight);
 
@@ -158,16 +155,22 @@ abstract Win (CWin) from CWin to CWin {
 		return untyped this[name];
 	}
 
+	public inline function fetch() {
+	    //
+	}
 
 /* === Instance Fields === */
 
 	/**
 	  * The current viewport
 	  */
-	public var viewport(get, never):Rectangle;
-	private inline function get_viewport():Rectangle {
-		return new Rectangle(this.scrollX, this.scrollY, this.innerWidth, this.innerHeight);
+	public var viewport(get, never):Rect<Float>;
+	private inline function get_viewport():Rect<Float> {
+		return cast new Rect(this.scrollX, this.scrollY, this.innerWidth, this.innerHeight);
 	}
+
+	public var visualViewport(get, never):Null<VisualViewport>;
+	private inline function get_visualViewport():Null<VisualViewport> return get('visualViewport');
 
 	/**
 	  * [this] Window, as an object
@@ -186,3 +189,38 @@ abstract Win (CWin) from CWin to CWin {
 	public static var current(get, never):Win;
 	private static inline function get_current() return new Win();
 }
+
+@:native('VisualViewport')
+extern class VisualViewport extends js.html.EventTarget {
+    public var offsetLeft(default, null): Int;
+    public var offsetTop(default, null): Int;
+    public var pageLeft(default, null): Int;
+    public var pageTop(default, null): Int;
+    public var width(default, null): Int;
+    public var height(default, null): Int;
+    public var clientWidth(default, null): Int;
+    public var clientHeight(default, null): Int;
+    public var scale(default, null): Int;
+
+    public var onresize: Null<Function>;
+    public var onscroll: Null<Function>;
+
+    private static inline function or(?a:Int, ?b:Int, c:Int):Int {
+        return (untyped __js__('{0} || {1} || {2}', a, b, c));
+    }
+
+    public inline function getRect():Rect<Int> {
+        return new Rect(pageLeft, pageTop, or(width, clientWidth, 0), or(height, clientHeight, 0));
+    }
+
+    public static inline function isSupported():Bool {
+        return untyped __js__('(typeof {0} !== "undefined") && ({1} in {2})', VisualViewport, "visualViewport", win);
+    }
+}
+
+@:native('Request')
+extern class FetchRequest {
+    public function new(input:EitherType<String, FetchRequest>, ?init:RequestInit):Void;
+}
+
+typedef RequestInit = { };

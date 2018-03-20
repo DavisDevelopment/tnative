@@ -70,4 +70,45 @@ class VoidAsyncs {
     public static macro function forward(callback:ExprOf<VoidCb>, error:ExprOf<Null<Dynamic>>) {
         return macro if ($error != null) return $callback( $error );
     }
+
+    public static macro function attemptWith(callback:ExprOf<VoidCb>, action:Expr) {
+        action = action.replace(macro _cb_, callback);
+        return macro {
+            try {
+                $action;
+            }
+            catch (error: Dynamic) {
+                $callback( error );
+            }
+        };
+    }
+
+    public static macro function sub(callback:ExprOf<VoidCb>, action:Expr):ExprOf<VoidCb> {
+        action = action.replace(macro _cb_, callback);
+        var efunc:ExprOf<VoidCb> = (macro function(?error: Dynamic) {
+            if (error != null) {
+                return $callback( error );
+            }
+            else {
+                try {
+                    $action;
+                }
+                catch (error: Dynamic) {
+                    return $callback( error );
+                }
+            }
+        });
+        return efunc;
+    }
+
+    public static function toPromise(f: VoidCb->Void):VoidPromise {
+        return new VoidAsync( f ).promise();
+    }
+
+    public static function toAsync(promise:VoidPromise, ?callback:VoidCb):VoidPromise {
+        if (callback != null) {
+            promise.then(callback.void(), callback.raise());
+        }
+        return promise;
+    }
 }

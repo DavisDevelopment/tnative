@@ -6,6 +6,7 @@ import tannus.geom.Shape;
 import tannus.geom.Vertices;
 
 using Lambda;
+
 class Polygon implements Shape {
 	/* Constructor Function */
 	public function new():Void {

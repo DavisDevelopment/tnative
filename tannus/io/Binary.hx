@@ -10,6 +10,8 @@ import tannus.sys.Mime;
 import tannus.math.TMath;
 import tannus.ds.Obj;
 
+import tannus.math.TMath.*;
+
 import haxe.Int64;
 import haxe.io.*;
 
@@ -20,6 +22,7 @@ using Lambda;
 using StringTools;
 using tannus.ds.StringUtils;
 using tannus.ds.ArrayTools;
+using tannus.math.TMath;
 
 #if js
 class Binary implements tannus.html.Blobable {
@@ -374,13 +377,32 @@ class Binary {
 	}
 
 	/* shift all bytes in [this] data [digits] to the left */
-	public function shiftLeft(digits : Int):Void {
-		var rpad:Binary = _alloc( digits );
-		rpad.fill( 0 );
-		var backward:ByteArray = slice( digits ).concat( rpad );
-		grow( digits );
-		//b = backward.b;
-		setData( backward.b );
+	public function shiftLeft(digits:Int, pad:Bool=true):Void {
+	    if ( pad ) {
+            var rpad:Binary = _alloc( digits );
+            rpad.fill( 0 );
+            var backward:ByteArray = slice( digits ).concat( rpad );
+            grow( digits );
+            //b = backward.b;
+            setData( backward.b );
+        }
+        else {
+            var trunc = slice( digits );
+            resize( trunc.length );
+            setData( trunc.b );
+        }
+	}
+
+	/* truncate [this] */
+	public function truncate(len: Int):Void {
+	    if (!(!len.isNaN() && len.isFinite()) || len > length || len < 0) {
+	        throw 'BinaryError: Invalid truncation length ($len)';
+	    }
+        else if (len < length) {
+            //shiftLeft((length - len), false);
+            setData(sub(0, len).b);
+            resize( len );
+        }
 	}
 
 	/* get a subset of [this] data */
@@ -393,6 +415,37 @@ class Binary {
 		return sub(min, ((max != null ? max : length) - min));
 	}
 
+    /**
+      * performs splice operation on [this]
+      */
+	public function splice(pos:Int, len:Int):ByteArray {
+	    if (len < 0 || pos > length) {
+	        return ByteArray.alloc( 0 );
+	    }
+        else {
+            if (pos < 0)
+                pos = (length + pos);
+            if (pos < 0)
+                pos = 0;
+            len = TMath.min(len, (length - pos));
+            var max = (pos + len);
+            var result = slice(pos, (max + 1));
+            if (pos == 0) {
+                var remainder = slice(max + 1);
+                rebase( remainder );
+            }
+            else {
+                var pre:ByteArray, post:ByteArray;
+                pre = slice(0, (pos - 1));
+                post = slice(max + 1);
+                blit(0, pre, 0, pre.length);
+                blit(pre.length, post, 0, post.length);
+                truncate(pre.length + post.length);
+            }
+            return result;
+        }
+	}
+
 	/* copy another Binary onto [this] one */
 	public function blit(index:Int, src:Binary, srcIndex:Int, size:Int):Void {
 		throw 'Not implemented';
@@ -401,6 +454,12 @@ class Binary {
 	/* resize [this] Binary data */
 	public function resize(size : Int):Void {
 		_length = size;
+	}
+
+    /* alter [this] such that it becomes identical to [x] */
+	private function rebase(x: Binary):Void {
+	    setData(x.getData());
+	    resize( x.length );
 	}
 
 	/* reverse [this] data in-place */
@@ -496,6 +555,23 @@ class Binary {
 	}
 #end
 
+    /* lexicographically compare [this] to [other] */
+    public function compareTo(other: Binary):Int {
+        var compLen = TMath.min(length, other.length);
+        return _compare(this, other, 0, 0, compLen);
+    }
+
+    public function indexOf(sub: ByteArray):Int {
+        var ilen = (length - sub.length);
+        for (index in 0...ilen) {
+            var c = _compare(this, sub, index, 0, sub.length);
+            if (c == 0) {
+                return index;
+            }
+        }
+        return -1;
+    }
+
 	/* check if [this] and [other] are equivalent in content */
 	public function equals(other : Binary):Bool {
 		if (length != other.length)
@@ -534,6 +610,19 @@ class Binary {
 	@:protected
 	private inline function _ofString(s : String):ByteArray {
 		return ((untyped Reflect.getProperty(Type.getClass(this), 'ofString'))( s ));
+	}
+
+	@:protected
+	private function _compare(a:Binary, b:Binary, posA:Int, posB:Int, len:Int):Int {
+	    inline function ic(a:Int, b:Int):Int return (a == b) ? 0 : ((a > b) ? 1 : -1);
+	    var c: Int;
+	    for (index in 0...len) {
+	        c = ic(a.get(posA + index).asint, b.get(posB + index).asint);
+	        if (c != 0) {
+	            return c;
+	        }
+	    }
+	    return 0;
 	}
 
 	/* === Computed Instance Fields === */

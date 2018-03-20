@@ -176,6 +176,31 @@ class ArrayTools {
 	}
 
     /**
+      * picks from two arrays based on the given [check] function
+      */
+	public static function or<T>(a:Array<T>, b:Array<T>, ?test:Array<T>->Bool):Array<T> {
+	    if (test != null) {
+	        return (if (test( a )) a else b);
+	    }
+        else {
+            if (empty( a )) {
+                return b;
+            }
+            return a;
+        }
+	}
+
+    /**
+      * 
+      */
+	public static inline function notEmpty<T>(a:Array<T>, defaultVal:Array<T>, hasContent:Bool=false):Array<T> {
+	    if ((hasContent && !ArrayTools.hasContent( a )) || empty( a )) {
+	        return defaultVal;
+	    }
+        return a;
+	}
+
+    /**
       *
       */
     public static function rotate<T>(a : Array<Array<T>>) : Array<Array<T>> {
@@ -704,19 +729,13 @@ class ArrayTools {
 	  * break the given Array into chunks of [size] length
 	  */
 	public static function chunk<T>(array:Array<T>, size:Int):Array<Array<T>> {
-		var chunks = new Array();
-		var chunk = new Array();
-		for (item in array) {
-			if (chunk.length == size) {
-				chunks.push( chunk );
-				chunk = new Array();
-			}
-			else {
-				chunk.push( item );
-			}
-		}
-		if (chunk.length > 0) {
-			chunks.push( chunk );
+		var chunks = [], ch = [];
+		for (x in array) {
+		    ch.push( x );
+		    if (ch.length == size) {
+		        chunks.push( ch );
+		        ch = [];
+		    }
 		}
 		return chunks;
 	}
@@ -791,6 +810,39 @@ class ArrayTools {
 	public static function all<T>(items:Iterable<T>, test:T->Bool):Bool {
 	    return !any(items, test.negate());
 	}
+
+    public static function reduce<T, TAcc>(a:Iterable<T>, f:TAcc->T->TAcc, v:TAcc):TAcc {
+        for (x in a) {
+            v = f(v, x);
+        }
+        return v;
+    }
+
+    public static function reducei<T,TAcc>(a:Array<T>, f:TAcc->T->Int->TAcc, v:TAcc):TAcc {
+        for (i in 0...a.length)
+            v = f(v, a[i], i);
+        return v;
+    }
+
+    public static inline function reduceRight<T,TAcc>(a:Array<T>, f:TAcc->T->TAcc, v:TAcc):TAcc {
+        var i:Int = a.length;
+        while (--i >= 0)
+            v = f(v, a[i]);
+        return v;
+    }
+
+    /**
+      * filters out elements from [a], modifying [a] in place, and returning the filtered-out elements
+      */
+    public static function filterInPlace<T>(a:Array<T>, f:T->Bool):Array<T> {
+        //f = f.negate();
+        return reduce(a, function(purged:Array<T>, item:T):Array<T> {
+            if (f( item ) && a.remove( item )) {
+                purged.push( item );
+            }
+            return purged;
+        }, new Array());
+    }
 
 	#if macro
 

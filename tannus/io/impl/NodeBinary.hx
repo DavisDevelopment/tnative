@@ -99,6 +99,10 @@ class NodeBinary extends Binary {
 		}
 	}
 
+	override function truncate(len: Int):Void {
+	    setData(b = b.slice(0, len));
+	}
+
 	/**
 	  * return the sum of [this] data and another
 	  */

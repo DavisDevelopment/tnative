@@ -4,12 +4,32 @@ import tannus.ds.DataView;
 
 import Std.*;
 import tannus.math.TMath.*;
+import haxe.macro.Expr;
 
 using Lambda;
 using tannus.ds.ArrayTools;
 using tannus.math.TMath;
+using tannus.macro.MacroTools;
 
-@:expose
+/*
+@:forward
+abstract Rect<T:Float> (CRect<T>) from CRect<T> to CRect<T> {
+	public inline function new(?x:T, ?y:T, ?width:T, ?height:T):Void {
+	    this = new CRect(x, y, width, height);
+	}
+
+	@:op(A == B)
+	public static inline function overloadedEq<T:Float>(a:Rect<T>, b:Rect<T>):Bool {
+	    return a.equals( b );
+	}
+
+	@:op(A != B)
+	public static inline function overloadedNeq<T:Float>(a:Rect<T>, b:Rect<T>):Bool {
+	    return a.nequals( b );
+	}
+}
+*/
+
 class Rect <T:Float> {
 	/* Constructor Function */
 	public function new(?x:T, ?y:T, ?width:T, ?height:T):Void {
@@ -43,20 +63,27 @@ class Rect <T:Float> {
 		return new Rect(x, y, w, h);
 	}
 
+    /**
+      * set [this] Rect's state
+      */
+	public inline function set(nx:T, ny:T, nw:T, nh:T):Void {
+	    x = nx;
+	    y = ny;
+	    width = nw;
+	    height = nh;
+	}
+
 	/**
 	  * copy data from the given Rect<T>
 	  */
-	public function pull(src : Rect<T>):Void {
-		x = src.x;
-		y = src.y;
-		w = src.w;
-		h = src.h;
+	public inline function pull(src : Rect<T>):Void {
+	    set(src.x, src.y, src.width, src.height);
 	}
 
 	/**
 	  * test whether [this] Rect is equal to [other]
 	  */
-	public function equals(o : Rect<T>):Bool {
+	public inline function equals(o : Rect<T>):Bool {
 		return (
 			(x == o.x) &&
 			(y == o.y) &&
@@ -65,10 +92,19 @@ class Rect <T:Float> {
 		);
 	}
 
+	public inline function nequals(o : Rect<T>):Bool {
+		return (
+			(x != o.x) ||
+			(y != o.y) ||
+			(w != o.w) ||
+			(h != o.h)
+		);
+	}
+
 	/**
 	  * check whether the given coordinates fall within [this] Rect
 	  */
-	public function contains(ox:Float, oy:Float):Bool {
+	public inline function contains(ox:Float, oy:Float):Bool {
 		return (
 			(ox > x && (ox < (x + w))) &&
 			(oy > y && (oy < (y + h)))
@@ -86,7 +122,7 @@ class Rect <T:Float> {
 	  * get the corners of [this] Rect
 	  */
 	public function getCorners():Array<Point<T>> {
-		return [topLeft, topRight, bottomLeft, bottomRight];
+		return [getTopLeft(), getTopRight(), getBottomLeft(), getBottomRight()];
 	}
 
 	/**
@@ -130,6 +166,25 @@ class Rect <T:Float> {
 		y -= Math.round(dh / 2);
 	}
 
+	public function scale(?sw:T, ?sh:T):Rect<T> {
+	    var ratio:Float;
+	    if (sw != null) {
+	        ratio = (sw / width);
+	        width = sw;
+	        height = (untyped ratio * height);
+	    }
+        else if (sh != null) {
+            ratio = (sh / height);
+            height = sh;
+            width = (untyped ratio * width);
+        }
+        return this;
+	}
+
+	public inline function scaled(?sw:Float, ?sh:Float):Rect<Float> {
+	    return clone().scale(untyped sw, untyped sh).float();
+	}
+
 	/**
 	  * Convert [this] Rect to a String
 	  */
@@ -144,38 +199,68 @@ class Rect <T:Float> {
 		return [x, y, w, h];
 	}
 
-	public inline function toRectangle():tannus.geom.Rectangle 
-		return tannus.geom.Rectangle.fromRect2D( this );
+	//public inline function toRectangle():tannus.geom.Rectangle 
+		//return tannus.geom.Rectangle.fromRect2D( this );
 
-	/**
-	  * Scale [this] Rect
-	  */
-	public function scale(?sw:Float, ?sh:Float):Rect<Float> {
-		if (sw != null) {
-			var ratio:Float = (sw / width);
-			return cast new Rect(x, y, untyped sw, untyped (ratio * height));
-		}
-		else if (sh != null) {
-			var ratio:Float = (sh / height);
-			return cast new Rect(x, y, untyped (ratio * width), untyped sh);
-		}
-		else {
-			return cast new Rect(x, y, w, h);
-		}
+	public function getTopLeft():Point<T> {
+	    return pt(x, y);
 	}
+
+	public function getTopRight():Point<T> {
+	    return pt(x+w, y);
+	}
+
+	public function getBottomLeft():Point<T> {
+	    return pt(x, y+h);
+	}
+
+	public function getBottomRight():Point<T> {
+	    return pt(x+w, y+h);
+	}
+
+	private static inline function pt<T:Float>(x:T, y:T):Point<T> { return new Point(x, y); }
 
 	/**
 	  * Round [this] Rect
 	  */
-	public inline function round():Rect<Int> return apply(untyped Math.round);
-	public inline function floor():Rect<Int> return apply(untyped Math.floor);
-	public inline function ceil():Rect<Int> return apply(untyped Math.ceil);
+	public inline function int():Rect<Int> return trans(_.int());
+	public inline function float():Rect<Float> return trans(_.float());
+	public inline function round():Rect<Int> return trans(_.round());
+	public inline function floor():Rect<Int> return trans(_.floor());
+	public inline function ceil():Rect<Int> return trans(_.ceil());
 
 	/**
 	  * apply the given function to all values in [this] Rect
 	  */
 	private inline function apply<A:Float>(f : T->A):Rect<A> {
 		return new Rect(f(x), f(y), f(w), f(h));
+	}
+
+	public macro function trans<Out:Float>(self:ExprOf<Rect<T>>, varArgs:Array<Expr>):ExprOf<Rect<Out>> {
+	    var cargs:Array<Expr> = [macro $self.x, macro $self.y, macro $self.width, macro $self.height];
+	    var u:Expr = macro _;
+	    switch ( varArgs ) {
+            case [et]:
+                cargs = [
+                    et.replace(u, cargs[0]),
+                    et.replace(u, cargs[1]),
+                    et.replace(u, cargs[2]),
+                    et.replace(u, cargs[3])
+                ];
+
+            case [etx, ety, etw, eth]:
+                cargs = [
+                    etx.replace(u, cargs[0]),
+                    ety.replace(u, cargs[1]),
+                    etw.replace(u, cargs[2]),
+                    eth.replace(u, cargs[3])
+                ];
+
+            default:
+                throw 'Error: Invalid varargs to tannus.geom2.Rect.trans';
+	    }
+
+	    return macro new tannus.geom2.Rect($a{cargs});
 	}
 
 /* === Computed Instance Fields === */
@@ -206,62 +291,24 @@ class Rect <T:Float> {
 	private inline function get_h():T return height;
 	private inline function set_h(v : T):T return (height = v);
 
-	public var topLeft(get, set):Point<T>;
-	private inline function get_topLeft():Point<T> return new Point(x, y);
-	private function set_topLeft(p : Point<T>):Point<T> {
-		x = p.x;
-		y = p.y;
-		return topLeft;
-	}
-
-	public var topRight(get, set):Point<T>;
-	private inline function get_topRight():Point<T> {
-		return new Point((x + w), y);
-	}
-	private function set_topRight(p : Point<T>):Point<T> {
-		x = untyped (p.x - w);
-		y = p.y;
-		return topRight;
-	}
-
-	public var bottomLeft(get, set):Point<T>;
-	private inline function get_bottomLeft():Point<T> {
-		return new Point(x, (y + h));
-	}
-	private function set_bottomLeft(p : Point<T>):Point<T> {
-		x = p.x;
-		y = untyped (p.y - h);
-		return bottomLeft;
-	}
-
-	public var bottomRight(get, set):Point<T>;
-	private inline function get_bottomRight():Point<T> {
-		return new Point((x + w), (y + h));
-	}
-	private function set_bottomRight(p : Point<T>):Point<T> {
-		x = untyped (p.x - w);
-		y = untyped (p.y - h);
-		return bottomRight;
-	}
-
 	public var centerX(get, set):Float;
 	private inline function get_centerX():Float return (x + (w / 2));
-	private function set_centerX(v : Float):Float {
-		x = cast Math.round(v - ((cast w) / 2));
-		return centerX;
+	private inline function set_centerX(v : Float):Float {
+	    return (x = (cast (v - w / 2)));
 	}
 
 	public var centerY(get, set):Float;
 	private inline function get_centerY():Float return (y + (h / 2));
-	private function set_centerY(v : Float):Float {
-		y = cast Math.round(v - ((cast h) / 2));
-		return centerY;
+	private inline function set_centerY(v : Float):Float {
+	    return (y = (cast (v - h / 2)));
 	}
 
 	public var center(get, set):Point<Float>;
+	@:deprecated
 	private function get_center():Point<Float> {
 		var z:Float = 0;
-		return LinkedPoint.create(centerX, centerY, z);
+		//return LinkedPoint.create(centerX, centerY, z);
+		return new Point(centerX, centerY);
 	}
 	private function set_center(v : Point<Float>):Point<Float> {
 		centerX = v.x;

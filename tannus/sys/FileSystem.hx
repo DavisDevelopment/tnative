@@ -161,14 +161,8 @@ class FileSystem {
 	/**
 	  * Copies [src] to [target]
 	  */
-	public static function copy(src:String, target:String, cb:Null<Dynamic>->Void):Void {
-		try {
-			F.copy(src, target);
-			cb( null );
-		}
-		catch (err : Dynamic) {
-			cb( err );
-		}
+	public static function copy(src:String, target:String):Void {
+        F.copy(src, target);
 	}
 
 	/**

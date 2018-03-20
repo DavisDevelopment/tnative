@@ -14,32 +14,13 @@ using Slambda;
 class Triangle<T:Float> {
 	/* Constructor Function */
 	public function new(?one:Point<T>, ?two:Point<T>, ?three:Point<T>):Void {
-	    /*
-		// initialize core data
-		a_x = cast 0;
-		a_y = cast 0;
-		a_z = cast 0;
-		b_x = cast 0;
-		b_y = cast 0;
-		b_z = cast 0;
-		c_x = cast 0;
-		c_y = cast 0;
-		c_z = cast 0;
+	    if (one == null) one = new Point();
+	    if (two == null) two = new Point();
+	    if (three == null) three = new Point();
 
-		// initialize Point data
-		d = new DataView( 3 );
-		initializeDataView();
-		*/
-
-		if (a != null) {
-			one = a;
-		}
-		if (b != null) {
-			two = b;
-		}
-		if (c != null) {
-			three = c;
-		}
+	    a = one;
+	    b = two;
+	    c = three;
 	}
 
 /* === Instance Methods === */
@@ -79,17 +60,4 @@ class Triangle<T:Float> {
     public var a : Point<T>;
     public var b : Point<T>;
     public var c : Point<T>;
-
-    /*
-	private var d : DataView<Point<T>>;
-	private var a_x : T;
-	private var a_y : T;
-	private var a_z : T;
-	private var b_x : T;
-	private var b_y : T;
-	private var b_z : T;
-	private var c_x : T;
-	private var c_y : T;
-	private var c_z : T;
-	*/
 }

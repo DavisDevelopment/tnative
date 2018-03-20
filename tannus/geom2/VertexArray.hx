@@ -11,8 +11,8 @@ using Slambda;
 using tannus.ds.ArrayTools;
 using tannus.math.TMath;
 
-@:expose
-class VertexArray<T:Float> {
+//@:expose
+class VertexArray <T:Float> {
 	/* Constructor Function */
 	public function new(?points : Array<Point<T>>):Void {
 		data = new Array();
@@ -23,6 +23,9 @@ class VertexArray<T:Float> {
 
 /* === Instance Methods === */
 
+    /**
+      * get the Rect<T> for which the 'containsPoint' method would return 'true' for all Points in [this]
+      */
 	public function getContainingRect():Rect<T> {
 		var minp:Null<Point<T>> = null;
 		var maxp:Null<Point<T>> = null;
@@ -73,14 +76,23 @@ class VertexArray<T:Float> {
 		return lines;
 	}
 
+    /**
+      * get the Point at the given index
+      */
 	public inline function get(index : Int):Null<Point<T>> {
 		return data[index];
 	}
 
+    /**
+      * set the Point at the given index
+      */
 	public inline function set(index:Int, p:Point<T>):Point<T> {
 		return (data[index] = p);
 	}
 
+    /**
+      * push a new Point onto [this]
+      */
 	public inline function push(p : Point<T>):Void {
 		data.push( p );
 	}
@@ -101,6 +113,9 @@ class VertexArray<T:Float> {
 		data.insert(index, p);
 	}
 
+    /**
+      * get the index of [point]
+      */
 	public function indexOf(point : Point<T>):Int {
 		for (i in 0...data.length) {
 			if (data[i].equals( point )) {
@@ -110,40 +125,63 @@ class VertexArray<T:Float> {
 		return -1;
 	}
 
+    /**
+      * create and return a deep-copy of [this]
+      */
 	public function clone():VertexArray<T> {
-		//return new VertexArray(data.macmap(_.clone()));
-		return mutate.fn(_.clone());
+	    return map.fn(_.clone());
 	}
 
 	public inline function filter(f : Point<T>->Bool):VertexArray<T> {
 		return new VertexArray(data.filter( f ));
 	}
 
-	public function map<A:Float>(f : Point<T>->Point<A>):VertexArray<A> {
+	public inline function map<A:Float>(f : Point<T>->Point<A>):VertexArray<A> {
 		return new VertexArray(data.map( f ));
 	}
 
+    /**
+      * remove [point] from [this]
+      */
 	public inline function remove(point : Point<T>):Bool {
 		return data.remove( point );
 	}
 
+    /**
+      * iterate over [this]
+      */
 	public function iterator():Iterator<Point<T>> {
 		return data.iterator();
 	}
 
+	/**
+	  * get [this] as a normal Array<Point<T>>
+	  */
+	public inline function toArray():Array<Point<T>> {
+	    return data.copy();
+	}
+
 /* === Operators === */
 
-	public function mutate<A:Float>(f : T->A):VertexArray<A> {
-		return map(function(x) return x.mutate( f ));
+    /**
+      * create a new VertexArray<A> by applying [f] to each coordinate value of each point in [this]
+      */
+	public function mutate<A:Float>(f : T -> A):VertexArray<A> {
+	    return map(function(point: Point<T>):Point<A> {
+	        return point.mutate( f );
+	    });
 	}
+
 	public function round():VertexArray<Int> {
-		return mutate( round );
+		return mutate( TMath.round );
 	}
+
 	public function floor():VertexArray<Int> {
-		return mutate( floor );
+		return mutate( TMath.floor );
 	}
+
 	public function ceil():VertexArray<Int> {
-		return mutate( ceil );
+		return mutate( TMath.ceil );
 	}
 
 /* === Computed Instance Fields === */

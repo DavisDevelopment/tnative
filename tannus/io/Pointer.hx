@@ -255,6 +255,10 @@ abstract Pointer<T> (Ref<T>) from Ref<T> {
 		return macro new tannus.io.Pointer(tannus.io.Getter.create($gref), tannus.io.Setter.create($sref));
 	}
 
+#if (haxe_ver >= 4)
+    public static macro function setr<T>(val: ExprOf<T>):ExprOf<Setter<T>> return macro (new tannus.io.Setter(x -> ($val = x)));
+#end
+
 	/**
 	  * Create a Pointer from a jQuery-style-accessor Function
 	  */
