@@ -872,12 +872,6 @@ class ArrayTools {
 }
 
 typedef SplitFilterResult<T> = {pass:Array<T>, fail:Array<T>};
-typedef ArrayDelta<T> = {
-	add: Array<T>,
-	remove: Array<T>,
-	move: Array<{item:T, index:Int}>
-};
-
 private typedef Measurable = {
 	var length : Int;
 };
