@@ -66,12 +66,12 @@ class ChromeStorage extends Storage {
 				var delta = change.get( key );
 				switch ([delta.previous, delta.current]) {
 					/* == Value Created == */
-					case [null, value]:
-						created[key] = value;
-						commits.push(Create(key, value));
+					case [null, val]:
+						created[key] = val;
+						commits.push(Create(key, val));
 
 					/* == Value Deleted == */
-					case [value, null]:
+					case [val, null]:
 						removed.push( key );
 						commits.push(Delete( key ));
 
