@@ -38,6 +38,13 @@ abstract Delta<T> (Tup2<Null<T>, Null<T>>) {
 	    return new Delta(previous, current);
 	}
 
+    /**
+      * create and return a copy of [this]
+      */
+	public inline function clone():Delta<T> {
+	    return new Delta(current, previous);
+	}
+
 /* === Instance Fields === */
 
 	/* The current value */
