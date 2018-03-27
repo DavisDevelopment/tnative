@@ -93,12 +93,8 @@ class ArrayTools {
 
 			/* for every index in the two arrays */
 			for (i in 0...left.length) {
-				/* get item in [left] at the current index */
-				var l = left[ i ];
-				/* get the item in [right] at the current index */
-				var r = right[ i ];
 				/* if [predicate] returns false */
-				if (!predicate(l, r)) {
+				if (!predicate(left[i], right[i])) {
 					/* then the two arrays are not equal */
 					return false;
 				}
