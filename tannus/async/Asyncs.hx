@@ -86,3 +86,5 @@ class Asyncs {
 }
 
 typedef VAsyncs = tannus.async.VoidAsyncs;
+// (Void->Void)s
+typedef V2s = tannus.async.VoidAsyncs.VoidVoidTools;
