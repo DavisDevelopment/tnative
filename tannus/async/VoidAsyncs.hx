@@ -1,9 +1,12 @@
 package tannus.async;
 
 import tannus.ds.Stack;
+import tannus.async.VoidCb;
 
+import haxe.Constraints.Function;
 import haxe.macro.Expr;
 import haxe.macro.Context;
+import haxe.macro.Type;
 
 using Lambda;
 using Slambda;
@@ -11,6 +14,7 @@ using tannus.ds.ArrayTools;
 using tannus.math.TMath;
 
 using haxe.macro.ExprTools;
+using haxe.macro.TypeTools;
 using tannus.macro.MacroTools;
 
 /*
@@ -63,6 +67,7 @@ class VoidAsyncs {
             va( handle );
         }
     }
+    public static inline function parallel(i:Iterable<VoidAsync>, done:VoidCb):Void callEach(i, done);
 
     /**
       * forward error to given VoidCb
@@ -110,5 +115,78 @@ class VoidAsyncs {
             promise.then(callback.void(), callback.raise());
         }
         return promise;
+    }
+
+    /**
+      * apply [params] to [f] with [callback] as the last argument
+      */
+    private static function applyAsync<F:Function, T>(f:F, params:Array<Dynamic>, callback:Cb<T>):Void {
+        Reflect.callMethod(null, untyped f, params.concat([callback]));
+    }
+    private static function doApplyAsync<F:Function, T>(f:F, params:Array<Dynamic>):Async<T> {
+        return (callback -> applyAsync(f, params, callback));
+    }
+
+    public static function applyEach<Func:Function, T>(funcs:Array<Func>, params:Array<Dynamic>, callback:Cb<Array<T>>):Void {
+        var results:Array<T> = new Array();
+        funcs.map(f -> doApplyAsync(f, params)).map(function(f: Async<T>) {
+            return (function(next: VoidCb) {
+                f(function(?error, ?value) {
+                    if (error != null) {
+                        return next( error );
+                    }
+                    else {
+                        results.push( value );
+                        next();
+                    }
+                });
+            });
+        });
+    }
+}
+
+/*
+class F0VoidAsyncTools {
+    public static function toAsync(f:(Void->Void)->Void):VoidAsync {
+        return (function(done: VoidCb) {
+            try {
+                f(function() {
+                    done();
+                });
+            }
+            catch (error: Dynamic) {
+                done( error );
+            }
+        });
+    }
+
+    public static function toCallback(f:Void->Void):VoidCb {
+        return (function(?error) {
+            if (error != null) {
+                throw error;
+            }
+            else {
+                f();
+            }
+        });
+    }
+}
+*/
+
+class VoidVoidTools {
+    /**
+      * asyncify a synchronous function
+      */
+    public static function toAsync(f: Void->Void):VoidAsync {
+        return (function(_: VoidCb) {
+            var err:Null<Dynamic> = null;
+            try {
+                f();
+            }
+            catch (e: Dynamic) {
+                err = e;
+            }
+            return _( err );
+        });
     }
 }
