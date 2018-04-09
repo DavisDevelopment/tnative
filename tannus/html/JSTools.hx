@@ -28,6 +28,10 @@ class JSTools {
 		return cast (untyped __js__('Array.prototype.slice.call')(o, 0));
 	}
 
+	public static inline function callprop<T>(o:Dynamic, name:String, ?args:Array<Dynamic>):T {
+	    return JSFunctionTools.apply(nativeArrayGet(o, name), o, args);
+	}
+
 	public static function fthis<T:Function>(with_self: Function):T {
 	    untyped {
 	        return Reflect.makeVarArgs(function(args: Array<Dynamic>) {
