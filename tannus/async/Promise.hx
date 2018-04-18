@@ -6,6 +6,7 @@ import tannus.io.Signal;
 import tannus.io.Signal2;
 
 import tannus.async.promises.*;
+import tannus.async.Cb;
 
 import haxe.extern.EitherType as Either;
 import haxe.macro.Type;
@@ -18,6 +19,8 @@ import Reflect.deleteField;
 using Slambda;
 using tannus.ds.ArrayTools;
 using tannus.async.PromiseTools;
+using tannus.FunctionTools;
+using tannus.async.Asyncs;
 
 using haxe.macro.ExprTools;
 using haxe.macro.TypeTools;
@@ -93,8 +96,8 @@ class Promise<T> implements Thenable<T, Promise<T>> {
     /**
       * invoke [action] when [this] promise has been settled, whether resolved or rejected
       */
-    public function always(action : Void -> Void):Void {
-        then((x)->action(), (x)->action());
+    public function always(action : Void -> Void):Promise<T> {
+        return then((x)->action(), (x)->action());
     }
 
     /**
@@ -117,14 +120,37 @@ class Promise<T> implements Thenable<T, Promise<T>> {
       * 'make' [this] Promise
       */
     private function _make():Void {
+
         function resolve(res) {
             _resolve( res );
         }
-        function reject(err) {
-            _reject( err );
+
+        function reject(error) {
+            _reject( error );
         }
+
+        var resolve:PromiseResolution<T>->Void = once(resolve);
+        var reject:Dynamic->Void = once(reject);
+
         setStatus(PSPending);
         exec(resolve, reject);
+    }
+
+    /**
+      * utility method to ensure that function [f] can only be called one time
+      */
+    private static function once<X>(f: X->Void):X->Void {
+        var called:Bool = false;
+        return (function(x: X) {
+            if ( called ) {
+                return ;
+            }
+            else {
+                f( x );
+                called = true;
+                return ;
+            }
+        });
     }
 
     /**
@@ -140,6 +166,9 @@ class Promise<T> implements Thenable<T, Promise<T>> {
       * resolve [this] Promise
       */
     private function _resolve<Res:PromiseResolution<T>>(resolution : Res):Void {
+        if ( _settled ) {
+            throw 'Error: Cannot resolve Promise more than once';
+        }
         if (resolution.isPromise()) {
             resolution.asPromise().then(_resolve, _reject);
         }
@@ -152,6 +181,9 @@ class Promise<T> implements Thenable<T, Promise<T>> {
       * reject [this] Promise
       */
     private function _reject(reason : Dynamic):Void {
+        if ( _settled ) {
+            throw 'Error: Cannot resolve Promise more than once';
+        }
         setStatus(PSRejected( reason ));
     }
 
@@ -192,10 +224,12 @@ class Promise<T> implements Thenable<T, Promise<T>> {
                 case PSResolved( result ):
                     signals.resolve.broadcast( result );
                     disposeSignals();
+                    _settled = true;
 
                 case PSRejected( reason ):
                     signals.reject.broadcast( reason );
                     disposeSignals();
+                    _settled = true;
             }
         }
     }
@@ -283,6 +317,7 @@ class Promise<T> implements Thenable<T, Promise<T>> {
     private var exec : PromiseExecutor<T>;
     private var signals : Null<{resolve:Signal<T>, reject:Signal<Dynamic>}>;
     private var _dependants : Array<Promise<Dynamic>>;
+    private var _settled: Bool = false;
 
 /* === Static Methods === */
 
@@ -298,25 +333,39 @@ class Promise<T> implements Thenable<T, Promise<T>> {
         });
     }
 
+    /**
+      * 
+      */
     public static function all(proms : Iterable<Promise<Dynamic>>):Promise<Array<Dynamic>> {
         return new Promise(function(yes, no) {
-            var values:Array<Dynamic> = [];
-            var resolved:Int = 0, total:Int = 0;
-
-            function make_step(i:Int, promise:Promise<Dynamic>) {
-                promise.then(function(value:Dynamic) {
-                    values[i] = value;
-                    if (resolved == total) {
-                        yes( values );
-                    }
-                }, no);
+            var array:Array<Promise<Dynamic>> = proms.array();
+            var results:Array<Dynamic> = new Array();
+            var complete = (function() {
+                yes( results );
+            });
+            complete = complete.once();
+            function checkOff(p: Promise<Dynamic>) {
+                array.remove( p );
+                if (array.empty()) {
+                    complete();
+                }
             }
-
-            var index:Int = 0;
+            var failed:Bool = false;
+            function handle(p: Promise<Dynamic>) {
+                if ( !failed ) {
+                    p.then(function(res) {
+                        if ( !failed ) {
+                            results.push( res );
+                            checkOff( p );
+                        }
+                    }, function(error) {
+                        failed = true;
+                        no( error );
+                    });
+                }
+            }
             for (prom in proms) {
-                total++;
-                make_step(index, prom);
-                index++;
+                handle( prom );
             }
         });
     }
