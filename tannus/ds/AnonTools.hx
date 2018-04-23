@@ -3,10 +3,17 @@ package tannus.ds;
 import tannus.macro.MacroTools;
 import tannus.io.*;
 
+import Type;
+import Type.ValueType as Vt;
+import Type as Types;
+
 import Slambda.fn;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 import haxe.macro.Type;
+
+import Reflect.*;
+import Type.*;
 
 using Lambda;
 using Slambda;
@@ -53,6 +60,128 @@ class AnonTools {
         }
 
         return action;
+    }
+
+    /**
+      * creates and returns a deep-copy of the given object [o]
+      * @param structs {Bool} denotes whether or not to attempt to copy class instances and enum values
+      */
+    public static function deepCopy<T>(o:T, structs:Bool=false):T {
+        return clone_dynamic(o, structs);
+    }
+
+    private static function clone_dynamic<T>(o:T, structs:Bool):T {
+        var vtype:ValueType = Types.typeof( o );
+        switch ( vtype ) {
+            // basemost atomic types
+            case TNull, TBool, TFloat, TInt:
+                return o;
+
+            // anonymous object value
+            case Vt.TObject:
+                return clone_anon(o, structs);
+
+            // enum value
+            case Vt.TEnum( e ):
+                //var ev:EnumValue = cast o;
+                return clone_enumvalue(o, cast e, structs);
+
+            // class instance
+            case Vt.TClass( c ):
+                return clone_instance(o, cast c, structs);
+
+            case Vt.TFunction:
+                // probably a few more targets for which something like this would work..
+                #if js
+                    // create an unbound copy of [o]
+                    return cast ((untyped o).bind(null));
+                #else
+                    throw 'TypeError: Cannot copy a function value';
+                #end
+
+            // unknown type
+            case Vt.TUnknown:
+                trace('Warning: Unknown, non-cloneable value', o);
+                return o;
+        }
+    }
+
+    /**
+      * create a deep-clone of an anonymous object
+      */
+    private static function clone_anon(o:Dynamic, structs:Bool, ?d:Dynamic):Dynamic {
+        var res:Dynamic = (d != null ? d : {});
+        var val:Dynamic;
+        for (k in fields( o )) {
+            val = deepCopy(field(o, k), structs);
+            // on the js-target
+            #if js
+                // if [k] is a method-property
+                if (isFunction( val )) {
+                    // rebind [val] to the created clone
+                    val = (untyped val).bind(res);
+                }
+            #end
+            setField(res, k, val);
+        }
+        return res;
+    }
+
+    /**
+      * create deep-clone of a class-instance
+      */
+    private static function clone_instance<T>(o:T, type:Class<T>, structs:Bool):T {
+        if (type == (String : Class<Dynamic>)) {
+            return o;
+        }
+        else if (type == (Array : Class<Dynamic>)) {
+            return untyped {
+                (o : Array<Dynamic>).map(deepCopy.bind(_, structs));
+            };
+        }
+        else {
+            if (hasField(o, 'clone') && isFunction(field(o, 'clone'))) {
+                return (untyped o.clone)();
+            }
+            else if ( structs ) {
+                var copi:T = createEmptyInstance( type );
+                clone_anon(o, structs, copi);
+                return copi;
+            }
+            else {
+                return o;
+            }
+        }
+    }
+
+    /**
+      * create deep-clone of an enum-value
+      */
+    private static function clone_enumvalue<T>(o:T, type:Enum<T>, structs:Bool):T {
+        var vt:EnumValue = cast o;
+        if (type.createAll().has( o )) {
+            return o;
+        }
+        else {
+            if ( structs ) {
+                return untyped {
+                    createEnum(type, vt.getName(), (vt.getParameters().map(deepCopy.bind(_, structs))));
+                };
+            }
+            else {
+                return o;
+            }
+        }
+    }
+
+    private static function all_instance_fields<T>(type:Class<T>):Set<String> {
+        var props:Set<String> = new Set();
+        var parent = getSuperClass( type );
+        if (parent != null) {
+            props.pushMany(all_instance_fields( parent ));
+        }
+        props.pushMany(getInstanceFields( type ));
+        return props;
     }
 
 	/**
