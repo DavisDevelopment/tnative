@@ -63,12 +63,20 @@ class Binary {
 		return (bigEndian ? (d | (c << 8) | (b << 16) | (a << 24)) : (a | (b << 8) | (c << 16) | (d << 24)));
 	}
 
+	/* read unsigned 32bit integer from given index */
+	public function getUint32(i: Int):Int {
+	    return signedToUnsigned(getInt32( i ));
+	}
+
 	/* store a 32bit integer to the given position */
 	public function setInt32(i:Int, v:Int):Void {
 		set(i, v);
 		set(i+1, v >> 8);
 		set(i+2, v >> 16);
 		set(i+3, v >> 24);
+	}
+	public inline function setUint32(i:Int, v:Int):Void {
+	    setInt32(i, v);
 	}
 
 	/* read a 64bit integer */
