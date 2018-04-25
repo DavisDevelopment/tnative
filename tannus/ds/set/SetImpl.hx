@@ -54,7 +54,7 @@ class SetImpl<T> implements ISet<T> {
         return result;
     }
 
-    public function filter(predicate : T -> Bool):Set<T> {
+    public function filter(predicate: T -> Bool):Set<T> {
         return reduce(function(acc:Set<T>, v:T) {
             if (predicate( v )) {
                 acc.add( v );
@@ -78,6 +78,10 @@ class SetImpl<T> implements ISet<T> {
             }
         }
         return result;
+    }
+
+    public function without(set: Set<T>):Set<T> {
+        return filter(x -> !set.exists(x));
     }
 
     public function iterator():Iterator<T> return d.keys();

@@ -18,6 +18,7 @@ interface ISet<T> {
     function difference(o : Set<T>):Set<T>;
     function union(o : Set<T>):Set<T>;
     function intersection(o : Set<T>):Set<T>;
+    function without(o: Set<T>):Set<T>;
     function filter(f : T->Bool):Set<T>;
     function map<TOut>(f : T->TOut):Array<TOut>;
     function iterator():Iterator<T>;
