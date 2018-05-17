@@ -112,7 +112,7 @@ class JsIterator<T> {
                 this.i = i;
 
             case [o, null]:
-                var iterf:Null<Void->NativeJsIterator<T>> = JSTools.nag(o, Symbol.iterator);
+                var iterf:Null<Void->NativeJsIterator<T>> = JSTools.nag(o, (untyped Symbol).iterator);
                 if (untyped __strict_neq__(js.Lib.typeof( iterf ), 'undefined')) {
                     if (Reflect.isFunction( iterf )) {
                         this.i = JSFunctionTools.apply(iterf, o);
