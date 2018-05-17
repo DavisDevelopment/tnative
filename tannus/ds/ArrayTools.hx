@@ -631,6 +631,14 @@ class ArrayTools {
 	}
 
 	/**
+	  * inline sort
+	  */
+	public static function isort<T>(a:Array<T>, f:T->T->Int):Array<T> {
+	    haxe.ds.ArraySort.sort(a, f);
+	    return a;
+	}
+
+	/**
 	  * macro-licious sort
 	  */
 	public static macro function macsort<T>(list:ExprOf<Array<T>>, parameters:Array<Expr>):Expr {
