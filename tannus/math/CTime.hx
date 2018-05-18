@@ -17,12 +17,20 @@ using tannus.math.TMath;
 class CTime implements IComparable<CTime> {
     /* Constructor Function */
     public function new(sec:Float=0.0, m:Int=0, h:Int=0, d:Int=0):Void {
-        days = d;
-        hours = h;
-        minutes = m;
-        totalSeconds = sec;
+        days = 0;
+        hours = 0;
+        minutes = 0;
 
-        inormalize();
+        totalSeconds = sec;
+		inline function add(n: Float) {
+		    totalSeconds += n;
+		}
+
+		add(60 * m);
+		add(60 * 60 * h);
+		add(60 * 60 * 24 * d);
+
+        //inormalize();
     }
 
 /* === Instance Methods === */
@@ -224,6 +232,7 @@ class CTime implements IComparable<CTime> {
 	  */
 	public static function fromString(s : String):Time {
 		var data:Array<Float> = s.trim().split(':').map( Std.parseFloat );
+		trace( data );
 		switch( data ) {
 			case [s]:
 				return new Time( s );
