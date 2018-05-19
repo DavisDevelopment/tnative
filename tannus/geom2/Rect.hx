@@ -56,6 +56,65 @@ class Rect <T:Float> {
 
 /* === Instance Methods === */
 
+    /**
+      check whether the properties of [this] Rect have valid data stored in them
+     **/
+    public inline function isSanitary():Bool {
+        return (
+            isCleanValue( x ) &&
+            isCleanValue( y ) &&
+            isCleanValue( width ) &&
+            isCleanValue( height )
+        );
+    }
+
+    /**
+      'sanitize' [this] Rect, such that all fields have valid values
+     **/
+    public function sanitize(?f: Rect<T>->Void):Bool {
+        var modified = false;
+        if (f != null) {
+            if (!isSanitary()) {
+                f(cast this);
+                modified = true;
+
+                if (!isSanitary()) {
+                    sanitize();
+                }
+            }
+        }
+        else {
+            if (!isCleanValue( x )) {
+                x = untyped 0;
+                modified = true;
+            }
+            
+            if (!isCleanValue( y )) {
+                y = untyped 0;
+                modified = true;
+            }
+
+            if (!isCleanValue( width )) {
+                width = untyped 0;
+                modified = true;
+            }
+
+            if (!isCleanValue( height )) {
+                height = untyped 0;
+                modified = true;
+            }
+        }
+        return modified;
+    }
+
+    private static inline function isCleanValue(n: Float):Bool {
+        return (
+            (n != null) &&
+            (n is Float) &&
+            (n.isFinite() && !n.isNaN())
+        );
+    }
+
 	/**
 	  * create and return a deep-copy of [this]
 	  */
