@@ -1,11 +1,18 @@
 package tannus.events;
 
 import tannus.io.Byte;
+import tannus.io.Char;
+
+import haxe.macro.Expr;
+import haxe.macro.Context;
 
 using StringTools;
 using tannus.ds.StringUtils;
 using Lambda;
 using tannus.ds.ArrayTools;
+#if macro
+using haxe.macro.ExprTools;
+#end
 
 class KeyTools {
 	/**
@@ -102,6 +109,16 @@ class KeyTools {
 				Number7 => '7',
 				Number8 => '8',
 				Number9 => '9',
+				Numpad0 => '<Numpad 0>',
+				Numpad1 => '<Numpad 1>',
+				Numpad2 => '<Numpad 2>',
+				Numpad3 => '<Numpad 3>',
+				Numpad4 => '<Numpad 4>',
+				Numpad5 => '<Numpad 5>',
+				Numpad6 => '<Numpad 6>',
+				Numpad7 => '<Numpad 7>',
+				Numpad8 => '<Numpad 8>',
+				Numpad9 => '<Numpad 9>',
 				F1 => '<F1>',
 				F2 => '<F2>',
 				F3 => '<F3>',
@@ -119,6 +136,41 @@ class KeyTools {
 		return _keyNames;
 	}
 
+	public static function keyChars():Map<Key, Char> {
+	    if (_keyChars == null) {
+	        _keyChars = keyNames().copy();
+	        inline function set(k,v) _keyChars[k] = v;
+	        inline function unset(k) _keyChars.remove(k);
+
+	        for (key in _keyChars.keys()) {
+	            var v:String = _keyChars[key].toLowerCase();
+	            if (v.length > 1) {
+	                if (v.startsWith('<Numpad ')) {
+	                    set(key, v.after('<Numpad').beforeLast('>').trim());
+	                }
+                    else {
+                        unset( key );
+                    }
+	            }
+	        }
+
+	        set(Backspace, cc(8));
+	        set(Tab, cc(9));
+	        set(Delete, cc(226));
+	        set(Space, cc(32));
+	        set(Enter, cc(13));
+	    }
+	    return _keyChars;
+	}
+
+	public static function charKeys():Map<Char, Key> {
+	    if (_charKeys == null) {
+	        var kc = keyChars();
+	        _charKeys = [for (key in kc.keys()) kc[key] => key];
+	    }
+	    return _charKeys;
+	}
+
 	/**
 	  * Get a map of names to their keys
 	  */
@@ -133,9 +185,22 @@ class KeyTools {
 		return _nameKeys;
 	}
 
+    static macro function cc(n: ExprOf<Int>):ExprOf<String> {
+        switch ( n.expr ) {
+            case EConst(CInt(Std.parseInt(_) => v)):
+                return Context.parse('"\\u${v.hex(4)}"', Context.currentPos());
+
+            case _:
+                return macro String.fromCharCode(${n});
+        }
+        //return Context.parseInlineString('\\u' + n.toString().lpad('0', 4));
+    }
+
 /* === Static Fields === */
 
 	/* a map of Keys to their names */
 	private static var _keyNames:Null<Map<Key, String>> = null;
 	private static var _nameKeys:Null<Map<String, Key>> = null;
+	private static var _keyChars:Null<Map<Key, Char>> = null;
+	private static var _charKeys:Null<Map<Char, Key>> = null;
 }
