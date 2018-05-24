@@ -206,6 +206,19 @@ class Function1Tools {
             return wrapper(f, a);
         }
     }
+
+    /**
+       `once` wraps and returns the argument function. `once` ensures that `f` will be called
+       at most once even if the returned function is invoked multiple times.
+      */
+    public static function once<I>(f : I -> Void):I->Void {
+        //var _i = false;
+        return function(x: I) {
+            var t = f;
+            f = (y)->null;
+            t( x );
+        };
+    }
 }
 
 /**
@@ -264,6 +277,15 @@ class Function2Tools {
         return function(a:A, b:B) {
             return wrapper(f, a, b);
         }
+    }
+
+    public static function once<T1,T2>(fun: T1->T2->Void):T1->T2->Void {
+        return (function(x:T1, y:T2) {
+            var t = fun;
+            fun = null;
+            if (t != null)
+                t(x, y);
+        });
     }
 }
 
