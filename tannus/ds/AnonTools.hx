@@ -20,6 +20,7 @@ using Slambda;
 using tannus.macro.MacroTools;
 using haxe.macro.ExprTools;
 using haxe.macro.TypeTools;
+using haxe.macro.ComplexTypeTools;
 
 class AnonTools {
     /**
@@ -188,25 +189,119 @@ class AnonTools {
 	  * 'with'
 	  */
 	public static macro function owith<T>(o:ExprOf<T>, action:Expr) {
-		var type = Context.typeof( o ).getClass();
-		var map:Map<String, ClassField> = new Map();
-		var list = type.fields.get();
-		for (f in list) {
-			map[f.name] = f;
-		}
+		//var type = Context.typeof( o ).getClass();
+		//var tvars = Context.getLocalTVars();
+		var mixins = Context.getLocalUsing();
+		var type = Context.typeof( o );
+		var pos = Context.currentPos();
+
+		var map = typeFields( type );
+		for (module in mixins) {
+		    mixinFields(type, module, map);
+        }
+
 		var out:Expr = action;
 		for (name in map.keys()) {
 			var ident:Expr = macro $i{name};
-			var field:Expr = {
-				pos: Context.currentPos(),
-				expr: ExprDef.EField(o, name)
-			};
+            var field:Expr = {
+                pos: Context.currentPos(),
+                expr: ExprDef.EField(o, name)
+            };
+			//var field:Expr = macro $o.$name;
+		    
 			out = withReplace(out, ident, field);
 		}
+
 		return out;
 	}
 
 #if macro
+
+    private static function mixinFields(type:Type, mref:Ref<ClassType>, ?m:Map<String, ClassField>):Map<String, ClassField> {
+        if (m == null)
+            m = new Map();
+
+        var mixin = mref.get();
+        // mixin methods
+        var mm = mixin.statics.get();
+        mm = mm.filter(function(field) {
+            return field.kind.match(FMethod(_));
+        })
+        .filter(function(field) {
+            switch ( field.type ) {
+                case TFun(_[0]=>arg1, _) if (arg1 != null):
+                    if (type.equals(arg1.t)) {
+                        return true;
+                    }
+                    else if (Context.unify(type, arg1.t)) {
+                        return true;
+                    }
+
+                case _:
+                    return false;
+            }
+            return false;
+        });
+
+        for (f in mm)
+            m.set(f.name, f);
+        return m;
+    }
+
+    private static function typeFields(type:Type, ?m:Map<String, ClassField>):Null<Map<String, ClassField>> {
+        if (m == null)
+            m = new Map();
+
+		switch ( type ) {
+            case Type.TInst(_.get()=>ctype, params):
+                tfclass(ctype, m);
+
+            case Type.TAnonymous(_.get() => atype):
+                tfanon(atype, m);
+
+            case Type.TAbstract(_.get()=>btype, params):
+                tfabstract(btype, m);
+
+            //case Type.TEnum(_.get()=>etype, params):
+                //etype.constructs
+
+            case Type.TType(_.get()=>ttype, params):
+                typeFields(ttype.type, m);
+
+            case other:
+                return null;
+		}
+
+		var scoped = false;
+		for (fieldName in m.keys()) {
+		    scoped = true;
+		    break;
+		}
+		if (!scoped)
+		    return null;
+		return m;
+    }
+    private static function tfclass(c:ClassType, m:Map<String, ClassField>) {
+        for (f in c.fields.get())
+            m.set(f.name, f);
+    }
+    private static function tfabstract(a:AbstractType, m:Map<String, ClassField>) {
+        if (a.impl != null) {
+            tfclass(a.impl.get(), m);
+        }
+        else {
+            typeFields(a.type, m);
+        }
+    }
+    private static function tfanon(a:AnonType, m:Map<String, ClassField>) {
+        for (f in a.fields)
+            m[f.name] = f;
+    }
+    private static function tfenum(e:EnumType, m) {
+        for (cn in e.constructs.keys()) {
+            m.set(cn, e.constructs.get(cn));
+        }
+    }
 
 	private static function withReplace(e:Expr, x:Expr, y:Expr):Expr {
 		if (e.expr.equals( x.expr )) {
@@ -218,9 +313,27 @@ class AnonTools {
 	}
 
 	private static function wrMapper(e:Expr, x:Expr, y:Expr):Expr {
+        switch ( e ) {
+            case macro @without $ee:
+                return ee;
+
+            case macro @ignore $ee:
+                return ee;
+
+            case macro super.$ee:
+                return macro $i{ee};
+
+            default:
+                if (e.expr.equals(x.expr))
+                    return y;
+                else
+                    return e.map(wrMapper.bind(_, x, y));
+        }
+        /*
 		switch ( e.expr ) {
 			case EMeta(s, ee) if (s.name == 'ignore'):
 				return ee;
+
 			default:
 				if (e.expr.equals( x.expr )) {
 					return y;
@@ -229,6 +342,7 @@ class AnonTools {
 					return e.map(wrMapper.bind(_, x, y));
 				}
 		}
+		*/
 	}
 
 #end
