@@ -22,6 +22,7 @@ class CTime implements IComparable<CTime> {
         minutes = 0;
 
         totalSeconds = sec;
+
 		inline function add(n: Float) {
 		    totalSeconds += n;
 		}
@@ -30,7 +31,7 @@ class CTime implements IComparable<CTime> {
 		add(60 * 60 * h);
 		add(60 * 60 * 24 * d);
 
-        //inormalize();
+        inormalize();
     }
 
 /* === Instance Methods === */
