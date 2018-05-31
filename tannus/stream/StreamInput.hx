@@ -16,12 +16,17 @@ using tannus.ds.ArrayTools;
 using StringTools;
 using tannus.ds.StringUtils;
 using tannus.FunctionTools;
+using tannus.async.Asyncs;
+using tannus.ds.MapTools;
 
 class StreamInput<T> extends EventDispatcher {
     /* Constructor Function */
     public function new(o: SIOptions<T>):Void {
         super();
+
+        /* register [this]'s signals */
         addSignals([
+            'initialized',
             'readable',
             'data',
             'end',
@@ -29,29 +34,92 @@ class StreamInput<T> extends EventDispatcher {
             'error'
         ]);
 
+        /* initialize internal state */
         _ended = false;
+        _closed = false;
         _paused = true;
+        _allocated = [true, true, true];
 
+        /* set [opts] field, our options/implementation details */
         opts = o;
 
+        /* create internal buffer */
         b = new DefaultStreamInternalBuffer();
+
+        /* create 'pusher' object */
         pusher = {
             next: (v -> _msg(Next(v))),
             error: (e -> _msg(Error(e))),
-            done: () -> _msg(Done)
+            done: () -> _msg(Done),
+            _stream: this
         };
 
-        _read();
+        if (opts.init != null) {
+            opts.init(pusher, function(?error) {
+                if (error != null) {
+                    pusher.error( error );
+                }
+                else {
+                    _read();
+                }
+            });
+        }
+        else {
+            _read();
+        }
+
+        _init(function(?error) {
+            if (error != null) {
+                pusher.error( error );
+            }
+            else {
+                _scheduleRead();
+            }
+        });
     }
 
 /* === Instance Methods === */
+
+    /**
+      initialize [this] Stream
+     **/
+    function _init(done: VoidCb):Void {
+        /**
+          wrap [done] in our long, ugly, complicated co-callback
+         **/
+        done = done.wrap(function(_, ?error) {
+            if (error != null) {
+                _raise( error );
+            }
+            else {
+                _started = true;
+                _opened = true;
+
+                addSignal('afterInit');
+                _event('initialized', this).then(function() {
+                    _event('afterInit', this).then(function() {
+                        removeSignal('afterInit');
+                    }, _.raise());
+                }, _.raise());
+
+                _( error );
+            }
+        });
+
+        if (opts.init != null) {
+            opts.init(pusher, done);
+        }
+        else {
+            done();
+        }
+    }
 
     /**
       method used internally to 'read' data into internal buffer
      **/
     private function _read(?len: Int):Void {
         if (opts.read != null) {
-            opts.read( pusher );
+            opts.read(pusher, len);
         }
         else {
             throw 'Error: No "_read" implementation given';
@@ -62,7 +130,86 @@ class StreamInput<T> extends EventDispatcher {
       method used internally to destroy [this] stream
      **/
     private function _destroy(err:Null<Dynamic>, callback:VoidCb):Void {
-        callback( err );
+        if (opts.destroy != null) {
+            opts.destroy( callback );
+        }
+        else {
+            callback( err );
+        }
+    }
+
+    /**
+      raise an error on [this]
+     **/
+    function raise(error: Dynamic) {
+        if (!(_ended || _closed)) {
+            _raise( error );
+        }
+        else {
+            throw error;
+        }
+    }
+
+    /**
+      raise an error on [this] stream
+     **/
+    private function _raise(error: Dynamic):Bool {
+        _event('error', error);
+        return true;
+    }
+
+    /**
+      mark the end of [this] stream
+     **/
+    private function _end(err:Null<Dynamic>, done:VoidCb):Bool {
+        _ended = true;
+        _destroy(err, function(?error) {
+            _event('end', error);
+            if (error != null) {
+                //_raise( error );
+                done( error );
+            }
+            else {
+                _close( done );
+            }
+        });
+        return _ended;
+    }
+
+    /**
+      end [this] stream
+     **/
+    function end(?done: VoidCb) {
+        if ( !_ended ) {
+            done = done.nn();
+            _end(null, done);
+        }
+    }
+
+    /**
+      shut down all stream-related operations, closing out this stream
+     **/
+    private function _close(done: VoidCb):Void {
+        _event('close', null)
+        .then(function() {
+            _closed = true;
+            defer(function() {
+                _dispose( done );
+            });
+        }, done.raise());
+    }
+
+    /**
+      delete and/or nullify memory-eating properties
+     **/
+    private function _dispose(done: VoidCb):Void {
+        this._sigs.pairs().iter(function(t) {
+            _sigs[t.left].clear();
+            t.right = null;
+            _sigs.remove( t.left );
+
+            trace('deleted "${t.left}" event');
+        });
     }
 
     /**
@@ -100,24 +247,24 @@ class StreamInput<T> extends EventDispatcher {
     /**
       listen for 'readable' event
      **/
-    public function onReadable(f: Void->Void):Void {
-        on('readable', untyped f);
+    public function onReadable(f:Void->Void, once:Bool=false):Void {
+        on('readable', untyped f, once);
     }
 
-    public function onData(f: T->Void):Void {
-        on('data', f);
+    public function onData(f: T->Void, once:Bool=false):Void {
+        on('data', f, once);
     }
 
-    public function onError(f: Dynamic->Void):Void {
-        on('error', f);
+    public function onError(f: Dynamic->Void, once:Bool=false):Void {
+        on('error', f, once);
     }
 
-    public function onEnd(f: Void->Void):Void {
-        on('end', untyped f);
+    public function onEnd(f: Void->Void, once:Bool=false):Void {
+        on('end', untyped f, once);
     }
 
-    public function onClose(f: ?Dynamic->Void):Void {
-        on('close', untyped f);
+    public function onClose(f:?Dynamic->Void, once:Bool=false):Void {
+        on('close', untyped f, once);
     }
 
     public function hasDataAvailable():Bool {
@@ -156,11 +303,12 @@ class StreamInput<T> extends EventDispatcher {
                 return push( value );
 
             case Error( error ):
-                return _raise( error );
+                raise( error );
 
             case Done:
-                return _end();
+                end();
         }
+        return true;
     }
 
     /**
@@ -194,6 +342,7 @@ class StreamInput<T> extends EventDispatcher {
         }
         else if (isFlowing()) {
             _event('data', value);
+            return true;
         }
         else {
             return false;
@@ -212,28 +361,28 @@ class StreamInput<T> extends EventDispatcher {
         }
     }
 
-    /**
-      raise an error on [this] stream
-     **/
-    private function _raise(error: Dynamic):Bool {
-        _event('error', error);
-        return true;
-    }
 
-    /**
-      mark the end of [this] stream
-     **/
-    private function _end():Bool {
-        _ended = true;
-        _event('end', null);
-        return _ended;
-    }
 
     /**
       dispatch an event
      **/
-    private function _event<T>(name:String, data:T):Void {
-        defer(dispatch.bind(name, data));
+    private function _event<T>(name:String, data:T):VoidPromise {
+        return new VoidPromise(function(retern, raise) {
+            try {
+                defer(function() {
+                    try {
+                        dispatch(name, data);
+                        retern();
+                    }
+                    catch (err: Dynamic) {
+                        raise( err );
+                    }
+                });
+            }
+            catch (err: Dynamic) {
+                raise( err );
+            }
+        });
     }
     
     /**
@@ -267,8 +416,24 @@ class StreamInput<T> extends EventDispatcher {
     /* [this]'s provided options */
     private var opts: SIOptions<T>;
 
+    /* whether [this] has started */
+    private var _started: Bool;
+    private var _opened: Bool;
+
     /* whether [this] has ended */
     private var _ended: Bool;
+
+    /* whether [this] has been closed entirely */
+    private var _closed: Bool;
+
+    /**
+      whether (and to what degree) [this] is still allocated and intact in-memory
+      --
+      $0: [_destroy] has not been run, or has failed
+      $1: [_end] has not been run, or has failed
+      $2: [_dispose] has not been run, or has failed
+     **/
+    private var _allocated:Array<Bool>;
 
     /* whether [this] is paused */
     private var _paused: Bool;
@@ -282,12 +447,15 @@ enum StreamInputErrorType<T> {
 }
 
 typedef SIOptions<T> = {
-    ?read: StreamInputPusher<T>->Void,
+    ?init: StreamInputPusher<T>->VoidCb->Void,
+    ?read: StreamInputPusher<T>->Null<Int>->Void,
     ?destroy: VoidCb->Void
 }
 
 typedef StreamInputPusher<T> = {
     next: T->Bool,
     error: Dynamic->Bool,
-    done: Void->Bool
+    done: Void->Bool,
+
+    _stream: StreamInput<T>
 };
