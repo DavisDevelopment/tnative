@@ -12,9 +12,9 @@ class EventLoop {
         if (_qpush == null) {
             _qpush = (
             #if node
-                untyped __js__('(setImmediate || process.nextTick)');
+                untyped __js__('(setImmediate || process.nextTick)')
             #else
-                untyped __js__('(setImmediate || (setTimeout && x => setTimeout(x, 0)))');
+                untyped __js__('(setImmediate || (setTimeout && x => setTimeout(x, 0)))')
             #end
             );
         }
