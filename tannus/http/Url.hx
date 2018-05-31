@@ -1,139 +1,293 @@
 package tannus.http;
 
-import tannus.ds.QueryString in Qs;
-import tannus.ds.Object;
-import tannus.io.RegEx;
-
-import tannus.sys.Path;
+//import thx.Error;
 
 using StringTools;
 using tannus.ds.StringUtils;
+using Slambda;
+using tannus.ds.ArrayTools;
+using tannus.FunctionTools;
 
-@:forward
-abstract Url (CUrl) from CUrl to CUrl {
-	public inline function new(?s : String) this = new CUrl(s);
+abstract Url (UrlType) from UrlType to UrlType {
+    public static var pattern(default, null):EReg = ~/^((((?:([^:\/#\?]+):)?(?:(\/\/)?((?:(([^:@\/#\?]+)(?:[:]([^:@\/#\?]+))?)@)?(([^:\/#\?\]\[]+|\[[^\/\]@#?]+\])(?:[:]([0-9]+))?))?)?)?((\/?(?:[^\/\?#]+\/+)*)([^\?#]*)))?(?:\?([^#]+))?)(?:#(.*))?/;
 
-/* === Type Casting === */
+    @:from 
+    public static function fromString(s: String):Url {
+        return parse(s, true);
+    }
 
-	@:to
-	public inline function toString():String return this.toString();
+    /**
+      parse a Url object from a String
+     **/
+    public static function parse(s:String, parseQueryString:Bool):Url {
+        if (!pattern.match( s ))
+            throw 'unable to parse "$s" to Url';
+        var port = pattern.matched(12),
+        o:Url = {
+            protocol : pattern.matched(4),
+            slashes: pattern.matched(5) == "//",
+            auth: pattern.matched(7),
+            hostName: pattern.matched(11),
+            port: (null == port) ? null : Std.parseInt(port),
+            pathName: pattern.matched(13),
+            queryString: null,
+            search: null,
+            hash: pattern.matched(17)
+        };
+        o.search = pattern.matched(16);
+        return o;
+    }
 
-	@:from
-	public static inline function fromString(s : String):Url return new CUrl(s);
-}
+    public var auth(get, set) : String;
+    public var hash(get, set) : String;
+    public var hasAuth(get, never) : Bool;
+    public var hasHash(get, never) : Bool;
+    public var hasPort(get, never) : Bool;
+    public var hasProtocol(get, never) : Bool;
+    public var hasQueryString(get, never) : Bool;
+    public var hasSearch(get, never) : Bool;
+    public var host(get, set) : String;
+    public var hostName(get, set) : String;
+    public var href(get, set) : String;
+    public var isAbsolute(get, never) : Bool;
+    public var isRelative(get, never) : Bool;
+    public var path(get, set) : String;
+    public var pathName(get, set) : String;
+    public var port(get, set) : Null<Int>;
+    public var protocol(get, set) : String;
+    public var queryString(get, set) : QueryString;
+    public var search(get, set) : String;
+    public var slashes(get, set) : Bool;
 
-@:expose('Href')
-@:expose('tannus.http.Url')
-class CUrl {
-	/* Constructor Function */
-	public function new(?surl : String):Void {
-		/* set all default values */
-		protocol = null;
-		hostname = null;
-		pathname = null;
-		search = null;
-		hash = null;
+    /**
+      Matches all the URL parts with anthat URL and returns true if they are all
+      equals.
+     */
+    @:op(A == B)
+    public static function equals(self : Url, that : Url) : Bool {
+        return self.equalsTo(that);
+    }
 
-		/* if [surl] was provided, parse it */
-		if (surl != null) {
-			//- extract the protocol (if present)
-			protocol = (~/^([A-Z]+):/i.match(surl) ? surl.substring(0, surl.indexOf(':')) : '');
-			if (protocol.empty())
-				protocol = 'http';
-			
-			//- [surl], stripped of [protocol]
-			var noproto:String = surl.remove(protocol+'://');
-			
-			//- strip the first "/" from [noproto], if "/" is the first character
-			if (noproto.startsWith('/'))
-				noproto = noproto.substring(1);
+    public function equalsTo(that: Url):Bool {
+        return (
+            this.protocol == that.protocol &&
+            this.slashes == that.slashes &&
+            this.auth == that.auth &&
+            this.hostName == that.hostName &&
+            this.port == that.port &&
+            this.pathName == that.pathName &&
+            this.queryString.equals(that.queryString) &&
+            this.search == that.search &&
+            this.hash == that.hash
+        );
+    }
 
-			//- get the hostname
-			hostname = noproto.before('/');
-			
-			//- get the pathname
-			pathname = (noproto.has('/') ? noproto.after('/') : '');
-			
-			//- get the search-string
-			search = (pathname.has('?') ? pathname.after('?') : '');
-			
-			//- strip [search] (if not empty) from [pathname]
-			pathname = pathname.strip('?').strip(search);
+    @:op(A / B)
+    public function concatString(that: String):Url {
+        var copy = clone();
+        if (pathName.empty()) {
+            if (!that.startsWith( "/" ))
+                that = ("/" + that);
+            copy.pathName = that;
+        } 
+        else {
+            if (that.startsWith("/"))
+                that = that.substring(1);
 
-			//- (if possible) extract hashcode from the search-string
-			hash = (search.has('#') ? search.after('#') : '');
-			search = search.before('#');
+            if (pathName.endsWith("/"))
+                copy.pathName = (copy.pathName + that);
+            else
+                copy.pathName = (copy.pathName + "/" + that);
+        }
+        return copy;
+    }
 
-			//- (if possible AND necessary) extract hashcode from the pathname
-			if (hash.empty() && pathname.has('#')) {
-				hash = pathname.after('#');
-				pathname = pathname.before('#');
-			}
+    @:to 
+    public function toString():String {
+        if ( isAbsolute ) {
+            return '${hasProtocol ? protocol + ":" : ""}${slashes?"//":""}${hasAuth?auth+"@":""}$host$path${hasHash?"#"+hash:""}';
+        }
+        else {
+            return '$path${hasHash?"#"+hash:""}';
+        }
+    }
 
-			params = Qs.parse(search);
-			try {
-				hashparams = Qs.parse(hash);
-			}
-			catch(err : String) {
-				hashparams = null;
-			}
-		}
-	}
+    /**
+      create and return a deep copy of [this]
+     **/
+    public function clone():Url {
+        return {
+            protocol: protocol,
+            slashes: slashes,
+            auth: auth,
+            hostName: hostName,
+            port: port,
+            pathName: pathName,
+            queryString: queryString.clone(),
+            search: search,
+            hash: hash
+        };
+    }
 
-/* === Instance Methods === */
-
-	/**
-	  * Create a URL String from [this]
-	  */
-	public function toString():String {
-		search = Qs.stringify(params);
-		hash = (hashparams != null ? Qs.stringify(hashparams) : hash+'');
-		var base:String = ('$protocol://$hostname/$pathname');
-		base += (params.keys.length == 0 ? '' : '?'+search);
-		base += (hash != '' ? '#'+hash : '');
-		return base;
-	}
-
-	/**
-	  * Creates a copy of [this]
-	  */
-	public function clone():Url {
-		return new Url(toString());
-	}
+    /**
+      creates a new QueryString if none previously existed
+      returns QueryString
+     **/
+    public function ensureQueryString():QueryString {
+        if (this.queryString != null)
+            return this.queryString;
+        else
+            return queryString = new Map();
+    }
 
 /* === Computed Instance Fields === */
 
-	/**
-	  * Get the Domain-name as an Array
-	  */
-	public var domain(get, set):Array<String>;
-	private function get_domain() return hostname.split('.');
-	private function set_domain(v:Array<String>):Array<String> {
-		hostname = v.join('.');
-		return domain;
-	}
+    inline function get_auth()
+        return this.auth;
+    inline function set_auth(value : String)
+        return this.auth = value;
 
-	/**
-	  * get the pathname as a Path
-	  */
-	public var path(get, set):Path;
-	private inline function get_path():Path {
-		return new Path(pathname);
-	}
-	private inline function set_path(v : Path):Path {
-		pathname = v;
-		return path;
-	}
+    inline function get_hasAuth()
+        return this.auth != null;
 
-/* === Instance Fields === */
+    inline function get_hasHash()
+        return this.hash != null;
 
-	public var protocol : Null<String>;
-	public var hostname : Null<String>;
-	public var pathname : Null<String>;
-	
-	public var search : Null<String>;
-	public var hash : Null<String>;
+    inline function get_hasPort()
+        return this.port != null;
 
-	public var params : Object;
-	public var hashparams : Null<Object>;
+    inline function get_hasProtocol()
+        return this.protocol != null;
+
+    inline function get_hasQueryString()
+        return this.queryString != null && !this.queryString.isEmpty();
+
+    inline function get_hasSearch()
+        return this.search != null || hasQueryString;
+
+    inline function get_host()
+        return this.hostName + (hasPort ? ':$port' : "");
+
+    inline function set_host(host : String) {
+        var p = host.indexOf(":");
+        if (p < 0) {
+            this.hostName = host;
+            this.port = null;
+        } 
+        else {
+            this.hostName = host.substring(0, p);
+            this.port = Std.parseInt(host.substring(p + 1));
+        }
+        return host;
+    }
+
+    inline function get_hostName()
+        return this.hostName;
+
+    inline function set_hostName(hostName : String)
+        return this.hostName = hostName;
+
+    function get_href()
+        return toString();
+
+    inline function set_href(value : String) {
+        this = (parse(value, true) : UrlType);
+        return value;
+    }
+
+    inline function get_isAbsolute()
+        return this.hostName != null;
+
+    inline function get_isRelative()
+        return this.hostName == null;
+
+    inline function get_path()
+        return this.pathName + (hasSearch ? '?$search' : "");
+
+    inline function set_path(value : String) {
+        var p = value.indexOf("?");
+        if (p < 0) {
+            this.pathName = value;
+            this.search = null;
+            this.queryString = null;
+        } 
+        else {
+            this.pathName = value.substring(0, p);
+            search = value.substring(p + 1);
+        }
+        return value;
+    }
+
+    inline function get_pathName()
+        return this.pathName;
+
+    inline function set_pathName(value : String)
+        return this.pathName = value;
+
+    inline function get_port()
+        return this.port;
+
+    inline function set_port(value)
+        return this.port = value;
+    inline function get_protocol()
+        return this.protocol;
+
+    function set_protocol(value : String)
+        return this.protocol = null == value ? null : value.toLowerCase();
+
+    inline function get_hash()
+        return this.hash;
+
+    inline function set_hash(value : String)
+        return this.hash = value;
+
+    inline function get_slashes()
+        return this.slashes;
+
+    inline function set_slashes(value : Bool)
+        return this.slashes = value;
+
+    inline function get_queryString()
+        return this.queryString;
+
+    inline function set_queryString(value : QueryString) {
+        if(null != value)
+            this.search = null;
+        return this.queryString = value;
+    }
+
+    function get_search():String {
+        if (null != this.search && "" != this.search) {
+            return this.search;
+        }
+        else {
+            return this.queryString.toString();
+        }
+    }
+
+    function set_search(value : String) {
+        var qs = try QueryString.parse(value) catch(e : Dynamic) null;
+        if (qs == null || qs.isEmptyOrMono()) {
+            this.search = value;
+            this.queryString = null;
+        } 
+        else {
+            this.queryString = qs;
+            this.search = null;
+        }
+        return value;
+    }
+}
+
+typedef UrlType = {
+    //'http://user:pass@host.com:8080/p/a/t/h?query=string#hash'
+    protocol : String,
+    slashes: Bool,
+    auth: String,
+    hostName: String,
+    port: Null<Int>,
+    pathName: String,
+    queryString: QueryString,
+    search: String, // for unparsable query string
+    hash: String
 }
