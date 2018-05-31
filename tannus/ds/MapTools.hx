@@ -100,6 +100,13 @@ class MapTools {
 		}
 		return o;
 	}
+
+    /**
+      get an Array of key=>value pairs
+     **/
+	public static inline function pairs<T>(self:Map<String, T>):Array<Pair<String, T>> {
+	    return [for (key in self.keys()) new Pair(key, self[key])];
+	}
 }
 
 /* Type Shorthand for the Delta of two Maps */
