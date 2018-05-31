@@ -24,6 +24,17 @@ using haxe.macro.ComplexTypeTools;
 
 class AnonTools {
     /**
+      get key=>value pairs
+     **/
+    public static function pairs(o: Dynamic):Array<Pair<String, Dynamic>> {
+        var res = [];
+        for (key in Reflect.fields( o )) {
+            res.push(new Pair(key, Reflect.field(o, key)));
+        }
+        return res;
+    }
+
+    /**
       * more generic and commonly useful 'owith'
       */
     public static macro function with(o:Expr, action:Expr) {
