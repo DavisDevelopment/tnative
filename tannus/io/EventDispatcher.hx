@@ -19,6 +19,19 @@ class EventDispatcher {
 		_sigs[name] = sig.or(new Signal());
 	}
 
+    /**
+      detach a Signal from [this] dispatcher, optionally destroying it
+     **/
+	public function removeSignal(name:String, destroy:Bool=true):Bool {
+	    var res = canDispatch(name);
+	    if ( res ) {
+	        if ( destroy )
+                _sigs[name].clear();
+	        _sigs.remove(name);
+	    }
+	    return res;
+	}
+
 	/**
 	  * Add a list of Signals to [this] Dispatcher
 	  */
