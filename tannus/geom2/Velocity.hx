@@ -2,7 +2,7 @@ package tannus.geom2;
 
 import tannus.ds.DataView;
 
-import tannus.geom.Angle;
+import tannus.geom2.Angle;
 
 import Std.*;
 import tannus.math.TMath.*;
@@ -55,14 +55,14 @@ class Velocity {
 /* === Computed Instance Fields === */
 
 	public var x(get, set):Float;
-	private inline function get_x():Float return (Math.cos( angle.radians ) * speed);
+	private inline function get_x():Float return (Math.cos(angle.getRadians()) * speed);
 	private function set_x(v : Float):Float {
 		setVector(v, y);
 		return v;
 	}
 	
 	public var y(get, set):Float;
-	private inline function get_y():Float return (Math.sin( angle.radians ) * speed);
+	private inline function get_y():Float return (Math.sin(angle.getRadians()) * speed);
 	private function set_y(v : Float):Float {
 		setVector(x, v);
 		return v;
@@ -83,7 +83,7 @@ class Velocity {
 /* === Static Methods === */
 
 	public static inline function fromVector(x:Float, y:Float):Velocity {
-		return (new Velocity(0,0).setVector(x, y));
+		return (new Velocity(0, new Angle(0)).setVector(x, y));
 	}
 	public static inline function fromPoint(p : Point<Float>):Velocity {
 		return fromVector(p.x, p.y);
