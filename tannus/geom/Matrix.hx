@@ -2,6 +2,10 @@ package tannus.geom;
 
 import tannus.geom.Point;
 
+#if js
+import js.html.DOMMatrix as DomMatrix;
+#end
+
 /**
   * Coordinate Matrix class
   */
@@ -53,7 +57,9 @@ class Matrix {
 		ty = sourceMatrix.ty;
 	}
 	
-	
+	/**
+	  creates a box
+	 **/
 	public function createBox(scaleX:Float, scaleY:Float, rotation:Float = 0, tx:Float = 0, ty:Float = 0):Void {
 		a = scaleX;
 		d = scaleY;
@@ -62,6 +68,9 @@ class Matrix {
 		this.ty = ty;
 	}
 	
+	/**
+	  creates a gradient box
+	 **/
 	public function createGradientBox (width:Float, height:Float, rotation:Float = 0, tx:Float = 0, ty:Float = 0):Void {
 		a = width / 1638.4;
 		d = height / 1638.4;
@@ -266,6 +275,21 @@ class Matrix {
 		tx = Math.round (tx * 10) / 10;
 		ty = Math.round (ty * 10) / 10;
 	}
+
+#if js
+
+    public function toDomMatrix():DomMatrix {
+        var m = new DomMatrix();
+        //m.a = a;
+        //m.b = b;
+        //m.c = c;
+        //m.d = d;
+        //m.e = tx;
+        //m.f = ty;
+        return m;
+    }
+
+#end
 	
 /* === Instance Fields === */
 	
