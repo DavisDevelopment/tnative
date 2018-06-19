@@ -9,6 +9,11 @@ using tannus.ds.ArrayTools;
 using tannus.FunctionTools;
 
 abstract Url (UrlType) from UrlType to UrlType {
+    /* Constructor Function */
+    public inline function new(href:String, parseQueryString:Bool=true):Void {
+        this = cast parse(href, parseQueryString);
+    }
+
     public static var pattern(default, null):EReg = ~/^((((?:([^:\/#\?]+):)?(?:(\/\/)?((?:(([^:@\/#\?]+)(?:[:]([^:@\/#\?]+))?)@)?(([^:\/#\?\]\[]+|\[[^\/\]@#?]+\])(?:[:]([0-9]+))?))?)?)?((\/?(?:[^\/\?#]+\/+)*)([^\?#]*)))?(?:\?([^#]+))?)(?:#(.*))?/;
 
     @:from 
@@ -55,6 +60,7 @@ abstract Url (UrlType) from UrlType to UrlType {
     public var pathName(get, set) : String;
     public var port(get, set) : Null<Int>;
     public var protocol(get, set) : String;
+    public var params(get, set): QueryString;
     public var queryString(get, set) : QueryString;
     public var search(get, set) : String;
     public var slashes(get, set) : Bool;
@@ -255,6 +261,8 @@ abstract Url (UrlType) from UrlType to UrlType {
             this.search = null;
         return this.queryString = value;
     }
+    inline function get_params() return queryString;
+    inline function set_params(v) return queryString = v;
 
     function get_search():String {
         if (null != this.search && "" != this.search) {
