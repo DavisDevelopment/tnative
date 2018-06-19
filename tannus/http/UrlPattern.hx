@@ -5,6 +5,7 @@ import tannus.sys.GlobStar in Pattern;
 import tannus.sys.Path;
 import tannus.nore.Selector;
 import tannus.ds.Object;
+import tannus.ds.Anon;
 
 using StringTools;
 using tannus.ds.StringUtils;
@@ -23,17 +24,16 @@ class CUrlPattern {
 	public function new(s : String):Void {
 		if (s.has('?')) {
 			var serch = s.after('?');
-			trace(serch);
 			s = s.before('?');
 			params = new Selector(serch);
 		}
 		else params = null;
 		u = s;
 		protocol = u.protocol;
-		hostname = u.hostname;
+		hostname = u.hostName;
 		pathname = null;
-		if (u.pathname != '') {
-			pathname = u.pathname;
+		if (u.pathName != '') {
+			pathname = u.pathName;
 		}
 	}
 
@@ -45,9 +45,9 @@ class CUrlPattern {
 	public function test(url : Url):Bool {
 		return (
 			protocol.test(url.protocol) &&
-			hostname.test(url.hostname) &&
+			hostname.test(url.hostName) &&
 			(pathname != null ? pathname.test(url.path) : true) &&
-			(params != null ? params.test(url.params) : true)
+			(params != null ? params.test(url.queryString.toObject()) : true)
 		);
 	}
 
@@ -59,7 +59,7 @@ class CUrlPattern {
 			return {};
 		
 		var o:Object = {};
-		o += hostname.match(url.hostname);
+		o += hostname.match(url.hostName);
 		
 		if (pathname != null)
 			o += pathname.match(url.path); 
