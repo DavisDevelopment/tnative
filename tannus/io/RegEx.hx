@@ -2,6 +2,10 @@ package tannus.io;
 
 import tannus.ds.Maybe;
 
+#if js
+import js.RegExp;
+#end
+
 using StringTools;
 using tannus.ds.StringUtils;
 using Lambda;
@@ -86,7 +90,7 @@ abstract RegEx (EReg) from EReg to EReg {
     /**
       * iterate over each match
       */
-	public function iter(text:String, f:RegEx->Void):Void {
+	public inline function iter(text:String, f:RegEx->Void):Void {
 	    map(text, function(me) {
 	        f( me );
 	        return '';
@@ -96,7 +100,7 @@ abstract RegEx (EReg) from EReg to EReg {
     /**
       * 
       */
-	public function reduce<TAcc>(text:String, f:RegEx->TAcc->TAcc, acc:TAcc):TAcc {
+	public inline function reduce<TAcc>(text:String, f:RegEx->TAcc->TAcc, acc:TAcc):TAcc {
 	    iter(text, function(self) {
 	        acc = f(self, acc);
 	    });
@@ -110,6 +114,35 @@ abstract RegEx (EReg) from EReg to EReg {
 	public function toTester():String->Bool {
 		return (this.match.bind(_));
 	}
+
+#if js
+
+    var re(get, never):RegExp;
+    inline function get_re() return cast(@:privateAccess this.r, RegExp);
+
+    public function toString():String {
+        return '~/${getSource()}/${getFlags()}';
+    }
+
+    public inline function getSource():String {
+        return re.source;
+    }
+
+    public inline function getFlags():String {
+        return Std.string((untyped re).flags);
+    }
+
+    @:op(A || B)
+    public static function combine_or(left:RegEx, right:RegEx):RegEx {
+        if (left.getFlags() != right.getFlags()) {
+            throw 'Error: EReg flags must be the same for left and right operands';
+        }
+        else {
+            return new RegEx(new EReg(('(?:${left.getSource()})|(?:${right.getSource()})'), left.getFlags()));
+        }
+    }
+
+#end
 }
 
 class RegExMatch {
