@@ -102,6 +102,10 @@ class Signal2<A, B> {
 		ignore( f );
 	}
 
+	public inline function clear():Void {
+	    handlers = new Array();
+	}
+
 	/**
 	  * Call a listener
 	  */
