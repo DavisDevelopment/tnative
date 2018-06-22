@@ -18,6 +18,7 @@ import Reflect.deleteField;
 using Slambda;
 using tannus.ds.ArrayTools;
 using tannus.async.PromiseTools;
+using tannus.FunctionTools;
 
 using haxe.macro.ExprTools;
 using haxe.macro.TypeTools;
@@ -93,8 +94,9 @@ class VoidPromise {
     /**
       * invoke [action] when [this] promise has been settled, whether resolved or rejected
       */
-    public function always(action : Void -> Void):Void {
-        then(action, (x)->action());
+    public function always(action : Void -> Void):VoidPromise {
+        //action = action.once();
+        return then(action.once(), (x -> action()).once());
     }
 
     /**
@@ -121,14 +123,20 @@ class VoidPromise {
       * 'make' [this] Promise
       */
     private function _make():Void {
+        //function resolve(?res: VpRes) {
+            //_resolve( res );
+        //}
         function resolve() {
             _resolve();
         }
+
         function reject(err) {
             _reject( err );
         }
+
         setStatus(PSPending);
-        exec(resolve, reject);
+
+        exec(resolve.once(), reject.once());
     }
 
     /**
@@ -143,8 +151,20 @@ class VoidPromise {
     /**
       * resolve [this] Promise
       */
-    private function _resolve():Void {
-        setStatus( PSResolved );
+    private function _resolve(?res: VpRes):Void {
+        if (res != null) {
+            res.toVp().then(
+                function() {
+                    setStatus(PSResolved);
+                },
+                function(error) {
+                    setStatus(PSRejected(error));
+                }
+            );
+        }
+        else {
+            setStatus( PSResolved );
+        }
     }
 
     /**
@@ -525,7 +545,45 @@ abstract VoidPromiseExecutor (VoidPromiseExecutorFunction) from VoidPromiseExecu
     }
 }
 
+//typedef VoidPromiseExecutorFunction = (?VpRes -> Void) -> (Dynamic->Void) -> Void;
 typedef VoidPromiseExecutorFunction = (Void -> Void) -> (Dynamic->Void) -> Void;
+
+abstract VpRes (VpResolution) from VpResolution {
+    @:from
+    public static inline function fromVpResolution<T:VpResolution>(res: T):VpRes {
+        return untyped res;
+    }
+
+    @:to
+    public static function toVp(res: VpResolution):VoidPromise {
+        if ((res is VoidPromise)) {
+            return cast res;
+        }
+        #if js
+        else if ((res is js.Promise<Dynamic>)) {
+            return toVp(Promise.fromJsPromise(cast res));
+        }
+        #end
+        else if ((res is Promise<Dynamic>)) {
+            return (res : Promise<Dynamic>).void();
+        }
+        else if (Reflect.isFunction( res )) {
+            return toVp(new Promise(function(accept, reject) {
+                (untyped res)(function(?error:Dynamic, ?result:Dynamic) {
+                    if (error != null)
+                        reject(error);
+                    else
+                        accept(result);
+                });
+            }));
+        }
+        else {
+            return toVp(Promise.resolve(cast res));
+        }
+    }
+}
+
+private typedef VpResolution = Either<#if js Either<Promise<Dynamic>,js.Promise<Dynamic>> #else Promise<Dynamic> #end, Either<VoidPromise, Either<Function->Void, Dynamic>>>;
 
 private typedef BuildConfig = {
     names: Array<Expr>,
