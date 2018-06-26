@@ -8,6 +8,9 @@ import tannus.io.Signal2;
 import tannus.async.promises.*;
 
 import haxe.extern.EitherType as Either;
+import haxe.ds.Option;
+import haxe.Constraints.Function;
+
 import haxe.macro.Type;
 import haxe.macro.Expr;
 import haxe.macro.Context;
@@ -19,6 +22,7 @@ using Slambda;
 using tannus.ds.ArrayTools;
 using tannus.async.PromiseTools;
 using tannus.FunctionTools;
+using tannus.async.Result;
 
 using haxe.macro.ExprTools;
 using haxe.macro.TypeTools;
@@ -275,6 +279,24 @@ class VoidPromise {
     }
     */
 
+    public function error():Promise<Option<Dynamic>> {
+        return new Promise<Option<Dynamic>>(function(yep, nope) {
+            try {
+                function done_success()
+                    yep(None);
+                function done_failure(failure_reason)
+                    yep(Some(failure_reason));
+                then(done_success.once(), done_failure.once());
+            }
+            catch (err: Dynamic) {
+                nope( err );
+                #if js
+                js.Lib.rethrow();
+                #end
+            }
+        });
+    }
+
     /**
       * derive a valued Promise from a Void one
       */
@@ -334,6 +356,22 @@ class VoidPromise {
                 throw error;
             }
         });
+    }
+
+    public static function all(a: Iterable<VoidPromise>):VoidPromise {
+        var val = a.array().map(x -> ((next:VoidCb) -> x.then(next.void(), next.raise()) : VoidAsync)).compact();
+        return new VoidPromise(function(finish, quit) {
+            VoidAsyncs.series(val, function(?err) {
+                if (err != null)
+                    quit(err);
+                else
+                    finish();
+            });
+        });
+    }
+
+    public static function fromAsyncs(asyncs: Iterable<VoidAsync>):VoidPromise {
+        return all(asyncs.array().map(a -> VoidAsyncs.toPromise(a)));
     }
 
     /**
