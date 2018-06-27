@@ -137,6 +137,18 @@ class StringUtils {
 		}
 	}
 
+    /**
+      strip all occurrences of each character in [chars] from [s]
+     **/
+	public static function trimChars(s:String, chars:String, caseInsensitive:Bool=false):String {
+	    for (c in chars.split('')) {
+	        s = s.replace(c, '');
+	        if (caseInsensitive)
+	            s = s.replace(c.toLowerCase(), '');
+        }
+        return s;
+	}
+
 	/**
 	  * Strip out all pieces of [str] which match the pattern [pat]
 	  */
