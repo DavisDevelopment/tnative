@@ -189,6 +189,20 @@ class PRegEx {
         return add(value.compile().generate());
     }
 
+    public function addJoinAny<T>(list:Iterable<T>, append:PRegEx->T->Void, separate:PRegEx->T->Void):PRegEx {
+        var it = list.iterator(), v:T;
+        while (it.hasNext()) {
+            v = it.next();
+            append(this, v);
+            if (it.hasNext())
+                separate(this, v);
+        }
+        return this;
+    }
+    public function addJoin<T:String>(list:Iterable<T>, sep:PRegEx->T->Void):PRegEx {
+        return addJoinAny(list, ((x,y)->x.add('' + y)), sep);
+    }
+
     /**
       * append given expression to [this], parsing out and injecting mixins
       */
