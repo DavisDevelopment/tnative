@@ -96,7 +96,8 @@ abstract Byte (Int) from Int to Int {
 	  * Tests whether [this] Byte would be a whitespace character in String form
 	  */
 	public inline function isWhiteSpace():Bool {
-		return Lambda.has([9, 10, 11, 12, 13, 32], asint);
+		//return Lambda.has([9, 10, 11, 12, 13, 32], asint);
+		return (isAny(9, 10, 11, 12, 13, 32));
 	}
 
 	/**
@@ -110,10 +111,11 @@ abstract Byte (Int) from Int to Int {
 	  * Check whether [this] Byte is a punctuation mark
 	  */
 	public inline function isPunctuation():Bool {
-		return Lambda.has([
-			33, 44, 45, 46,
-			58, 59, 53
-		], asint);
+		//return Lambda.has([
+			//33, 44, 45, 46,
+			//58, 59, 53
+		//], asint);
+		return isAny(33, 44, 45, 46, 58, 59, 53);
 	}
 
 	/**
