@@ -33,4 +33,16 @@ class OptionTools {
             case Some(v): v;
         };
     }
+    public static inline function ifSome<T>(o:Option<T>, f:T->Void) {
+        switch o {
+            case Some(v): f(v);
+            case _:
+        }
+    }
+    public static inline function map<TIn,TOut>(o:Option<TIn>, f:TIn->TOut):Option<TOut> {
+        return switch o {
+            case null, None: None;
+            case Some(x): Some(f(x));
+        };
+    }
 }
