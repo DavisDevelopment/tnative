@@ -50,4 +50,9 @@ abstract Anon<T> (Dynamic<T>) from Dynamic<T> to Dynamic<T> {
         return this;
         #end
     }
+
+    @:from
+    public static inline function of<T>(betty: Dynamic<T>):Anon<T> {
+        return cast betty;
+    }
 }
