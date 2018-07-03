@@ -172,7 +172,7 @@ class WebRequest extends EventDispatcher {
 	private function readyStateChanged():Void {
 		switch ( readyState ) {
 			case HeadersReceived:
-				trace(req.getAllResponseHeaders());
+				//trace(req.getAllResponseHeaders());
 
 			default:
 				null;
@@ -217,6 +217,9 @@ class WebRequest extends EventDispatcher {
             detail: _.detail
         }));
         forward('timeout', pext);
+        forward('readystatechange', function(evt) {
+            return readyState;
+        });
 	}
 
 	/**
@@ -224,6 +227,7 @@ class WebRequest extends EventDispatcher {
 	  */
 	private function done():Void {
 		dispatch(eventName(), req.response);
+
 	}
 
 	/**
@@ -253,6 +257,23 @@ class WebRequest extends EventDispatcher {
 	    on('abort', f);
 	}
 
+	public function onReadyStateChange(f : ReadyState->Void):Void {
+	    on('readystatechange', f);
+	}
+
+	public function onResponseHeadersAvailable(f: Map<String, String> -> Void) {
+	    function _check(rs: ReadyState) {
+            switch rs {
+                case Unsent, Opened:
+                    once('readystatechange', _check);
+
+                case HeadersReceived, Loading, Done:
+                    return f(getAllResponseHeaders());
+            }
+        }
+        _check( readyState );
+	}
+
 /* === Computed Instance Fields === */
 
 	/* the ready state of [this] shit */
@@ -263,6 +284,9 @@ class WebRequest extends EventDispatcher {
 	public var responseType(get, set):ResponseType;
 	private inline function get_responseType():ResponseType return cast(req.responseType, String);
 	private inline function set_responseType(v : ResponseType):ResponseType return untyped(req.responseType = cast v);
+
+	public var status(get, never): Int;
+	private inline function get_status() return req.status;
 
 /* === Instance Fields === */
 
