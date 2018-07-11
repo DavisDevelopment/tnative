@@ -327,9 +327,42 @@ class Promise<T> implements Thenable<T, Promise<T>> {
         });
     }
 
+    public static function raise<T>(error: Dynamic):Promise<T> {
+        return new Promise<T>(function(_, _throw) {
+            _throw( error );
+        });
+    }
+
     public static function pair<A, B>(resPair : Pair<PromiseResolution<A>, PromiseResolution<B>>):Promise<Pair<A, B>> {
         return all(untyped [resolve(resPair.left), resolve(resPair.right)]).transform(function(a : Array<Dynamic>) {
             return untyped (new Pair(untyped a[0], untyped a[1]));
+        });
+    }
+
+    public static function result<T>(prom: Promise<T>):Promise<Result<T, Dynamic>> {
+        return prom.derive(function(_, accept, e) {
+            _.then(value -> accept(Result.ResSuccess(value)), error -> accept(Result.ResFailure(error)));
+        });
+    }
+
+    public static function either<T>(a:Promise<T>, b:Promise<T>):Promise<T> {
+        return pair(new Pair(result(a), result(b))).derive(function(_, accept, reject) {
+            _.then(function(t: Pair<Result<T, Dynamic>, Result<T, Dynamic>>) {
+                switch [t.left, t.right] {
+                    case [Result.ResSuccess(value), _]:
+                        return accept(value);
+
+                    case [Result.ResFailure(_), Result.ResSuccess(value)]:
+                        return accept(value);
+
+                    case [Result.ResFailure(a_err), Result.ResFailure(b_err)]:
+                        reject(new Pair(a_err, b_err));
+
+                    default:
+                }
+            }, function(wtf) {
+                reject(wtf);
+            });
         });
     }
 
