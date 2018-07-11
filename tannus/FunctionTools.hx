@@ -201,10 +201,10 @@ class Function1Tools {
         }
     }
 
-    public static inline function wrap<A, ARet, BRet>(f:A->ARet, wrapper:(A->ARet)->A->BRet):A->BRet {
-        return function(a: A):BRet {
-            return wrapper(f, a);
-        }
+    public static inline function wrap<A, B, ARet, BRet>(f:A->ARet, wrapper:(A->ARet)->B->BRet):B->BRet {
+        return (function(b: B):BRet {
+            return wrapper(f, b);
+        });
     }
 
     /**
