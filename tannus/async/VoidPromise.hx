@@ -358,6 +358,12 @@ class VoidPromise {
         });
     }
 
+    public static function raise(error: Dynamic):VoidPromise {
+        return new VoidPromise(function(_, _throw) {
+            _throw( error );
+        });
+    }
+
     public static function all(a: Iterable<VoidPromise>):VoidPromise {
         var val = a.array().map(x -> ((next:VoidCb) -> x.then(next.void(), next.raise()) : VoidAsync)).compact();
         return new VoidPromise(function(finish, quit) {
