@@ -26,10 +26,10 @@ abstract Cb<T> (Callback<T, Dynamic>) from Callback<T, Dynamic> {
             #if (js && debug)
                 js.Lib.global.console.error( error );
             #end
-            trace( error );
+            //trace( error );
         }
         else if (value != null) {
-            trace( value );
+            //trace( value );
         }
     }
 }
