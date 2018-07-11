@@ -3,6 +3,7 @@ package tannus.ds;
 import tannus.ds.EitherType;
 import tannus.io.RegEx;
 import tannus.io.Byte;
+import tannus.io.Char;
 import tannus.ds.tuples.Tup2 in Tuple;
 
 import haxe.macro.Expr;
@@ -29,6 +30,15 @@ class StringUtils {
 		else {
 			throw 'IndexOutOfBoundError: $i is not within range(0, ${s.length - 1})';
 		}
+	}
+
+	public static function characterAt(s:String, i:Int):Char {
+	    if (i <= (s.length - 1)) {
+	        return new Char(s.charAt( i ));
+	    }
+        else {
+            throw 'IndexOutOfBoundsError: $i is not within range(0, ${s.length - 1})';
+        }
 	}
 
 	public static function iterBytes(s: String, pos:Int=0, ?len:Int):Iterator<Byte> {
