@@ -78,11 +78,11 @@ class AnonTools {
       * creates and returns a deep-copy of the given object [o]
       * @param structs {Bool} denotes whether or not to attempt to copy class instances and enum values
       */
-    public static function deepCopy<T>(o:T, structs:Bool=false):T {
-        return clone_dynamic(o, structs);
+    public static function deepCopy<T>(o:T, ?target:T, structs:Bool=false):T {
+        return clone_dynamic(o, target, structs);
     }
 
-    private static function clone_dynamic<T>(o:T, structs:Bool):T {
+    private static function clone_dynamic<T>(o:T, ?target:T, structs:Bool):T {
         var vtype:ValueType = Types.typeof( o );
         switch ( vtype ) {
             // basemost atomic types
@@ -91,7 +91,7 @@ class AnonTools {
 
             // anonymous object value
             case Vt.TObject:
-                return clone_anon(o, structs);
+                return clone_anon(o, structs, target);
 
             // enum value
             case Vt.TEnum( e ):
@@ -100,7 +100,7 @@ class AnonTools {
 
             // class instance
             case Vt.TClass( c ):
-                return clone_instance(o, cast c, structs);
+                return clone_instance(o, cast c, structs, target);
 
             case Vt.TFunction:
                 // probably a few more targets for which something like this would work..
@@ -142,7 +142,7 @@ class AnonTools {
     /**
       * create deep-clone of a class-instance
       */
-    private static function clone_instance<T>(o:T, type:Class<T>, structs:Bool):T {
+    private static function clone_instance<T>(o:T, type:Class<T>, structs:Bool, ?target:T):T {
         if (type == (String : Class<Dynamic>)) {
             return o;
         }
@@ -156,7 +156,7 @@ class AnonTools {
                 return (untyped o.clone)();
             }
             else if ( structs ) {
-                var copi:T = createEmptyInstance( type );
+                var copi:T = (target != null ? target : createEmptyInstance( type ));
                 clone_anon(o, structs, copi);
                 return copi;
             }
