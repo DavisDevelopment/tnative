@@ -330,16 +330,27 @@ class Function3Tools {
         };
     }
 
+    public static inline function wrap<A1, B1, C1, A2, B2, C2, Ret1, Ret2>(f:A1->B1->C1->Ret1, wrapper:(A1->B1->C1->Ret1)->A2->B2->C2->Ret2):A2->B2->C2->Ret2 {
+        return function(a:A2, b:B2, c:C2):Ret2 {
+            return wrapper(f, a, b, c);
+        }
+    }
 }
 
 class Function4Tools {
     public inline static function curry<A, B, C, D, E>(f: A -> B -> C -> D -> E): A -> B -> C -> (D -> E)
-                                                                                  return function(a: A, b: B, c: C) { return function(d) { return f(a, b, c, d); } };
+        return function(a: A, b: B, c: C) { return function(d) { return f(a, b, c, d); } };
+
+    public static inline function wrap<A1, B1, C1, D1, A2, B2, C2, D2, Ret1, Ret2>(f:A1->B1->C1->D1->Ret1, wrapper:(A1->B1->C1->D1->Ret1)->A2->B2->C2->D2->Ret2):A2->B2->C2->D2->Ret2 {
+        return function(a:A2, b:B2, c:C2, d:D2):Ret2 {
+            return wrapper(f, a, b, c, d);
+        }
+    }
 }
 
 class Function5Tools {
     public inline static function curry<A, B, C, D, E, F>(f: A -> B -> C -> D -> E -> F): A -> B -> C -> D -> (E -> F)
-                                                                                          return function(a: A, b: B, c: C, d: D) { return function(e) { return f(a, b, c, d, e); } };
+        return function(a: A, b: B, c: C, d: D) { return function(e) { return f(a, b, c, d, e); } };
 }
 
 class Function6Tools {
