@@ -311,6 +311,13 @@ class StringUtils {
 		);
 	}
 
+	public static inline function ifHas<T>(s:String, sub:String, onHas:String->T, onNotHas:String->T):T {
+	    if (has(s, sub)) {
+	        return onHas( s );
+	    }
+        else return onNotHas( s );
+	}
+
 	/**
 	  * Get last byte of [this] String
 	  */
@@ -363,6 +370,10 @@ class StringUtils {
 			}
 		}
 		return true;
+	}
+
+	public static function chunk(s: String):Array<String> {
+        return (~/\b/g).split(s).filter(x -> !empty(x.trim()));
 	}
 }
 
