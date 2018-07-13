@@ -21,7 +21,7 @@ class Dsv {
         var result: Array<Array<String>> = new Array();
         dsv == "" ? [] : 
         if (dsv == '' || dsv.empty())
-            //
+            null;
         else
             result = new tannus.csv.Parser(options.delimiter, options.quote, options.escapedQuote).parse( dsv );
 
@@ -134,7 +134,7 @@ class Dsv {
       check whether [value] needs to be quoted
      **/
     static inline function requiresQuotes(value:String, delimiter:String, quote:String):Bool {
-        return (value.contains(delimiter) || value.contains(quote) || value.contains('\n') || value.contains('\r'));
+        return (value.has(delimiter) || value.has(quote) || value.has('\n') || value.has('\r'));
     }
 
     static inline function applyQuotes(value:String, quote:String, escapedQuote:String):String {
