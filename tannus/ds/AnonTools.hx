@@ -82,6 +82,9 @@ class AnonTools {
         return clone_dynamic(o, target, structs);
     }
 
+    /**
+      clone any type
+     **/
     private static function clone_dynamic<T>(o:T, ?target:T, structs:Bool):T {
         var vtype:ValueType = Types.typeof( o );
         switch ( vtype ) {
@@ -125,7 +128,7 @@ class AnonTools {
         var res:Dynamic = (d != null ? d : {});
         var val:Dynamic;
         for (k in fields( o )) {
-            val = deepCopy(field(o, k), structs);
+            val = deepCopy(field(o, k), null, structs);
             // on the js-target
             #if js
                 // if [k] is a method-property
@@ -148,7 +151,7 @@ class AnonTools {
         }
         else if (type == (Array : Class<Dynamic>)) {
             return untyped {
-                (o : Array<Dynamic>).map(deepCopy.bind(_, structs));
+                (o : Array<Dynamic>).map(deepCopy.bind(_, null, structs));
             };
         }
         else {
@@ -177,7 +180,7 @@ class AnonTools {
         else {
             if ( structs ) {
                 return untyped {
-                    createEnum(type, vt.getName(), (vt.getParameters().map(deepCopy.bind(_, structs))));
+                    createEnum(type, vt.getName(), (vt.getParameters().map(deepCopy.bind(_, null, structs))));
                 };
             }
             else {
