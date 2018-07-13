@@ -36,7 +36,7 @@ class Parser {
             loop();
         } 
         catch(e : Dynamic) {
-            throw new thx.Error('unable to parse at pos $pos: ${Std.string(e)}');
+            throw 'unable to parse at pos $pos: ${Std.string(e)}';
         }
 
         /* finalize results */
