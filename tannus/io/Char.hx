@@ -129,7 +129,9 @@ abstract Char (String) from String to String {
     public inline function toString():String return (this : String);
 
     @:from
-    public static inline function fromInt(i: Int):Char return fromString(String.fromCharCode(sanitizeInt( i )));
+    public static inline function fromInt(i: Int):Char {
+        return fromString(String.fromCharCode(sanitizeInt( i )));
+    }
 
     @:to
     public inline function toInt():Int return StringTools.fastCodeAt(this, 0);
@@ -162,15 +164,17 @@ abstract Char (String) from String to String {
         return ensureIsValidString( s );
     }
 
-    private static inline function validateInt(i: Int):Void {
+    private static inline function validateInt(i: Null<Int>):Void {
         if (i == null || !i.isFinite() || i.isNaN() || !i.inRange(0, 0xFFFD)) {
             throw CharException.CEInvalidCharCode;
         }
         return ;
     }
 
-    private static inline function ensureIsValidInt(i: Int):Int {
+    private static inline function ensureIsValidInt(i: Null<Int>):Int {
         validateInt( i );
+        if (i == null)
+            i = 0;
         return i;
     }
 
