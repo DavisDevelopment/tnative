@@ -285,6 +285,15 @@ class Promise<T> implements Thenable<T, Promise<T>> {
         return macro new ArrayPromise($self);
     }
 
+    @:native('_void')
+    public function void():VoidPromise {
+        return new VoidPromise(function(resolve, reject) {
+            then(function(_) {
+                resolve();
+            }, reject);
+        });
+    }
+
 #if js
 
     public function toJsPromise():js.Promise<T> {
