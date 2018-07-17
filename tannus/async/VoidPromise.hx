@@ -358,6 +358,7 @@ class VoidPromise {
         });
     }
 
+    @:native('_raise')
     public static function raise(error: Dynamic):VoidPromise {
         return new VoidPromise(function(_, _throw) {
             _throw( error );

@@ -9,12 +9,12 @@ abstract Async<T> (Cb<T>->Void) from Cb<T>->Void {
 
     @:to
     public function promise():Promise<T> {
-        return new Promise(function(yield, raise) {
+        return new Promise(function(_yield, _raise) {
             this(function(?error, ?result) {
                 if (error != null)
-                    return raise( error );
+                    return _raise( error );
                 else {
-                    return yield( result );
+                    return _yield( result );
                 }
             });
         });

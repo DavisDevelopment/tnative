@@ -336,6 +336,7 @@ class Promise<T> implements Thenable<T, Promise<T>> {
         });
     }
 
+    @:native('_raise')
     public static function raise<T>(error: Dynamic):Promise<T> {
         return new Promise<T>(function(_, _throw) {
             _throw( error );
