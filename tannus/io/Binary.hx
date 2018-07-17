@@ -55,29 +55,18 @@ class Binary {
 	}
 
 	/* read a 32bit integer from the given index */
-	public function getInt32(i : Int):Int {
-	    var a:Int = get( i );
-	    var b:Int = get(i + 1);
-	    var c:Int = get(i + 2);
-	    var d:Int = get(i + 3);
-		return (bigEndian ? (d | (c << 8) | (b << 16) | (a << 24)) : (a | (b << 8) | (c << 16) | (d << 24)));
-	}
+	//public function getInt32(i : Int):Int {
+		//var a:Int = get( i );
+		//var b:Int = get(i + 1);
+		//var c:Int = get(i + 2);
+		//var d:Int = get(i + 3);
+		//return (bigEndian ? (d | (c << 8) | (b << 16) | (a << 24)) : (a | (b << 8) | (c << 16) | (d << 24)));
+	//}
 
-	/* read unsigned 32bit integer from given index */
-	public function getUint32(i: Int):Int {
-	    return signedToUnsigned(getInt32( i ));
-	}
-
-	/* store a 32bit integer to the given position */
-	public function setInt32(i:Int, v:Int):Void {
-		set(i, v);
-		set(i+1, v >> 8);
-		set(i+2, v >> 16);
-		set(i+3, v >> 24);
-	}
-	public inline function setUint32(i:Int, v:Int):Void {
-	    setInt32(i, v);
-	}
+     //read unsigned 32bit integer from given index 
+	//public function getUint32(i: Int):Int {
+		//return signedToUnsigned(getInt32( i ));
+	//}
 
 	/* read a 64bit integer */
 	public inline function getInt64(i : Int):Int64 {
@@ -114,6 +103,136 @@ class Binary {
 	/* write a Float */
 	public inline function setFloat(i:Int, v:Float):Void {
 		setInt32(i, TMath.floatToI32( v ));
+	}
+
+    public inline function getUInt8(i: Int):Int return get( i );
+	public function getInt8(i: Int):Int {
+	    var n:Int = getUInt8( i );
+	    if (n >= 128) {
+	        return (n - 256);
+	    }
+	    return n;
+	}
+
+	public function getUInt16(i: Int):Int {
+	    var a:Int = getUInt8(i + 0);
+	    var b:Int = getUInt8(i + 1);
+		//return bigEndian ? b | (a << 8) : a | (b << 8);
+	    return 
+	        if ( bigEndian )
+	            b | (a << 8)
+            else
+                a | (b << 8);
+	}
+
+	public function getInt16(i: Int):Int {
+	    var a:Int = getUInt8(i + 0);
+	    var b:Int = getUInt8(i + 1);
+	    var n:Int = bigEndian ? b | (a << 8) : a | (b << 8);
+	    if (n & 0x8000 != 0)
+	        return n - 0x10000;
+	    return n;
+	}
+
+	public function getInt24(i: Int):Int {
+	    var a = getUInt8(i + 0),
+	    b = getUInt8(i + 1),
+	    c = getUInt8(i + 2),
+	    n = bigEndian 
+	        ? c | (b << 8) | (a << 16) 
+	        : a | (b << 8) | (c << 16);
+	    if (n & 0x80000 != 0)
+	        return n - 0x100000;
+	    return n;
+	}
+
+	public function getUInt24(i: Int):Int {
+	    var a = getUInt8(i + 0),
+	    b = getUInt8(i + 1),
+	    c = getUInt8(i + 2);
+	    return bigEndian 
+	        ? c | (b << 8) | (a << 16) 
+	        : a | (b << 8) | (c << 16);
+	}
+
+	public function getUInt32(i: Int):Int {
+	    var a = getUInt8(i + 0),
+	    b = getUInt8(i + 1),
+	    c = getUInt8(i + 2),
+	    d = getUInt8(i + 3);
+	    return bigEndian
+	        ? d | (c << 8) | (b << 16) | (a << 24)
+	        : a | (b << 8) | (c << 16) | (d << 24);
+	}
+
+	public function getInt32(i: Int):Int {
+	    var n:Int = getUInt32( i );
+	    if (n & 0x80000000 != 0)
+	        return (n | 0x80000000);
+	    return n;
+	}
+
+	public inline function setUInt8(i:Int, v:Int):Int return set(i, v);
+	public inline function setInt8(i:Int, v:Int):Int {
+	    return setUInt8(i, v & 0xFF);
+	}
+
+	public function setUInt16(i:Int, v:Int):Int {
+	    if ( bigEndian ) {
+            setUInt8(i + 0, v >> 8);
+            setUInt8(i + 1, v & 0xFF);
+        }
+        else {
+            setUInt8(i + 0, v & 0xFF);
+            setUInt8(i + 1, v >> 8);
+        }
+        return v;
+	}
+
+	public inline function setInt16(i:Int, v:Int):Int {
+	    return setUInt16(i, v & 0xFFFF);
+	}
+
+	public function setUInt24(i:Int, v:Int):Int {
+	    if ( bigEndian ) {
+	        setUInt8(i + 0, v >> 16);
+	        setUInt8(i + 1, (v >> 8) & 0xFF);
+	        setUInt8(i + 2, v & 0xFF);
+	    }
+        else {
+            setUInt8(i + 0, v & 0xFF);
+            setUInt8(i + 1, (v >> 8) & 0xFF);
+            setUInt8(i + 2, v >> 16);
+        }
+        return v;
+	}
+
+	public inline function setInt24(i:Int, v:Int):Int {
+	    return setUInt24(i, v & 0xFFFFFF);
+	}
+
+	public function setUInt32(i:Int, v:Int):Int {
+	    if ( bigEndian ) {
+	        setUInt8((i + 0), (v >> 24));
+	        setUInt8((i + 1), (v >> 16));
+	        setUInt8((i + 2), (v >> 8 ));
+	        setUInt8((i + 3), (v/*  */));
+	    }
+        else {
+            setUInt8((i + 0), (/* */ v));
+            setUInt8((i + 1), (v >>  8));
+            setUInt8((i + 2), (v >> 16));
+            setUInt8((i + 3), (v >> 24));
+        }
+		return v;
+	}
+
+	/* store a 32bit integer to the given position */
+	public function setInt32(i:Int, v:Int):Void {
+		set(i, v);
+		set(i+1, v >> 8);
+		set(i+2, v >> 16);
+		set(i+3, v >> 24);
 	}
 
 	/* fill [this] data with the given Byte */
@@ -391,7 +510,6 @@ class Binary {
             rpad.fill( 0 );
             var backward:ByteArray = slice( digits ).concat( rpad );
             grow( digits );
-            //b = backward.b;
             setData( backward.b );
         }
         else {
@@ -407,7 +525,6 @@ class Binary {
 	        throw 'BinaryError: Invalid truncation length ($len)';
 	    }
         else if (len < length) {
-            //shiftLeft((length - len), false);
             setData(sub(0, len).b);
             resize( len );
         }
@@ -472,10 +589,15 @@ class Binary {
 
 	/* reverse [this] data in-place */
 	public function reverse():Void {
-		for (i in 0...Math.floor(length / 2)) {
-			var temp = get( i );
-			set(i, get(length - i - 1));
-			set((length - i - 1), temp);
+	    /**
+	      [=INEFFICIENT=] 
+	      should be overridden where possible
+	     **/
+	    var temp: Int;
+		for (i in 0...floor(length / 2)) {
+			temp = getUInt8( i );
+			setUInt8(i, getUInt8(length - i - 1));
+			setUInt8((length - i - 1), temp);
 		}
 	}
 
@@ -487,11 +609,13 @@ class Binary {
 
 	/* get the concatenation of [this] data and [other] */
 	public function concat(other : ByteArray):ByteArray {
+	    /*[TODO] this method needs to be implemented by child-classes */
 		throw 'Not implemented';
 	}
 
 	/* create and return a copy of [this] */
 	public function copy():Binary {
+	    /*[TODO] this method needs to be implemented by child-classes */
 		return this;
 	}
 
@@ -503,6 +627,7 @@ class Binary {
 
 	/* get a subset of [this] data as a String */
 	public function getString(index:Int, len:Int):String {
+	    /*[TODO] this method needs to be implemented by child-classes */
 		return '';
 	}
 
@@ -523,20 +648,21 @@ class Binary {
 
 	/* convert [this] to a haxe.io.Bytes object */
 	public function toBytes():haxe.io.Bytes {
+	    /*[TODO] this method needs to be implemented by child-classes */
 		return haxe.io.Bytes.alloc( 0 );
 	}
 
 	/* convert [this] to a hexidecimal String */
 	public function toHex():String {
-		var sb = new StringBuf();
-		var chars = ('0123456789ABCDEF'.split('').map(function(s) {
-			return s.charCodeAt(0);
-		}));
+		var sb: StringBuf = new StringBuf(),
+		/* */c: Int;
+
 		for (i in 0...length) {
-			var c = get( i );
-			sb.addChar(chars[c >> 4]);
-			sb.addChar(chars[c & 15]);
+			c = getUInt8( i );
+			sb.addChar(hex_chars.charCodeAt(c >> 4));
+			sb.addChar(hex_chars.charCodeAt(c & 15));
 		}
+
 		return sb.toString();
 	}
 
@@ -632,6 +758,8 @@ class Binary {
 	    }
 	    return 0;
 	}
+
+	static var hex_chars:String = '0123456789ABCDEF';
 
 	/* === Computed Instance Fields === */
 
