@@ -50,6 +50,18 @@ class DefaultStreamInternalBuffer<T> implements StreamInternalBuffer<T> {
         return ret;
     }
 
+    public function unshift(value: T) {
+        a.unshift( value );
+        update_state();
+    }
+
+    public function flush():Array<T> {
+        var ret = a;
+        a = [];
+        update_state();
+        return ret;
+    }
+
     public function length():Int return a.length;
     public function recommendedHighWaterMark():Int return 16;
 
