@@ -92,6 +92,17 @@ class JSFunctionTools {
     public static inline function construct<TFunc:Function, TInst>(f:TFunc, ?parameters:Array<Dynamic>):TInst {
         return Type.createInstance((untyped f), (parameters != null ? parameters : []));
     }
+
+	public static function fthis<T:Function>(with_self: Function):T {
+	    untyped {
+	        return Reflect.makeVarArgs(function(args: Array<Dynamic>) {
+	            var self:Dynamic = __js__('this');
+	            trace( self );
+	            args.unshift( self );
+	            return Reflect.callMethod(null, with_self, args);
+	        });
+	    };
+	}
 }
 
 typedef NativeJsIterator<T> = {
