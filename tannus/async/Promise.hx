@@ -7,6 +7,7 @@ import tannus.io.Signal2;
 
 import tannus.async.promises.*;
 import tannus.async.Cb;
+import tannus.async.Broker;
 
 import haxe.extern.EitherType as Either;
 import haxe.macro.Type;
