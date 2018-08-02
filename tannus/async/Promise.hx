@@ -295,6 +295,20 @@ class Promise<T> implements Thenable<T, Promise<T>> {
         });
     }
 
+    public function future<Err>(?mapError:Dynamic->Err):Future<T, Err> {
+        if (mapError == null)
+            mapError = untyped (error -> error);
+        return new Future<T, Err>(function(future) {
+            then(function(result: T) {
+                future.yield( result );
+            });
+
+            unless(function(error: Dynamic) {
+                future.raise(mapError( error ));
+            });
+        });
+    }
+
 #if js
 
     public function toJsPromise():js.Promise<T> {
