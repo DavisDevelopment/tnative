@@ -20,6 +20,7 @@ using tannus.ds.ArrayTools;
 using tannus.async.FutureTools;
 using tannus.async.Result;
 using tannus.Nil;
+using tannus.FunctionTools;
 
 using haxe.macro.ExprTools;
 using haxe.macro.TypeTools;
@@ -64,14 +65,14 @@ class Future <TRes, TErr> {
     /**
       * create and return a new Future derived from [this] one
       */
-    public function derive<OutRes,OutErr>(extender:Future<TRes,TErr>->FutureResolutionProvider<OutRes,OutErr>)->Void, ?nomake:Bool):Future<OutRes,OutErr> {
+    public function derive<OutRes,OutErr>(extender:Future<TRes, TErr> -> FutureResolutionProvider<OutRes, OutErr> -> Void, ?nomake:Bool):Future<OutRes, OutErr> {
         return new DerivedFuture(extender, this, nomake);
     }
 
     /**
       * promise a transformation on [this] Future's data
       */
-    public function transform<Out, Err>(?mapv:TRes->Out, ?mape:TErr->Err, ?nomake:Bool):Future<Out, Err> {
+    public function transform<Out, Err>(?mapv:TRes->FutureResolution<Out, Err>, ?mape:TErr->Err, ?nomake:Bool):Future<Out, Err> {
         return cast new TransformedFuture(this, {
             v: mapv,
             e: mape
@@ -102,22 +103,10 @@ class Future <TRes, TErr> {
     /**
       * resolve [this] Future
       */
-    private function _resolve<Res:FutureResolution<TRes, TErr>>(resolution : Res):Void {
-        if (resolution.isResult()) {
-            setStatus(FSReached(resolution.asResult()));
-        }
-        else if (resolution.isPromise()) {
-            resolution.asPromise().then(_resolve, function(error) {
-                //FIXME
-                throw error;
-            });
-        }
-        else if (resolution.isFuture()) {
-            //TODO
-        }
-        else {
-            throw 'Error: Unhandled Future resolution value $resolution';
-        }
+    private function _resolve(resolution : FutureResolution<TRes, TErr>):Void {
+        _settleResult(resolution, function(o: Result<TRes, TErr>) {
+            setStatus(FSReached( o ));
+        });
     }
 
     /**
@@ -132,21 +121,26 @@ class Future <TRes, TErr> {
     }
 
     public function fork<SubErr>(child:Future<FutureResolution<TRes, SubErr>, SubErr>, translateError:SubErr->TErr):Future<TRes, TErr> {
-        child.then(function(out: Result<TRes,SubErr>) {
+        child.then(function(out: Result<FutureResolution<TRes, SubErr>, SubErr>) {
             switch ( out ) {
                 case ResSuccess( value ):
-                    if (value.isResult() || value.isFuture() || value.isPromise()) {
-                        _resolve( value );
-                    }
-                    else {
-                        _resolve(ResSuccess( value ));
-                    }
+                    _settleResult(value, function(o: Result<TRes, SubErr>) {
+                        switch o {
+                            case ResSuccess(v):
+                                _resolve(Res.value(v));
+
+                            case ResFailure(e):
+                                _resolve(Res.error(translateError(e)));
+                        }
+                    });
 
                 case ResFailure( error ):
-                    _resolve(Result.ResFailure(translateError(error)));
+                    _resolve(FutureResolution.error(translateError(error)));
+                    //_resolve(Result.Res(translateError(error)));
             }
             //betty
         });
+        return this;
     }
 
     /**
@@ -207,7 +201,7 @@ class Future <TRes, TErr> {
     }
 
     public inline function isSettled():Bool {
-        return (getStatus().match(FSResolved(_)|FSRejected(_)));
+        return (getStatus().match(FSReached(_)));
     }
 
     public inline function isUnsettled():Bool {
@@ -235,30 +229,55 @@ class Future <TRes, TErr> {
 
 /* === Static Methods === */
 
+    public static function async<TRes, TErr>(f: (Result<TRes, TErr>->Void)->Void):Future<TRes, TErr> {
+        return new Future<TRes, TErr>(function(out) {
+            f(function(result) {
+                switch result {
+                    case ResSuccess(x):
+                        out.yield( x );
+
+                    case ResFailure(e):
+                        out.raise(e);
+                }
+            });
+        });
+    }
+
     public static function resolve<TRes, TErr, R:FutureResolution<TRes, TErr>>(res : R):Future<TRes, TErr> {
         return new Future(function(_resolve:FutureResolutionProvider<TRes, TErr>) {
             _resolve(untyped res);
         });
     }
 
-    public static function pair<A, B>(resPair : Pair<FutureResolution<A>, FutureResolution<B>>):Future<Pair<A, B>> {
+    public static function error<TRes, TErr>(err: TErr):Future<TRes, TErr> {
+        return new Future<TRes, TErr>(function(res) {
+            res.raise( err );
+        });
+    }
+
+    public static function pair<A, B, E>(resPair : Pair<FutureResolution<A, E>, FutureResolution<B, E>>):Future<Pair<A, B>, E> {
         return all(untyped [resolve(resPair.left), resolve(resPair.right)]).transform(function(a : Array<Dynamic>) {
             return untyped (new Pair(untyped a[0], untyped a[1]));
         });
     }
 
-    public static function all(proms : Iterable<Future<Dynamic>>):Future<Array<Dynamic>> {
-        return new Future(function(yes, no) {
+    public static function all(proms : Iterable<Future<Dynamic, Dynamic>>):Future<Array<Dynamic>, Dynamic> {
+        return new Future(function(out) {
             var values:Array<Dynamic> = [];
             var resolved:Int = 0, total:Int = 0;
 
-            function make_step(i:Int, promise:Future<Dynamic>) {
-                promise.then(function(value:Dynamic) {
-                    values[i] = value;
-                    if (resolved == total) {
-                        yes( values );
+            function make_step(i:Int, future:Future<Dynamic, Dynamic>) {
+                future.then(function(outcome:Result<Dynamic, Dynamic>) {
+                    switch outcome {
+                        case ResSuccess(value):
+                            values[i] = value;
+                            if (resolved == total)
+                                out.yield( values );
+
+                        case ResFailure(error):
+                            out.raise( error );
                     }
-                }, no);
+                });
             }
 
             var index:Int = 0;
@@ -270,23 +289,43 @@ class Future <TRes, TErr> {
         });
     }
 
-    public static function _settle<TRes, TErr>(res:FutureResolution<TRes, TErr>, onValue:T->Void, ?onError:Dynamic->Void):Void {
-        if (res.isFuture()) {
-            res.asFuture().then(onValue, onError);
+    public static function _settle<TRes, TErr>(res:FutureResolution<TRes, TErr>, onValue:TRes->Void, ?onError:TErr->Void):Void {
+        if (res.isResult()) {
+            switch (res.asResult()) {
+                case ResSuccess(v):
+                    onValue(v);
+
+                case ResFailure(e):
+                    if (onError != null)
+                        onError(e);
+            }
         }
         else {
-            onValue(res.asValue());
+            var fut = res.asFuture();
+            fut.then(function(outcome: Result<TRes, TErr>) {
+                switch outcome {
+                    case ResSuccess(v):
+                        onValue(v);
+
+                    case ResFailure(e):
+                        if (onError != null)
+                            onError(e);
+                }
+            });
         }
+    }
+
+    public static function _settleResult<T,E>(res:FutureResolution<T,E>, cb:Result<T, E>->Void):Void {
+        cb = cb.once();
+        _settle(res, fn(cb(ResSuccess(_))), fn(cb(ResFailure(_))));
     }
 
     /**
       * declarative, less bulky (than using the constructor) macro for creating new promises
       */
     public static macro function create<TRes, TErr>(e:Expr, rest:Array<Expr>):ExprOf<Future<TRes, TErr>> {
-        var yes:Expr = (macro accept);
-        var no:Expr = (macro reject);
         var cfg:BuildConfig = {
-            names: [yes, no],
+            names: [],
             nomake: false
         };
 
@@ -299,15 +338,11 @@ class Future <TRes, TErr> {
             case [{pos:_,expr:EConst(CIdent(ident))}] if (ident == 'true' || ident == 'false'):
                 cfg.nomake = (ident == 'true');
 
-            case [{pos:_,expr:EArrayDecl([yep, nope])}]:
-                cfg.names = [yep, nope];
-
             default:
                 null;
         }
         
         var executorExpr:Expr = build_exec(e, cfg);
-        //trace(executorExpr.toString());
 
         // the final product
         return macro new tannus.async.Future($executorExpr, $v{cfg.nomake});
@@ -319,158 +354,54 @@ class Future <TRes, TErr> {
       * generate and return an expression for a FutureExecutor function
       */
     private static function build_exec(e:Expr, cfg:BuildConfig, _map:Bool=true):Expr {
-        var yes:Expr = cfg.names[0], no:Expr = cfg.names[1];
         var orig_e:Expr = e;
-        if (_map) {
+        if ( _map ) {
             e = create_mapper(e, cfg).map(create_mapper.bind(_, cfg));
         }
-        var exec:Expr = e.buildFunction([yes.toString(), no.toString()], true);
+        var exec:Expr = e.buildFunction(['out'], true);
         return exec;
     }
 
     /**
       * method used to transform the syntax used within Future.create(...) into a functional declaration of a Future
       */
-    /*
     private static function create_mapper(e:Expr, cfg:BuildConfig):Expr {
-        var yes:Expr = cfg.names[0], no:Expr = cfg.names[1];
+        var out:Expr = macro out;
         var cm:Expr->Expr = create_mapper.bind(_, cfg);
 
-        switch ( e.expr ) {
-            case EReturn( res ):
-                var resolution:Expr = res.map( cm );
-                return macro $yes($resolution);
+        switch e {
+            case macro return $ret:
+                switch ret {
+                    case macro @ignore $ret:
+                        return macro return $ret;
 
-            case EThrow( err ):
-                return macro $no( $err );
-
-            // metadata
-            case EMeta(meta, expr):
-                switch ( meta.name ) {
-                    case 'ignore':
-                        return e;
-
-                    case 'forward':
-                        return macro $expr.then($yes, $no);
-
-                    case 'promise':
-                        var _cast:Bool = false;
-                        var _untyped:Bool = false;
-                        if (meta.params != null) {
-                            switch ( meta.params ) {
-                                case [_.expr=>EConst(CIdent(m))]:
-                                    if (m == '_cast_') {
-                                        _cast = true;
-                                    }
-                                    else if (m == '_untyped_') {
-                                        _untyped = true;
-                                    }
-
-                                default:
-                                    null;
+                    case macro @await $expr:
+                        var res:Expr = macro {
+                            var _res = $expr;
+                            if ((_res is tannus.async.Future<Dynamic, Dynamic>))
+                                $out.wait(cast _res);
+                            else if ((_res is tannus.async.Promise<Dynamic, Dynamic>))
+                                $out.trust(cast _res);
+                            else {
+                                $out.wait(_res);
                             }
-                        }
-                        switch ( expr.expr ) {
-                            case ECall(fExpr, fArgs):
-                                var yesArg:Expr = yes, noArg:Expr = no;
-                                if ( _cast ) {
-                                    yesArg = macro cast $yesArg;
-                                    noArg = macro cast $noArg;
-                                }
-                                else if ( _untyped ) {
-                                    yesArg = macro untyped $yesArg;
-                                    noArg = macro untyped $noArg;
-                                }
-                                fArgs.push( yesArg );
-                                fArgs.push( noArg );
-                                return {
-                                    pos: expr.pos,
-                                    expr: ECall(fExpr, fArgs)
-                                };
+                        };
+                        return res;
 
-                            default:
-                                throw 'Error: Invalid use @promise in Future.create';
-                        }
-
-                    case 'exec':
-                        var ecfg:BuildConfig = {nomake:cfg.nomake, names:[macro resolve, macro reject]};
-                        if (meta.params != null) {
-                            switch ( meta.params ) {
-                                case [{pos:_, expr:EArrayDecl(configNames)}]:
-                                    ecfg.names = configNames;
-
-                                default:
-                                    null;
-                            }
-                        }
-                        return build_exec(create_mapper(expr, ecfg), ecfg);
-
-                    case 'create':
-                        var ecfg:BuildConfig = {nomake:cfg.nomake, names:[macro resolve, macro reject]};
-                        if (meta.params != null) {
-                            switch ( meta.params ) {
-                                case [{pos:_, expr:EArrayDecl(configNames)}]:
-                                    ecfg.names = configNames;
-
-                                default:
-                                    null;
-                            }
-                        }
-                        var executor:Expr = build_exec(create_mapper(expr, ecfg), ecfg);
-                        return macro new tannus.async.Future($executor);
-
-                    case 'with':
-                        trace('@with is urinal magic, Betty');
-                        return expr;
-
-                    default:
-                        return e;
+                    case _:
+                        return macro $out.yield($ret);
                 }
+
+            case macro throw $err:
+                return macro $out.raise($err);
+
+            case macro @ignore $e:
+                return e;
 
             default:
                 return e.map( cm );
         }
     }
-
-    private static function build_with(ctx:Expr, e:Expr):Expr {
-        switch ( e.expr ) {
-            case ETry(tryExpr, catches):
-                //var checks = [];
-                var handlers = [];
-                for (c in catches) {
-                    var checkExpr:Expr = {pos:e.pos, expr:ECheckType(macro x, c.type)};
-                    trace(checkExpr.toString());
-                    //checks.push(macro (x) -> $checkExpr);
-
-                    var handlerExpr = c.expr.buildFunction([c.name], true);
-                    trace(handlerExpr.toString());
-                    handlers.push({
-                        check: (macro (x) -> $checkExpr),
-                        f: handlerExpr
-                    });
-                }
-                var blockBody:Array<Expr> = [];
-                var catchStatements:Array<Expr> = handlers.map(h -> macro $ctx.unless(${h.f}, ${h.check}));
-                var tryStatement:Expr = tryExpr.replace(macro _, macro result).buildFunction(['result'], true);
-                trace(tryStatement.toString());
-                tryStatement = macro $ctx.then( $tryStatement );
-                trace(tryStatement.toString());
-                blockBody = [tryStatement].concat( catchStatements );
-                var block = macro $b{blockBody};
-                trace(block.toString());
-                return block;
-
-            case EBlock(_[0] => firstExpr) if (firstExpr != null):
-                return build_with(ctx, firstExpr);
-
-            case ExprDef.EParenthesis(pe):
-                return build_with(ctx, pe);
-
-            default:
-                return e;
-        }
-    }
-    */
 
 #end
 }
@@ -501,7 +432,7 @@ abstract FutureExecutor<TRes, TErr> (FutureExecutorFunction<TRes, TErr>) from Fu
 */
 typedef FutureExecutorFunction <TRes, TErr> = FutureResolutionProvider<TRes, TErr> -> Void;
 
-typedef FutureResolution <TRes, TErr> = EitherType<EitherType<Result<TRes, TErr>, Future<TRes, TErr>>, Promise<FutureResolution>>;
+//typedef FutureResolution <TRes, TErr> = EitherType<EitherType<Result<TRes, TErr>, Future<TRes, TErr>>, Promise<FutureResolution<TRes, TErr>>>;
 
 @:callable
 @:forward
@@ -515,12 +446,29 @@ abstract FutureResolutionProvider<TRes, TErr> (FrpFunc<TRes, TErr>) from FrpFunc
 
     @:native('_yield')
     public inline function yield(value: TRes) {
-        this(Result.ResSuccess( value ));
+        //give(Result.ResSuccess( value ));
+        resolve(Res.value(value));
     }
 
     @:native('_raise')
     public inline function raise(value: TErr) {
-        this(Result.ResFailure( value ));
+        resolve(Res.error(value));
+    }
+
+    public inline function wait(future: Future<TRes, TErr>) {
+        resolve(Res.future( future ));
+    }
+
+    public inline function trust(promise: Promise<FutureResolution<TRes, TErr>>) {
+        resolve(Res.promise(promise));
+    }
+
+    public inline function give(result: Result<TRes, TErr>) {
+        this(Res.result(result));
+    }
+
+    public inline function resolve(resolution: FutureResolution<TRes, TErr>) {
+        this(resolution);
     }
 
     public inline function doGive(result: FutureResolution<TRes, TErr>):Void->Void {
@@ -533,26 +481,77 @@ abstract FutureResolutionProvider<TRes, TErr> (FrpFunc<TRes, TErr>) from FrpFunc
 }
 
 typedef FrpFunc<V,E> = FutureResolution<V, E> -> Void;
+//typedef TFRes<TRes, TErr> = EitherType<EitherType<Result<TRes, TErr>, Future<TRes, TErr>>, Promise<FutureResolution<TRes, TErr>>>;
+enum TFRes<T, E> {
+    //RValue(v: T): TFRes<T, E>;
+    //RError(e: E): TFRes<T, E>;
+    RResult(r: Result<T, E>): TFRes<T, E>;
+    RFuture(f: Future<T, E>): TFRes<T, E>;
+    RPromise(p: Promise<FutureResolution<T, E>>): TFRes<T, E>;
+}
 
-/*
 @:forward
-abstract FutureResolution<TRes, TErr> (TPRes<TRes, TErr>) from TPRes<TRes, TErr> to TPRes<TRes, TErr> {
-    public inline function new(res : TPRes<TRes, TErr>):Void {
+abstract FutureResolution<TRes, TErr> (TFRes<TRes, TErr>) from TFRes<TRes, TErr> to TFRes<TRes, TErr> {
+    public inline function new(res : TFRes<TRes, TErr>):Void {
         this = res;
     }
+
+    public var type(get, never): TFRes<TRes, TErr>;
+    inline function get_type() return this;
+
+    //public inline function isPlainValue():Bool return type.match(RValue(_));
+    //public inline function isPlainError():Bool return type.match(RError(_));
+    public inline function isResult():Bool return type.match(RResult(_));
+    public inline function isPromise():Bool return type.match(RPromise(_));
     public inline function isFuture():Bool return (this is Future<TRes, TErr>);
+
     @:to
-    public inline function asFuture():Future<TRes, TErr> return this;
-    @:to
-    public inline function asValue():T return this;
-    @:from
-    public static inline function fromFuture<TRes, TErr>(p:Future<TRes, TErr>):FutureResolution<TRes, TErr> return fromAny( p );
-    @:from
-    public static inline function fromAny<TRes, TErr>(v : Dynamic):FutureResolution<TRes, TErr> {
-        return new FutureResolution( v );
+    public function asFuture():Future<TRes, TErr> {
+        return switch type {
+            case RResult(res): new Future(function(_) _.resolve(res));
+            case RFuture(fut): fut;
+            //case RValue(val): Future.resolve(val);
+            //case RError(err): Future.error(err);
+            case RPromise(prom): prom.future().derive(function(root, out) {
+                root.then(function(outcome: Result<FutureResolution<TRes, TErr>, TErr>) {
+                    switch outcome {
+                        case ResSuccess(fres):
+                            out.resolve(fres);
+
+                        case ResFailure(err):
+                            out.raise(err);
+                    }
+                });
+            });
+        }
     }
+
+    @:to
+    public function asResult():Result<TRes, TErr> {
+        return switch type {
+            case RResult(res): res;
+            //case RValue(v): Result.ResSuccess(v);
+            //case RError(e): Result.ResFailure(e);
+            case _: throw 'Error: Cannot convert $type to Result<T, E>';
+        }
+    }
+
+    @:from
+    public static inline function future<TRes, TErr>(p:Future<TRes, TErr>):FutureResolution<TRes, TErr> return TFRes.RFuture( p );
+
+    @:from
+    public static inline function promise<T, E>(p: Promise<FutureResolution<T, E>>):FutureResolution<T, E> return TFRes.RPromise( p );
+
+    @:from
+    public static inline function result<T, E>(r: Result<T, E>):FutureResolution<T, E> return TFRes.RResult( r );
+
+    @:from
+    public static inline function value<T,E>(v: T):FutureResolution<T,E> return result(ResSuccess(v));
+
+    @:from
+    public static inline function error<T,E>(e: E):FutureResolution<T,E> return result(ResFailure(e));
 }
-*/
+private typedef Res<T,E> = FutureResolution<T, E>;
 
 class DerivedFuture<ARes, AErr, BRes, BErr> extends Future<BRes, BErr> {
     /* Constructor Function */
@@ -565,13 +564,15 @@ class DerivedFuture<ARes, AErr, BRes, BErr> extends Future<BRes, BErr> {
 
 class TransformedFuture<TIn, TOut, TErr1, TErr2> extends Future<TOut, TErr2> {
     /* Constructor Function */
-    public function new(parent:Future<TIn, TErr1>, transform:{?v:TIn->FutureResolution<TOut>, ?e:TErr1->TErr2}) {
+    public function new(parent:Future<TIn, TErr1>, transform:{?v:TIn->FutureResolution<TOut, TErr2>, ?e:TErr1->TErr2}) {
         super((x -> null), true);
 
         this.parent = parent;
         this.parent._attach( this );
 
-        var tv:TIn->TOut = transform.v, te:TErr1->TErr2 = transform.e;
+        var tv:TIn->TOut = untyped transform.v,
+        te:TErr1->TErr2 = untyped transform.e;
+
         if (tv == null)
             tv = untyped FunctionTools.identity;
 
