@@ -25,7 +25,7 @@ class NilTools {
         return (
             (value == null) ||
             isNil( value ) ||
-            (isMeasurable(value) && (measure(x) > 0))
+            (isMeasurable(value) && (measure(value) > 0))
         );
     }
 
