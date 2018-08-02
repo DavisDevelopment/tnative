@@ -42,9 +42,35 @@ class Feed<Item, Quality> {
 
 /* === Instance Methods === */
 
-    public function post(post: FeedPost<Item, Quality>):Feed<Item, Quality> {
-        push(FeedToken.Post( post ));
+    public function add(token: FeedToken<Item, Quality>):Feed<Item, Quality> {
+        push( token );
         return this;
+    }
+
+    public function adds(tokens: Iterable<FeedToken<Item, Quality>>):Feed<Item, Quality> {
+        var target = this;
+        for (token in tokens) {
+            target = target.add( token );
+        }
+        return target;
+    }
+
+    public function post(post: FeedPost<Item, Quality>):Feed<Item, Quality> {
+        //push(FeedToken.Post( post ));
+        //return this;
+        return add(Post( post ));
+    }
+
+    public function posts(posts: Array<FeedPost<Item, Quality>>):Feed<Item, Quality> {
+        return adds([for (post in posts) Post(post)]);
+    }
+
+    public inline function put(item: FeedPost<Item, Quality>):Feed<Item, Quality> {
+        return post( item );
+    }
+
+    public inline function puts(posts: Array<FeedPost<Item, Quality>>):Feed<Item, Quality> {
+        return this.posts( posts );
     }
 
     public function pass():Feed<Item, Quality> {
@@ -59,9 +85,18 @@ class Feed<Item, Quality> {
         return this;
     }
 
+    @:native('_raise_')
+    public inline function raise(error: Dynamic):Feed<Item, Quality> {
+        return exception( error );
+    }
+
     public function foot(last: Option<FeedPost<Item, Quality>>):Feed<Item, Quality> {
         push(FeedToken.Foot( last ));
         return this;
+    }
+
+    public function end():Feed<Item, Quality> {
+        return foot(None);
     }
 
     /**
@@ -104,7 +139,7 @@ class Feed<Item, Quality> {
         }
         else {
             return new Promise(function(yes, _) {
-                _onNext.push(function(tk: FeedToken<Item, Quality>) {
+                onNext(function(tk: FeedToken<Item, Quality>) {
                     yes( tk );
                 });
             });
@@ -116,6 +151,17 @@ class Feed<Item, Quality> {
      **/
     public inline function next():Next<FeedToken<Item, Quality>> {
         return pop();
+    }
+
+    public inline function onNext(f: FeedToken<Item, Quality>->Void) {
+        _onNext.push( f );
+    }
+
+    /**
+      convert [this] Feed into a Stream
+     **/
+    public function stream():Stream<Item, Quality> {
+        return Stream.feed( this );
     }
 
     /**
@@ -163,6 +209,8 @@ enum FeedToken<Item, Quality> {
  **/
 enum FeedPostBase<Item, Quality> {
     PostPlain(item: Item): FeedPostBase<Item, Quality>;
+    PostLazyPlain(item: Lazy<Item>): FeedPostBase<Item, Quality>;
+    PostLazy(item: Lazy<FeedPost<Item, Quality>>): FeedPostBase<Item, Quality>;
     PostDeferred(item: Next<FeedPost<Item, Quality>>): FeedPostBase<Item, Quality>;
 }
 
@@ -182,6 +230,12 @@ abstract FeedPost<Item, Q> (FeedPostBase<Item, Q>) from FeedPostBase<Item, Q> to
             case PostPlain(item):
                 return Next.sync( item );
 
+            case PostLazyPlain(_.get() => item):
+                return Next.sync( item );
+
+            case PostLazy(_.get() => post):
+                return post.item();
+
             case PostDeferred(next):
                 return next.flatMap.fn(_.item());
         }
@@ -197,6 +251,16 @@ abstract FeedPost<Item, Q> (FeedPostBase<Item, Q>) from FeedPostBase<Item, Q> to
     @:from
     public static function ofItem<T, Q>(item: T):FeedPost<T, Q> {
         return PostPlain( item );
+    }
+
+    @:from
+    public static function ofLazyItem<T, Q>(item: Lazy<T>):FeedPost<T, Q> {
+        return PostLazyPlain( item );
+    }
+
+    @:from
+    public static function ofLazy<T, Q>(item: Lazy<FeedPost<T, Q>>):FeedPost<T, Q> {
+        return PostLazy( item );
     }
 
     @:from
