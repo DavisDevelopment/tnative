@@ -40,6 +40,10 @@ abstract Stream<Item, Quality> (StreamObject<Item, Quality>) from StreamObject<I
         return new NextStream( f );
     }
 
+    public static function empty<I, Q>():Stream<I, Q> {
+        return Empty.make();
+    }
+
     public static function single<I,Q>(i: I):Stream<I, Q> {
         return new Single( i );
     }
@@ -111,6 +115,63 @@ class Single<Item, Quality> extends StreamBase<Item, Quality> {
             }
         });
     }
+}
+
+class ForwardStream<I, Q> extends StreamBase<I, Q> {
+    /* Constructor Function */
+    public function new(stream: Stream<I, Q>) {
+        this.s = stream;
+    }
+
+/* === Instance Methods === */
+
+    override function next():Next<Step<I, Q>> {
+        return s.next();
+    }
+
+    override function forEach<Safety>(handler: Handler<I, Safety>):Next<Conclusion<I, Safety, Q>> {
+        return s.forEach( handler );
+    }
+
+    override function decompose(into: Array<Stream<I, Q>>):Void {
+        return s.decompose( into );
+    }
+
+    override function append(x: Stream<I, Q>):Stream<I, Q> {
+        return s.append( x );
+    }
+
+    override function prepend(x: Stream<I, Q>):Stream<I, Q> {
+        return s.prepend( x );
+    }
+
+    override function regroup<O>(regrouper: Regrouper<I, O, Q>):Stream<O, Q> {
+        return s.regroup( regrouper );
+    }
+
+    override function map<O>(map: Mapping<I, O, Q>):Stream<O, Q> {
+        return s.map( map );
+    }
+
+    override function filter(f: Filter<I, Q>):Stream<I, Q> {
+        return s.filter( f );
+    }
+
+    override function reduce<Safety, Acc>(initial:Acc, reducer:Reducer<I, Safety, Acc>):Next<Reduction<I, Safety, Q, Acc>> {
+        return s.reduce(initial, reducer);
+    }
+
+    override function blend(other: Stream<I, Q>):Stream<I, Q> {
+        return s.blend( other );
+    }
+
+    override function get_depleted() {
+        return s.depleted;
+    }
+
+/* === Instance Fields === */
+
+    var s: Stream<I, Q>;
 }
 
 class NextStream<I, Q> extends StreamBase<I, Q> {
@@ -268,9 +329,11 @@ class Feed<Item, Quality> {
     var ended(default, null): Bool;
 }
 
+/**
+  a stream made up of multiple sub-streams
+ **/
 class CompoundStream<I,Q> extends StreamBase<I, Q> {
-    var parts:Array<Stream<I, Q>>;
-
+    /* Constructor Function */
     public function new(parts) {
         this.parts = parts;
     }
@@ -347,6 +410,10 @@ class CompoundStream<I,Q> extends StreamBase<I, Q> {
             s.decompose( streams );
         return new CompoundStream(streams);
     }
+
+/* === Instance Fields === */
+
+    var parts:Array<Stream<I, Q>>;
 }
 
 class CloggedStream<Item> extends StreamBase<Item, Dynamic> {
@@ -516,12 +583,6 @@ enum Reduction<Item, Safety, Quality, Result> {
     Reduced(result: Result): Reduction<Item, Safety, Quality, Result>;
 }
 
-enum FeedToken<Item, Quality> {
-    Post(item: Item): FeedToken<Item, Quality>;
-    Foot(last: Option<Item>): FeedToken<Item, Quality>;
-    Exception<Error>(e: Error): FeedToken<Item, Error>;
-}
-
 /**
   value used for .reduce actions
  **/
@@ -612,7 +673,7 @@ abstract Mapping<I, O, Q> (Regrouper<I, O, Q>) to Regrouper<I, O, Q> {
     }
 
     @:from
-    public static function async<In, Out, Q>(f: In->Next<Out>):Mapping<In, Out, Q> {
+    public static inline function async<In, Out, Q>(f: In->Next<Out>):Mapping<In, Out, Q> {
         return new Mapping(Regrouper.makeNoStatus(function(inputs: Array<In>) {
             return f(inputs[0]).map(function(o) return Converted(Stream.single(o)));
         }));
@@ -749,6 +810,14 @@ abstract Next<T> (Promise<T>) from Promise<T> to Promise<T> {
         return new Promise<T>(function(yes, _) {
             f(function(value: T) {
                 yes( value );
+            });
+        });
+    }
+
+    public static function plainAsync<T>(value: Lazy<T>):Next<T> {
+        return new Promise<T>(function(yes, _) {
+            Feed.defer(function() {
+                yes(value.get());
             });
         });
     }
