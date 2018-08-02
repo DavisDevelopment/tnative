@@ -5,7 +5,6 @@ import tannus.ds.*;
 import tannus.async.*;
 
 import Slambda.fn;
-import edis.Globals.*;
 
 import tannus.stream.StreamMessage;
 import tannus.stream.StreamMessage as Msg;
