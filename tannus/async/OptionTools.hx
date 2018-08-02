@@ -1,6 +1,6 @@
 package tannus.async;
 
-import tannus.ds.Delta;
+import tannus.ds.*;
 import tannus.io.Signal;
 import tannus.io.Signal2;
 
@@ -43,6 +43,13 @@ class OptionTools {
         return switch o {
             case null, None: None;
             case Some(x): Some(f(x));
+        };
+    }
+
+    public static inline function or<T>(a:Option<T>, b:Lazy<T>):T {
+        return switch a {
+            case Some(v): v;
+            case None: b.get();
         };
     }
 }
