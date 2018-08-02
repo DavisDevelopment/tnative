@@ -20,6 +20,10 @@ abstract Chunk (ChunkObject) from ChunkObject to ChunkObject {
         return this.getCursor();
     }
 
+    public inline function iterator() {
+        return new ChunkIterator(this.getCursor());
+    }
+
     public inline function slice(from:Int, to:Int):Chunk {
         return this.slice(from, to);
     }
