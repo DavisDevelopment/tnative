@@ -22,8 +22,12 @@ using tannus.macro.MacroTools;
 using tannus.FunctionTools;
 
 class FutureTools {
-    public static function promiseFuture<TRes, TErr>(promise: Promise<Dynamic>):Future<TRes, TErr> {
-        //TODO
+    public static function promiseFuture<TRes, TErr>(promise: Promise<TRes>):Future<TRes, TErr> {
+        return new Future(function(out) {
+            promise.then(function(result) {
+                out.yield( result );
+            }, out.raise);
+        });
     }
 
     public static inline function isFuture<TRes, TErr>(res : FutureResolution<TRes, TErr>):Bool {
