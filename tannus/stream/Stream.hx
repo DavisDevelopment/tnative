@@ -11,6 +11,7 @@ import tannus.io.VoidSignal;
 import tannus.async.Promise;
 import tannus.async.Result;
 import tannus.async.AsyncError;
+import tannus.async.Feed;
 
 import haxe.ds.Option;
 import haxe.ds.Either;
@@ -30,6 +31,10 @@ using tannus.stream.Tools;
 
 @:forward
 abstract Stream<Item, Quality> (StreamObject<Item, Quality>) from StreamObject<Item, Quality> to StreamObject<Item, Quality> {
+/* === Instance Methods === */
+
+/* === Instance Fields === */
+
     public var depleted(get, never): Bool;
     inline function get_depleted() return this.depleted;
 
@@ -42,6 +47,11 @@ abstract Stream<Item, Quality> (StreamObject<Item, Quality>) from StreamObject<I
 
     public static function empty<I, Q>():Stream<I, Q> {
         return Empty.make();
+    }
+
+    @:from
+    public static function feed<I, Q>(f: Feed<I, Q>):Stream<I, Q> {
+        return new FeedStream( f );
     }
 
     public static function single<I,Q>(i: I):Stream<I, Q> {
@@ -240,93 +250,42 @@ class Generator<Item, Quality> extends StreamBase<Item, Quality> {
     }
 }
 
-class FeedStream<I, Q> extends Generator<I, Q> {
+/**
+  a Stream that pulls from the given Feed
+ **/
+class FeedStream<I, Q> extends ForwardStream<I, Q> {
     /* Constructor Function */
-    public function new(feed: (Next<FeedToken<I, Q>>->Void)->Void):Void {
-        this.feed = feed;
+    public function new(feed: Feed<I, Q>) {
+        super(new NextStream(new Promise(function(resolve, _) {
+            feed.next()
+            .map(function(token: FeedToken<I, Q>) {
+                return switch token {
+                    case FeedToken.Exception( error ):
+                        Stream.ofError( error );
 
-        super(Next.async(function(cb: Step<I, Q>->Void) {
-            feed(function(o) o.then(function(token: FeedToken<I, Q>) {
-                switch token {
-                    case FeedToken.Exception(error):
-                        cb(Step.Fail( error ));
+                    case FeedToken.Post( post ):
+                        Stream
+                            .flatten(post.item().map.fn(Stream.single(_)))
+                            .append(new FeedStream( feed ));
+                        //(Stream.single( item ).append(new FeedStream( feed )));
 
-                    case FeedToken.Post(item):
-                        cb(Step.Link(item, new FeedStream( feed )));
+                    case FeedToken.Foot( last ):
+                        //last.map(function(item: I) return Stream.single( item )).or(Empty.make());
+                        last
+                            .map(function(post: FeedPost<I, Q>) {
+                                return Stream.flatten(post.item().map.fn(Stream.single(_)));
+                            })
+                            .or(Empty.make());
 
-                    case FeedToken.Foot(last):
-                        switch last {
-                            case Some(item):
-                                cb(Step.Link(item, Empty.make()));
-
-                            case None:
-                                cb(Step.End);
-                        }
+                    case FeedToken.Pass:
+                        new FeedStream( feed );
                 }
-            }));
-        }));
+            })
+            .then(function(ns: Stream<I, Q>) {
+                resolve( ns );
+            }, _);
+        })));
     }
-
-/* === Instance Methods === */
-
-/* === Instance Fields === */
-
-    var feed: (Next<FeedToken<I, Q>>->Void)->Void;
-}
-
-class Feed<Item, Quality> {
-    public function new() {
-        hasBuffered = new VoidSignal();
-        buffer = new Array();
-        ended = false;
-    }
-
-    public function push(token: FeedToken<Item, Quality>) {
-        if ( ended ) {
-            throw 'Error: Cannot append $token to a Feed which has ended';
-        }
-        else {
-            var wasEmpty:Bool = buffer.empty();
-            buffer.push( token );
-            if ( wasEmpty ) {
-                defer(function() {
-                    if (!buffer.empty())
-                        hasBuffered.fire();
-                });
-            }
-        }
-    }
-
-    public function pop():Next<FeedToken<Item, Quality>> {
-        if (buffer.hasContent()) {
-            var tk = buffer.shift();
-            switch tk {
-                case FeedToken.Exception(_)|FeedToken.Foot(_):
-                    ended = true;
-                    return Next.sync( tk );
-
-                case _:
-                    return Next.sync( tk );
-            }
-        }
-        else {
-            return Next.async(function(cb: FeedToken<Item, Quality>->Void) {
-                hasBuffered.once(function() {
-                    pop().then(function(tk) {
-                        cb( tk );
-                    });
-                });
-            });
-        }
-    }
-
-    public static inline function defer(f: Void->Void):Void {
-        haxe.MainLoop.addThread( f );
-    }
-
-    var buffer: Array<FeedToken<Item, Quality>>;
-    var hasBuffered: VoidSignal;
-    var ended(default, null): Bool;
 }
 
 /**
