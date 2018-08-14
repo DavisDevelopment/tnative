@@ -10,6 +10,24 @@ import Type;
 import Slambda.fn;
 
 class SortingTools {
+    public static inline function comparison<T>(x:T, y:T):Lazy<Int> {
+        return Lazy.ofFunc(function() {
+            return compareAny(x, y);
+        });
+    }
+
+    public static function drillDown(a: Array<Lazy<Int>>):Int {
+        var n = 0;
+        for (v in a) {
+            n = v.get();
+            if (n == 0)
+                continue;
+            else
+                return n;
+        }
+        return 0;
+    }
+
     /**
       * 
       */
@@ -29,6 +47,9 @@ class SortingTools {
     public static inline function compareDates(x:Date, y:Date):Int return comparePrims(x.getTime(), y.getTime());
     public static inline function compareIComparables<T:IComparable<T>>(x:T, y:T):Int return x.compareTo( y );
     public static inline function compareArrays<T>(x:Array<T>, y:Array<T>):Int return compareEnumValueParams(x, y);
+    public static inline function compareAny<T>(x:T, y:T):Int {
+        return compareEnumValueParam(x, y);
+    }
 
 	/**
 	  * chain together any number of sorters, which will be evaluated in order
