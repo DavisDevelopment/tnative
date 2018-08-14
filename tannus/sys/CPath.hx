@@ -168,13 +168,46 @@ class CPath implements tannus.ds.IComparable<CPath> {
 		return cross(this, other, fn(_1.has(_2)));
 	}
 
+    /**
+      check that [other] can be found at the beginning of [this]
+     **/
 	public function startsWith(other : CPath):Bool {
 	    return cross(this, other, fn(_1.startsWith(_2)));
 	}
 
+    /**
+      check whether [this] ends with [other], or in other words, check that [other] can be found at the end of [this]
+     **/
 	public function endsWith(other : CPath):Bool {
 	    return cross(this, other, fn(_1.endsWith(_2)));
 	}
+
+	/**
+	  check whether [this] and [other] are equivalent
+	 **/
+    public function equivalent(other:CPath, caseSensitive:Bool=true):Bool {
+        var a:Array<String> = this.pieces;
+        var b:Array<String> = other.pieces;
+
+        if (a.length != b.length) {
+            return false;
+        }
+        else {
+            for (index in 0...a.length) {
+                if ( caseSensitive ) {
+                    if (a[index] != b[index]) {
+                        return false;
+                    }
+                }
+                else {
+                    if (a[index].toLowerCase() != b[index].toLowerCase()) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+    }
 
     /**
       * format [this] Path
@@ -204,6 +237,10 @@ class CPath implements tannus.ds.IComparable<CPath> {
             }
         }
         return simple;
+	}
+
+	public inline function withSeparator(sep: String):String {
+	    return toString().replace(separator, sep);
 	}
 
     /**
@@ -326,7 +363,7 @@ class CPath implements tannus.ds.IComparable<CPath> {
 	/* all of the segments of [this] Path */
 	public var pieces(get, set):Array<String>;
 	private function get_pieces():Array<String> {
-		return (s.split(separator));
+		return (withoutDrive().split( separator ));
 	}
 	private function set_pieces(v : Array<String>):Array<String> {
 		s = sjoin( v ).toString();
