@@ -80,7 +80,7 @@ abstract WebDirectoryEntry (DirectoryEntry) from DirectoryEntry {
 	  * Get all Subdirectories of [this]
 	  */
 	public function getDirectories():ArrayPromise<WebDirectoryEntry> {
-		return readEntries().filter.fn( _.isDirectory ).map.fn(new WebDirectoryEntry(cast _));
+		return readEntries().filter.fn( _.isDirectory ).vmap.fn(new WebDirectoryEntry(cast _));
 	}
 
 	/**
