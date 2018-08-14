@@ -311,6 +311,13 @@ class StringUtils {
 		);
 	}
 
+	public static function sep(s:String, sub:String, last:Bool=false):Array<String> {
+	    return [
+	        (if ( last ) beforeLast else before)(s, sub),
+	        (if ( last ) afterLast else after)(s, sub)
+	    ];
+	}
+
 	public static inline function ifHas<T>(s:String, sub:String, onHas:String->T, onNotHas:String->T):T {
 	    if (has(s, sub)) {
 	        return onHas( s );
@@ -377,14 +384,14 @@ class StringUtils {
 	}
 }
 
-abstract Sep (Tuple<String, String>) {
+abstract Sep (Pair<String, String>) {
 	public inline function new(a:String, b:String):Void {
-		this = new Tuple(a, b);
+		this = new Pair(a, b);
 	}
 
 	public var before(get, never):String;
-	private inline function get_before():String return this._0;
+	private inline function get_before():String return this.left;
 
 	public var after(get, never):String;
-	private inline function get_after():String return this._1;
+	private inline function get_after():String return this.right;
 }
