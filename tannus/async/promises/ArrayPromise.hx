@@ -34,7 +34,6 @@ class ArrayPromise<T> extends TypeDedicatedPromise<Array<T>> {
             }, err);
         }).array();
     }
-    public function map<TOut>(f : T->TOut):ArrayPromise<TOut> { return ltf(_.map( f )).array(); }
     public function filter(test : T->Bool):ArrayPromise<T> return ltf(_.filter(test)).array();
     public function join(sep:String):StringPromise return ltf(_.join(sep)).string();
     public function each(action:T->Void):ArrayPromise<T> {
@@ -44,5 +43,9 @@ class ArrayPromise<T> extends TypeDedicatedPromise<Array<T>> {
             }
         });
         return this;
+    }
+
+    public function vmap<TOut>(f : T->TOut):ArrayPromise<TOut> {
+        return ltf(_.map( f )).array();
     }
 }
