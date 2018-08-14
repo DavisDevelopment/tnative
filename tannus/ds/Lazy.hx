@@ -24,7 +24,7 @@ abstract Lazy<T>(LazyObject<T>) from LazyObject<T> {
 
     @:from
     @:noUsing 
-    static inline function ofConst<T>(c:T):Lazy<T> return new LazyConst(c);
+    public static inline function ofConst<T>(c:T):Lazy<T> return new LazyConst(c);
 }
 
 private interface LazyObject<T> {
