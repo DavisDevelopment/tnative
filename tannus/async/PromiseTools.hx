@@ -17,6 +17,7 @@ import Reflect.deleteField;
 using Slambda;
 using tannus.ds.ArrayTools;
 using tannus.FunctionTools;
+using tannus.async.FutureTools;
 
 using haxe.macro.ExprTools;
 using haxe.macro.TypeTools;
@@ -48,6 +49,16 @@ class PromiseTools {
             prom.then((x->y()), (x->n(x)));
         });
     }
+
+    //public static inline function map<I, O>(prom:Promise<I>, f:I->O):Promise<O> {
+        //return prom.transform( f );
+    //}
+
+    //public static function flatMap<I, O>(prom:Promise<I>, f:I->Promise<O>):Promise<O> {
+        //return prom.transform(function(input: I):Promise<O> {
+            //return f( input );
+        //});
+    //}
 }
 
 class PromiseResTools {

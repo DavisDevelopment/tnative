@@ -21,7 +21,7 @@ using Slambda;
 using tannus.ds.ArrayTools;
 using tannus.async.PromiseTools;
 using tannus.FunctionTools;
-using tannus.async.Asyncs;
+//using tannus.async.Asyncs;
 
 using haxe.macro.ExprTools;
 using haxe.macro.TypeTools;
@@ -111,10 +111,26 @@ class Promise<T> implements Thenable<T, Promise<T>> {
     /**
       * promise a transformation on [this] Promise's data
       */
-    public function transform<TOut, TRes:PromiseResolution<TOut>>(transformer:T->TRes, ?nomake:Bool):Promise<TOut> {
+    public function transform<TOut>(transformer:T->PromiseResolution<TOut>, ?nomake:Bool):Promise<TOut> {
         return derive(function(_from, resolve, reject) {
             _from.then((result) -> resolve(untyped transformer( result )), reject);
         }, nomake);
+    }
+
+    /**
+      one-to-one transformation
+     **/
+    public function map<O>(f: T->O):Promise<O> {
+        return transform( f );
+    }
+
+    /**
+      one-to-<code>Promise<<em>one</em>></code> transformation
+     **/
+    public function flatMap<O>(f: T->Promise<O>):Promise<O> {
+        return transform(function(input: T):Promise<O> {
+            return f( input );
+        });
     }
 
     /**
@@ -166,12 +182,12 @@ class Promise<T> implements Thenable<T, Promise<T>> {
     /**
       * resolve [this] Promise
       */
-    private function _resolve<Res:PromiseResolution<T>>(resolution : Res):Void {
+    private function _resolve(resolution : PromiseResolution<T>):Void {
         if ( _settled ) {
             throw 'Error: Cannot resolve Promise more than once';
         }
         if (resolution.isPromise()) {
-            resolution.asPromise().then(_resolve, _reject);
+            resolution.asPromise().then(v -> _resolve(v), _reject);
         }
         else {
             setStatus(PSResolved(resolution.asValue()));
@@ -428,9 +444,20 @@ class Promise<T> implements Thenable<T, Promise<T>> {
         });
     }
 
+    /**
+      resolve the given [PromiseResolution] recursively to a non-Promise value
+     **/
     public static function _settle<T>(res:PromiseResolution<T>, onValue:T->Void, ?onError:Dynamic->Void):Void {
         if (res.isPromise()) {
-            res.asPromise().then(onValue, onError);
+            //res.asPromise().then(function(fres) {
+                //Future._settle(fres, function(res2: PromiseResolution<T>) {
+                    //if (res2.isPromise())
+                        //_settle(res2, onValue, onError);
+                    //else
+                        //onValue(res.asValue());
+                //}, onError);
+            //}, onError);
+            res.asPromise().then((v -> onValue(v)));
         }
         else {
             onValue(res.asValue());
