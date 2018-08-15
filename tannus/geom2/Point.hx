@@ -27,13 +27,22 @@ class Point <T:Float> implements IMultiPoint<T> implements IComparable<Point<T>>
 		if (y == null) y = untyped 0;
 		if (z == null) z = untyped 0;
 		d.sets([x, y, z]);
+
 	    #else
-		if (x == null) x = untyped 0;
-		if (y == null) y = untyped 0;
-		if (z == null) z = untyped 0;
+
+		if (x == null)
+		    x = untyped 0;
+
+		if (y == null) 
+		    y = untyped 0;
+
+		if (z == null) 
+		    z = untyped 0;
+
 		this.x = x;
 		this.y = y;
 		this.z = z;
+
 	    #end
 	}
 
@@ -52,12 +61,15 @@ class Point <T:Float> implements IMultiPoint<T> implements IComparable<Point<T>>
 	public inline function angleTo(other : Point<T>):Angle {
 		return new Angle(angleBetween(x, other.x, y, other.y));
 	}
+
 	public inline function distanceFrom(other : Point<T>):Float {
 		return Math.sqrt(Math.pow((x - other.x), 2) + Math.pow((y - other.y), 2));
 	}
+
 	public function dimensionality():Int {
 	    return 2;
 	}
+
 	public function getCoordinate(i: Int):T {
 	    return switch ( i ) {
             case 0: x;
@@ -66,10 +78,13 @@ class Point <T:Float> implements IMultiPoint<T> implements IComparable<Point<T>>
             default: throw 'Error: OutOfBounds';
 	    }
 	}
+
 	public function getRawData():Array<T> return [x, y, z];
+
 	public function distanceFromIMultiPoint(other: IMultiPoint<T>):Float {
 	    return sqrt(pow(x - other.getCoordinate(0), 2) + pow(y - other.getCoordinate(1), 2));
 	}
+
 	public function compareTo(other: Point<T>):Int {
 	    return compresolve([
 	        Reflect.compare(x, other.x),
@@ -84,6 +99,7 @@ class Point <T:Float> implements IMultiPoint<T> implements IComparable<Point<T>>
 	public inline function copyFrom(other : Point<T>):Void {
 	    set(other.x, other.y, other.z);
 	}
+
 	public inline function pull(other: Point<T>):Void copyFrom( other );
 	
 	/**

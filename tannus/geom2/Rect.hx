@@ -363,16 +363,11 @@ class Rect <T:Float> {
 	}
 
 	public var center(get, set):Point<Float>;
-	@:deprecated
-	private function get_center():Point<Float> {
-		var z:Float = 0;
-		//return LinkedPoint.create(centerX, centerY, z);
-		return new Point(centerX, centerY);
-	}
+	private inline function get_center():Point<Float> return new Point(centerX, centerY);
 	private function set_center(v : Point<Float>):Point<Float> {
 		centerX = v.x;
 		centerY = v.y;
-		return center;
+		return v;
 	}
 
 /* === Instance Fields === */
