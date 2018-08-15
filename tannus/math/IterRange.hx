@@ -54,9 +54,13 @@ class IterRange {
         return 'range($start, $finish, $step)';
     }
 
-    public function iterator() {
+    /**
+      convert [this] to an iterator
+     **/
+    public function iterator():Iterator<Int> {
         __i = 0;
-        return this;
+
+        return new IterRangeIterator(this);
     }
 
     @:noCompletion
@@ -99,4 +103,14 @@ class IterRange {
     public var step(default, null): Int;
 
     var __i: Int;
+}
+
+@:forward(hasNext, next)
+abstract IterRangeIterator (IterRange) {
+    public inline function new(ir) {
+        this = ir;
+    }
+
+    public inline function hasNext():Bool return this.hasNext();
+    public inline function next():Int return this.next();
 }
