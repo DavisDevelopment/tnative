@@ -8,8 +8,9 @@ using tannus.ds.StringUtils;
 using tannus.ds.ArrayTools;
 using tannus.FunctionTools;
 
+@:native('Lin')
 enum Nil {
-    nil;
+    Nil;
 }
 
 class NilTools {
@@ -17,7 +18,7 @@ class NilTools {
         return (
             isEnumValue( value ) &&
             (value is Nil) &&
-            ((value : Nil).match(nil))
+            ((value : Nil).match(Nil))
         );
     }
 
