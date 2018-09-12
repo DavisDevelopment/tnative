@@ -181,3 +181,19 @@ class FwdItr<T> {
     var i(default, null): Itr<T>;
 }
 
+class RefItr<T> {
+    public function new(i: Ref<Itr<T>>) {
+        this.i = i;
+    }
+
+    public function hasNext():Bool {
+        return i.get().hasNext();
+    }
+
+    public function next():T {
+        return i.get().next();
+    }
+
+    var i(default, null): Ref<Itr<T>>;
+}
+
