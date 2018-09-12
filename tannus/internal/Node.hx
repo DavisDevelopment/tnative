@@ -13,6 +13,10 @@
 
 package tannus.internal;
 
+typedef Node = js.Node;
+
+#if (fish_people && donkey_birds)
+
 typedef NodeListener = Dynamic;
 typedef NodeErr = Null<String>;
 
@@ -922,6 +926,7 @@ class NodeC {
 	public static inline var FILE_READWRITE_APPEND = "a+";
 }
 
+@:native("global")
 class Node {
 	public static var assert(get,null) : NodeAssert;
 	public static var child_process(get,null) : NodeChildProcessCommands;
@@ -939,7 +944,7 @@ class Node {
 	public static var process(default,null) : NodeProcess = untyped __js__('process');
 	public static var querystring(get,null) : NodeQueryString;
 	public static var repl(get,null) : NodeREPL;
-	public static var require(default,null) : String->Dynamic = untyped __js__('require');
+	public static var require(default, null) : String->Dynamic = untyped __js__('require');
 	public static var tls(get,null) : NodeTLS;
 	public static var url(get,null) : NodeUrl;
 	public static var util(get,null) : NodeUtil;
@@ -965,7 +970,7 @@ class Node {
 			{ isNodeWebkit() ? untyped __js__('global.clearImmediate') : untyped __js__('clearImmediate'); } :
 			null;
 	}
-	public static var global:Dynamic = untyped __js__('global');
+	public static var global:Dynamic<Dynamic> = cast Node;//untyped __js__('global');
 
 	public static var __filename(get, null):String;
 	public static var __dirname(get, null):String;
@@ -1006,4 +1011,4 @@ class Node {
 	public static function isNodeWebkit():Bool return untyped __js__('(typeof process == "object")');
 }
 
-
+#end
