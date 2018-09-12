@@ -835,6 +835,15 @@ class ArrayTools {
         return v;
     }
 
+    public static inline function compose<TIn, TAcc>(a:Array<TIn>, two:TAcc->TAcc->TAcc, one:TIn->TAcc):TAcc {
+        return switch a.length {
+            case 0: null;
+            case 1: one(a.shift());
+            case _ > 1 => true: two(one(a.shift()), compose(a, two, one));
+            default: null;
+        }
+    }
+
     /**
       * filters out elements from [a], modifying [a] in place, and returning the filtered-out elements
       */
