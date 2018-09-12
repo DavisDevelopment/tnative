@@ -245,7 +245,7 @@ class Future <TRes, TErr> {
 
     public static function resolve<TRes, TErr, R:FutureResolution<TRes, TErr>>(res : R):Future<TRes, TErr> {
         return new Future(function(_resolve:FutureResolutionProvider<TRes, TErr>) {
-            _resolve(untyped res);
+            _resolve((cast res : FutureResolution<TRes, TErr>));
         });
     }
 
@@ -255,11 +255,15 @@ class Future <TRes, TErr> {
         });
     }
 
-    public static function pair<A, B, E>(resPair : Pair<FutureResolution<A, E>, FutureResolution<B, E>>):Future<Pair<A, B>, E> {
-        return all(untyped [resolve(resPair.left), resolve(resPair.right)]).transform(function(a : Array<Dynamic>) {
-            return untyped (new Pair(untyped a[0], untyped a[1]));
-        });
-    }
+    //public static function pair<A, B, E>(resPair : Pair<FutureResolution<A, E>, FutureResolution<B, E>>):Future<Pair<A, B>, E> {
+        //var proms = [
+            //resolve(resPair.left),
+            //resolve(resPair.right)
+        //];
+        //return all(cast proms).transform(function(a : Array<Dynamic>) {
+            //return untyped (new Pair(untyped a[0], untyped a[1]));
+        //});
+    //}
 
     public static function all(proms : Iterable<Future<Dynamic, Dynamic>>):Future<Array<Dynamic>, Dynamic> {
         return new Future(function(out) {

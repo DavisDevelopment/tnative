@@ -4,6 +4,7 @@ import haxe.macro.Expr;
 import haxe.macro.Context;
 
 import tannus.math.TMath.*;
+import tannus.math.TMath as M;
 
 using StringTools;
 using tannus.ds.StringUtils;
@@ -59,7 +60,7 @@ abstract Byte (Int) from Int to Int {
 	  * Tests whether [this] Byte would be a number in String form
 	  */
 	public inline function isNumeric():Bool {
-	    return inRange(48, 57);
+	    return M.inRange(this, 48, 57);
 		//return (this >= 48 && this <= 57);
 	}
 
@@ -67,7 +68,7 @@ abstract Byte (Int) from Int to Int {
 	  * Tests whether [this] Byte would be a letter in String form
 	  */
 	public inline function isLetter():Bool {
-	    return (inRange(65, 90) || inRange(97, 122));
+	    return (M.inRange(this, 65, 90) || M.inRange(this, 97, 122));
 		//return ((this >= 65 && this <= 90) || (this >= 97 && this <= 122));
 	}
 

@@ -1,5 +1,8 @@
 package tannus.io;
 
+import tannus.async.Promise;
+import tannus.async.promises.StringPromise;
+
 using StringTools;
 using tannus.ds.StringUtils;
 
@@ -11,12 +14,26 @@ class Prompt {
 
 /* === Instance Methods === */
 
-	/**
-	  * Prompt the user for some input
-	  */
+    public function line():StringPromise {
+        return new Promise(function(yep, nah) {
+            try {
+                getLine(function(v) {
+                    yep( v );
+                });
+            }
+            catch (e: Dynamic) {
+                nah( e );
+            }
+        }).string();
+    }
+
+    /**
+      prompt the user for a single line of input
+     **/
 	public function getLine(cb : String->Void):Void {
 		//#if (cpp || neko || cs || php || java)
-	    #if (sys && !python)
+		//#if (sys && !python)
+		#if sys
 
 			/* get input/output streams */
 			var inp = Sys.stdin();
@@ -30,13 +47,22 @@ class Prompt {
 			var line:String = inp.readLine();
 			cb( line );
 
-		#elseif python
+		//#elseif python
 
-			var inp:String->String = python.Syntax.pythonCode('input');
-			cb(inp( message ));
+			//var inp:String->String = python.Syntax.pythonCode('input');
+			//cb(inp( message ));
 
-		#elseif node
-			
+		#elseif (node || nodejs)
+			//#if hxnodejs
+			var i = js.node.Readline.createInterface({
+                input: js.Node.process.stdin,
+                output: js.Node.process.stdout
+			});
+			i.question(message, function(answer: String) {
+			    i.close();
+			    cb( answer );
+			});
+			/*
 			var rl:Dynamic = tannus.internal.Node.require('readline');
 			var i:Dynamic = rl.createInterface({
 				'input': tannus.internal.Node.process.stdin,
@@ -46,6 +72,7 @@ class Prompt {
 				i.close();
 				cb( answer );
 			});
+			*/
 
 		#elseif js
 

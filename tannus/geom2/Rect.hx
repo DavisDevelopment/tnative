@@ -30,9 +30,10 @@ abstract Rect<T:Float> (CRect<T>) from CRect<T> to CRect<T> {
 }
 */
 
+//#if !js @:generic #end
 class Rect <T:Float> {
 	/* Constructor Function */
-	public function new(?x:T, ?y:T, ?width:T, ?height:T):Void {
+	public function new(?x:Null<T>, ?y:Null<T>, ?width:Null<T>, ?height:Null<T>):Void {
 	    #if !js
 		d = new DataView(4, untyped 0);
 
@@ -107,7 +108,7 @@ class Rect <T:Float> {
         return modified;
     }
 
-    private static inline function isCleanValue(n: Float):Bool {
+    private static inline function isCleanValue(n: Null<Float>):Bool {
         return (
             (n != null) &&
             (n is Float) &&
@@ -225,7 +226,7 @@ class Rect <T:Float> {
 		y -= Math.round(dh / 2);
 	}
 
-	public function scale(?sw:T, ?sh:T):Rect<T> {
+	public function scale(?sw:Null<T>, ?sh:Null<T>):Rect<T> {
 	    var ratio:Float;
 	    if (sw != null) {
 	        ratio = (sw / width);
@@ -373,7 +374,9 @@ class Rect <T:Float> {
 /* === Instance Fields === */
 
 #if !js
+
 	private var d : DataView<T>;
+
 #else
     public var x : T;
     public var y : T;

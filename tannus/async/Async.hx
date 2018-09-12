@@ -9,8 +9,8 @@ abstract Async<T> (Cb<T>->Void) from Cb<T>->Void {
 
     @:to
     public function promise():Promise<T> {
-        return new Promise(function(_yield, _raise) {
-            this(function(?error, ?result) {
+        return new Promise<T>(function(_yield, _raise) {
+            this(function(?error:Null<Dynamic>, ?result:Null<T>) {
                 if (error != null)
                     return _raise( error );
                 else {

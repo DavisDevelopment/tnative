@@ -41,7 +41,7 @@ abstract Anon<T> (Dynamic<T>) from Dynamic<T> to Dynamic<T> {
     public function iterator():Iterator<T> return keys().iterator().map(k->get(k));
 
     @:op(A << B)
-    public function assign<T>(right: Anon<T>):Anon<T> {
+    public function assign(right: Anon<T>):Anon<T> {
         #if js
         return untyped __js__('Object.assign({0}, {1})', this, right);
         #else

@@ -113,7 +113,7 @@ class Promise<T> implements Thenable<T, Promise<T>> {
       */
     public function transform<TOut>(transformer:T->PromiseResolution<TOut>, ?nomake:Bool):Promise<TOut> {
         return derive(function(_from, resolve, reject) {
-            _from.then((result) -> resolve(untyped transformer( result )), reject);
+            _from.then((result) -> resolve(cast transformer( result )), reject);
         }, nomake);
     }
 
@@ -375,9 +375,16 @@ class Promise<T> implements Thenable<T, Promise<T>> {
     }
 
     public static function pair<A, B>(resPair : Pair<PromiseResolution<A>, PromiseResolution<B>>):Promise<Pair<A, B>> {
-        return all(untyped [resolve(resPair.left), resolve(resPair.right)]).transform(function(a : Array<Dynamic>) {
-            return untyped (new Pair(untyped a[0], untyped a[1]));
+        return all([
+            (cast resolve(resPair.left) : Promise<Dynamic>),
+            (cast resolve(resPair.right) : Promise<Dynamic>)
+        ])
+        .map(function(a: Array<Dynamic>):Pair<A, B> {
+            return new Pair((a[0] : A), (a[1] : B));
         });
+        //.transform(function(a : Array<Dynamic>) {
+            //return untyped (new Pair(untyped a[0], untyped a[1]));
+        //});
     }
 
     public static function result<T>(prom: Promise<T>):Promise<Result<T, Dynamic>> {
@@ -537,6 +544,7 @@ class Promise<T> implements Thenable<T, Promise<T>> {
                     case 'forward':
                         return macro $expr.then($yes, $no);
 
+                    /*
                     case 'promise':
                         var _cast:Bool = false;
                         var _untyped:Bool = false;
@@ -575,6 +583,7 @@ class Promise<T> implements Thenable<T, Promise<T>> {
                             default:
                                 throw 'Error: Invalid use @promise in Promise.create';
                         }
+                    */
 
                     case 'exec':
                         var ecfg:BuildConfig = {nomake:cfg.nomake, names:[macro resolve, macro reject]};

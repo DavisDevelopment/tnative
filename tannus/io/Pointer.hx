@@ -276,13 +276,13 @@ private class Ref<T> {
 		setter = s;
 		deleter = d;
 
-		#if js
+		#if (js && !macro)
 		function prop(n : String) {
 			defineGetter(n, get);
 			defineSetter(n, set);
+			
 		}
-		for (n in ['value', 'v', '_'])
-			prop( n );
+        prop('value');
 		#end
 	}
 
