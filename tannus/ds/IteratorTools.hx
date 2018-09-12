@@ -171,3 +171,13 @@ abstract Itr<T> (Iterator<T>) from Iterator<T> to Iterator<T> {
         return CompoundIter.build( ia );
     }
 }
+
+class FwdItr<T> {
+    public function new(i: Itr<T>) {
+        this.i = i;
+    }
+    public function hasNext():Bool return i.hasNext();
+    public function next():T return i.next();
+    var i(default, null): Itr<T>;
+}
+
