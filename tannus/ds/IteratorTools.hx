@@ -197,6 +197,55 @@ class RefItr<T> {
     var i(default, null): Ref<Itr<T>>;
 }
 
+class FilterItr<T> extends RefItr<T> {
+    public function new(i:Itr<T>, pred:T->Bool) {
+        super(Ref.const(i));
+        predicate = pred;
+        _next = null;
+    }
+
+    override function hasNext():Bool {
+        if (_next != null)
+            return true;
+        if (i.get().hasNext()) {
+            _next = i.get().next();
+            if (!predicate(_next)) {
+                _next = null;
+                return hasNext();
+            }
+            return true;
+        }
+        return false;
+    }
+
+    override function next():T {
+        var ret:Null<T> = null;
+        if (_next != null) {
+            ret = _next;
+            _next = null;
+            return ret;
+        }
+        else {
+            var it = i.get();
+            if (!it.hasNext())
+                throw 'IteratorError';
+            ret = it.next();
+
+            if (predicate( ret )) {
+                return ret;
+            }
+
+            if (hasNext()) {
+                return next();
+            }
+        }
+        return ret;
+    }
+
+    var predicate(default, null): T->Bool;
+    var _next(default, null): Null<T>;
+}
+
 class FlatItr<T> {
     public function new(src: Itr<Itr<T>>) {
         i2 = src;
