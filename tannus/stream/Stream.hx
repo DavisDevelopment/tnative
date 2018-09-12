@@ -76,6 +76,28 @@ abstract Stream<Item, Quality> (StreamObject<Item, Quality>) from StreamObject<I
 /* === Casting === */
 }
 
+abstract RealStream<T> (Stream<T, Dynamic>) to Stream<T, Dynamic> {
+    private inline function new(i: StreamObject<T, Dynamic>) {
+        this = i;
+    }
+
+    @:from
+    public static inline function wrap<T, Q>(s: Stream<T, Q>):RealStream<T> {
+        return cast new RealStream(cast(s, StreamObject<Dynamic, Dynamic>));
+    }
+}
+
+class ConcreteStream<T> extends ForwardStream<T, Dynamic> {
+    /* Constructor Function */
+    public function new(s: Stream<T, Dynamic>):Void {
+        super( s );
+    }
+
+    public static function make<I, Q>(src: Stream<I, Q>):ConcreteStream<I> {
+        return new ConcreteStream((src : Stream<I, Dynamic>));
+    }
+}
+
 class ErrorStream<Item, Error> extends StreamBase<Item, Error> {
     var error: Error;
     public function new(error) {
