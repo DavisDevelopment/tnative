@@ -197,3 +197,76 @@ class RefItr<T> {
     var i(default, null): Ref<Itr<T>>;
 }
 
+class FlatItr<T> {
+    public function new(src: Itr<Itr<T>>) {
+        i2 = src;
+        i = Itr.empty();
+    }
+
+    public function hasNext():Bool {
+        switch [i, i2] {
+            case [null, _]:
+                return false;
+
+            case [_, _]: 
+                switch [i.hasNext(), i2.hasNext()] {
+                    case [true, _]:
+                        return true;
+
+                    case [false, true]:
+                        i = i2.next();
+                        return (i.hasNext() || hasNext());
+
+                    case [false, false]:
+                        i = null;
+                        return false;
+
+                    case _:
+                        return true;
+                }
+        }
+    }
+
+    public function next():T {
+        if (i == null)
+            throw 'IteratorError';
+        if (!i.hasNext()) {
+            if (i2.hasNext()) {
+                i = i2.next();
+                return next();
+            }
+            else {
+                i = null;
+            }
+        }
+        return i.next();
+    }
+
+    var i2(default, null): Itr<Itr<T>>;
+    var i(default, null): Null<Itr<T>>;
+}
+
+//class StepIter<T> extends FwdItr<IStep<T>> {
+    //public function new(i) {
+        //super(Itr.empty());
+
+        //steps = i;
+        //this.i = null;
+        //ended = false;
+    //}
+
+    //override function next():T {
+        //if (i == null)
+
+    //}
+
+    //public var ended(default, null): Bool;
+
+    //var steps(default, null): Itr<IStep<T>>;
+//}
+
+//enum IStep<T> {
+    //Link(val:T, rest:Lazy<Itr<T>>);
+    //Fail(error: Dynamic);
+    //End;
+//}
