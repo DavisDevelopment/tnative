@@ -365,8 +365,10 @@ class ArrayTools {
 	/**
 	  * obtain the intersection of two Arrays
 	  */
-	public static inline function intersection<T>(one:Array<T>, two:Array<T>):Array<T> {
-		return ((one.length < two.length) ? macfilter(one, !two.has( _ )) : macfilter(two, !one.has( _ )));
+	public static function intersection<T>(one:Array<T>, two:Array<T>):Array<T> {
+	    return one.filter(function(item: T):Bool {
+	        return (-1 != two.indexOf( item ));
+	    });
 	}
 
 	/**
