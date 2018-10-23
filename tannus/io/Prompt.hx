@@ -5,6 +5,8 @@ import tannus.async.promises.StringPromise;
 
 using StringTools;
 using tannus.ds.StringUtils;
+using tannus.FunctionTools;
+using tannus.async.Asyncs;
 
 class Prompt {
 	/* Constructor Function */
@@ -156,6 +158,14 @@ class Prompt {
 			}
 			return -1;
 		}, cb);
+	}
+
+	public function readLine():Promise<String> {
+	    return new Promise(function(yes, _) {
+	        getLine(function(line: String) {
+	            yes( line );
+	        });
+	    });
 	}
 	  
 /* === Instance Fields === */
