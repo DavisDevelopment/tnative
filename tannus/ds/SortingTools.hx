@@ -4,12 +4,31 @@ import tannus.math.TMath.*;
 
 import haxe.extern.EitherType;
 
+import haxe.macro.Expr;
+import haxe.macro.Context;
+
 import Reflect.*;
 import Type;
 
 import Slambda.fn;
 
+using Lambda;
+using tannus.ds.ArrayTools;
+using haxe.macro.ExprTools;
+using tannus.macro.MacroTools;
+
 class SortingTools {
+    public static macro function macDrillDown(comparisons: Array<ExprOf<Int>>):ExprOf<Int> {
+        comparisons.reverse();
+        var res:ExprOf<Int> = comparisons.reduceInit(function(res:ExprOf<Int>, e:ExprOf<Int>) {
+            return macro switch ( $e ) {
+                case 0: $res;
+                case c: c;
+            }
+        });
+        return res;
+    }
+
     public static inline function comparison<T>(x:T, y:T):Lazy<Int> {
         return Lazy.ofFunc(function() {
             return compareAny(x, y);
