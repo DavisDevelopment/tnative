@@ -43,7 +43,8 @@ class PromiseTools {
         });
     }
 
-    @:native('_void_')
+    //@:native('_void_')
+    #if !(cpp) @:native('_void') #end
     public static function void<T, Prom:Promise<T>>(prom: Prom):VoidPromise {
         return new VoidPromise(function(y, n) {
             prom.then((x->y()), (x->n(x)));

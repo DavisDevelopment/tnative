@@ -56,9 +56,9 @@ abstract Setter<T> (Set<T>) from Set<T> {
 	}
 
     @:to
-    @:native('_void')
     @:keep
-	public static function void<T>(self: Setter<T>):T -> Void {
+    //@:native('noreturn')
+	public static function noreturn<T>(self: Setter<T>):T -> Void {
 		return (function(x: T):Void {
 		    self( x );
 		    return ;

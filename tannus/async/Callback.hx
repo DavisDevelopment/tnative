@@ -12,10 +12,12 @@ abstract Callback<Result, Error> (?Error->?Result->Void) from ?Error->?Result->V
     }
 
     @:to
-    @:native('_raise')
+    //@:native('_raise')
+    #if !(cpp) @:native('_raise') #end
     public inline function raise():Error->Void return untyped this.bind(_, null);
     @:to
-    @:native('_yield')
+    //@:native('_yield')
+    #if !(cpp) @:native('_yield') #end
     public inline function yield():Result->Void return untyped this.bind(null, _);
     public inline function void(?val:Result, ?err:Error):Void->Void return this.bind(err, val);
     @:to

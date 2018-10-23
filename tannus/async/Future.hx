@@ -448,13 +448,13 @@ abstract FutureResolutionProvider<TRes, TErr> (FrpFunc<TRes, TErr>) from FrpFunc
 
 /* === Instance Methods === */
 
-    @:native('_yield')
+    #if !(cpp) @:native('_yield') #end
     public inline function yield(value: TRes) {
         //give(Result.ResSuccess( value ));
         resolve(Res.value(value));
     }
 
-    @:native('_raise')
+    #if !(cpp) @:native('_raise') #end
     public inline function raise(value: TErr) {
         resolve(Res.error(value));
     }

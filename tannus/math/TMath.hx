@@ -11,10 +11,9 @@ import Std.*;
 import haxe.macro.Expr;
 import haxe.macro.Context;
 
-using StringTools;
-using tannus.ds.StringUtils;
 using haxe.macro.ExprTools;
 using tannus.macro.MacroTools;
+
 using StringTools;
 using tannus.ds.StringUtils;
 

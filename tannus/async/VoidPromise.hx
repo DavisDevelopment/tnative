@@ -345,7 +345,7 @@ class VoidPromise {
 
 /* === Static Methods === */
 
-    @:native('_void')
+    #if !(cpp) @:native('_void') #end
     public static function void(f : Void->Void):VoidPromise {
         return create({
             try {
@@ -358,7 +358,8 @@ class VoidPromise {
         });
     }
 
-    @:native('_raise')
+    //@:native('_raise')
+    #if !(cpp) @:native('_raise') #end
     public static function raise(error: Dynamic):VoidPromise {
         return new VoidPromise(function(_, _throw) {
             _throw( error );
