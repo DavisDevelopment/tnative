@@ -20,6 +20,10 @@ using tannus.FunctionTools;
   */
 @:expose( 'StringTools' )
 class StringUtils {
+    public static inline function append(x:String, y:String):String {
+        return x + y;
+    }
+
 	/**
 	  * Get the Byte at index [i] in String [s]
 	  */
