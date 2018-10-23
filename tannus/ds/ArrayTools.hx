@@ -817,14 +817,31 @@ class ArrayTools {
 	    return !any(items, test.negate());
 	}
 
-    public static function reduce<T, TAcc>(a:Iterable<T>, f:TAcc->T->TAcc, v:TAcc):TAcc {
+	public static inline function fold<T, TAcc>(a:Iterable<T>, acc:TAcc, fn:TAcc->T->TAcc):TAcc {
+	    return reduce(a, fn, acc);
+	}
+
+	public static inline function reduceInit<A>(a:Array<A>, fn:A->A->A):A {
+	    return 
+        if (a.length == 0) null
+        else fold(a, a.shift(), fn);
+	}
+
+    public static inline function reduce<T, TAcc>(a:Iterable<T>, f:TAcc->T->TAcc, v:TAcc):TAcc {
         for (x in a) {
             v = f(v, x);
         }
         return v;
     }
 
-    public static function reducei<T,TAcc>(a:Array<T>, f:TAcc->T->Int->TAcc, v:TAcc):TAcc {
+    /**
+      alias for [reduce] that is never inlined
+     **/
+    public static function nireduce<T, Acc>(a:Iterable<T>, f:Acc->T->Acc, acc:Acc):Acc {
+        return reduce(a, f, acc);
+    }
+
+    public static inline function reducei<T,TAcc>(a:Array<T>, f:TAcc->T->Int->TAcc, v:TAcc):TAcc {
         for (i in 0...a.length)
             v = f(v, a[i], i);
         return v;
@@ -844,6 +861,29 @@ class ArrayTools {
             case _ > 1 => true: two(one(a.shift()), compose(a, two, one));
             default: null;
         }
+    }
+
+    public static inline function mapi<TIn, TOut>(a:Array<TIn>, fn:TIn->Int->TOut):Array<TOut> {
+        var mi:Int = 0;
+        return a.map(function(elem) {
+            return fn(elem, mi++);
+        });
+    }
+
+    public static inline function take<T>(a:Array<T>, n:Int):Array<T> {
+        return a.slice(0, n);
+    }
+
+    public static inline function takeLast<T>(a:Array<T>, n:Int):Array<T> {
+        return a.slice(a.length - n);
+    }
+
+    public static inline function withAppend<T>(a:Array<T>, v:T):Array<T> {
+        return a.concat([v]);
+    }
+
+    public static inline function withPrepend<T>(a:Array<T>, v:T):Array<T> {
+        return [v].concat( a );
     }
 
     /**
