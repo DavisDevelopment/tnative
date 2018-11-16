@@ -14,6 +14,8 @@ using Lambda;
 using tannus.ds.FunctionTools;
 using tannus.FunctionTools;
 
+typedef Itrbls = tannus.ds.IterableTools;
+
 // @:expose( 'ArrayTools' )
 class ArrayTools {
 	/**
@@ -716,16 +718,21 @@ class ArrayTools {
 	/**
 	  * check that [test] returns 'true' for every item in [list]
 	  */
-	public static function every<T>(list:Iterable<T>, test:T->Bool):Bool {
-		for (x in list) {
-			if (!test( x )) {
-				return false;
-			}
-		}
-		return true;
+	#if js inline #end
+	public static function every<T>(arr:Array<T>, test:T->Bool):Bool {
+	    #if js
+	        return untyped arr.every( test );
+        #else
+            for (x in arr) {
+                if (!test( x )) {
+                    return false;
+                }
+            }
+            return true;
+		#end
 	}
 
-	public static macro function macevery<T>(list:ExprOf<Iterable<T>>, test:Expr):ExprOf<Bool> {
+	public static macro function macevery<T>(list:ExprOf<Array<T>>, test:Expr):ExprOf<Bool> {
 		test = test.replace(macro _, macro x);
 		test = test.buildFunction(['x']);
 		return macro tannus.ds.ArrayTools.every($list, $test);
@@ -801,47 +808,84 @@ class ArrayTools {
 		//return macro tannus.ds.ArrayTools.index($list, $keygen);
 	//}
 
+    #if js inline #end
+	public static function find<T>(items:Array<T>, pred:T -> Bool):Null<T> {
+	    #if js
+	    return untyped items.find( pred );
+	    #else
+	    for (x in items)
+	        if (pred( x ))
+	            return x;
+	    return null;
+	    #end
+	}
+
+	#if js inline #end
+	public static function findIndex<T>(items:Array<T>, pred:T->Bool):Int {
+	    #if js
+	    return untyped items.findIndex( pred );
+	    #else
+	    for (i in 0...items.length)
+	        if (pred(items[i]))
+	            return i;
+	    return -1;
+	    #end
+	}
+
 	/**
 	  * Check whether [test] returned true for any of the given items
 	  */
-	public static function any<T>(items:Iterable<T>, test:T->Bool):Bool {
+	#if js inline #end
+	public static function any<T>(items:Array<T>, test:T->Bool):Bool {
+	    #if js
+	    return findIndex(items, test) != -1;
+	    #else
 		for (item in items) {
 			if (test( item )) {
 				return true;
 			}
 		}
 		return false;
+		#end
 	}
 
 	public static function all<T>(items:Iterable<T>, test:T->Bool):Bool {
-	    return !any(items, test.negate());
+	    return !IterableTools.any(items, test.negate());
 	}
 
-	public static inline function fold<T, TAcc>(a:Iterable<T>, acc:TAcc, fn:TAcc->T->TAcc):TAcc {
+	public static inline function fold<T, TAcc>(a:Array<T>, acc:TAcc, fn:TAcc->T->TAcc):TAcc {
 	    return reduce(a, fn, acc);
 	}
 
 	public static inline function reduceInit<A>(a:Array<A>, fn:A->A->A):A {
+	    #if js
+	    return untyped a.reduce( fn );
+	    #else
 	    return 
         if (a.length == 0) null
         else fold(a, a.shift(), fn);
+        #end
 	}
 
-    public static inline function reduce<T, TAcc>(a:Iterable<T>, f:TAcc->T->TAcc, v:TAcc):TAcc {
+    public static inline function reduce<T, TAcc>(a:Array<T>, f:TAcc->T->TAcc, v:TAcc):TAcc {
+        #if js
+        return untyped a.reduce(f, v);
+        #else
         for (x in a) {
             v = f(v, x);
         }
         return v;
+        #end
     }
 
     /**
       alias for [reduce] that is never inlined
      **/
-    public static function nireduce<T, Acc>(a:Iterable<T>, f:Acc->T->Acc, acc:Acc):Acc {
+    public static function nireduce<T, Acc>(a:Array<T>, f:Acc->T->Acc, acc:Acc):Acc {
         return reduce(a, f, acc);
     }
 
-    public static inline function reducei<T,TAcc>(a:Array<T>, f:TAcc->T->Int->TAcc, v:TAcc):TAcc {
+    public static inline function reducei<T, TAcc>(a:Array<T>, f:TAcc->T->Int->TAcc, v:TAcc):TAcc {
         for (i in 0...a.length)
             v = f(v, a[i], i);
         return v;
@@ -868,6 +912,17 @@ class ArrayTools {
         return a.map(function(elem) {
             return fn(elem, mi++);
         });
+    }
+
+    public static inline function iter<T>(a:Array<T>, fn:T->Void):Void {
+        #if js
+        untyped {
+            a.forEach( fn );
+        }
+        #else
+        for (x in a)
+            fn( x );
+        #end
     }
 
     public static inline function take<T>(a:Array<T>, n:Int):Array<T> {
