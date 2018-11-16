@@ -273,7 +273,7 @@ abstract Url (UrlType) from UrlType to UrlType {
                     #if js
                     js.Lib.rethrow();
                     #elseif neko
-                    neko.Lib.rethrow();
+                    neko.Lib.rethrow( o );
                     #elseif cs
                     cs.Lib.rethrow();
                     #elseif cpp
@@ -286,7 +286,7 @@ abstract Url (UrlType) from UrlType to UrlType {
             #if js
             js.Lib.rethrow();
             #elseif neko
-            neko.Lib.rethrow();
+            neko.Lib.rethrow( error );
             #elseif cs
             cs.Lib.rethrow();
             #elseif cpp
