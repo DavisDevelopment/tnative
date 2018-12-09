@@ -645,7 +645,7 @@ class LinkedPoint extends TPoint {
         inline function desc(ref:Ptr<Float>) {
             return {get: function() return ref.get(), set: function(v) return ref.set(v)};
         }
-        defineProperties(untyped {
+        this.defineProperties(untyped {
             x: desc( rx ),
             y: desc( ry ),
             z: desc( rz )

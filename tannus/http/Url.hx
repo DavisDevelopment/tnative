@@ -275,9 +275,9 @@ abstract Url (UrlType) from UrlType to UrlType {
                     #elseif neko
                     neko.Lib.rethrow( o );
                     #elseif cs
-                    cs.Lib.rethrow();
+                    cs.Lib.rethrow( o );
                     #elseif cpp
-                    cpp.Lib.rethrow();
+                    cpp.Lib.rethrow( o );
                     #end
                     throw o;
             }
@@ -288,9 +288,9 @@ abstract Url (UrlType) from UrlType to UrlType {
             #elseif neko
             neko.Lib.rethrow( error );
             #elseif cs
-            cs.Lib.rethrow();
+            cs.Lib.rethrow( error );
             #elseif cpp
-            cpp.Lib.rethrow();
+            cpp.Lib.rethrow( error );
             #end
             throw error;
         }
