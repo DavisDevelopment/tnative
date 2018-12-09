@@ -637,9 +637,12 @@ class ArrayTools {
 	/**
 	  * inline sort
 	  */
-	public static function isort<T>(a:Array<T>, f:T->T->Int):Array<T> {
+	public static inline function isort<T>(a:Array<T>, f:T->T->Int):Array<T> {
 	    haxe.ds.ArraySort.sort(a, f);
 	    return a;
+	}
+	public static inline function sorted<T>(a:Array<T>, f:T->T->Int):Array<T> {
+	    return isort(a.copy(), f);
 	}
 
 	/**
