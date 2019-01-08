@@ -6,12 +6,13 @@ import tannus.ds.Destructible;
 
 import tannus.ds.tuples.Tup2;
 // import tannus.ds.Object;
+#if js
+import  tannus.html.JSTools.*;
+#end
 
 import haxe.macro.Expr;
 
 using tannus.macro.MacroTools;
-
-#if js using tannus.html.JSTools; #end
 
 @:generic
 abstract Pointer<T> (Ref<T>) from Ref<T> {
@@ -278,8 +279,8 @@ private class Ref<T> {
 
 		#if (js && !macro)
 		function prop(n : String) {
-			defineGetter(n, get);
-			defineSetter(n, set);
+			defineGetter(this, n, get);
+			defineSetter(this, n, set);
 			
 		}
         prop('value');

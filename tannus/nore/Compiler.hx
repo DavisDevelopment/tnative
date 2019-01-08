@@ -28,7 +28,7 @@ class Compiler {
 	public function compileString(s : String):CheckFunction {
 		var l = new Lexer();
 		for (s in operators.keys()) {
-			l.operator( s );
+			l.op( s );
 		}
 		var p = new Parser();
 		var toks = l.lex( s );
@@ -225,8 +225,8 @@ class Compiler {
 				return false;
 			}
 		}
-		operator('==', eq);
-		operator('!=', function(x:Dynamic, y:Dynamic):Bool {
+		oper('==', eq);
+		oper('!=', function(x:Dynamic, y:Dynamic):Bool {
 			return !eq(x, y);
 		});
 
@@ -245,12 +245,12 @@ class Compiler {
 				return false;
 		}
 
-		operator('>', greaterThan);
-		operator('<', lessThan);
-		operator('>=', function(x, y) {
+		oper('>', greaterThan);
+		oper('<', lessThan);
+		oper('>=', function(x, y) {
 			return (greaterThan(x, y) || eq(x, y));
 		});
-		operator('<=', function(x, y) {
+		oper('<=', function(x, y) {
 			return (lessThan(x, y) || eq(x, y));
 		});
 		
@@ -265,8 +265,8 @@ class Compiler {
 				return false;
 			}
 		}
-		operator('has', has);
-		operator('contains', has);
+		oper('has', has);
+		oper('contains', has);
 
 		function regtest(x:Dynamic, y:Dynamic):Bool {
 			switch ([x, y].map(Tt.typename.bind(_))) {
@@ -279,7 +279,7 @@ class Compiler {
 			}
 		}
 
-		operator('~=', regtest);
+		oper('~=', regtest);
 	}
 
 	/**
@@ -292,7 +292,7 @@ class Compiler {
 	/**
 	  * Add a new operator
 	  */
-	public inline function operator(name:String, f:OperatorFunction):Void {
+	public inline function oper(name:String, f:OperatorFunction):Void {
 		operators.set(name, f);
 	}
 
