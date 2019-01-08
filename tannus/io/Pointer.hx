@@ -248,7 +248,7 @@ abstract Pointer<T> (Ref<T>) from Ref<T> {
 		return macro (function() {
 			var _v = $val;
 			return new tannus.io.Pointer(tannus.io.Getter.create(_v), tannus.io.Setter.create(_v));
-		}());
+		})();
 	}
 
 	public static macro function dual<T>(gref:ExprOf<T>, sref:ExprOf<T>):ExprOf<Pointer<T>> {
