@@ -6,6 +6,7 @@ import tannus.io.Signal;
 import tannus.ds.Delta;
 import tannus.ds.Maybe;
 import tannus.ds.Ref;
+import tannus.ds.Lazy;
 
 import tannus.storage.Commit;
 
@@ -22,7 +23,8 @@ class Storage {
 		commits = new Array();
 		deleted = new Array();
 		_ready = false;
-		_remote_commit = new Ref( _remoteCommitSignal );
+		//_remote_commit = new Ref( _remoteCommitSignal );
+		_remote_commit = Lazy.ofFunc(_remoteCommitSignal);
 	}
 
 /* === Frontend Instance Methods === */
@@ -310,7 +312,7 @@ class Storage {
 	private var _ready : Bool;
 
 	/* signal for listening to remote changes */
-	private var _remote_commit : Ref<Signal<Commit>>;
+	private var _remote_commit : Lazy<Signal<Commit>>;
 
 /* === Static Methods === */
 

@@ -138,11 +138,20 @@ abstract Url (UrlType) from UrlType to UrlType {
         };
     }
 
+    // {protocol:String, slashes:Bool, auth:String, hostName:String, port:Null<Int>, pathName:String, queryString:QueryString, search:String, hash:String}
+    public static inline function construct(url: {protocol:String, slashes:Bool, auth:String, hostName:String, port:Null<Int>, pathName:String, queryString:QueryString, search:String, hash:String}):Url {
+        return url;
+    }
+
     /**
       factory method
      **/
     public static inline function create(?proto:Null<String>, host:Null<String>, ?port:Int, ?path:String, ?query:Either<QueryString, String>, ?hash:String):Url {
         return fromNullableUrl(_n(proto, host, port, path, query, hash));
+    }
+
+    public static inline function make(init: {?protocol:String, ?host:String, ?port:Int, ?path:String, ?query:Either<QueryString, String>, ?hash:String}):Url {
+        return create(init.protocol, init.host, init.port, init.path, init.query, init.hash);
     }
 
     @:from
@@ -479,8 +488,8 @@ abstract Url (UrlType) from UrlType to UrlType {
     inline function set_slashes(value : Bool) return this.slashes = value;
 }
 
+//'http://user:pass@host.com:8080/p/a/t/h?query=string#hash'
 typedef UrlType = {
-    //'http://user:pass@host.com:8080/p/a/t/h?query=string#hash'
     protocol : String,
     slashes: Bool,
     auth: String,

@@ -40,7 +40,7 @@ class FilePromise extends Promise<WebFile> {
 	  * get the writer for [this] File
 	  */
 	public function writer():Promise<WebFileWriter> {
-		return Promise.create(withentry(@forward _.writer()));
+		return Promise.create(this.withentry(@forward _.writer()));
 	}
 
 	/**

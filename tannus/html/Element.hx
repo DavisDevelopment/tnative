@@ -241,12 +241,12 @@ abstract Element (JQuery) from JQuery to JQuery {
 	/* invoke a plugin method on [this] Element */
 	public function plugin<T>(name:String, ?arguments:Array<Dynamic>):T {
 		if (arguments == null) arguments = new Array();
-		return callMethod(getProperty( name ), arguments);
+		return callMethod(this, getProperty(this, name), arguments);
 	}
 
 	/* get a Function for the requested method, already bound to [this] */
 	public function method<T:Function>(name : String):T {
-		var _f:Dynamic = callMethod.bind(getProperty( name ), _).makeVarArgs();
+		var _f:Dynamic = callMethod.bind(this, getProperty(this, name), _).makeVarArgs();
 		return untyped _f;
 	}
 
