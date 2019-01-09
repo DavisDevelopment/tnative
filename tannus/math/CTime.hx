@@ -40,12 +40,12 @@ class CTime implements IComparable<CTime> {
         return new Time(seconds, minutes, hours, days);
     }
 
-    private static function op(operator:Float->Float->Float, x:Time, y:Time):Time {
-        return fromSeconds(operator(x.totalSeconds, y.totalSeconds));
+    private static function op(oper:Float->Float->Float, x:Time, y:Time):Time {
+        return fromSeconds(oper(x.totalSeconds, y.totalSeconds));
     }
 
-    private function iop(operator:Float->Float->Float, x:Time):Time {
-        (totalSeconds = operator(totalSeconds, x.totalSeconds));
+    private function iop(oper:Float->Float->Float, x:Time):Time {
+        (totalSeconds = oper(totalSeconds, x.totalSeconds));
         return this;
     }
 
