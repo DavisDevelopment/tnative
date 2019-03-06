@@ -81,7 +81,7 @@ abstract Byte (Int) from Int to Int {
 	  * Check whether [this] Byte is an uppercase Letter
 	  */
 	public inline function isUppercase():Bool {
-	    return inRange(65, 90);
+	    return M.inRange(this, 65, 90);
 		//return (this >= 65 && this <= 90);
 	}
 
@@ -89,7 +89,7 @@ abstract Byte (Int) from Int to Int {
 	  * Check whether [this] Byte is a lowercase letter
 	  */
 	public inline function isLowercase():Bool {
-	    return inRange(97, 122);
+	    return M.inRange(this, 97, 122);
 		//return (this >= 97 && this <= 122);
 	}
 

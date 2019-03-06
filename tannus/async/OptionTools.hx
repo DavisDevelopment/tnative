@@ -33,6 +33,16 @@ class OptionTools {
             case Some(v): v;
         };
     }
+
+    public static function extract<T>(o:Option<T>, ?failure:Dynamic):T {
+        if (failure == null)
+            failure = 'Failed to extract a value from $o';
+        return switch o {
+            case Some(x): x;
+            case None: throw failure;
+        }
+    }
+
     public static inline function ifSome<T>(o:Option<T>, f:T->Void) {
         switch o {
             case Some(v): f(v);

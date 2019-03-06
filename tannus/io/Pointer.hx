@@ -6,12 +6,13 @@ import tannus.ds.Destructible;
 
 import tannus.ds.tuples.Tup2;
 // import tannus.ds.Object;
+#if js
+import  tannus.html.JSTools.*;
+#end
 
 import haxe.macro.Expr;
 
 using tannus.macro.MacroTools;
-
-#if js using tannus.html.JSTools; #end
 
 @:generic
 abstract Pointer<T> (Ref<T>) from Ref<T> {
@@ -248,7 +249,7 @@ abstract Pointer<T> (Ref<T>) from Ref<T> {
 		return macro (function() {
 			var _v = $val;
 			return new tannus.io.Pointer(tannus.io.Getter.create(_v), tannus.io.Setter.create(_v));
-		}());
+		})();
 	}
 
 	public static macro function dual<T>(gref:ExprOf<T>, sref:ExprOf<T>):ExprOf<Pointer<T>> {
@@ -278,8 +279,8 @@ private class Ref<T> {
 
 		#if (js && !macro)
 		function prop(n : String) {
-			defineGetter(n, get);
-			defineSetter(n, set);
+			defineGetter(this, n, get);
+			defineSetter(this, n, set);
 			
 		}
         prop('value');

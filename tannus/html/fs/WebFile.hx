@@ -101,7 +101,11 @@ class WebFile {
 	/* the date for the last time [this] File was modified */
 	public var lastModified(get, never):Date;
 	private inline function get_lastModified():Date {
+	    #if (haxe_ver >= 4)
+		return Date.fromTime( file.lastModified );
+		#else
 		return file.lastModifiedDate;
+		#end
 	}
 
 #if (node || node_webkit || electron)

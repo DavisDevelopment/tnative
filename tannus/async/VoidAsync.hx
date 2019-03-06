@@ -17,4 +17,18 @@ abstract VoidAsync (VoidCb->Void) from VoidCb->Void to VoidCb->Void {
             });
         });
     }
+
+    @:from
+    public static inline function fromVoid(fn: Void->Void):VoidAsync {
+        return new VoidAsync(function(callback: VoidCb) {
+            var error = null;
+            try {
+                fn();
+            }
+            catch (err: Dynamic) {
+                error = err;
+            }
+            callback( error );
+        });
+    }
 }

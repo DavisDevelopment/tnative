@@ -67,7 +67,7 @@ class CompileTime {
 			var __now = $ctime;
 			$action;
 			return Std.int($ctime - __now);
-		}());
+		})();
 	}
 
 	/**

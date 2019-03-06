@@ -19,10 +19,10 @@ class Lexer {
 		reset();
 		operators = new Array();
 
-		operator( '=>' );
-		operator( 'is' );
-		operator( 'has' );
-		operator( 'contains' );
+		op( '=>' );
+		op( 'is' );
+		op( 'has' );
+		op( 'contains' );
 	}
 
 /* === Instance Methods === */
@@ -30,8 +30,8 @@ class Lexer {
 	/**
 	  * Add an operator to [this]'s registry
 	  */
-	public inline function operator(op : String):Void {
-		operators.push( op );
+	public inline function op(oper : String):Void {
+		operators.push( oper );
 	}
 
 	/**

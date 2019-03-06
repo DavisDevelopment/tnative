@@ -98,6 +98,14 @@ class TMath {
 
 	public static inline function fixed(n:Float, c:Int=0):Float return Std.parseFloat(toFixed(n, c));
 
+    public inline static function toPrecision(n:Float, precision:Int = 2):Float {
+        return (
+            int( n ) + 
+            int((n - int( n )) * pow(10, precision)) /
+            pow(10, precision)
+        );
+    }
+
 	#if !js @:generic #end
 	inline public static function max<T:Float> (a :T, b :T) :T
 	{

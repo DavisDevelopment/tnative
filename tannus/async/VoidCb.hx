@@ -92,4 +92,11 @@ abstract VoidCb (?Dynamic->Void) from ?Dynamic->Void {
     
     public var f(get, never):?Dynamic->Void;
     private inline function get_f():?Dynamic->Void return this;
+
+    @:from
+    public static inline function fromVoid(fn: Void -> Void):VoidCb {
+        return new VoidCb(function(?_:Dynamic) {
+            return fn();
+        });
+    }
 }
